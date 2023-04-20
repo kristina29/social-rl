@@ -1,0 +1,9 @@
+datasets/
+thesis/thesis-blx.bib
+thesis/thesis.aux
+thesis/thesis.log
+thesis/thesis.out
+thesis/thesis.run.xml
+thesis/thesis.synctex.gz
+thesis/.DS_Store
+.DS_Store
