@@ -8,3 +8,5 @@ thesis/thesis.run.xml
 thesis/thesis.synctex.gz
 thesis/.DS_Store
 .DS_Store
+src/.idea/
+src/.ipynb_checkpoints/
