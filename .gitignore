@@ -10,3 +10,4 @@ thesis/.DS_Store
 .DS_Store
 src/.idea/
 src/.ipynb_checkpoints/
+src/__pycache__/

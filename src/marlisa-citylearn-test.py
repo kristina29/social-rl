@@ -1,16 +1,67 @@
+from matplotlib import pyplot as plt
 
+from citylearn.citylearn import CityLearnEnv
 
-# Load dataset
+from citylearn.data import DataSet
+from citylearn.agents.marlisa import MARLISA
+from utils import set_schema_buildings, set_schema_simulation_period, set_active_observations, plot_simulation_summary
 
-# Building data file
+DATASET_NAME = 'citylearn_challenge_2022_phase_all'
+schema = DataSet.get_schema(DATASET_NAME)
 root_directory = schema['root_directory']
 
-# change the suffix number in the next code line to a
-# number between 1 and 17 to preview other buildings
-building_name = 'Building_1'
+RANDOM_SEED = 0
+print('Random seed:', RANDOM_SEED)
 
-filename = schema['buildings'][building_name]['energy_simulation']
-filepath = os.path.join(root_directory, filename)
-building_data = pd.read_csv(filepath)
-print(building_data.head())
+# edit next code line to change number of buildings in simulation
+building_count = 2
 
+ # edit next code line to change number of days in simulation
+day_count = 7
+
+# edit next code line to change active observations in simulation
+active_observations = ['hour']
+
+schema, buildings = set_schema_buildings(schema, building_count, RANDOM_SEED)
+schema, simulation_start_time_step, simulation_end_time_step = set_schema_simulation_period(schema, day_count,
+                                                                                            RANDOM_SEED, root_directory)
+schema, active_observations = set_active_observations(schema, active_observations)
+
+print('Selected buildings:', buildings)
+print(
+    f'Selected {day_count}-day period time steps:',
+    (simulation_start_time_step, simulation_end_time_step)
+)
+print(f'Active observations:', active_observations)
+
+schema['central_agent'] = False
+env = CityLearnEnv(schema)
+
+marlisa_model = MARLISA(env)
+
+# ----------------- CALCULATE NUMBER OF TRAINING EPISODES -----------------
+marlisa_episodes = 2
+print('Number of episodes to train:', marlisa_episodes)
+
+# ------------------------------- TRAIN MODEL -----------------------------
+marlisa_model.learn(episodes=marlisa_episodes, deterministic_finish=True)
+
+observations = env.reset()
+marlisa_actions_list = []
+
+while not env.done:
+    actions = marlisa_model.predict(observations, deterministic=True)
+    observations, _, _, _ = env.step(actions)
+    marlisa_actions_list.append(actions)
+
+plot_simulation_summary(
+    {'MARLISA': env}
+)
+
+#fig = plot_actions(sacr_actions_list, 'SAC Actions using Custom Reward')
+plt.show()
+
+#dataset_name = 'citylearn_challenge_2022_phase_1'
+#env = CityLearnEnv(dataset_name)
+#model = MARLISA(env)
+#model.learn(episodes=2, deterministic_finish=True)
