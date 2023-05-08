@@ -13,3 +13,5 @@ src/.ipynb_checkpoints/
 src/__pycache__/
 src/citylearn/data/
 src/citylearn/assets/
+src/citylearn/__pycache__/
+src/citylearn/agents/__pycache__/
