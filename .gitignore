@@ -11,3 +11,5 @@ thesis/.DS_Store
 src/.idea/
 src/.ipynb_checkpoints/
 src/__pycache__/
+src/citylearn/data/
+src/citylearn/assets/
