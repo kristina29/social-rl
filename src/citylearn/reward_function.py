@@ -71,7 +71,8 @@ class MARL(RewardFunction):
 
         district_electricity_consumption = self.env.net_electricity_consumption[self.env.time_step]
         building_electricity_consumption = np.array([b.net_electricity_consumption[b.time_step]*-1 for b in self.env.buildings])
-        reward = np.sign(building_electricity_consumption)*0.01*building_electricity_consumption**2*np.nanmax(0, district_electricity_consumption)
+        district_electricity_consumption = np.array([district_electricity_consumption, 0])
+        reward = np.sign(building_electricity_consumption)*0.01*building_electricity_consumption**2*np.nanmax(district_electricity_consumption)
         return reward.tolist()
 
 class IndependentSACReward(RewardFunction):

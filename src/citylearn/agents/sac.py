@@ -222,9 +222,6 @@ class SAC(RLC):
         return (reward - self.r_norm_mean[index])/self.r_norm_std[index]
 
     def get_normalized_observations(self, index: int, observations: List[float]) -> npt.NDArray[np.float64]:
-        print(np.array(observations, dtype = float))
-        print(self.norm_mean[index])
-        print(self.norm_std[index])
         return (np.array(observations, dtype = float) - self.norm_mean[index])/self.norm_std[index]
 
     def get_encoded_observations(self, index: int, observations: List[float]) -> npt.NDArray[np.float64]:

@@ -4,6 +4,7 @@ from citylearn.citylearn import CityLearnEnv
 
 from citylearn.data import DataSet
 from citylearn.agents.marlisa import MARLISA
+from citylearn.reward_function import MARL
 from utils import set_schema_buildings, set_schema_simulation_period, set_active_observations, plot_simulation_summary
 
 DATASET_NAME = 'citylearn_challenge_2022_phase_all'
@@ -14,13 +15,14 @@ RANDOM_SEED = 0
 print('Random seed:', RANDOM_SEED)
 
 # edit next code line to change number of buildings in simulation
-building_count = 2
+building_count = 5
 
  # edit next code line to change number of days in simulation
-day_count = 7
+day_count = 28
 
 # edit next code line to change active observations in simulation
-active_observations = ['hour']
+active_observations = ['hour', 'outdoor_dry_bulb_temperature', 'outdoor_dry_bulb_temperature_predicted_6h',
+                       'direct_solar_irradiance', 'net_electricity_consumption']
 
 schema, buildings = set_schema_buildings(schema, building_count, RANDOM_SEED)
 schema, simulation_start_time_step, simulation_end_time_step = set_schema_simulation_period(schema, day_count,
@@ -36,8 +38,9 @@ print(f'Active observations:', active_observations)
 
 schema['central_agent'] = False
 env = CityLearnEnv(schema)
+env.reward_function = MARL(env)
 
-marlisa_model = MARLISA(env)
+marlisa_model = MARLISA(env, start_training_time_step=50, information_sharing=True)
 
 # ----------------- CALCULATE NUMBER OF TRAINING EPISODES -----------------
 marlisa_episodes = 2

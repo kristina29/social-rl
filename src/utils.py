@@ -228,7 +228,7 @@ def plot_building_kpis(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
 
     kpis = pd.concat(kpis_list, ignore_index=True, sort=False)
     kpi_names = kpis['kpi'].unique()
-    column_count_limit = 3
+    column_count_limit = 8
     row_count = math.ceil(len(kpi_names) / column_count_limit)
     column_count = min(column_count_limit, len(kpi_names))
     building_count = len(kpis['name'].unique())
@@ -336,7 +336,7 @@ def plot_building_load_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
     """
 
     building_count = len(list(envs.values())[0].buildings)
-    column_count_limit = 4
+    column_count_limit = 8
     row_count = math.ceil(building_count / column_count_limit)
     column_count = min(column_count_limit, building_count)
     figsize = (4.0 * column_count, 1.75 * row_count)
@@ -421,7 +421,7 @@ def plot_battery_soc_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
     """
 
     building_count = len(list(envs.values())[0].buildings)
-    column_count_limit = 4
+    column_count_limit = 8
     row_count = math.ceil(building_count / column_count_limit)
     column_count = min(column_count_limit, building_count)
     figsize = (4.0 * column_count, 1.75 * row_count)
