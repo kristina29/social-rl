@@ -13,10 +13,9 @@
 # print info about current job
 scontrol show job $SLURM_JOB_ID 
 
-# source $HOME/.bashrc
+source $HOME/.bashrc
 
 # insert your commands here
-brew install micromamba
 micromamba activate social-rl
 srun python3 marlisa-citylearn-test.py --use-gpu
 micromamba deactivate
