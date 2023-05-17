@@ -19,6 +19,3 @@ source $HOME/.bashrc
 micromamba activate social-rl
 srun python3 marlisa-citylearn-test.py --use-gpu
 micromamba deactivate
-
-#do not use conda
-#--gres=gpu:2
