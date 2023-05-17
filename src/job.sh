@@ -2,7 +2,7 @@
 #SBATCH --ntasks=1                # Number of tasks (see below)
 #SBATCH --cpus-per-task=5         # Number of CPU cores per task
 #SBATCH --nodes=1                 # Ensure that all cores are on one machine
-#SBATCH --time=0-12:00            # Runtime in D-HH:MM
+#SBATCH --time=0-2:00            # Runtime in D-HH:MM
 #SBATCH --gres=gpu:2    # optionally type and number of gpus
 #SBATCH --mem=100G                # Memory pool for all cores (see also --mem-per-cpu)
 #SBATCH --output=logs/job_%j.out  # File to which STDOUT will be written - make sure this is not on $HOME
@@ -13,7 +13,7 @@
 # print info about current job
 scontrol show job $SLURM_JOB_ID 
 
-source $HOME/.bashrc
+# source $HOME/.bashrc
 
 # insert your commands here
 brew install micromamba
