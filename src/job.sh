@@ -16,8 +16,9 @@ scontrol show job $SLURM_JOB_ID
 source $HOME/.bashrc
 
 # insert your commands here
+brew install micromamba
 micromamba activate social-rl
-srun python3 ../../marlisa-citylearn-test.py --use-gpu
+srun python3 marlisa-citylearn-test.py --use-gpu
 micromamba deactivate
 
 #do not use conda
