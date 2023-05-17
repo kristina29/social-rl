@@ -7,7 +7,7 @@ from citylearn.agents.marlisa import MARLISA
 from citylearn.reward_function import MARL
 from utils import set_schema_buildings, set_schema_simulation_period, set_active_observations, plot_simulation_summary
 
-DATASET_NAME = 'citylearn_challenge_2022_phase_all'
+DATASET_NAME = 'test'
 schema = DataSet.get_schema(DATASET_NAME)
 root_directory = schema['root_directory']
 
@@ -15,7 +15,7 @@ RANDOM_SEED = 0
 print('Random seed:', RANDOM_SEED)
 
 # edit next code line to change number of buildings in simulation
-building_count = 5
+building_count = 4
 
  # edit next code line to change number of days in simulation
 day_count = 28

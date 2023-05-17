@@ -6,6 +6,8 @@ thesis/thesis.log
 thesis/thesis.out
 thesis/thesis.run.xml
 thesis/thesis.synctex.gz
+thesis/thesis.toc
+thesis/thesis.pdf
 thesis/.DS_Store
 .DS_Store
 src/.idea/
@@ -15,3 +17,4 @@ src/citylearn/data/
 src/citylearn/assets/
 src/citylearn/__pycache__/
 src/citylearn/agents/__pycache__/
+LaTeXTemplates_masters-doctoral-thesis_v2/

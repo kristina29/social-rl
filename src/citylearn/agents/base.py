@@ -68,7 +68,6 @@ class Agent(Environment):
     @property
     def action_dimension(self) -> List[int]:
         """Number of returned actions."""
-
         return [s.shape[0] for s in self.action_space]
 
     @property

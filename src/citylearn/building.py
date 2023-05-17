@@ -25,7 +25,7 @@ class Building(Environment):
         observation_metadata : dict
             Mapping of active and inactive observations.
         action_metadata : dict
-            Mapping od active and inactive actions.
+            Mapping of active and inactive actions.
         carbon_intensity : CarbonIntensity, optional
             Carbon dioxide emission rate time series.
         pricing : Pricing, optional
@@ -829,7 +829,6 @@ class Building(Environment):
         """
         
         low_limit, high_limit = [], []
- 
         for key in self.active_actions:
             if key == 'electrical_storage':
                 limit = self.electrical_storage.nominal_power/self.electrical_storage.capacity

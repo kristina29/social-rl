@@ -6,23 +6,27 @@ try:
     from sklearn.decomposition import PCA
     from sklearn.linear_model import LinearRegression
 except (ModuleNotFoundError, ImportError) as e:
-    raise Exception("This functionality requires you to install scikit-learn. You can install scikit-learn by : pip scikit-learn, or for more detailed instructions please visit https://scikit-learn.org/stable/install.html.")
+    raise Exception(
+        "This functionality requires you to install scikit-learn. You can install scikit-learn by : pip scikit-learn, or for more detailed instructions please visit https://scikit-learn.org/stable/install.html.")
 
 try:
     import torch
 except (ModuleNotFoundError, ImportError) as e:
-    raise Exception("This functionality requires you to install torch. You can install torch by : pip install torch torchvision, or for more detailed instructions please visit https://pytorch.org.")
+    raise Exception(
+        "This functionality requires you to install torch. You can install torch by : pip install torch torchvision, or for more detailed instructions please visit https://pytorch.org.")
 
 from citylearn.agents.sac import SAC
 from citylearn.preprocessing import Encoder, NoNormalization, PeriodicNormalization, RemoveFeature
 from citylearn.rl import RegressionBuffer
 
+
 class MARLISA(SAC):
     __COORDINATION_VARIABLE_COUNT = 2
 
     def __init__(
-        self, *args, regression_buffer_capacity: int = None, start_regression_time_step: int = None, 
-        regression_frequency: int = None, information_sharing: bool = None, pca_compression: float = None, iterations: int = None, **kwargs
+            self, *args, regression_buffer_capacity: int = None, start_regression_time_step: int = None,
+            regression_frequency: int = None, information_sharing: bool = None, pca_compression: float = None,
+            iterations: int = None, **kwargs
     ):
         self.__coordination_variables_history = None
         self.information_sharing = information_sharing
@@ -111,7 +115,8 @@ class MARLISA(SAC):
     def iterations(self, iterations: int):
         self.__iterations = 2 if iterations is None else iterations
 
-    def update(self, observations: List[List[float]], actions: List[List[float]], reward: List[float], next_observations: List[List[float]], done: bool):
+    def update(self, observations: List[List[float]], actions: List[List[float]], reward: List[float],
+               next_observations: List[List[float]], done: bool):
         r"""Update replay buffer.
 
         Parameters
@@ -131,14 +136,16 @@ class MARLISA(SAC):
         # Run once the regression model has been fitted
         # Normalize all the observations using periodical normalization, one-hot encoding, or -1, 1 scaling. It also removes observations that are not necessary (solar irradiance if there are no solar PV panels).
 
-        for i, (o, a, r, n, c0, c1) in enumerate(zip(observations, actions, reward, next_observations, self.coordination_variables_history[0], self.coordination_variables_history[1])):
+        for i, (o, a, r, n, c0, c1) in enumerate(
+                zip(observations, actions, reward, next_observations, self.coordination_variables_history[0],
+                    self.coordination_variables_history[1])):
             if self.information_sharing:
                 # update regression buffer
                 variables = np.hstack(np.concatenate((self.get_encoded_regression_variables(i, o), a)))
                 # The targets are the net electricity consumption.
                 target = self.get_encoded_regression_targets(i, n)
                 self.regression_buffer[i].push(variables, target)
-            
+
             else:
                 pass
 
@@ -150,7 +157,7 @@ class MARLISA(SAC):
                 if self.information_sharing:
                     o = np.hstack(np.concatenate((o, c0), dtype=float))
                     n = np.hstack(np.concatenate((n, c1), dtype=float))
-                
+
                 else:
                     pass
 
@@ -169,17 +176,17 @@ class MARLISA(SAC):
             else:
                 pass
 
-            if self.time_step >= self.start_regression_time_step\
-                and (self.regression_flag[i] < 2 or self.time_step%self.regression_frequency == 0):
+            if self.time_step >= self.start_regression_time_step \
+                    and (self.regression_flag[i] < 2 or self.time_step % self.regression_frequency == 0):
                 if self.information_sharing:
                     self.state_estimator[i].fit(self.regression_buffer[i].x, self.regression_buffer[i].y)
-                
+
                 else:
                     pass
 
                 if self.regression_flag[i] < 2:
                     self.regression_flag[i] += 1
-                
+
                 else:
                     pass
 
@@ -198,19 +205,19 @@ class MARLISA(SAC):
 
                     R = np.array([j[2] for j in self.replay_buffer[i].buffer], dtype=float)
                     self.r_norm_mean[i] = np.nanmean(R, dtype=float)
-                    self.r_norm_std[i] = np.nanstd(R, dtype=float)/self.reward_scaling + 1e-5
+                    self.r_norm_std[i] = np.nanstd(R, dtype=float) / self.reward_scaling + 1e-5
 
                     # update buffer with normalization
                     self.replay_buffer[i].buffer = [(
-                        np.hstack(self.pca[i].transform(self.get_normalized_observations(i, o).reshape(1,-1))[0]),
+                        np.hstack(self.pca[i].transform(self.get_normalized_observations(i, o).reshape(1, -1))[0]),
                         a,
                         self.get_normalized_reward(i, r),
-                        np.hstack(self.pca[i].transform(self.get_normalized_observations(i, n).reshape(1,-1))[0]),
+                        np.hstack(self.pca[i].transform(self.get_normalized_observations(i, n).reshape(1, -1))[0]),
                         d
                     ) for o, a, r, n, d in self.replay_buffer[i].buffer]
                     self.pca_flag[i] = True
                     self.normalized[i] = True
-                
+
                 else:
                     pass
 
@@ -231,8 +238,8 @@ class MARLISA(SAC):
                         target_q_values = torch.min(
                             self.target_soft_q_net1[i](n, new_next_actions),
                             self.target_soft_q_net2[i](n, new_next_actions),
-                        ) - self.alpha*new_log_pi
-                        q_target = r + (1 - d)*self.discount*target_q_values
+                        ) - self.alpha * new_log_pi
+                        q_target = r + (1 - d) * self.discount * target_q_values
 
                     # Update Soft Q-Networks
                     q1_pred = self.soft_q_net1[i](o, a)
@@ -252,22 +259,25 @@ class MARLISA(SAC):
                         self.soft_q_net1[i](o, new_actions),
                         self.soft_q_net2[i](o, new_actions)
                     )
-                    policy_loss = (self.alpha*log_pi - q_new_actions).mean()
+                    policy_loss = (self.alpha * log_pi - q_new_actions).mean()
                     self.policy_optimizer[i].zero_grad()
                     policy_loss.backward()
                     self.policy_optimizer[i].step()
 
                     # Soft Updates
-                    for target_param, param in zip(self.target_soft_q_net1[i].parameters(), self.soft_q_net1[i].parameters()):
-                        target_param.data.copy_(target_param.data*(1.0 - self.tau) + param.data*self.tau)
+                    for target_param, param in zip(self.target_soft_q_net1[i].parameters(),
+                                                   self.soft_q_net1[i].parameters()):
+                        target_param.data.copy_(target_param.data * (1.0 - self.tau) + param.data * self.tau)
 
-                    for target_param, param in zip(self.target_soft_q_net2[i].parameters(), self.soft_q_net2[i].parameters()):
-                        target_param.data.copy_(target_param.data*(1.0 - self.tau) + param.data*self.tau)
+                    for target_param, param in zip(self.target_soft_q_net2[i].parameters(),
+                                                   self.soft_q_net2[i].parameters()):
+                        target_param.data.copy_(target_param.data * (1.0 - self.tau) + param.data * self.tau)
 
             else:
                 pass
 
-    def get_post_exploration_prediction(self, observations: List[List[float]], deterministic: bool) -> List[List[float]]:
+    def get_post_exploration_prediction(self, observations: List[List[float]], deterministic: bool) -> List[
+        List[float]]:
         func = {
             True: self.get_post_exploration_actions_with_information_sharing,
             False: self.get_post_exploration_actions_without_information_sharing
@@ -275,7 +285,7 @@ class MARLISA(SAC):
         actions, coordination_variables = func(observations, deterministic)
         self.__coordination_variables_history[0] = deepcopy(self.__coordination_variables_history[1])
         self.__coordination_variables_history[1] = coordination_variables[0:]
-        
+
         return actions
 
     def get_exploration_prediction(self, observations: List[List[float]]) -> List[List[float]]:
@@ -286,18 +296,20 @@ class MARLISA(SAC):
         actions, coordination_variables = func(observations)
         self.__coordination_variables_history[0] = deepcopy(self.__coordination_variables_history[1])
         self.__coordination_variables_history[1] = coordination_variables[0:]
-        
+
         return actions
 
-    def get_post_exploration_actions_with_information_sharing(self, observations: List[List[float]], deterministic: bool) -> Tuple[List[List[float]], List[List[float]]]:
+    def get_post_exploration_actions_with_information_sharing(self, observations: List[List[float]],
+                                                              deterministic: bool) -> Tuple[
+        List[List[float]], List[List[float]]]:
         agent_count = len(self.action_dimension)
         actions = [None for _ in range(agent_count)]
         action_order = list(range(agent_count))
-        next_agent_ixs = [sorted(action_order)[action_order[(i + 1)%agent_count]] for i in range(agent_count)]
-        coordination_variables = [[0.0, 0.0] for _ in range(agent_count)] 
+        next_agent_ixs = [sorted(action_order)[action_order[(i + 1) % agent_count]] for i in range(agent_count)]
+        coordination_variables = [[0.0, 0.0] for _ in range(agent_count)]
         expected_demand = [0.0 for _ in range(agent_count)]
         total_demand = 0.0
-        
+
         for i in range(self.iterations):
             capacity_dispatched = 0.0
 
@@ -305,7 +317,7 @@ class MARLISA(SAC):
                 o = self.get_encoded_observations(c, o)
                 o = np.hstack(np.concatenate((o, coordination_variables[c])))
                 o = self.get_normalized_observations(c, o)
-                o = self.pca[c].transform(o.reshape(1,-1))[0]
+                o = self.pca[c].transform(o.reshape(1, -1))[0]
                 o = torch.FloatTensor(o).unsqueeze(0).to(self.device)
                 result = self.policy_net[i].sample(o)
                 a = result[2] if self.time_step >= self.deterministic_start_time_step or deterministic else result[0]
@@ -317,14 +329,16 @@ class MARLISA(SAC):
                     pass
                 else:
                     total_demand += expected_demand[c] - expected_demand[n]
-                    coordination_variables[n][0] = total_demand/self.total_coefficient
+                    coordination_variables[n][0] = total_demand / self.total_coefficient
 
                 coordination_variables[c][1] = capacity_dispatched
                 capacity_dispatched += self.energy_size_coefficient[c]
-        
+
         return actions, coordination_variables
 
-    def get_post_exploration_actions_without_information_sharing(self, observations: List[List[float]], deterministic: bool) -> Tuple[List[List[float]], List[List[float]]]:
+    def get_post_exploration_actions_without_information_sharing(self, observations: List[List[float]],
+                                                                 deterministic: bool) -> Tuple[
+        List[List[float]], List[List[float]]]:
         agent_count = len(self.action_dimension)
         actions = [None for _ in range(agent_count)]
         coordination_variables = [[0.0, 0.0] for _ in range(agent_count)]
@@ -332,42 +346,46 @@ class MARLISA(SAC):
         for i, o in enumerate(observations):
             o = self.get_encoded_observations(i, o)
             o = self.get_normalized_observations(i, o)
-            o = self.pca[i].transform(o.reshape(1,-1))[0]
+            o = self.pca[i].transform(o.reshape(1, -1))[0]
             o = torch.FloatTensor(o).unsqueeze(0).to(self.device)
             result = self.policy_net[i].sample(o)
             a = result[2] if self.time_step >= self.deterministic_start_time_step or deterministic else result[0]
             a = list(a.detach().cpu().numpy()[0])
             actions[i] = a
-        
+
         return actions, coordination_variables
 
-    def get_exploration_actions_with_information_sharing(self, observations: List[List[float]]) -> Tuple[List[List[float]], List[List[float]]]:
+    def get_exploration_actions_with_information_sharing(self, observations: List[List[float]]) -> Tuple[
+        List[List[float]], List[List[float]]]:
         actions, coordination_variables = self.get_exploration_actions_without_information_sharing(observations)
-    
+
         if self.time_step > self.start_regression_time_step:
             agent_count = len(self.action_dimension)
             action_order = list(range(agent_count))
             np.random.shuffle(action_order)
             expected_demand = [self.predict_demand(i, o, a) for i, (o, a) in enumerate(zip(observations, actions))]
             coordination_variables = [[
-                (sum(expected_demand) - expected_demand[i])/self.total_coefficient,
+                (sum(expected_demand) - expected_demand[i]) / self.total_coefficient,
                 sum([self.energy_size_coefficient[j] for j in action_order[0:action_order.index(i)]])
             ] for i in range(agent_count)]
-        
+
         else:
             pass
-        
+
         return actions, coordination_variables
 
-    def get_exploration_actions_without_information_sharing(self, observations: List[List[float]]) -> Tuple[List[List[float]], List[List[float]]]:
+    def get_exploration_actions_without_information_sharing(self, observations: List[List[float]]) -> Tuple[
+        List[List[float]], List[List[float]]]:
         actions = super().get_exploration_prediction(observations)
         coordination_variables = [[0.0, 0.0] for _ in range(len(self.action_dimension))]
 
         return actions, coordination_variables
 
     def predict_demand(self, index: int, observations: List[float], actions: List[float]) -> float:
-        return self.state_estimator[index].predict(self.get_regression_variables(index, observations, actions).reshape(1, -1))[0]
-    
+        return \
+        self.state_estimator[index].predict(self.get_regression_variables(index, observations, actions).reshape(1, -1))[
+            0]
+
     def get_regression_variables(self, index: int, observations: List[float], actions: List[float]) -> List[float]:
         return np.hstack(np.concatenate((self.get_encoded_regression_variables(index, observations), actions)))
 
@@ -377,21 +395,21 @@ class MARLISA(SAC):
         del o[net_electricity_consumption_ix]
         e = self.regression_encoders[index][0:]
         del e[net_electricity_consumption_ix]
-        
-        return np.array([j for j in np.hstack(e*np.array(o, dtype=float)) if j != None], dtype=float).tolist()
+
+        return np.array([j for j in np.hstack(e * np.array(o, dtype=float)) if j != None], dtype=float).tolist()
 
     def get_encoded_regression_targets(self, index: int, observations: List[float]) -> float:
         net_electricity_consumption_ix = self.observation_names[index].index('net_electricity_consumption')
         o = observations[net_electricity_consumption_ix]
         e = self.regression_encoders[index][net_electricity_consumption_ix]
-        
-        return e*o
+
+        return e * o
 
     def set_pca(self):
         addition = self.__COORDINATION_VARIABLE_COUNT if self.information_sharing else 0
-        
+
         for i, s in enumerate(self.observation_space):
-            n_components = int((self.pca_compression)*(addition + len(self.get_encoded_observations(i, s.low))))
+            n_components = int((self.pca_compression) * (addition + len(self.get_encoded_observations(i, s.low))))
             self.pca[i] = PCA(n_components=n_components)
 
     def set_energy_coefficients(self):
@@ -399,16 +417,16 @@ class MARLISA(SAC):
         self.total_coefficient = 0
 
         for b in self.building_information:
-            coef = b['annual_dhw_demand']/.9 \
-                + b['annual_cooling_demand']/3.5 \
-                    + b['annual_heating_demand']/3.5 \
-                        + b['annual_nonshiftable_electrical_demand'] \
-                            - b['solar_power']*8760/6.0
-            coef = max(0.3*(coef + b['solar_power']*8760/6.0), coef)/8760
+            coef = b['annual_dhw_demand'] / .9 \
+                   + b['annual_cooling_demand'] / 3.5 \
+                   + b['annual_heating_demand'] / 3.5 \
+                   + b['annual_nonshiftable_electrical_demand'] \
+                   - b['solar_power'] * 8760 / 6.0
+            coef = max(0.3 * (coef + b['solar_power'] * 8760 / 6.0), coef) / 8760
             self.energy_size_coefficient.append(coef)
             self.total_coefficient += coef
 
-        self.energy_size_coefficient = [c/self.total_coefficient for c in self.energy_size_coefficient]
+        self.energy_size_coefficient = [c / self.total_coefficient for c in self.energy_size_coefficient]
 
     def set_regression_encoders(self) -> List[List[Encoder]]:
         r"""Get observation value transformers/encoders for use in MARLISA agent internal regression model.
@@ -426,9 +444,9 @@ class MARLISA(SAC):
         encoders = []
         remove_features = [
             'outdoor_dry_bulb_temperature', 'outdoor_dry_bulb_temperature_predicted_6h',
-            'outdoor_dry_bulb_temperature_predicted_12h','outdoor_dry_bulb_temperature_predicted_24h',
+            'outdoor_dry_bulb_temperature_predicted_12h', 'outdoor_dry_bulb_temperature_predicted_24h',
             'outdoor_relative_humidity', 'outdoor_relative_humidity_predicted_6h',
-            'outdoor_relative_humidity_predicted_12h','outdoor_relative_humidity_predicted_24h',
+            'outdoor_relative_humidity_predicted_12h', 'outdoor_relative_humidity_predicted_24h',
             'diffuse_solar_irradiance', 'diffuse_solar_irradiance_predicted_6h',
             'diffuse_solar_irradiance_predicted_12h', 'diffuse_solar_irradiance_predicted_24h',
             'direct_solar_irradiance', 'direct_solar_irradiance_predicted_6h',
@@ -441,10 +459,10 @@ class MARLISA(SAC):
             for i, n in enumerate(o):
                 if n in ['month', 'hour']:
                     e.append(PeriodicNormalization(s.high[i]))
-            
+
                 elif n in remove_features:
                     e.append(RemoveFeature())
-            
+
                 else:
                     e.append(NoNormalization())
 
@@ -459,5 +477,5 @@ class MARLISA(SAC):
     def reset(self):
         super().reset()
         self.__coordination_variables_history = [
-            [[0.0]*self.__COORDINATION_VARIABLE_COUNT for _ in self.action_dimension] for _ in range(2)
+            [[0.0] * self.__COORDINATION_VARIABLE_COUNT for _ in self.action_dimension] for _ in range(2)
         ]

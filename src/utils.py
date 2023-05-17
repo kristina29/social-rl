@@ -42,10 +42,10 @@ def set_schema_buildings(
 
     # remove buildins 12 and 15 as they have pecularities in their data
     # that are not relevant to this tutorial
-    buildings_to_exclude = ['Building_12', 'Building_15']
+    # buildings_to_exclude = ['Building_12', 'Building_15']
 
-    for b in buildings_to_exclude:
-        buildings.remove(b)
+    #for b in buildings_to_exclude:
+    #    buildings.remove(b)
 
     # randomly select specified number of buildings
     buildings = np.random.choice(buildings, size=count, replace=False).tolist()

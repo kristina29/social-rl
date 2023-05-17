@@ -180,8 +180,8 @@ class SAC(RLC):
         """
 
         deterministic = False if deterministic is None else deterministic
-
-        if self.time_step > self.end_exploration_time_step or deterministic:
+        #TODO
+        if self.time_step > 3 or self.time_step > self.end_exploration_time_step or deterministic:
             actions = self.get_post_exploration_prediction(observations, deterministic)
             
         else:
@@ -228,8 +228,10 @@ class SAC(RLC):
         return np.array([j for j in np.hstack(self.encoders[index]*np.array(observations, dtype=float)) if j != None], dtype = float)
 
     def set_networks(self, internal_observation_count: int = None):
+        # e.g. number of coordination variables in MARLISA agent
         internal_observation_count = 0 if internal_observation_count is None else internal_observation_count
 
+        # len(action_dimension) is the number of agents (buildings) -> for each agent, own networks
         for i in range(len(self.action_dimension)):
             observation_dimension = self.observation_dimension[i] + internal_observation_count
             # init networks
