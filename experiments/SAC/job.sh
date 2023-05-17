@@ -17,7 +17,7 @@ source $HOME/.bashrc
 
 # insert your commands here
 micromamba activate social-rl
-srun python3 marlisa-citylearn-test.py --use-gpu
+srun python3 ../../marlisa-citylearn-test.py --use-gpu
 micromamba deactivate
 
 #do not use conda
