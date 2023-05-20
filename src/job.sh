@@ -11,14 +11,11 @@
 #SBATCH --mail-user=kristina.lietz@student.uni-tuebingen.de   # Email to which notifications will be sent
 
 # print info about current job
-scontrol show job $SLURM_JOB_ID 
-
-source $HOME/.bashrc
+scontrol show job $SLURM_JOB_ID
 
 # insert your commands here
+eval "$(micromamba shell hook --shell=bash)"
 micromamba activate social-rl
 srun python3 marlisa-citylearn-test.py --use-gpu
 micromamba deactivate
 
-#do not use conda
-#--gres=gpu:2
