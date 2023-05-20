@@ -18,6 +18,6 @@ source $HOME/.bashrc
 # insert your commands here
 #eval "$(micromamba shell hook --shell=bash)"
 micromamba activate social-rl
-srun python3 src/nonsocial-rl.py -b 4
+srun python3 src/nonsocial-rl.py -b 4 -d 300 -e 64
 micromamba deactivate
 
