@@ -474,7 +474,7 @@ def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], filename):
     """Plots KPIs, load and battery SoC profiles for different control agents.
 
     Parameters
-    ----------
+    -----c-----
     envs: Mapping[str, CityLearnEnv]
         Mapping of user-defined control agent names to environments
         the agents have been used to control.
