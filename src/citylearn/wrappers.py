@@ -224,8 +224,8 @@ class StableBaselines3ObservationWrapper(ObservationWrapper):
 
 class StableBaselines3Wrapper(Wrapper):
     def __init__(self, env: CityLearnEnv):
-        assert env.central_agent, 'The StableBaselines3Wrapper wrapper is compatible only when env.central_agent = True.'\
-            ' First set env.central_agent = True to use this wrapper.'
+        #assert env.central_agent, 'The StableBaselines3Wrapper wrapper is compatible only when env.central_agent = True.'\
+        #    ' First set env.central_agent = True to use this wrapper.'
 
         env = StableBaselines3ActionWrapper(env)
         env = StableBaselines3RewardWrapper(env)

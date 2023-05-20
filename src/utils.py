@@ -4,6 +4,8 @@ from typing import Tuple, List, Mapping
 
 import numpy as np
 import pandas as pd
+from matplotlib.backends.backend_pdf import PdfPages
+
 from citylearn.citylearn import CityLearnEnv
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
@@ -35,17 +37,19 @@ def set_schema_buildings(
     assert 1 <= count <= 15, 'Count must be between 1 and 15.'
 
     # set random seed
-    np.random.seed(seed)
+    if seed is not None:
+        np.random.seed(seed)
 
     # get all building names
     buildings = list(schema['buildings'].keys())
 
     # remove buildins 12 and 15 as they have pecularities in their data
     # that are not relevant to this tutorial
-    # buildings_to_exclude = ['Building_12', 'Building_15']
+    buildings_to_exclude = ['Building_12', 'Building_15']
 
-    #for b in buildings_to_exclude:
-    #    buildings.remove(b)
+    for b in buildings_to_exclude:
+        if b in buildings:
+            buildings.remove(b)
 
     # randomly select specified number of buildings
     buildings = np.random.choice(buildings, size=count, replace=False).tolist()
@@ -262,6 +266,7 @@ def plot_building_kpis(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
                 p.get_width(), ha='left', va='center'
             )
 
+    fig.suptitle('KPIs at building-level', fontsize=16)
     plt.tight_layout()
     return fig
 
@@ -314,6 +319,7 @@ def plot_district_kpis(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
         )
 
     ax.legend(loc='upper left', bbox_to_anchor=(1.3, 1.0), framealpha=0.0)
+    fig.suptitle('KPIs at district-level', fontsize=16)
     plt.tight_layout()
 
     return fig
@@ -348,9 +354,6 @@ def plot_building_load_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
             x = range(len(y))
             ax.plot(x, y, label=k)
 
-        print('i', i)
-        print(len(v.buildings))
-        print('')
         y = v.buildings[i].net_electricity_consumption_without_storage
         ax.plot(x, y, label='Baseline')
         ax.set_title(v.buildings[i].name)
@@ -365,6 +368,7 @@ def plot_building_load_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
         else:
             ax.legend().set_visible(False)
 
+    fig.suptitle('Building-level net electricty consumption profile', fontsize=16)
     plt.tight_layout()
 
     return fig
@@ -401,12 +405,13 @@ def plot_district_load_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
     ax.xaxis.set_major_locator(ticker.MultipleLocator(24))
     ax.legend(loc='upper left', bbox_to_anchor=(1.0, 1.0), framealpha=0.0)
 
+    fig.suptitle('District-level net electricty consumption profile', fontsize=14)
     plt.tight_layout()
     return fig
 
 
 def plot_battery_soc_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
-    """Plots building-level battery SoC profiles fro different control agents.
+    """Plots building-level battery SoC profiles from different control agents.
 
     Parameters
     ----------
@@ -447,12 +452,25 @@ def plot_battery_soc_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
         else:
             ax.legend().set_visible(False)
 
+    fig.suptitle('Building-level battery SoC profiles', fontsize=16)
     plt.tight_layout()
 
     return fig
 
 
-def plot_simulation_summary(envs: Mapping[str, CityLearnEnv]):
+# save all produces figures as pdf
+def save_multi_image(filename):
+    """https://www.tutorialspoint.com/saving-multiple-figures-to-one-pdf-file-in-matplotlib"""
+    pp = PdfPages(filename + '.pdf')
+    fig_nums = plt.get_fignums()
+    figs = [plt.figure(n) for n in fig_nums]
+    for fig in figs:
+        fig.savefig(pp, format='pdf')
+    pp.close()
+    print("Plots saved in file", filename + '.pdf')
+
+
+def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], filename):
     """Plots KPIs, load and battery SoC profiles for different control agents.
 
     Parameters
@@ -462,18 +480,9 @@ def plot_simulation_summary(envs: Mapping[str, CityLearnEnv]):
         the agents have been used to control.
     """
 
-    _ = plot_building_kpis(envs)
-    print('Building-level KPIs:')
-    plt.show()
-    _ = plot_building_load_profiles(envs)
-    print('Building-level load profiles:')
-    plt.show()
-    _ = plot_battery_soc_profiles(envs)
-    print('Battery SoC profiles:')
-    plt.show()
-    _ = plot_district_kpis(envs)
-    print('District-level KPIs:')
-    plt.show()
-    print('District-level load profiles:')
-    _ = plot_district_load_profiles(envs)
-    plt.show()
+    plot_building_kpis(envs)
+    plot_building_load_profiles(envs)
+    plot_battery_soc_profiles(envs)
+    plot_district_kpis(envs)
+    plot_district_load_profiles(envs)
+    save_multi_image(filename)

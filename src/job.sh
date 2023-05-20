@@ -18,6 +18,6 @@ source $HOME/.bashrc
 # insert your commands here
 #eval "$(micromamba shell hook --shell=bash)"
 micromamba activate social-rl
-srun python3 src/marlisa-citylearn-test.py --use-gpu
+srun python3 src/nonsocial-rl.py -o hour -o outdoor_dry_bulb_temperature -d 7 -b 2 -e 2 --use-gpu
 micromamba deactivate
 
