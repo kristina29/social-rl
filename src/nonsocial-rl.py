@@ -120,10 +120,6 @@ def train_sac(schema, episodes, random_seed):
     sac_model = SAC(env=env, seed=random_seed)
     sac_model.learn(episodes=episodes, deterministic_finish=True)
 
-    content = env.em.get_state()
-    with gzip.open("sac_env.state", 'wb') as f:
-        f.write(content)
-
     return env
 
 

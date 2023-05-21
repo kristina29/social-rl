@@ -87,8 +87,6 @@ class SAC(RLC):
 
             self.replay_buffer[i].push(o, a, r, n, done)
 
-            print(len(self.replay_buffer[i]))
-
             if self.time_step >= self.start_training_time_step and self.batch_size <= len(self.replay_buffer[i]):
                 if not self.normalized[i]:
                     # calculate normalized observations and rewards
