@@ -1,6 +1,7 @@
 commands.txt
 CityLearn-master/
 datasets/
+formelles/
 thesis/*.aux
 thesis/*.log
 thesis/*.out
@@ -11,6 +12,8 @@ thesis/thesis.pdf
 thesis/.DS_Store
 thesis/old/
 .DS_Store
+plots_*
+src/plots_*
 src/.idea/
 src/.ipynb_checkpoints/
 src/__pycache__/

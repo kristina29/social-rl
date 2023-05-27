@@ -1,3 +1,4 @@
+import gzip
 import sys
 
 from datetime import datetime
@@ -11,7 +12,7 @@ from options import parseOptions
 from utils import set_schema_buildings, set_schema_simulation_period, set_active_observations, plot_simulation_summary
 
 
-def train(dataset_name, random_seed, building_count, day_count, episodes, active_observations, exclude_tql,
+def train(dataset_name, random_seed, building_count, episodes, active_observations, exclude_tql,
           exclude_rbc):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
@@ -22,7 +23,7 @@ def train(dataset_name, random_seed, building_count, day_count, episodes, active
     # TODO: DATA EXPLORATION
 
     # Data Preprocessing
-    schema = preprocessing(schema, building_count, day_count, random_seed, active_observations)
+    schema = preprocessing(schema, building_count, random_seed, active_observations)
 
     all_envs = {}
     # Train rule-based control (RBC) agent for comparison
@@ -42,16 +43,10 @@ def train(dataset_name, random_seed, building_count, day_count, episodes, active
     plot_simulation_summary(all_envs, filename)
 
 
-def preprocessing(schema, building_count, day_count, random_seed, active_observations):
-    root_directory = schema['root_directory']
-
+def preprocessing(schema, building_count, random_seed, active_observations):
     if building_count is not None:
         schema, buildings = set_schema_buildings(schema, building_count, random_seed)
         print('Selected buildings:', buildings)
-    if day_count is not None:
-        schema, simulation_start_time_step, simulation_end_time_step = \
-            set_schema_simulation_period(schema, day_count, random_seed, root_directory)
-        print(f'Selected {day_count}-day period time steps:', (simulation_start_time_step, simulation_end_time_step))
     if active_observations is not None:
         schema, active_observations = set_active_observations(schema, active_observations)
     else:
@@ -136,21 +131,19 @@ if __name__ == '__main__':
     DATASET_NAME = opts.schema
     seed = opts.seed
     building_count = opts.buildings
-    day_count = opts.days
     episodes = opts.episodes
     exclude_tql = opts.exclude_tql
     exclude_rbc = opts.exclude_rbc
     active_observations = opts.observations
 
     # only when used in pycharm for testing
-    if len(sys.argv) == 9:
+    if len(sys.argv) == 8 and False:
         DATASET_NAME = sys.argv[1]
         seed = int(sys.argv[2])
         building_count = int(sys.argv[3])
-        day_count = int(sys.argv[4])
-        episodes = int(sys.argv[5])
-        exclude_tql = bool(int(sys.argv[6]))
-        exclude_rbc = bool(int(sys.argv[7]))
-        active_observations = [sys.argv[8]]
+        episodes = int(sys.argv[4])
+        exclude_tql = bool(int(sys.argv[5]))
+        exclude_rbc = bool(int(sys.argv[6]))
+        active_observations = [sys.argv[7]]
 
-    train(DATASET_NAME, seed, building_count, day_count, episodes, active_observations, exclude_tql, exclude_rbc)
+    train(DATASET_NAME, seed, building_count, episodes, active_observations, exclude_tql, exclude_rbc)

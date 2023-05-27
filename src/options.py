@@ -26,9 +26,6 @@ def parseOptions():
     optParser.add_option('-b', '--buildings', action='store', type='int', dest='buildings',
                          help='Number of random selected buildings to include in training (between 1 and 15). '
                               'If not defined, all buildings are included.')
-    optParser.add_option('-d', '--days', action='store', type='int', dest='days',
-                         help='Number of random selected consecutive days to include in training. '
-                              'If not defined, all available days are used.')
     optParser.add_option('-e', '--episodes', action='store', type='int', dest='episodes',
                          default='128',
                          help='Number of training epsiodes')
