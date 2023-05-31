@@ -1,4 +1,5 @@
 import sys
+import time
 
 from datetime import datetime
 from citylearn.agents.q_learning import TabularQLearning
@@ -114,7 +115,7 @@ def train_sac(schema, episodes, random_seed):
 
 
 if __name__ == '__main__':
-    #  BINS DEFINED IN SCHEMA 
+    st = time.time()
 
     opts = parseOptions_nonsocial()
 
@@ -141,3 +142,11 @@ if __name__ == '__main__':
     episodes = 2
 
     train(DATASET_NAME, seed, building_count, episodes, active_observations, exclude_tql, exclude_rbc)
+
+    # get the end time
+    et = time.time()
+
+    # print the execution time
+    elapsed_time = et - st
+    print("")
+    print('Execution time:', round(elapsed_time / 60), 'minutes')

@@ -1,4 +1,5 @@
 import sys
+import time
 
 from datetime import datetime
 
@@ -76,7 +77,7 @@ def train_sacdb2(schema, episodes, random_seed):
 
 
 if __name__ == '__main__':
-    #  BINS DEFINED IN SCHEMA 
+    st = time.time()
 
     opts = parseOptions_social()
 
@@ -104,3 +105,11 @@ if __name__ == '__main__':
 
     train(DATASET_NAME, seed, building_count, demonstrators_count, episodes, active_observations, exclude_tql,
           exclude_rbc, exclude_sac)
+
+    # get the end time
+    et = time.time()
+
+    # print the execution time
+    elapsed_time = et - st
+    print("")
+    print('Execution time:', round(elapsed_time / 60), 'minutes')
