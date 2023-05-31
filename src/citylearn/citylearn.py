@@ -18,7 +18,7 @@ logging.getLogger('matplotlib.pyplot').disabled = True
 
 class CityLearnEnv(Environment, Env):
     def __init__(self, 
-        schema: Union[str, Path, Mapping[str, Any]], root_directory: Union[str, Path] = None, buildings: List[Building] = None, simulation_start_time_step: int = None, simulation_end_time_step: int = None, 
+        schema: Union[str, Path, Mapping[str, Any]], root_directory: Union[str, Path] = None, buildings: List[Building] = None, simulation_start_time_step: int = None, simulation_end_time_step: int = None,
         reward_function: 'citylearn.reward_function.RewardFunction' = None, central_agent: bool = None, shared_observations: List[str] = None, **kwargs
     ):
         r"""Initialize `CityLearnEnv`.
@@ -407,6 +407,16 @@ class CityLearnEnv(Environment, Env):
 
         return pd.DataFrame([b.solar_generation for b in self.buildings]).sum(axis = 0, min_count = 1).to_numpy()
 
+    @property
+    def demonstrator_count(self) -> int:
+        """Number of buildings that act as demonstrator in training"""
+        counter = 0
+        for b in self.buildings:
+            if b.demonstrator:
+                counter += 1
+
+        return counter
+
     @schema.setter
     def schema(self, schema: Union[str, Path, Mapping[str, Any]]):
         self.__schema = schema
@@ -541,6 +551,7 @@ class CityLearnEnv(Environment, Env):
 
         for building in self.buildings:
             building_dict = {}
+            building_dict['demonstrator'] = building.demonstrator
             building_dict['solar_power'] = round(building.pv.nominal_power, 3)
             building_dict['annual_dhw_demand'] = round(sum(building.energy_simulation.dhw_demand)/n_years, 3)
             building_dict['annual_cooling_demand'] = round(sum(building.energy_simulation.cooling_demand)/n_years, 3)
@@ -794,6 +805,7 @@ class CityLearnEnv(Environment, Env):
                     building_type = 'citylearn.citylearn.Building' if building_schema.get('type', None) is None else building_schema['type']
                     building_type_module = '.'.join(building_type.split('.')[0:-1])
                     building_type_name = building_type.split('.')[-1]
+                    demonstrator = building_schema['demonstrator']
                     building_constructor = getattr(importlib.import_module(building_type_module),building_type_name)
 
                     building: Building = building_constructor(
@@ -803,7 +815,8 @@ class CityLearnEnv(Environment, Env):
                         action_metadata=action_metadata, 
                         carbon_intensity=carbon_intensity, 
                         pricing=pricing,
-                        name=building_name, 
+                        name=building_name,
+                        demonstrator=demonstrator,
                         seconds_per_time_step=seconds_per_time_step,
                     )
 

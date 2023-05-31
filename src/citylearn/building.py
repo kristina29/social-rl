@@ -10,9 +10,10 @@ from citylearn.preprocessing import Normalize, PeriodicNormalization
 
 class Building(Environment):
     def __init__(
-        self, energy_simulation: EnergySimulation, weather: Weather, observation_metadata: Mapping[str, bool], action_metadata: Mapping[str, bool], carbon_intensity: CarbonIntensity = None, 
+        self, energy_simulation: EnergySimulation, weather: Weather, observation_metadata: Mapping[str, bool], action_metadata: Mapping[str, bool], carbon_intensity: CarbonIntensity = None,
         pricing: Pricing = None, dhw_storage: StorageTank = None, cooling_storage: StorageTank = None, heating_storage: StorageTank = None, electrical_storage: Battery = None, 
-        dhw_device: Union[HeatPump, ElectricHeater] = None, cooling_device: HeatPump = None, heating_device: Union[HeatPump, ElectricHeater] = None, pv: PV = None, name: str = None, **kwargs
+        dhw_device: Union[HeatPump, ElectricHeater] = None, cooling_device: HeatPump = None, heating_device: Union[HeatPump, ElectricHeater] = None, pv: PV = None, name: str = None,
+        demonstrator: bool = False, **kwargs
     ):
         r"""Initialize `Building`.
 
@@ -48,6 +49,8 @@ class Building(Environment):
             PV object for offsetting electricity demand from grid.
         name : str, optional
             Unique building name.
+        demonstrator: bool, optional
+            Defines whether the building acts as demonstrator in training
 
         Other Parameters
         ----------------
@@ -56,6 +59,7 @@ class Building(Environment):
         """
 
         self.name = name
+        self.demonstrator = demonstrator
         self.energy_simulation = energy_simulation
         self.weather = weather
         self.carbon_intensity = carbon_intensity
