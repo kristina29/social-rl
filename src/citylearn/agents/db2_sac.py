@@ -78,20 +78,20 @@ class SACDB2(SAC):
 
                 for _ in range(self.update_per_time_step):
                     o = self.update_step(i)
-                    print(type(o))
 
-                    # Use demonstrator actions for updating policy
-                    for demonstrator_policy in self.demonstrator_policy_net:
-                        demonstrator_actions, log_pi, _ = demonstrator_policy.sample(o)
-                        q_demonstrator = torch.min(
-                            self.soft_q_net1[i](o, demonstrator_actions),
-                            self.soft_q_net2[i](o, demonstrator_actions)
-                        )
-                        q_demonstrator = q_demonstrator + self.imitation_lr * (1-q_demonstrator)
-                        policy_loss = (self.alpha * log_pi - q_demonstrator).mean()
-                        self.policy_optimizer[i].zero_grad()
-                        policy_loss.backward()
-                        self.policy_optimizer[i].step()
+                    # Use demonstrator actions for updating policy, only if the building is not a demonstrator itself
+                    if not self.env.buildings[i].demonstrator:
+                        for demonstrator_policy in self.demonstrator_policy_net:
+                            demonstrator_actions, log_pi, _ = demonstrator_policy.sample(o)
+                            q_demonstrator = torch.min(
+                                self.soft_q_net1[i](o, demonstrator_actions),
+                                self.soft_q_net2[i](o, demonstrator_actions)
+                            )
+                            q_demonstrator = q_demonstrator + self.imitation_lr * (1-q_demonstrator)
+                            policy_loss = (self.alpha * log_pi - q_demonstrator).mean()
+                            self.policy_optimizer[i].zero_grad()
+                            policy_loss.backward()
+                            self.policy_optimizer[i].step()
 
             else:
                 pass

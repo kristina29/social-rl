@@ -1,3 +1,3 @@
-scp klietz10@134.2.168.242:/mnt/qb/work/ludwig/klietz10/src/data/S2S_data/ecmwf_s2s_100m_wind_spd_fcst_w_VI_and_rea_DAILY_stmon_02.nc /data/S2S_data/
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230531T142854.pdf .
 
 scp src/citylearn/data/test/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/test/
