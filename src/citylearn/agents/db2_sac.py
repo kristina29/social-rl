@@ -71,69 +71,14 @@ class SACDB2(SAC):
 
             if self.time_step >= self.start_training_time_step and self.batch_size <= len(self.replay_buffer[i]):
                 if not self.normalized[i]:
-                    # calculate normalized observations and rewards
-                    X = np.array([j[0] for j in self.replay_buffer[i].buffer], dtype=float)
-                    self.norm_mean[i] = np.nanmean(X, axis=0)
-                    self.norm_std[i] = np.nanstd(X, axis=0) + 1e-5
-                    R = np.array([j[2] for j in self.replay_buffer[i].buffer], dtype=float)
-                    self.r_norm_mean[i] = np.nanmean(R, dtype=float)
-                    self.r_norm_std[i] = np.nanstd(R, dtype=float) / self.reward_scaling + 1e-5
-
-                    # update buffer with normalization
-                    self.replay_buffer[i].buffer = [(
-                        np.hstack(self.get_normalized_observations(i, o).reshape(1, -1)[0]),
-                        a,
-                        self.get_normalized_reward(i, r),
-                        np.hstack(self.get_normalized_observations(i, n).reshape(1, -1)[0]),
-                        d
-                    ) for o, a, r, n, d in self.replay_buffer[i].buffer]
-                    self.normalized[i] = True
+                    self.normalize(i)
 
                 else:
                     pass
 
                 for _ in range(self.update_per_time_step):
-                    o, a, r, n, d = self.replay_buffer[i].sample(self.batch_size)
-                    tensor = torch.cuda.FloatTensor if self.device.type == 'cuda' else torch.FloatTensor
-                    o = tensor(o).to(self.device)
-                    n = tensor(n).to(self.device)
-                    a = tensor(a).to(self.device)
-                    r = tensor(r).unsqueeze(1).to(self.device)
-                    d = tensor(d).unsqueeze(1).to(self.device)
-
-                    with torch.no_grad():
-                        # Update Q-values. First, sample an action from the Gaussian policy/distribution for the current (next) observation and its associated log probability of occurrence.
-                        new_next_actions, new_log_pi, _ = self.policy_net[i].sample(n)
-
-                        # The updated Q-value is found by subtracting the logprob of the sampled action (proportional to the entropy) to the Q-values estimated by the target networks.
-                        target_q_values = torch.min(
-                            self.target_soft_q_net1[i](n, new_next_actions),
-                            self.target_soft_q_net2[i](n, new_next_actions),
-                        ) - self.alpha * new_log_pi
-                        q_target = r + (1 - d) * self.discount * target_q_values
-
-                    # Update Soft Q-Networks
-                    q1_pred = self.soft_q_net1[i](o, a)
-                    q2_pred = self.soft_q_net2[i](o, a)
-                    q1_loss = self.soft_q_criterion(q1_pred, q_target)
-                    q2_loss = self.soft_q_criterion(q2_pred, q_target)
-                    self.soft_q_optimizer1[i].zero_grad()
-                    q1_loss.backward()
-                    self.soft_q_optimizer1[i].step()
-                    self.soft_q_optimizer2[i].zero_grad()
-                    q2_loss.backward()
-                    self.soft_q_optimizer2[i].step()
-
-                    # Update Policy
-                    new_actions, log_pi, _ = self.policy_net[i].sample(o)
-                    q_new_actions = torch.min(
-                        self.soft_q_net1[i](o, new_actions),
-                        self.soft_q_net2[i](o, new_actions)
-                    )
-                    policy_loss = (self.alpha * log_pi - q_new_actions).mean()
-                    self.policy_optimizer[i].zero_grad()
-                    policy_loss.backward()
-                    self.policy_optimizer[i].step()
+                    o = self.update_step(i)
+                    print(type(o))
 
                     # Use demonstrator actions for updating policy
                     for demonstrator_policy in self.demonstrator_policy_net:
@@ -147,15 +92,6 @@ class SACDB2(SAC):
                         self.policy_optimizer[i].zero_grad()
                         policy_loss.backward()
                         self.policy_optimizer[i].step()
-
-                    # Soft Updates
-                    for target_param, param in zip(self.target_soft_q_net1[i].parameters(),
-                                                   self.soft_q_net1[i].parameters()):
-                        target_param.data.copy_(target_param.data * (1.0 - self.tau) + param.data * self.tau)
-
-                    for target_param, param in zip(self.target_soft_q_net2[i].parameters(),
-                                                   self.soft_q_net2[i].parameters()):
-                        target_param.data.copy_(target_param.data * (1.0 - self.tau) + param.data * self.tau)
 
             else:
                 pass
