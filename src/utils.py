@@ -114,8 +114,14 @@ def set_schema_demonstrators(
 def get_active_parts(schema, key='observations'):
     active_parts = []
     all_parts = schema[key]
+
+    # parameter that defines if the object is active
+    active_param = 'active'
+    if key=='buildings': #
+        active_param = 'include'
+
     for part in all_parts:
-        active_parts.append(part) if all_parts[part]['active'] else None
+        active_parts.append(part) if all_parts[part][active_param] else None
 
     return active_parts
 

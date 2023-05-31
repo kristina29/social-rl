@@ -10,48 +10,30 @@ except (ModuleNotFoundError, ImportError) as e:
     raise Exception(
         "This functionality requires you to install torch. You can install torch by : pip install torch torchvision, or for more detailed instructions please visit https://pytorch.org.")
 
-from citylearn.agents.rbc import RBC, BasicRBC, OptimizedRBC, BasicBatteryRBC
-from citylearn.agents.rlc import RLC
-from citylearn.preprocessing import Encoder, RemoveFeature
-from citylearn.rl import PolicyNetwork, ReplayBuffer, SoftQNetwork
+from citylearn.agents.sac import SAC
 
-
-class SACDB2(RLC):
-    def __init__(self, *args, **kwargs):
-        r"""Initialize :class:`SAC`.
+class SACDB2(SAC):
+    def __init__(self, *args, imitation_lr: float = 0.01, **kwargs):
+        r"""Initialize :class:`SACDB2`.
 
         Parameters
         ----------
         *args : tuple
-            `RLC` positional arguments.
+            `SAC` positional arguments.
+        imitation_lr: float
+            Imitation learning rate
 
         Other Parameters
         ----------------
         **kwargs : dict
             Other keyword arguments used to initialize super class.
         """
-
         super().__init__(*args, **kwargs)
 
-        # internally defined
-        self.normalized = [False for _ in self.action_space]
-        self.soft_q_criterion = nn.SmoothL1Loss()
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.replay_buffer = [ReplayBuffer(int(self.replay_buffer_capacity)) for _ in self.action_space]
-        self.soft_q_net1 = [None for _ in self.action_space]
-        self.soft_q_net2 = [None for _ in self.action_space]
-        self.target_soft_q_net1 = [None for _ in self.action_space]
-        self.target_soft_q_net2 = [None for _ in self.action_space]
-        self.policy_net = [None for _ in self.action_space]
-        self.soft_q_optimizer1 = [None for _ in self.action_space]
-        self.soft_q_optimizer2 = [None for _ in self.action_space]
-        self.policy_optimizer = [None for _ in self.action_space]
-        self.target_entropy = [None for _ in self.action_space]
-        self.norm_mean = [None for _ in self.action_space]
-        self.norm_std = [None for _ in self.action_space]
-        self.r_norm_mean = [None for _ in self.action_space]
-        self.r_norm_std = [None for _ in self.action_space]
-        self.set_networks()
+        self.imitation_lr = imitation_lr
+        self.demonstrator_policy_net = [None for _ in range(self.env.demonstrator_count)]
+
+        self.set_demonstrator_policies()
 
     def update(self, observations: List[List[float]], actions: List[List[float]], reward: List[float],
                next_observations: List[List[float]], done: bool):
@@ -148,11 +130,23 @@ class SACDB2(RLC):
                         self.soft_q_net1[i](o, new_actions),
                         self.soft_q_net2[i](o, new_actions)
                     )
-                    print(q_new_actions)
                     policy_loss = (self.alpha * log_pi - q_new_actions).mean()
                     self.policy_optimizer[i].zero_grad()
                     policy_loss.backward()
                     self.policy_optimizer[i].step()
+
+                    # Use demonstrator actions for updating policy
+                    for demonstrator_policy in self.demonstrator_policy_net:
+                        demonstrator_actions, log_pi, _ = demonstrator_policy.sample(o)
+                        q_demonstrator = torch.min(
+                            self.soft_q_net1[i](o, demonstrator_actions),
+                            self.soft_q_net2[i](o, demonstrator_actions)
+                        )
+                        q_demonstrator = q_demonstrator + self.imitation_lr * (1-q_demonstrator)
+                        policy_loss = (self.alpha * log_pi - q_demonstrator).mean()
+                        self.policy_optimizer[i].zero_grad()
+                        policy_loss.backward()
+                        self.policy_optimizer[i].step()
 
                     # Soft Updates
                     for target_param, param in zip(self.target_soft_q_net1[i].parameters(),
@@ -166,114 +160,11 @@ class SACDB2(RLC):
             else:
                 pass
 
-    def predict(self, observations: List[List[float]], deterministic: bool = None):
-        r"""Provide actions for current time step.
-
-        Will return randomly sampled actions from `action_space` if :attr:`end_exploration_time_step` >= :attr:`time_step`
-        else will use policy to sample actions.
-
-        Parameters
-        ----------
-        observations: List[List[float]]
-            Environment observations
-        deterministic: bool, default: False
-            Wether to return purely exploitatative deterministic actions.
-
-        Returns
-        -------
-        actions: List[float]
-            Action values
-        """
-
-        deterministic = False if deterministic is None else deterministic
-
-        if self.time_step > self.end_exploration_time_step or deterministic:
-            actions = self.get_post_exploration_prediction(observations, deterministic)
-
-        else:
-            actions = self.get_exploration_prediction(observations)
-
-        self.actions = actions
-        self.next_time_step()
-        return actions
-
-    def get_post_exploration_prediction(self, observations: List[List[float]], deterministic: bool) -> List[
-        List[float]]:
-        """Action sampling using policy, post-exploration time step"""
-
-        actions = []
-
-        for i, o in enumerate(observations):
-            o = self.get_encoded_observations(i, o)
-            o = self.get_normalized_observations(i, o)
-            o = torch.FloatTensor(o).unsqueeze(0).to(self.device)
-            result = self.policy_net[i].sample(o)
-            a = result[2] if self.time_step >= self.deterministic_start_time_step or deterministic else result[0]
-            actions.append(a.detach().cpu().numpy()[0])
-
-        return actions
-
-    def get_exploration_prediction(self, observations: List[List[float]]) -> List[List[float]]:
-        """Return randomly sampled actions from `action_space` multiplied by :attr:`action_scaling_coefficient`.
-
-        Returns
-        -------
-        actions: List[List[float]]
-            Action values.
-        """
-
-        # random actions
-        return [list(self.action_scaling_coefficient * s.sample()) for s in self.action_space]
-
-    def get_normalized_reward(self, index: int, reward: float) -> float:
-        return (reward - self.r_norm_mean[index]) / self.r_norm_std[index]
-
-    def get_normalized_observations(self, index: int, observations: List[float]) -> npt.NDArray[np.float64]:
-        return (np.array(observations, dtype=float) - self.norm_mean[index]) / self.norm_std[index]
-
-    def get_encoded_observations(self, index: int, observations: List[float]) -> npt.NDArray[np.float64]:
-        return np.array([j for j in np.hstack(self.encoders[index] * np.array(observations, dtype=float)) if j != None],
-                        dtype=float)
-
-    def set_networks(self, internal_observation_count: int = None):
-        internal_observation_count = 0 if internal_observation_count is None else internal_observation_count
-
+    def set_demonstrator_policies(self):
+        demonstrator_count = 0
         for i in range(len(self.action_dimension)):
-            observation_dimension = self.observation_dimension[i] + internal_observation_count
-            # init networks
-            self.soft_q_net1[i] = SoftQNetwork(observation_dimension, self.action_dimension[i],
-                                               self.hidden_dimension).to(self.device)
-            self.soft_q_net2[i] = SoftQNetwork(observation_dimension, self.action_dimension[i],
-                                               self.hidden_dimension).to(self.device)
-            self.target_soft_q_net1[i] = SoftQNetwork(observation_dimension, self.action_dimension[i],
-                                                      self.hidden_dimension).to(self.device)
-            self.target_soft_q_net2[i] = SoftQNetwork(observation_dimension, self.action_dimension[i],
-                                                      self.hidden_dimension).to(self.device)
+            if self.env.buildings[i].demonstrator:
+                self.demonstrator_policy_net[demonstrator_count] = self.policy_net[i]
+                demonstrator_count += 1
 
-            for target_param, param in zip(self.target_soft_q_net1[i].parameters(), self.soft_q_net1[i].parameters()):
-                target_param.data.copy_(param.data)
-
-            for target_param, param in zip(self.target_soft_q_net2[i].parameters(), self.soft_q_net2[i].parameters()):
-                target_param.data.copy_(param.data)
-
-            # Policy
-            self.policy_net[i] = PolicyNetwork(observation_dimension, self.action_dimension[i], self.action_space[i],
-                                               self.action_scaling_coefficient, self.hidden_dimension).to(self.device)
-            self.soft_q_optimizer1[i] = optim.Adam(self.soft_q_net1[i].parameters(), lr=self.lr)
-            self.soft_q_optimizer2[i] = optim.Adam(self.soft_q_net2[i].parameters(), lr=self.lr)
-            self.policy_optimizer[i] = optim.Adam(self.policy_net[i].parameters(), lr=self.lr)
-            self.target_entropy[i] = -np.prod(self.action_space[i].shape).item()
-
-    def set_encoders(self) -> List[List[Encoder]]:
-        encoders = super().set_encoders()
-
-        for i, o in enumerate(self.observation_names):
-            for j, n in enumerate(o):
-                if n == 'net_electricity_consumption':
-                    encoders[i][j] = RemoveFeature()
-
-                else:
-                    pass
-
-        return encoders
 

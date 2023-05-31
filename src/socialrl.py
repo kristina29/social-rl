@@ -6,7 +6,8 @@ from citylearn.agents.db2_sac import SACDB2
 from citylearn.citylearn import CityLearnEnv
 from citylearn.data import DataSet
 from options import parseOptions_social
-from utils import set_schema_buildings, set_active_observations, plot_simulation_summary, set_schema_demonstrators
+from utils import set_schema_buildings, set_active_observations, plot_simulation_summary, set_schema_demonstrators, \
+    get_active_parts
 from nonsocialrl import train_tql, train_rbc, train_sac
 
 
