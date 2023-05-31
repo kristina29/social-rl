@@ -16,8 +16,31 @@ class ExtendedOption(Option):
                 self, action, dest, opt, value, values, parser)
 
 
-def parseOptions():
+def parseOptions_nonsocial():
     optParser = OptionParser(option_class=ExtendedOption)
+    optParser = add_nonsocial_options(optParser)
+
+    opts, args = optParser.parse_args()
+
+    return opts
+
+
+def parseOptions_social():
+    optParser = OptionParser(option_class=ExtendedOption)
+    optParser = add_nonsocial_options(optParser)
+    optParser.add_option('-d', '--demonstrators', action='store', type='int', dest='demonstrators',
+                         default='1',
+                         help='Number of random selected buildings that act as demonstrators (lower or equal than the '
+                              'number of total buildings). If not defined, one building acts as demonstrator.')
+    optParser.add_option('--sac', action='store_true', default=False, dest='exclude_sac',
+                         help='Do not train a soft actor-critic (SAC) agent for comparison.')
+
+    opts, args = optParser.parse_args()
+
+    return opts
+
+
+def add_nonsocial_options(optParser):
     optParser.add_option('-s', '--schema', action='store', type='string', dest='schema',
                          default='test',
                          help='Name of the directory including the schema and data files')
@@ -37,6 +60,4 @@ def parseOptions():
                          help='Comma separated list of observations that should be active. '
                               'If not defined, the full observation space (as defined in the schema file) is used.')
 
-    opts, args = optParser.parse_args()
-
-    return opts
+    return optParser

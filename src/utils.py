@@ -69,6 +69,57 @@ def set_schema_buildings(
     return schema, buildings
 
 
+def set_schema_demonstrators(
+        schema: dict, count: int, seed: int
+) -> Tuple[dict, List[str]]:
+    """Randomly select number of buildings to use as demonstrators.
+
+    Parameters
+    ----------
+    schema: dict
+        CityLearn dataset mapping used to construct environment.
+    count: int
+        Number of buildings to set as demonstrator in schema.
+    seed: int
+        Seed for pseudo-random number generator
+
+    Returns
+    -------
+    schema: dict
+        CityLearn dataset mapping with active buildings set.
+    demonstrators: List[str]
+        List of selected buildings.
+    """
+
+    # set random seed
+    if seed is not None:
+        np.random.seed(seed)
+
+    # get all active buildings
+    buildings = get_active_parts(schema, key='buildings')
+
+    # randomly select specified number of buildings
+    demonstrators = np.random.choice(buildings, size=count, replace=False).tolist()
+
+    # update schema to only included selected buildings
+    for b in schema['buildings']:
+        if b in demonstrators:
+            schema['buildings'][b]['demonstrator'] = True
+        else:
+            schema['buildings'][b]['demonstrator'] = False
+
+    return schema, demonstrators
+
+
+def get_active_parts(schema, key='observations'):
+    active_parts = []
+    all_parts = schema[key]
+    for part in all_parts:
+        active_parts.append(part) if all_parts[part]['active'] else None
+
+    return active_parts
+
+
 def set_schema_simulation_period(
         schema: dict, count: int, seed: int
         , root_directory=None) -> Tuple[dict, int, int]:
