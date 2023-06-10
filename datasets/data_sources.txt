@@ -11,3 +11,5 @@ weather_ny_42.30_-74.37_2021.csv	https://nsrdb.nrel.gov/data-viewer
 							Year 2021
 							Interval 5 minutes
 							Convert UTC to Local Time
+					retrieved on the 07. June 2023
+					More info: https://nsrdb.nrel.gov/data-sets/us-data
