@@ -1,4 +1,7 @@
+import numpy as np
 import pandas as pd
+
+pd.options.mode.chained_assignment = None  # default='warn'
 
 WEATHER_VARS = ['Outdoor Drybulb Temperature [C]',
                 'Relative Humidity [%]',
@@ -40,8 +43,8 @@ def preprocess(load_path, save_path) -> None:
 
     weather = median_by_hour(weather)
     weather = add_daytype(weather)
-    weather = add_predictions(weather)
     weather = correct_time_series_start(weather)
+    weather = add_predictions(weather)
 
     # drop not needed columns
     weather = weather.drop(columns=['Datetime', 'Year', 'Month', 'Day', 'Hour', 'Minute', 'Day Type'])
@@ -82,6 +85,10 @@ def add_predictions(weather) -> pd.DataFrame:
             weather[col_name] = weather.loc[:, variable]
             weather[col_name] = weather[col_name].shift(-pred_horizon)
 
+            # fill missing prediction values with the actual ones at the time the forecast addresses
+            for i in weather[np.isnan(weather[col_name])].index:
+                weather.loc[i, col_name] = weather.loc[i+pred_horizon-24][variable]
+
     return weather
 
 
@@ -95,7 +102,7 @@ def correct_time_series_start(weather) -> pd.DataFrame:
                                   (weather['Day Type'] == 7)].tolist()[-1]
     idx = weather.index.tolist()
     del idx[:first_row_idx]
-    weather = weather.reindex(idx + list(range(first_row_idx)))
+    weather = weather.reindex(idx + list(range(first_row_idx))).reset_index()
 
     return weather
 
