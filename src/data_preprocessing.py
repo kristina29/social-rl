@@ -1,21 +1,42 @@
 import pandas as pd
 
-
-WEATHER_VARS = ['Wind Speed [m/s]',
-                'Outdoor Drybulb Temperature [C]',
+WEATHER_VARS = ['Outdoor Drybulb Temperature [C]',
                 'Relative Humidity [%]',
                 'Diffuse Solar Radiation [W/m2]',
-                'Direct Solar Radiation [W/m2]']
+                'Direct Solar Radiation [W/m2]',
+                'Wind Speed [m/s]']
+
+FINAL_ORDER = ['Outdoor Drybulb Temperature [C]',
+               'Relative Humidity [%]',
+               'Diffuse Solar Radiation [W/m2]',
+               'Direct Solar Radiation [W/m2]',
+               '6h Prediction Outdoor Drybulb Temperature [C]',
+               '12h Prediction Outdoor Drybulb Temperature [C]',
+               '24h Prediction Outdoor Drybulb Temperature [C]',
+               '6h Prediction Relative Humidity [%]',
+               '12h Prediction Relative Humidity [%]',
+               '24h Prediction Relative Humidity [%]',
+               '6h Prediction Diffuse Solar Radiation [W/m2]',
+               '12h Prediction Diffuse Solar Radiation [W/m2]',
+               '24h Prediction Diffuse Solar Radiation [W/m2]',
+               '6h Prediction Direct Solar Radiation [W/m2]',
+               '12h Prediction Direct Solar Radiation [W/m2]',
+               '24h Prediction Direct Solar Radiation [W/m2]',
+               'Wind Speed [m/s]',
+               '6h Prediction Wind Speed [m/s]',
+               '12h Prediction Wind Speed [m/s]',
+               '24h Prediction Wind Speed [m/s]']
+
 
 def preprocess(load_path, save_path) -> None:
     weather = pd.read_csv(load_path, skiprows=2)
 
     # rename columns to match citylearn framework
-    weather = weather.rename(columns={'Wind Speed': WEATHER_VARS[0],
-                                      'Temperature': WEATHER_VARS[1],
-                                      'Relative Humidity': WEATHER_VARS[2],
-                                      'DHI': WEATHER_VARS[3],
-                                      'DNI': WEATHER_VARS[4]})
+    weather = weather.rename(columns={'Temperature': WEATHER_VARS[0],
+                                      'Relative Humidity': WEATHER_VARS[1],
+                                      'DHI': WEATHER_VARS[2],
+                                      'DNI': WEATHER_VARS[3],
+                                      'Wind Speed': WEATHER_VARS[4]})
 
     weather = median_by_hour(weather)
     weather = add_daytype(weather)
@@ -24,6 +45,9 @@ def preprocess(load_path, save_path) -> None:
 
     # drop not needed columns
     weather = weather.drop(columns=['Datetime', 'Year', 'Month', 'Day', 'Hour', 'Minute', 'Day Type'])
+
+    # reorder to match citylearn
+    weather = weather[FINAL_ORDER]
 
     weather.to_csv(save_path, index=False)
     print(f'File saved under {save_path}')
@@ -53,7 +77,7 @@ def add_predictions(weather) -> pd.DataFrame:
     # First just real values
     # TODO: add noise or real predictions
     for variable in WEATHER_VARS:
-        for pred_horizon in [6, 12 ,24]:
+        for pred_horizon in [6, 12, 24]:
             col_name = f'{pred_horizon}h Prediction {variable}'
             weather[col_name] = weather.loc[:, variable]
             weather[col_name] = weather[col_name].shift(-pred_horizon)
