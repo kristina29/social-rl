@@ -128,16 +128,6 @@ class Weather:
         Direct solar irradiance 12 hours ahead prediction time series in [W/m^2].
     direct_solar_irradiance_predicted_24h : np.array
         Direct solar irradiance 24 hours ahead prediction time series in [W/m^2].
-    wind_included: bool
-        Defines whether wind speed (and predictions) data is provided.
-    wind_speed : np.array, optional
-        Wind speed time series in [m/s].
-    wind_speed_predicted_6h : np.array, optional
-        Wind speed 6 hours ahead prediction time series in [m/s].
-    wind_speed_predicted_12h : np.array, optional
-        Wind speed 12 hours ahead prediction time series in [m/s].
-    wind_speed_predicted_24h : np.array, optional
-        Wind speed 24 hours ahead prediction time series in [m/s].
     """
 
     def __init__(
@@ -146,8 +136,6 @@ class Weather:
         outdoor_relative_humidity_predicted_6h: Iterable[float], outdoor_relative_humidity_predicted_12h: Iterable[float], outdoor_relative_humidity_predicted_24h: Iterable[float],
         diffuse_solar_irradiance_predicted_6h: Iterable[float], diffuse_solar_irradiance_predicted_12h: Iterable[float], diffuse_solar_irradiance_predicted_24h: Iterable[float],
         direct_solar_irradiance_predicted_6h: Iterable[float], direct_solar_irradiance_predicted_12h: Iterable[float], direct_solar_irradiance_predicted_24h: Iterable[float],
-        wind_speed: Iterable[float] = None, wind_speed_predicted_6h: Iterable[float] = None, wind_speed_predicted_12h: Iterable[float] = None,
-        wind_speed_predicted_24h: Iterable[float] = None,
     ):
         r"""Initialize `Weather`."""
 
@@ -168,19 +156,40 @@ class Weather:
         self.direct_solar_irradiance_predicted_12h = np.array(direct_solar_irradiance_predicted_12h, dtype = float)
         self.direct_solar_irradiance_predicted_24h = np.array(direct_solar_irradiance_predicted_24h, dtype = float)
 
-        # optional include wind
-        if self.wind_speed is not None:
-            self.wind_included = True
-            self.wind_speed = np.array(wind_speed, dtype=float)
-            self.wind_speed_predicted_6h = np.array(wind_speed_predicted_6h, dtype=float)
-            self.wind_speed_predicted_12h = np.array(wind_speed_predicted_12h, dtype=float)
-            self.wind_speed_predicted_24h = np.array(wind_speed_predicted_24h, dtype=float)
-        else:
-            self.wind_included = False
-            if not self.wind_speed == self.wind_speed_predicted_6h == self.wind_speed_predicted_12h == self.wind_speed_predicted_12h:
-                raise Warning("The wind speed in the weather file is not defined, but wind speed forecasts were "
-                              "provided. The forecasts are not used.")
+class WeatherWind(Weather):
+    """`Building` `wind weather` data class.
 
+    Attributes
+    ----------
+    wind_speed : np.array, optional
+        Wind speed time series in [m/s].
+    wind_speed_predicted_6h : np.array, optional
+        Wind speed 6 hours ahead prediction time series in [m/s].
+    wind_speed_predicted_12h : np.array, optional
+        Wind speed 12 hours ahead prediction time series in [m/s].
+    wind_speed_predicted_24h : np.array, optional
+        Wind speed 24 hours ahead prediction time series in [m/s].
+    """
+
+    def __init__(
+        self, wind_speed: Iterable[float], wind_speed_predicted_6h: Iterable[float],
+        wind_speed_predicted_12h: Iterable[float], wind_speed_predicted_24h: Iterable[float], *args,
+    ):
+        r"""Initialize `WeatherWind`.
+
+        Parameters
+        ----------
+        *args : tuple
+            `Weather` positional arguments.
+
+        """
+
+        super().__init__(*args)
+
+        self.wind_speed = np.array(wind_speed, dtype=float)
+        self.wind_speed_predicted_6h = np.array(wind_speed_predicted_6h, dtype=float)
+        self.wind_speed_predicted_12h = np.array(wind_speed_predicted_12h, dtype=float)
+        self.wind_speed_predicted_24h = np.array(wind_speed_predicted_24h, dtype=float)
 
 class Pricing:
     """`Building` `pricing` data class.
