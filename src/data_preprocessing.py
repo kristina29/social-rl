@@ -6,7 +6,11 @@ WEATHER_VARS = ['Outdoor Drybulb Temperature [C]',
                 'Direct Solar Radiation [W/m2]',
                 'Wind Speed [m/s]']
 
-FINAL_ORDER = ['Outdoor Drybulb Temperature [C]',
+FINAL_ORDER = ['Wind Speed [m/s]',
+               '6h Prediction Wind Speed [m/s]',
+               '12h Prediction Wind Speed [m/s]',
+               '24h Prediction Wind Speed [m/s]',
+               'Outdoor Drybulb Temperature [C]',
                'Relative Humidity [%]',
                'Diffuse Solar Radiation [W/m2]',
                'Direct Solar Radiation [W/m2]',
@@ -21,11 +25,7 @@ FINAL_ORDER = ['Outdoor Drybulb Temperature [C]',
                '24h Prediction Diffuse Solar Radiation [W/m2]',
                '6h Prediction Direct Solar Radiation [W/m2]',
                '12h Prediction Direct Solar Radiation [W/m2]',
-               '24h Prediction Direct Solar Radiation [W/m2]',
-               'Wind Speed [m/s]',
-               '6h Prediction Wind Speed [m/s]',
-               '12h Prediction Wind Speed [m/s]',
-               '24h Prediction Wind Speed [m/s]']
+               '24h Prediction Direct Solar Radiation [W/m2]']
 
 
 def preprocess(load_path, save_path) -> None:
