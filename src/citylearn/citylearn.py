@@ -509,8 +509,6 @@ class CityLearnEnv(Environment, Env):
         self.next_time_step()
         reward = self.reward_function.calculate()
         self.__rewards.append(reward)
-        print(self.observation_names)
-        print(self.observations)
         return self.observations, reward, self.done, self.get_info()
 
     def get_info(self) -> Mapping[Any, Any]:
