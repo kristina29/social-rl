@@ -149,7 +149,7 @@ def read_fuel_data(load_dir) -> pd.DataFrame:
     return fuel
 
 
-def adapt_price(load_path, save_path, fuel_mix, alpha=0.7) -> None:
+def adapt_price(load_path, save_path, fuel_mix, alpha=6) -> None:
     price = pd.read_csv(load_path)['Electricity Pricing [$]']
     fossil_share = fuel_mix['Fossil Share']
 
