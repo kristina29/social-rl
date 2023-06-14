@@ -9,7 +9,7 @@ import pandas as pd
 from citylearn.base import Environment
 from citylearn.building import Building
 from citylearn.cost_function import CostFunction
-from citylearn.data import DataSet, EnergySimulation, CarbonIntensity, Pricing, Weather
+from citylearn.data import DataSet, EnergySimulation, CarbonIntensity, Pricing, Weather, WeatherWind
 from citylearn.utilities import read_json
 
 LOGGER = logging.getLogger()
@@ -780,7 +780,16 @@ class CityLearnEnv(Environment, Env):
                     energy_simulation = pd.read_csv(os.path.join(root_directory,building_schema['energy_simulation'])).iloc[simulation_start_time_step:simulation_end_time_step + 1].copy()
                     energy_simulation = EnergySimulation(*energy_simulation.values.T)
                     weather = pd.read_csv(os.path.join(root_directory,building_schema['weather'])).iloc[simulation_start_time_step:simulation_end_time_step + 1].copy()
-                    weather = Weather(*weather.values.T)
+
+                    if len(weather.columns) == 16:
+                        # wind not included
+                        weather = Weather(*weather.values.T)
+                    elif len(weather.columns) == 20:
+                        # wind included
+                        weather = WeatherWind(*weather.values.T)
+                    else:
+                        raise ValueError('Weather dataset corrupted. Unexpected number of columns '
+                                         '(need 20 if wind speed included, 16 else)')
 
                     if building_schema.get('carbon_intensity', None) is not None:
                         carbon_intensity = pd.read_csv(os.path.join(root_directory,building_schema['carbon_intensity'])).iloc[simulation_start_time_step:simulation_end_time_step + 1].copy()

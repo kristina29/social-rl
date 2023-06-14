@@ -1,0 +1,15 @@
+fuel_mix_ny	http://mis.nyiso.com/public/P-63list.htm
+		12-2021 - ... - 01-2021
+		retrieved on the 07. June 2023
+		More info: https://www.nyiso.com/real-time-dashboard
+
+weather_ny_42.30_-74.37_2021.csv	https://nsrdb.nrel.gov/data-viewer
+					With input: 	Latitude 42.3
+							Longitude -74.37
+							USA Continental & Mexico
+							Attributes DHI, DNI, Relative Humidity, Temperature, Wind Speed
+							Year 2021
+							Interval 5 minutes
+							Convert UTC to Local Time
+					retrieved on the 07. June 2023
+					More info: https://nsrdb.nrel.gov/data-sets/us-data
