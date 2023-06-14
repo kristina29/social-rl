@@ -140,6 +140,7 @@ def read_fuel_data(load_dir) -> pd.DataFrame:
 
     fuel['Renewable Sources'] = fuel[['Hydro', 'Wind', 'Other Renewables']].sum(axis=1)
     fuel['Other'] = fuel[['Dual Fuel', 'Natural Gas', 'Nuclear', 'Other Fossil Fuels']].sum(axis=1)
+    fuel['Fossil Share'] = fuel['Other']/(fuel['Renewable Sources']+fuel['Other'])
     fuel = fuel.drop(columns=['Hydro', 'Wind', 'Other Renewables', 'Dual Fuel', 'Natural Gas', 'Nuclear',
                                 'Other Fossil Fuels'])
 
