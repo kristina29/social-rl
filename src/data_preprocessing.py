@@ -52,7 +52,7 @@ def preprocess_data(load_path, save_path, weather) -> pd.DataFrame:
     df = correct_time_series_start(df)
 
     if weather:
-        df = add_predictions(df)
+        df = add_predictions(df, weather=True)
 
     # drop not needed columns
     df = df.drop(columns=['Datetime', 'Year', 'Month', 'Day', 'Hour', 'Minute', 'Day Type'])
@@ -87,20 +87,26 @@ def add_daytype(df) -> pd.DataFrame:
     return df
 
 
-def add_predictions(weather) -> pd.DataFrame:
+def add_predictions(df, weather) -> pd.DataFrame:
     # First just real values
     # TODO: add noise or real predictions
-    for variable in WEATHER_VARS:
+
+    if weather:
+        vars = WEATHER_VARS
+    else:
+        vars = ['Electricity Pricing [$]']
+
+    for variable in vars:
         for pred_horizon in [6, 12, 24]:
             col_name = f'{pred_horizon}h Prediction {variable}'
-            weather[col_name] = weather.loc[:, variable]
-            weather[col_name] = weather[col_name].shift(-pred_horizon)
+            df[col_name] = df.loc[:, variable]
+            df[col_name] = df[col_name].shift(-pred_horizon)
 
             # fill missing prediction values with the actual ones at the time the forecast addresses
-            for i in weather[np.isnan(weather[col_name])].index:
-                weather.loc[i, col_name] = weather.loc[i + pred_horizon - 24][variable]
+            for i in df[np.isnan(df[col_name])].index:
+                df.loc[i, col_name] = df.loc[i + pred_horizon - 24][variable]
 
-    return weather
+    return df
 
 
 def correct_time_series_start(df) -> pd.DataFrame:
@@ -150,12 +156,16 @@ def read_fuel_data(load_dir) -> pd.DataFrame:
 
 
 def adapt_price(load_path, save_path, fuel_mix, alpha=6) -> None:
-    price = pd.read_csv(load_path)['Electricity Pricing [$]']
+    price = pd.read_csv(load_path)
     fossil_share = fuel_mix['Fossil Share']
 
-    new_price = price + alpha * fossil_share
-    new_price.to_csv(save_path, index=False)
+    price['Electricity Pricing [$]'] = price['Electricity Pricing [$]'] + alpha * fossil_share
 
+    # set minimum price to 0.2
+    price['Electricity Pricing [$]'] = price['Electricity Pricing [$]'] - price['Electricity Pricing [$]'].min() + 0.2
+    price = add_predictions(price, weather=False)
+
+    price.to_csv(save_path, index=False)
     print(f'File saved under {save_path}')
 
 
