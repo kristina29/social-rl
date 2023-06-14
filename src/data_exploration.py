@@ -117,6 +117,26 @@ if ny_data:
     ax.set_ylabel('Other renewables energy [$MW$]')
     ax.set_xlabel('DNI [$W/m^2$]')
 
+
+##################################################
+# PREPROCESSED FUEL MIX DATA
+##################################################
+fuel_mix = pd.read_csv('citylearn/data/nydata/fuelmix.csv')
+
+sum = np.array(fuel_mix['Renewable Sources']+fuel_mix['Other'])
+fig, ax = plt.subplots()
+ax.plot(np.arange(sum.size), sum)
+ax.set_title('Total Energy produced')
+ax.set_ylabel('Energy produced [$MW$]')
+ax.set_xlabel('Time step')
+
+percent = np.array(fuel_mix['Renewable Sources']/sum)*100
+fig, ax = plt.subplots()
+ax.plot(np.arange(percent.size), percent)
+ax.set_title('$\%$ Renweable Energy from total produced Energy')
+ax.set_ylabel('%')
+ax.set_xlabel('Time step')
+
 if save:
     filename = "../datasets/data_exploration_plots/exploration-plots_" + datetime.now().strftime("%Y%m%dT%H%M%S")
     save_multi_image(filename)
