@@ -189,6 +189,14 @@ ax.set_title('Solar generation Building 14 vs. DNI (NY data)')
 ax.set_ylabel('Solar generation [$W/kW$]')
 ax.set_xlabel('DNI [$W/m^2$]')
 
+##################################################
+# PRICING DATA
+##################################################
+
+pricing_new = pd.read_csv('citylearn/data/nydata/pricing.csv')['Electricity Pricing [$]']
+
+
+
 if save:
     filename = "../datasets/data_exploration_plots/exploration-plots_" + datetime.now().strftime("%Y%m%dT%H%M%S")
     save_multi_image(filename)
