@@ -7,8 +7,8 @@ import numpy as np
 from datetime import datetime
 from utils import save_multi_image
 
-save = True
-ny_data = True
+save = False
+ny_data = False
 
 ##################################################
 # DATA CITYLEARN CHALLENGE 2022
@@ -136,6 +136,9 @@ ax.plot(np.arange(percent.size), percent)
 ax.set_title('$\%$ Renweable Energy from total produced Energy')
 ax.set_ylabel('%')
 ax.set_xlabel('Time step')
+
+print(f'Min: {percent.min()}')
+print(f'Max: {percent.max()}')
 
 if save:
     filename = "../datasets/data_exploration_plots/exploration-plots_" + datetime.now().strftime("%Y%m%dT%H%M%S")
