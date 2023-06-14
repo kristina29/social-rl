@@ -33,7 +33,7 @@ WEATHER_FINAL_ORDER = ['Wind Speed [m/s]',
                        '24h Prediction Direct Solar Radiation [W/m2]']
 
 
-def preprocess_data(load_path, save_path, weather) -> None:
+def preprocess_data(load_path, save_path, weather) -> pd.DataFrame:
     if weather:
         df = pd.read_csv(load_path, skiprows=2)
 
@@ -63,6 +63,8 @@ def preprocess_data(load_path, save_path, weather) -> None:
 
     df.to_csv(save_path, index=False)
     print(f'File saved under {save_path}')
+
+    return df
 
 
 def median_by_hour(df) -> pd.DataFrame:
@@ -147,6 +149,16 @@ def read_fuel_data(load_dir) -> pd.DataFrame:
     return fuel
 
 
+def adapt_price(load_path, save_path, fuel_mix, alpha=0.7) -> None:
+    price = pd.read_csv(load_path)['Electricity Pricing [$]']
+    fossil_share = fuel_mix['Fossil Share']
+
+    new_price = price + alpha * fossil_share
+    new_price.to_csv(save_path, index=False)
+
+    print(f'File saved under {save_path}')
+
+
 if __name__ == '__main__':
     weather_filepath = '../datasets/weather_ny_42.30_-74.37_2021.csv'
     weather_save_filepath = 'citylearn/data/nydata/weather.csv'
@@ -154,4 +166,9 @@ if __name__ == '__main__':
 
     fuel_mix_dirpath = '../datasets/fuel_mix_ny_2021'
     fuel_mix_save_filepath = 'citylearn/data/nydata/fuelmix.csv'
-    preprocess_data(fuel_mix_dirpath, fuel_mix_save_filepath, weather=False)
+    fuel_mix = preprocess_data(fuel_mix_dirpath, fuel_mix_save_filepath, weather=False)
+
+    price_filepath = 'citylearn/data/test/pricing.csv'
+    price_save_filepath = 'citylearn/data/nydata/pricing.csv'
+    adapt_price(price_filepath, price_save_filepath, fuel_mix)
+
