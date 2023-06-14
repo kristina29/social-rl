@@ -140,6 +140,7 @@ if __name__ == '__main__':
     exclude_tql = 1
     exclude_rbc = 1
     episodes = 2
+    DATASET_NAME = 'nydata'
 
     train(DATASET_NAME, seed, building_count, episodes, active_observations, exclude_tql, exclude_rbc)
 

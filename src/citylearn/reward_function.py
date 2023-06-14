@@ -147,3 +147,28 @@ class SolarPenaltyReward(RewardFunction):
             reward = reward_list
         
         return reward
+
+class PricePenaltyReward(RewardFunction):
+    def __init__(self, env: CityLearnEnv):
+        super().__init__(env)
+
+    def calculate(self) -> List[float]:
+        r"""The reward is defined to minimize the price paid for the electricity consumption.
+
+        The reward is the electricity price paid for the used amount of electricity from the grid at the current time
+        step returned as a negative value.
+
+        Returns
+        -------
+        reward: List[float]
+            Reward for transition to current timestep.
+
+        Notes
+        -----
+        Reward value is calculated as :math:`[\textrm{min}(-e_0, 0), \dots, \textrm{min}(-e_n, 0)]`
+        where :math:`e` is `electricity_consumption` and :math:`n` is the number of agents.
+        """
+        print(self.env.buildings[0].observations)
+        reward = [min(b.net_electricity_consumption[b.time_step]*-1, 0) for b in self.env.buildings]
+
+        return reward
