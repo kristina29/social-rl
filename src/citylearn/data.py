@@ -234,13 +234,16 @@ class CarbonIntensity:
 class FuelMix:
     """`Building` `fuel_mix` data class.
 
-        Attributes
-        ----------
-        renewable_source : np.array
-            Renewable energy production time series in [MW].
-        other_source : np.array
-            Non-Renewable energy production prediction time series in [MW].
-        fossil_share : np.array
-            Share of non-renewable energy production of total energy production time series.
+    Attributes
+    ----------
+    renewable_energy_produced : np.array
+        Renewable energy production time series in [MW].
+    non_renewable_energy_produced : np.array
+        Non-Renewable energy production prediction time series in [MW].
     """
-    pass
+
+    def __init__(self, renewable_energy_produced: Iterable[float], non_renewable_energy_produced: Iterable[float]):
+        r"""Initialize `FuelMix`."""
+
+        self.renewable_energy_produced = np.array(renewable_energy_produced, dtype = float)
+        self.non_renewable_energy_produced = np.array(non_renewable_energy_produced, dtype=float)

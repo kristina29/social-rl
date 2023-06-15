@@ -9,7 +9,7 @@ import pandas as pd
 from citylearn.base import Environment
 from citylearn.building import Building
 from citylearn.cost_function import CostFunction
-from citylearn.data import DataSet, EnergySimulation, CarbonIntensity, Pricing, Weather, WeatherWind
+from citylearn.data import DataSet, EnergySimulation, CarbonIntensity, Pricing, Weather, WeatherWind, FuelMix
 from citylearn.utilities import read_json
 
 LOGGER = logging.getLogger()
@@ -803,6 +803,12 @@ class CityLearnEnv(Environment, Env):
                         pricing = Pricing(*pricing.values.T)
                     else:
                         pricing = None
+
+                    if building_schema.get('fuel_mix', None) is not None:
+                        fuel_mix = pd.read_csv(os.path.join(root_directory,building_schema['fuel_mix'])).iloc[simulation_start_time_step:simulation_end_time_step + 1].copy()
+                        fuel_mix = FuelMix(*fuel_mix.values.T)
+                    else:
+                        fuel_mix = None
                         
                     # observation and action metadata
                     inactive_observations = [] if building_schema.get('inactive_observations', None) is None else building_schema['inactive_observations']
