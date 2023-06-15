@@ -538,8 +538,8 @@ def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], filename):
     """
 
     plot_building_kpis(envs)
-    plot_building_load_profiles(envs)
-    plot_battery_soc_profiles(envs)
+    # plot_building_load_profiles(envs)
+    # plot_battery_soc_profiles(envs)
     plot_district_kpis(envs)
-    plot_district_load_profiles(envs)
+    # plot_district_load_profiles(envs)
     save_multi_image(filename)
