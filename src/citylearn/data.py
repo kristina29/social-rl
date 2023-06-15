@@ -230,3 +230,20 @@ class CarbonIntensity:
         r"""Initialize `CarbonIntensity`."""
 
         self.carbon_intensity = np.array(carbon_intensity, dtype = float)
+
+class FuelMix:
+    """`Building` `fuel_mix` data class.
+
+    Attributes
+    ----------
+    renewable_energy_produced : np.array
+        Renewable energy production time series in [MW].
+    non_renewable_energy_produced : np.array
+        Non-Renewable energy production prediction time series in [MW].
+    """
+
+    def __init__(self, renewable_energy_produced: Iterable[float], non_renewable_energy_produced: Iterable[float]):
+        r"""Initialize `FuelMix`."""
+
+        self.renewable_energy_produced = np.array(renewable_energy_produced, dtype = float)
+        self.non_renewable_energy_produced = np.array(non_renewable_energy_produced, dtype=float)
