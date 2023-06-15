@@ -148,7 +148,6 @@ def read_fuel_data(load_dir) -> pd.DataFrame:
 
     fuel['Renewable Sources'] = fuel[['Hydro', 'Wind', 'Other Renewables']].sum(axis=1)
     fuel['Other'] = fuel[['Dual Fuel', 'Natural Gas', 'Nuclear', 'Other Fossil Fuels']].sum(axis=1)
-    fuel['Fossil Share'] = fuel['Other']/(fuel['Renewable Sources']+fuel['Other'])
     fuel = fuel.drop(columns=['Hydro', 'Wind', 'Other Renewables', 'Dual Fuel', 'Natural Gas', 'Nuclear',
                                 'Other Fossil Fuels'])
 
@@ -157,7 +156,7 @@ def read_fuel_data(load_dir) -> pd.DataFrame:
 
 def adapt_price(load_path, save_path, fuel_mix, alpha=6) -> None:
     price = pd.read_csv(load_path)
-    fossil_share = fuel_mix['Fossil Share']
+    fossil_share = fuel_mix['Other']/(fuel_mix['Renewable Sources']+fuel_mix['Other'])
 
     price['Electricity Pricing [$]'] = price['Electricity Pricing [$]'] + alpha * fossil_share
 
