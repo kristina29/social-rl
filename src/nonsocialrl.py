@@ -137,6 +137,13 @@ if __name__ == '__main__':
         exclude_rbc = bool(int(sys.argv[6]))
         active_observations = [sys.argv[7]]
 
+    DATASET_NAME = 'nydata'
+    exclude_rbc = 1
+    exclude_tql = 1
+    building_count = 2
+    episodes = 2
+    active_observations = ['renewable_energy_produced', 'non_renewable_energy_produced']
+
     train(DATASET_NAME, seed, building_count, episodes, active_observations, exclude_tql, exclude_rbc)
 
     # get the end time
