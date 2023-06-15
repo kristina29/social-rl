@@ -130,7 +130,7 @@ ax.set_title('Total Energy produced')
 ax.set_ylabel('Energy produced [$MW$]')
 ax.set_xlabel('Time step')
 
-percent = np.array(1-fuel_mix['Fossil Share'])*100
+percent = np.array(fuel_mix['Renewable Sources']/sum)*100
 fig, ax = plt.subplots()
 ax.plot(np.arange(percent.size), percent)
 ax.set_title('$\%$ Renweable Energy from total produced Energy')
@@ -188,6 +188,28 @@ ax.scatter(dni, solar_generation, s=1)
 ax.set_title('Solar generation Building 14 vs. DNI (NY data)')
 ax.set_ylabel('Solar generation [$W/kW$]')
 ax.set_xlabel('DNI [$W/m^2$]')
+
+##################################################
+# PRICING DATA
+##################################################
+
+pricing_new = pd.read_csv('citylearn/data/nydata/pricing.csv')['Electricity Pricing [$]']
+
+fig, ax = plt.subplots()
+ax.plot(np.arange(len(pricing_new)), pricing_new)
+ax.set_title('Electricity Pricing [$] - Weighted by Fossil Energy share')
+ax.set_ylabel('$')
+ax.set_xlabel('Time step')
+
+fig, ax = plt.subplots()
+ax.plot(np.arange(168), pricing_new[:168], label='Prices influenced by fossil energy')
+ax.plot(np.arange(168), pricing[:168], label='Old prices')
+ax.set_title('Electricity Pricing [$] - Original vs. Weighted by Fossil Energy share')
+ax.set_ylabel('$')
+ax.set_xticks(np.arange(0, len(ticks)))
+ax.xaxis.set_tick_params(length=0)
+ax.set_xticklabels(ticks, rotation=0)
+[l.set_visible(False) for (i,l) in enumerate(ax.get_xticklabels()) if (i-18) % 24 != 0]
 
 if save:
     filename = "../datasets/data_exploration_plots/exploration-plots_" + datetime.now().strftime("%Y%m%dT%H%M%S")
