@@ -130,7 +130,7 @@ ax.set_title('Total Energy produced')
 ax.set_ylabel('Energy produced [$MW$]')
 ax.set_xlabel('Time step')
 
-percent = np.array(1-fuel_mix['Fossil Share'])*100
+percent = np.array(fuel_mix['Renewable Sources']/sum)*100
 fig, ax = plt.subplots()
 ax.plot(np.arange(percent.size), percent)
 ax.set_title('$\%$ Renweable Energy from total produced Energy')
