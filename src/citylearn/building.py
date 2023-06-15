@@ -287,6 +287,30 @@ class Building(Environment):
         return self.__net_electricity_consumption
 
     @property
+    def net_renewable_electricity_consumption(self) -> List[float]:
+        """net renewable electricity consumption time series, in [kWh].
+
+        Notes
+        -----
+        net_renewable_electricity_consumption = `net_electricity_consumption_without_storage`
+        """
+
+        # TODO
+        pass
+
+    @property
+    def net_renewable_electricity_share(self) -> List[float]:
+        """net renewable electricity share time series.
+
+        Notes
+        -----
+        net_renewable_electricity_share = `net_renewable_electricity_consumption` / ( `net_renewable_electricity_consumption` + `net_non_renewable_electricity_consumption`)
+        """
+
+        #TODO
+        pass
+
+    @property
     def cooling_electricity_consumption(self) -> List[float]:
         """`cooling_device` net electricity consumption in meeting domestic hot water and `cooling_stoage` energy demand time series, in [kWh]. 
         
