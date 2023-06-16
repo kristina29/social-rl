@@ -237,9 +237,9 @@ class FuelMix:
     Attributes
     ----------
     renewable_energy_produced : np.array
-        Renewable energy production time series in [MW].
+        Renewable energy production time series in [kWh].
     non_renewable_energy_produced : np.array
-        Non-Renewable energy production prediction time series in [MW].
+        Non-Renewable energy production prediction time series in [kWh].
     """
 
     def __init__(self, renewable_energy_produced: Iterable[float], non_renewable_energy_produced: Iterable[float]):
