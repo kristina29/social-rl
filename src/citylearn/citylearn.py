@@ -628,7 +628,7 @@ class CityLearnEnv(Environment, Env):
                         if sum(b.pricing.electricity_pricing) != 0 else None,
                 }, {
                 'name': b.name,
-                'cost_function': 'average_daily_renewable_share',
+                'cost_function': '1 - average_daily_renewable_share',
                 'value': CostFunction.average_daily_renewable_share(b.net_renewable_electricity_share)[-1]/\
                     CostFunction.average_daily_renewable_share(b.net_renewable_electricity_share_without_storage)[-1]\
                         if sum(b.fuel_mix.renewable_energy_produced) != 0 else None,

@@ -255,7 +255,7 @@ class CostFunction:
     @staticmethod
     def average_daily_renewable_share(net_renewable_electricity_share: List[float],
                                       daily_time_step: int = None) -> List[float]:
-        r"""Mean of daily share of renewable electricity consumption of the total consumption.
+        r"""Difference between 1 and the Mean of daily share of renewable electricity consumption of the total consumption.
 
         Parameters
         ----------
@@ -267,13 +267,15 @@ class CostFunction:
         Returns
         -------
         average_daily_renewable_share : List[float]
-            Average daily share of renewable electricity consumption.
+            1-Average daily share of renewable electricity consumption.
+            (equivalent to average daily share of non-renewable electricity consumption)
         """
 
         daily_time_step = 24 if daily_time_step is None else daily_time_step
         data = pd.DataFrame({'renewable_share': net_renewable_electricity_share})
         data['group'] = (data.index / daily_time_step).astype(int)
         data = data.groupby(['group'])[['renewable_share']].mean()
+        data['renewable_share'] = 1-data['renewable_share']
         data['renewable_share'] = data['renewable_share'].rolling(window=data.shape[0], min_periods=1).mean()
 
         return data['renewable_share'].tolist()
