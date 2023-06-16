@@ -143,7 +143,7 @@ if __name__ == '__main__':
         exclude_tql = 1
         building_count = 2
         episodes = 2
-        seed = 0
+        seed = 1
         active_observations = ['renewable_energy_produced', 'non_renewable_energy_produced']
 
     train(DATASET_NAME, seed, building_count, episodes, active_observations, exclude_tql, exclude_rbc)
