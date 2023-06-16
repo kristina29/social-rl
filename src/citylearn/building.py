@@ -1,6 +1,8 @@
 import inspect
 import math
 from typing import List, Mapping, Tuple, Union
+
+import pandas as pd
 from gym import spaces
 import numpy as np
 from citylearn.base import Environment
@@ -295,7 +297,7 @@ class Building(Environment):
         net_renewable_electricity_consumption_without_storage = min(`net_electricity_consumption_without_storage`, `renewable_energy_produced`)
         """
 
-        return np.stack((self.net_electricity_consumption_without_storage, self.__fuel_mix.renewable_energy_produced)).min(axis=0)
+        return np.stack((self.net_electricity_consumption_without_storage, self.__fuel_mix.renewable_energy_produced)).min(axis=0).clip(min=0)
 
     @property
     def net_non_renewable_electricity_consumption_without_storage(self) -> np.ndarray:
@@ -306,7 +308,7 @@ class Building(Environment):
         net_non_renewable_electricity_consumption = net_electricity_consumption_without_storage - `net_renewable_electricity_consumption`
         """
 
-        return self.net_electricity_consumption_without_storage - self.net_renewable_electricity_consumption
+        return (self.net_electricity_consumption_without_storage - self.net_renewable_electricity_consumption).clip(min=0)
 
     @property
     def net_renewable_electricity_share_without_storage(self) -> List[float]:
@@ -316,8 +318,12 @@ class Building(Environment):
         -----
         net_renewable_electricity_share = `net_renewable_electricity_consumption` / `net_electricity_consumption_without_storage`
         """
+        data = list(self.net_renewable_electricity_consumption / self.net_electricity_consumption)
+        if any(data) < 0 or any(data) > 1:
+            data = pd.DataFrame({'data': data})
+            data.to_csv(f'b{self.name}bad_share_without_storage.csv', index=False)
 
-        return list(self.net_renewable_electricity_consumption / self.net_electricity_consumption_without_storage)
+        return list((self.net_renewable_electricity_consumption / self.net_electricity_consumption_without_storage).clip(min=0))
 
     @property
     def net_renewable_electricity_consumption(self) -> np.ndarray:
@@ -328,7 +334,7 @@ class Building(Environment):
         net_renewable_electricity_consumption = min(`net_electricity_consumption`, `renewable_energy_produced`)
         """
 
-        return np.stack((self.net_electricity_consumption, self.__fuel_mix.renewable_energy_produced)).min(axis=0)
+        return np.stack((self.net_electricity_consumption, self.__fuel_mix.renewable_energy_produced)).min(axis=0).clip(min=0)
 
     @property
     def net_non_renewable_electricity_consumption(self) -> np.ndarray:
@@ -339,7 +345,7 @@ class Building(Environment):
         net_non_renewable_electricity_consumption = net_electricity_consumption - `net_renewable_electricity_consumption`
         """
 
-        return self.net_electricity_consumption - self.net_renewable_electricity_consumption
+        return (self.net_electricity_consumption - self.net_renewable_electricity_consumption).clip(min=0)
 
     @property
     def net_renewable_electricity_share(self) -> List[float]:
@@ -349,8 +355,12 @@ class Building(Environment):
         -----
         net_renewable_electricity_share = `net_renewable_electricity_consumption` / `net_electricity_consumption`
         """
+        data = list(self.net_renewable_electricity_consumption / self.net_electricity_consumption)
+        if any(data) < 0 or any(data) > 1:
+            data = pd.DataFrame({'data':data})
+            data.to_csv(f'b{self.name}bad_share.csv', index=False)
 
-        return list(self.net_renewable_electricity_consumption / self.net_electricity_consumption)
+        return list((self.net_renewable_electricity_consumption / self.net_electricity_consumption).clip(min=0))
 
     @property
     def cooling_electricity_consumption(self) -> List[float]:
