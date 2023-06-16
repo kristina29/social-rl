@@ -16,6 +16,7 @@ thesis/*.lot
 thesis/thesis.pdf
 thesis/.DS_Store
 thesis/old/
+thesis/figures/~$figures.pptx
 .DS_Store
 plots_*
 src/plots_*
@@ -26,4 +27,5 @@ src/citylearn/data/
 src/citylearn/assets/
 src/citylearn/__pycache__/
 src/citylearn/agents/__pycache__/
+src/b_net_electricity_consumption.csv
 LaTeXTemplates_masters-doctoral-thesis_v2/
