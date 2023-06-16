@@ -626,6 +626,12 @@ class CityLearnEnv(Environment, Env):
                 'value': CostFunction.cost(b.net_electricity_consumption_cost)[-1]/\
                     CostFunction.cost(b.net_electricity_consumption_without_storage_cost)[-1]\
                         if sum(b.pricing.electricity_pricing) != 0 else None,
+                }, {
+                'name': b.name,
+                'cost_function': '1 - average_daily_renewable_share',
+                'value': CostFunction.average_daily_renewable_share(b.net_renewable_electricity_share)[-1]/\
+                    CostFunction.average_daily_renewable_share(b.net_renewable_electricity_share_without_storage)[-1]\
+                        if sum(b.fuel_mix.renewable_energy_produced) != 0 else None,
                 }]
 
         building_level = pd.DataFrame(building_level)
@@ -830,6 +836,7 @@ class CityLearnEnv(Environment, Env):
                         action_metadata=action_metadata, 
                         carbon_intensity=carbon_intensity, 
                         pricing=pricing,
+                        fuel_mix=fuel_mix,
                         name=building_name,
                         demonstrator=demonstrator,
                         seconds_per_time_step=seconds_per_time_step,
