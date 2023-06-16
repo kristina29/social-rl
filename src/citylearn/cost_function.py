@@ -273,7 +273,7 @@ class CostFunction:
         daily_time_step = 24 if daily_time_step is None else daily_time_step
         data = pd.DataFrame({'renewable_share': net_renewable_electricity_share})
         data['group'] = (data.index / daily_time_step).astype(int)
-        data = data.groupby(['group'])[['renewable_share']].max()
+        data = data.groupby(['group'])[['renewable_share']].mean()
         data['renewable_share'] = data['renewable_share'].rolling(window=data.shape[0], min_periods=1).mean()
 
         return data['renewable_share'].tolist()

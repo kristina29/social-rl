@@ -292,11 +292,21 @@ class Building(Environment):
 
         Notes
         -----
-        net_renewable_electricity_consumption = `net_electricity_consumption_without_storage`
+        net_renewable_electricity_consumption = min(`net_electricity_consumption_without_storage_and_pv`, `renewable_energy_produced`)
         """
 
-        # TODO
-        pass
+        return min(self.net_electricity_consumption_without_storage_and_pv, self.__fuel_mix.renewable_energy_produced)
+
+    @property
+    def net_non_renewable_electricity_consumption(self) -> List[float]:
+        """net non renewable electricity consumption time series, in [kWh].
+
+        Notes
+        -----
+        net_non_renewable_electricity_consumption = net_electricity_consumption_without_storage_and_pv - `net_renewable_electricity_consumption`
+        """
+
+        return self.net_electricity_consumption_without_storage_and_pv - self.net_renewable_electricity_consumption
 
     @property
     def net_renewable_electricity_share(self) -> List[float]:
@@ -304,11 +314,10 @@ class Building(Environment):
 
         Notes
         -----
-        net_renewable_electricity_share = `net_renewable_electricity_consumption` / ( `net_renewable_electricity_consumption` + `net_non_renewable_electricity_consumption`)
+        net_renewable_electricity_share = `net_renewable_electricity_consumption` / `net_electricity_consumption_without_storage_and_pv`
         """
 
-        #TODO
-        pass
+        return self.net_renewable_electricity_consumption / self.net_electricity_consumption_without_storage_and_pv
 
     @property
     def cooling_electricity_consumption(self) -> List[float]:
