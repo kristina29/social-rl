@@ -4,16 +4,16 @@ from typing import List, Mapping, Tuple, Union
 from gym import spaces
 import numpy as np
 from citylearn.base import Environment
-from citylearn.data import EnergySimulation, CarbonIntensity, Pricing, Weather
+from citylearn.data import EnergySimulation, CarbonIntensity, Pricing, Weather, FuelMix
 from citylearn.energy_model import Battery, ElectricHeater, HeatPump, PV, StorageTank
 from citylearn.preprocessing import Normalize, PeriodicNormalization
 
 class Building(Environment):
     def __init__(
         self, energy_simulation: EnergySimulation, weather: Weather, observation_metadata: Mapping[str, bool], action_metadata: Mapping[str, bool], carbon_intensity: CarbonIntensity = None,
-        pricing: Pricing = None, dhw_storage: StorageTank = None, cooling_storage: StorageTank = None, heating_storage: StorageTank = None, electrical_storage: Battery = None, 
-        dhw_device: Union[HeatPump, ElectricHeater] = None, cooling_device: HeatPump = None, heating_device: Union[HeatPump, ElectricHeater] = None, pv: PV = None, name: str = None,
-        demonstrator: bool = False, **kwargs
+        pricing: Pricing = None, fuel_mix: FuelMix = None, dhw_storage: StorageTank = None, cooling_storage: StorageTank = None, heating_storage: StorageTank = None,
+        electrical_storage: Battery = None, dhw_device: Union[HeatPump, ElectricHeater] = None, cooling_device: HeatPump = None, heating_device: Union[HeatPump, ElectricHeater] = None, pv: PV = None,
+        name: str = None, demonstrator: bool = False, **kwargs
     ):
         r"""Initialize `Building`.
 
@@ -31,6 +31,8 @@ class Building(Environment):
             Carbon dioxide emission rate time series.
         pricing : Pricing, optional
             Energy pricing and forecasts time series.
+        fuel_mix : FuelMix, optional
+            Energy produced with renewable sources and not reneable sources time series.
         dhw_storage : StorageTank, optional
             Hot water storage object for domestic hot water.
         cooling_storage : StorageTank, optional
@@ -64,6 +66,7 @@ class Building(Environment):
         self.weather = weather
         self.carbon_intensity = carbon_intensity
         self.pricing = pricing
+        self.fuel_mix = fuel_mix
         self.dhw_storage = dhw_storage
         self.cooling_storage = cooling_storage
         self.heating_storage = heating_storage
@@ -122,6 +125,12 @@ class Building(Environment):
         """Energy pricing and forecasts time series."""
 
         return self.__pricing
+
+    @property
+    def fuel_mix(self) -> FuelMix:
+        """Energy produced with renewable sources and not renewable sources time series."""
+
+        return self.__fuel_mix
 
     @property
     def dhw_storage(self) -> StorageTank:
@@ -276,6 +285,72 @@ class Building(Environment):
         """
 
         return self.__net_electricity_consumption
+
+    @property
+    def net_renewable_electricity_consumption_without_storage(self) -> np.ndarray:
+        """net renewable electricity consumption in the absence of flexibility provided by storage devices time series, in [kWh].
+
+        Notes
+        -----
+        net_renewable_electricity_consumption_without_storage = min(`net_electricity_consumption_without_storage`, `renewable_energy_produced`)
+        """
+
+        return np.stack((self.net_electricity_consumption_without_storage, self.__fuel_mix.renewable_energy_produced)).min(axis=0)
+
+    @property
+    def net_non_renewable_electricity_consumption_without_storage(self) -> np.ndarray:
+        """net non renewable electricity consumption in the absence of flexibility provided by storage devices time series, in [kWh].
+
+        Notes
+        -----
+        net_non_renewable_electricity_consumption = net_electricity_consumption_without_storage - `net_renewable_electricity_consumption`
+        """
+
+        return self.net_electricity_consumption_without_storage - self.net_renewable_electricity_consumption
+
+    @property
+    def net_renewable_electricity_share_without_storage(self) -> List[float]:
+        """net renewable electricity share in the absence of flexibility provided by storage devices  time series.
+
+        Notes
+        -----
+        net_renewable_electricity_share = `net_renewable_electricity_consumption` / `net_electricity_consumption_without_storage`
+        """
+
+        return list(self.net_renewable_electricity_consumption / self.net_electricity_consumption_without_storage)
+
+    @property
+    def net_renewable_electricity_consumption(self) -> np.ndarray:
+        """net renewable electricity consumption time series, in [kWh].
+
+        Notes
+        -----
+        net_renewable_electricity_consumption = min(`net_electricity_consumption`, `renewable_energy_produced`)
+        """
+
+        return np.stack((self.net_electricity_consumption, self.__fuel_mix.renewable_energy_produced)).min(axis=0)
+
+    @property
+    def net_non_renewable_electricity_consumption(self) -> np.ndarray:
+        """net non renewable electricity consumption time series, in [kWh].
+
+        Notes
+        -----
+        net_non_renewable_electricity_consumption = net_electricity_consumption - `net_renewable_electricity_consumption`
+        """
+
+        return self.net_electricity_consumption - self.net_renewable_electricity_consumption
+
+    @property
+    def net_renewable_electricity_share(self) -> List[float]:
+        """net renewable electricity share time series.
+
+        Notes
+        -----
+        net_renewable_electricity_share = `net_renewable_electricity_consumption` / `net_electricity_consumption`
+        """
+
+        return list(self.net_renewable_electricity_consumption / self.net_electricity_consumption)
 
     @property
     def cooling_electricity_consumption(self) -> List[float]:
@@ -484,6 +559,14 @@ class Building(Environment):
         else:
             self.__pricing = pricing
 
+    @fuel_mix.setter
+    def fuel_mix(self, fuel_mix: FuelMix):
+        if fuel_mix is None:
+            self.__fuel_mix = FuelMix(np.zeros(len(self.energy_simulation.hour), dtype=float),
+                                      np.zeros(len(self.energy_simulation.hour), dtype=float))
+        else:
+            self.__fuel_mix = fuel_mix
+
     @dhw_storage.setter
     def dhw_storage(self, dhw_storage: StorageTank):
         self.__dhw_storage = StorageTank(0.0) if dhw_storage is None else dhw_storage
@@ -557,6 +640,7 @@ class Building(Environment):
             **{k: v[self.time_step] for k, v in vars(self.energy_simulation).items()},
             **{k: v[self.time_step] for k, v in vars(self.weather).items()},
             **{k: v[self.time_step] for k, v in vars(self.pricing).items()},
+            **{k: v[self.time_step] for k, v in vars(self.fuel_mix).items()},
             'solar_generation':self.pv.get_generation(self.energy_simulation.solar_generation[self.time_step]),
             **{
                 'cooling_storage_soc':self.cooling_storage.soc[self.time_step]/self.cooling_storage.capacity,
@@ -778,6 +862,7 @@ class Building(Environment):
             **vars(self.weather),
             **vars(self.carbon_intensity),
             **vars(self.pricing),
+            **vars(self.fuel_mix),
         }
 
         for key in self.active_observations:
