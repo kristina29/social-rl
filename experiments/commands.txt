@@ -1,4 +1,4 @@
-scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230616T135929.pdf experiments/SAC/05_pricing_reward_new_KPI/plots_20230616T135929.pdf
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230616T163046.pdf experiments/SAC/05_pricing_reward_new_KPI/plots_20230616T163046.pdf
 
 scp src/citylearn/data/nydata/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata/
 
