@@ -137,7 +137,7 @@ if __name__ == '__main__':
         exclude_rbc = bool(int(sys.argv[6]))
         active_observations = [sys.argv[7]]
 
-    if True:
+    if False:
         DATASET_NAME = 'nydata'
         exclude_rbc = 1
         exclude_tql = 1

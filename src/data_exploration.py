@@ -123,14 +123,14 @@ if ny_data:
 ##################################################
 fuel_mix = pd.read_csv('citylearn/data/nydata/fuelmix.csv')
 
-sum = np.array(fuel_mix['Renewable Sources']+fuel_mix['Other'])
+sum = np.array(fuel_mix['Renewable Sources [kWh]']+fuel_mix['Other [kWh]'])
 fig, ax = plt.subplots()
 ax.plot(np.arange(sum.size), sum)
 ax.set_title('Total Energy produced')
 ax.set_ylabel('Energy produced [$MW$]')
 ax.set_xlabel('Time step')
 
-percent = np.array(fuel_mix['Renewable Sources']/sum)*100
+percent = np.array(fuel_mix['Renewable Sources [kWh]']/sum)*100
 fig, ax = plt.subplots()
 ax.plot(np.arange(percent.size), percent)
 ax.set_title('$\%$ Renweable Energy from total produced Energy')
