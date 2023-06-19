@@ -316,14 +316,11 @@ class Building(Environment):
 
         Notes
         -----
-        net_renewable_electricity_share = `net_renewable_electricity_consumption` / `net_electricity_consumption_without_storage`
+        net_renewable_electricity_share_without_storage = `net_renewable_electricity_consumption_without_storage`
+                                                            / `net_electricity_consumption_without_storage`
         """
-        data = list(self.net_renewable_electricity_consumption / self.net_electricity_consumption)
-        if any(data) < 0 or any(data) > 1:
-            data = pd.DataFrame({'data': data})
-            data.to_csv(f'b{self.name}bad_share_without_storage.csv', index=False)
 
-        return list((self.net_renewable_electricity_consumption / self.net_electricity_consumption_without_storage).clip(min=0))
+        return list((self.net_renewable_electricity_consumption_without_storage / self.net_electricity_consumption_without_storage).clip(min=0))
 
     @property
     def net_renewable_electricity_consumption(self) -> np.ndarray:
