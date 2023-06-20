@@ -246,7 +246,8 @@ def get_kpis(env: CityLearnEnv) -> pd.DataFrame:
     # names of KPIs to retrieve from evaluate function
     kpi_names = [
         'electricity_consumption', 'cost', 'carbon_emissions',
-        'average_daily_peak', 'ramping', '1 - load_factor'
+        'average_daily_peak', 'ramping', '1 - load_factor',
+        '1 - average_daily_renewable_share'
     ]
     kpis = kpis[
         (kpis['cost_function'].isin(kpi_names))
@@ -538,8 +539,8 @@ def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], filename):
     """
 
     plot_building_kpis(envs)
-    plot_building_load_profiles(envs)
-    plot_battery_soc_profiles(envs)
+    # plot_building_load_profiles(envs)
+    # plot_battery_soc_profiles(envs)
     plot_district_kpis(envs)
-    plot_district_load_profiles(envs)
+    # plot_district_load_profiles(envs)
     save_multi_image(filename)

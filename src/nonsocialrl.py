@@ -128,7 +128,7 @@ if __name__ == '__main__':
     active_observations = opts.observations
 
     # only when used in pycharm for testing
-    if len(sys.argv) == 8:
+    if len(sys.argv) == 8 and False:
         DATASET_NAME = sys.argv[1]
         seed = int(sys.argv[2])
         building_count = int(sys.argv[3])
@@ -137,9 +137,13 @@ if __name__ == '__main__':
         exclude_rbc = bool(int(sys.argv[6]))
         active_observations = [sys.argv[7]]
 
-    exclude_tql = 1
-    exclude_rbc = 1
-    episodes = 2
+    if False:
+        DATASET_NAME = 'nydata'
+        exclude_rbc = 1
+        exclude_tql = 1
+        building_count = 2
+        episodes = 2
+        active_observations = ['renewable_energy_produced', 'non_renewable_energy_produced']
 
     train(DATASET_NAME, seed, building_count, episodes, active_observations, exclude_tql, exclude_rbc)
 
