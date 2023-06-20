@@ -2,11 +2,14 @@ import time
 from datetime import datetime
 
 import pandas as pd
+import numpy as np
+from matplotlib import pyplot as plt
 
 from citylearn.agents.sac import SAC
 from citylearn.citylearn import CityLearnEnv
 from citylearn.data import DataSet
 
+from scipy.stats import norm
 
 def exploration():
     # load data
@@ -35,11 +38,37 @@ def exploration():
     print(f'Number of buildings: {len(env.buildings)}')
     print(f'Number of iterations: {n}')
 
+def calculation():
+    filenames = ['../experiments/Explore_Demand/01/electricity_consumption20230620T143319.csv',
+                 '../experiments/Explore_Demand/02/electricity_consumption20230620T140421.csv',
+                 '../experiments/Explore_Demand/3/electricity_consumption20230620T141523.csv']
+
+    data = pd.read_csv(filenames[0])
+    for file in filenames[1:]:
+        data.append(pd.read_csv(file))
+
+    x_axis = np.arange(-50, 50, 0.001)
+    for col in data.columns:
+        mean = data[col].mean()
+        std = data[col].std()
+        print(f'Mean of {col}: {mean} kWh')
+        print(f'Median of {col}: {data[col].median()} kWh')
+        print(f'Std of {col}: {std} kWh')
+        print('')
+        plt.plot(x_axis, norm.pdf(x_axis, mean, std), label=col)
+    plt.legend()
 
 if __name__ == '__main__':
     st = time.time()
 
-    exploration()
+    explore = False
+    calculate = True
+
+    if explore:
+        exploration()
+    if calculate:
+        calculation()
+
 
     # get the end time
     et = time.time()
