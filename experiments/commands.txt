@@ -3,3 +3,5 @@ scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230616T
 scp src/citylearn/data/nydata/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata/
 
 scp src/job.sh klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/
+
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/electricity_consumption20230620T143319.csv experiments/Explore_Demand/01
