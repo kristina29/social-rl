@@ -215,6 +215,22 @@ Referenzen: \cite{SaaSchTue97,TueConSaa96ismis,SchTueSaa98preprint}
 \cleardoublepage
 
 %% 
+\chapter{Background}
+  \label{Background}
+
+\todo[inline]{TODO}
+
+\section{Reinforcement Learning}
+\begin{figure}[htb]
+     \center
+     \includegraphics[width=\textwidth]{figures/rl_overview.pdf}
+  \caption{In RL, the agent observes the state of the environment $s_t$ at timestep $t$ via the observation $o_t$. The policy $\pi$ determines the agent's action $a_t$, which in turn determines the next state $s_{t+1}$ of the environment and the environment sends an reward $r_t$ to the agent. The policy of the agent is trained using the observation, the action, and the reward,}
+  \label{fig:rl_overview}
+\end{figure}
+\noindent
+Reinforcement Learning (RL) is a machine learning method that, in contrast to supervised and not-supervised methods, does need labeled data for learning. Instead, it explores in an environment the possible actions and aims to maximize the long-term reward. Figure \ref{fig:rl_overview} shows the general RL approach. Formally, at each time step $t$, the environment is in a state $s_t$ that is observed by the agent via an observation $o_t$. This observation may not include the complete state. Based on this observation, the agent takes an action $a_t$, which determines the next state $s_{t+1}$ of the environment. The action is determined by the policy $\pi=p(a_t|o_t)$, which may also be deterministic. Also, as reaction to the received action, the environment sends an reward signal $r_t$ to the agent. The policy of the agent is trained with the goal, to maximize the discounted total reward. 
+
+\todo[inline]{TODO Markov Decision Process}
 \input{Background}
 \cleardoublepage
 
