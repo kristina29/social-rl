@@ -16,7 +16,7 @@ def exploration():
     electricity_consumption_without_storage = []
     electricity_consumption_without_storage_and_pv = []
 
-    n = 10
+    n = 3
     for i in range(n):
         # Train soft actor-critic (SAC) agent
         env = CityLearnEnv(schema)
