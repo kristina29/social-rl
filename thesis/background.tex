@@ -6,6 +6,8 @@
 
 
 \subsection{Soft Actor-Critic}
+\todo[inline]{TODO Continuous spaces}
+
 \begin{algorithm}
 \caption{Soft Actor-Critic \cite{haarnoja2018soft}}
 \label{alg:sac-update}
@@ -16,7 +18,7 @@
 \For{each iteration}
 	\For{each environment step}
 		\State $\mathbf{a}_t \sim \pi_{\phi}(\mathbf{a}_t|\mathbf{s}_t)$ \Comment{Sample action from the policy}
-		\State $\mathbf{s}_{t+1} \sim p(\mathbf{s}_{t+1}|\mathbf{a}_t)$ \Comment{Sample transition from the environment}
+		\State $\mathbf{s}_{t+1} \sim p(\mathbf{s}_{t+1}|\mathbf{s}_t,\mathbf{a}_t)$ \Comment{Sample transition from the environment}
 		\State $\mathcal{D} \gets \mathcal{D} \cup \{(\mathbf{s}_t,\mathbf{a}_t,r(\mathbf{s}_t,\mathbf{a}_t),\mathbf{s}_{t+1})\}$ \Comment{Store the transition in the replay pool}
 	\EndFor
 	\For{each gradient step}
@@ -43,7 +45,7 @@
 \For{each iteration}
 	\For{each environment step}
 		\State $\mathbf{a}_t \sim \pi_{\phi}(\mathbf{a}_t|\mathbf{s}_t)$ \Comment{Sample action from the policy}
-		\State $\mathbf{s}_{t+1} \sim p(\mathbf{s}_{t+1}|\mathbf{a}_t)$ \Comment{Sample transition from the environment}
+		\State $\mathbf{s}_{t+1} \sim p(\mathbf{s}_{t+1}|\mathbf{s}_t,\mathbf{a}_t)$ \Comment{Sample transition from the environment}
 		\State $\mathcal{D} \gets \mathcal{D} \cup \{(\mathbf{s}_t,\mathbf{a}_t,r(\mathbf{s}_t,\mathbf{a}_t),\mathbf{s}_{t+1})\}$ \Comment{Store the transition in the replay pool}
 	\EndFor
 	\For{each gradient step}

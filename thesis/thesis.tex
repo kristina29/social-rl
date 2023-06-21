@@ -232,11 +232,31 @@ As defined by Sutton and Barto \cite{sutton2018reinforcement}, RL is a machine l
 \end{figure}
 
 \noindent
-Figure \ref{fig:rl_overview} shows the general RL approach. RL problems are often formulated as finite MDPs, where the RL agents interact with an environment. At each time step $t$, the environment is in a state $s_t$ that the agent observes. Based on this observation, the agent takes action $a_t$, which determines the next state $s_{t+1}$ of the environment. The policy $\pi=p(a_t|s_t)$ determines the action, which may also be deterministic. Also, reacting to the received action, the environment sends the agent a reward signal $r_t$. The agent's policy is trained to maximize the discounted total reward. 
+Figure \ref{fig:rl_overview} shows the general RL approach. RL problems are often formulated as finite MDPs, 
+%defined by a tuple $(\mathcal{S}, \mathcal{A}, p, r)$, 
+where the agent interacts with the environment over a series of time steps. At each time step $t$, the agent observes the current state of the environment, denoted as $s_t \in \mathcal{S}$. Based on this state, the agent selects an action $a_t \in \mathcal{A}$. We assume, that the set of possible actions $\mathcal{A}$ is the same in all states. As a consequence of the chosen action, the agent receives at the next time step a numerical reward $r_{t+1}\in\mathcal{R} \subset \mathbb{R}$ and a new state $s_{t+1}$.
+
+\todo[inline]{discrete spaces, markov property}
+
+The dynamics of the MDP are captured by a function $p: \mathcal{S}\times\mathcal{R}\times\mathcal{S}\times\mathcal{A} \rightarrow [0,1]$. This function represents the probability of transitioning from state $s\in\mathcal{S}$ to state $s'\in\mathcal{S}$ and receiving reward $r\in\mathcal{R}$ when the action $a\in\mathcal{A}$ is taken:
+\begin{equation}
+p(s', r \mid s,a)=P(s_t=s', r_t=r \mid s_{t-1}=s, a_{t-1}=a)
+\end{equation}
+Using the dynamics function $p$, we can calculate additional quantities of interest. The state-transition probability defined as function $p: \mathcal{S}\times\mathcal{S}\times\mathcal{A} \rightarrow [0,1]$ is the probability of transitioning to state $s'$ when action $a$ is taken, given the current state is $s$: 
+\begin{equation}
+p(s'\mid s,a)=P(s_t=s'\mid s_{t-1}=s, a_{t-1}=a) = \sum_{r\in\mathcal{R}}p(s',r \mid s,a)
+\end{equation}
+Furthermore, we can calculate the expected reward for a given state-action pair $(s,a)$ as function $r: \mathcal{S}\times\mathcal{A}\rightarrow \mathbb{R}$: 
+\begin{equation}
+r(s,a)=\mathbb{E}[r_t\mid s_{t-1}=s,a_{t-1}=a]=\sum_{r\in\mathcal{R}}r\sum_{s'\in\mathcal{S}}p(s',r\mid s,a)
+\end{equation}
 
 \begin{itemize}
-\item
-\end{itemize}
+\item Goal: maximize expected discounted return $G_t = R_{t+1}+\gamma R_{t+2}+\gamma^2R_{t+3}+... = \sum_{k=0}^{\infty}\gamma^kR_{t+k+1}$ with discount rate $0 \leq \gamma \leq 1$
+\end{itemize} 
+
+
+The policy $\pi: \mathcal{S}=p(a_t|s_t)$ determines the action, which may also be deterministic. Also, reacting to the received action, the environment sends the agent a reward signal $r_t$. The agent's policy is trained to maximize the discounted total reward. 
 
 
 \todo[inline]{TODO Continuous action - 335, continuous state ---$>$ function approximation}
