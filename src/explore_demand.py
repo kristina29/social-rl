@@ -18,7 +18,7 @@ def exploration():
     # load data
     schema = DataSet.get_schema('test')
 
-    #schema = preprocessing(schema, 2, 0, ['hour'])
+    # schema = preprocessing(schema, 2, 0, ['hour'])
 
     electricity_consumption = []
     electricity_consumption_without_storage = []
@@ -35,7 +35,7 @@ def exploration():
             electricity_consumption.extend(b.net_electricity_consumption)
             electricity_consumption_without_storage.extend(b.net_electricity_consumption_without_storage)
             electricity_consumption_without_storage_and_pv.extend(b.net_electricity_consumption_without_storage_and_pv)
-            building_id.extend([b.name]*len(b.net_electricity_consumption))
+            building_id.extend([b.name] * len(b.net_electricity_consumption))
 
     data = pd.DataFrame({'electricity_consumption': electricity_consumption,
                          'electricity_consumption_without_storage': electricity_consumption_without_storage,
@@ -49,36 +49,33 @@ def exploration():
 
 
 def calculation():
-    filenames = ['../experiments/Explore_Demand/01/electricity_consumption20230620T143319.csv',
-                 '../experiments/Explore_Demand/02/electricity_consumption20230620T140421.csv',
-                 '../experiments/Explore_Demand/3/electricity_consumption20230620T141523.csv']
+    filenames = ['../experiments/Explore_Demand/per_building/electricity_consumption20230621T154955.csv',
+                 '../experiments/Explore_Demand/per_building/electricity_consumption20230621T155019.csv',
+                 '../experiments/Explore_Demand/per_building/electricity_consumption20230621T155100.csv',
+                 '../experiments/Explore_Demand/per_building/electricity_consumption20230621T160455.csv']
 
-    b = 17
     data = pd.read_csv(filenames[0])
     for file in filenames[1:]:
         data.append(pd.read_csv(file))
 
-    x_axis = np.arange(-50, 50, 0.001)
-    stat_data = pd.DataFrame(columns={'Column', 'Median', 'Median per Building'})
-    for col in data.columns:
-        mean = data[col].mean()
-        median = data[col].median()
-        std = data[col].std()
-        print(f'Mean of {col}: {mean} kWh')
-        print(f'Median of {col}: {median} kWh')
-        print(f'Std of {col}: {std} kWh')
-        print('')
-        plt.plot(x_axis, norm.pdf(x_axis, mean, std), label=col)
-        stat_data.append(pd.DataFrame({'Column': col, 'Median': median, 'Median per Building': median / b}))
-    plt.legend()
-    plt.show()
+    data = data.groupby('building', as_index=False).agg(['median', 'std'])
+
+    stat_data = pd.DataFrame(columns=['Column', 'Median [kWh]', 'Std [kWh]', 'Building'])
+    for i in range(0, len(data.columns), 2):
+        col = data.columns[i]
+        stat_data = stat_data.append(pd.DataFrame({'Column': col[0],
+                                                   'Median [kWh]': data[col].tolist(),
+                                                   'Std [kWh]': data.iloc[:, i + 1].tolist(),
+                                                   'Building': data.index.tolist()}))
+
+    stat_data.to_csv('citylearn/data/nydata/statistics_building_electricity_consumption.csv', index=False)
 
 
 if __name__ == '__main__':
     st = time.time()
 
-    explore = True
-    calculate = False
+    explore = False
+    calculate = True
 
     if explore:
         exploration()
