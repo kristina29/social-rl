@@ -5,6 +5,7 @@ CityLearn-master/
 datasets/fuel_mix_ny_2021/
 datasets/weather_ny_42.30_-74.37_2021.csv
 datasets/data_exploration_plots/
+experiments/Explore_Demand/
 formelles/
 thesis/*.bbl
 thesis/*.blg

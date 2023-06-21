@@ -61,6 +61,7 @@ def preprocess_data(load_path, save_path, weather) -> pd.DataFrame:
         # reorder to match citylearn
         df = df[WEATHER_FINAL_ORDER]
 
+
     df.to_csv(save_path, index=False)
     print(f'File saved under {save_path}')
 
@@ -149,8 +150,9 @@ def read_fuel_data(load_dir) -> pd.DataFrame:
     # group by renewable and not renewable and convert given MW into kWh
     fuel['Renewable Sources [kWh]'] = fuel[['Hydro', 'Wind', 'Other Renewables']].sum(axis=1) * 1000
     fuel['Other [kWh]'] = fuel[['Dual Fuel', 'Natural Gas', 'Nuclear', 'Other Fossil Fuels']].sum(axis=1) * 1000
+    fuel['Renewable Share'] = fuel['Renewable Sources [kWh]'] / (fuel['Renewable Sources [kWh]'] + fuel['Other [kWh]'])
     fuel = fuel.drop(columns=['Hydro', 'Wind', 'Other Renewables', 'Dual Fuel', 'Natural Gas', 'Nuclear',
-                                'Other Fossil Fuels'])
+                              'Other Fossil Fuels'])
 
     return fuel
 
