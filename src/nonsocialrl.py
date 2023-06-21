@@ -7,9 +7,10 @@ from citylearn.agents.rbc import OptimizedRBC
 from citylearn.agents.sac import SAC
 from citylearn.citylearn import CityLearnEnv
 from citylearn.data import DataSet
+from citylearn.utilities import get_active_parts
 from citylearn.wrappers import TabularQLearningWrapper
 from options import parseOptions_nonsocial
-from utils import set_schema_buildings, set_active_observations, plot_simulation_summary, get_active_parts
+from utils import set_schema_buildings, set_active_observations, plot_simulation_summary
 
 
 def train(dataset_name, random_seed, building_count, episodes, active_observations, exclude_tql,
@@ -50,7 +51,7 @@ def preprocessing(schema, building_count, random_seed, active_observations):
     if active_observations is not None:
         schema, active_observations = set_active_observations(schema, active_observations)
     else:
-        active_observations = get_active_parts(schema)
+        active_observations = get_active_parts(schema, 'observations')
     print(f'Active observations:', active_observations)
 
     return schema
@@ -137,7 +138,7 @@ if __name__ == '__main__':
         exclude_rbc = bool(int(sys.argv[6]))
         active_observations = [sys.argv[7]]
 
-    if False:
+    if True:
         DATASET_NAME = 'nydata'
         exclude_rbc = 1
         exclude_tql = 1

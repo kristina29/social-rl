@@ -10,7 +10,7 @@ from citylearn.base import Environment
 from citylearn.building import Building
 from citylearn.cost_function import CostFunction
 from citylearn.data import DataSet, EnergySimulation, CarbonIntensity, Pricing, Weather, WeatherWind, FuelMix
-from citylearn.utilities import read_json
+from citylearn.utilities import read_json, get_active_parts
 
 LOGGER = logging.getLogger()
 logging.getLogger('matplotlib.font_manager').disabled = True
@@ -779,7 +779,21 @@ class CityLearnEnv(Environment, Env):
         
         else:
             buildings = ()
-            
+
+            if self.schema['fuel_mix'] is not None:
+                fuel_mix = pd.read_csv(os.path.join(root_directory, self.schema['fuel_mix'])).iloc[
+                            simulation_start_time_step:simulation_end_time_step + 1].copy()
+                fuel_mix = FuelMix(*fuel_mix.values.T)
+
+                fuel_mix_attribute = self.schema['fuel_mix_attribute']
+                sum_medians = 0
+                for b in get_active_parts(self.schema, 'buildings'):
+                    sum_medians += self.schema['buildings'][b][fuel_mix_attribute]
+
+                fuel_mix.scale_to_buildings(sum_medians)
+            else:
+                fuel_mix = None
+
             for building_name, building_schema in self.schema['buildings'].items():
                 if building_schema['include']:
                     # data
@@ -809,12 +823,6 @@ class CityLearnEnv(Environment, Env):
                         pricing = Pricing(*pricing.values.T)
                     else:
                         pricing = None
-
-                    if building_schema.get('fuel_mix', None) is not None:
-                        fuel_mix = pd.read_csv(os.path.join(root_directory,building_schema['fuel_mix'])).iloc[simulation_start_time_step:simulation_end_time_step + 1].copy()
-                        fuel_mix = FuelMix(*fuel_mix.values.T)
-                    else:
-                        fuel_mix = None
                         
                     # observation and action metadata
                     inactive_observations = [] if building_schema.get('inactive_observations', None) is None else building_schema['inactive_observations']

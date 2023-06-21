@@ -130,7 +130,7 @@ class Building(Environment):
 
     @property
     def fuel_mix(self) -> FuelMix:
-        """Energy produced with renewable sources and not renewable sources time series."""
+        """Energy produced with renewable sources and not renewable sources and renewable share time series."""
 
         return self.__fuel_mix
 
@@ -570,6 +570,7 @@ class Building(Environment):
     def fuel_mix(self, fuel_mix: FuelMix):
         if fuel_mix is None:
             self.__fuel_mix = FuelMix(np.zeros(len(self.energy_simulation.hour), dtype=float),
+                                      np.zeros(len(self.energy_simulation.hour), dtype=float),
                                       np.zeros(len(self.energy_simulation.hour), dtype=float))
         else:
             self.__fuel_mix = fuel_mix
