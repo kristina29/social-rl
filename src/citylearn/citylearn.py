@@ -470,6 +470,7 @@ class CityLearnEnv(Environment, Env):
             'diffuse_solar_irradiance_predicted_12h', 'diffuse_solar_irradiance_predicted_24h',
             'direct_solar_irradiance', 'direct_solar_irradiance_predicted_6h',
             'direct_solar_irradiance_predicted_12h', 'direct_solar_irradiance_predicted_24h',
+            'wind_speed', 'wind_speed_predicted_6h', 'wind_speed_predicted_12h', 'wind_speed_predicted_24h',
             'carbon_intensity',
         ]
 
