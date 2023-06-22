@@ -281,10 +281,6 @@ class CityLearnEnv(Environment, Env):
 
         return self.__net_electricity_consumption
 
-    ################################################################
-    ################ TODO
-    ################################################################
-
     @property
     def net_renewable_electricity_consumption_without_storage(self) -> np.ndarray:
         """net renewable electricity consumption in the absence of flexibility provided by storage devices time series, in [kWh].
@@ -356,10 +352,6 @@ class CityLearnEnv(Environment, Env):
         """
 
         return list((self.net_renewable_electricity_consumption / self.net_electricity_consumption).clip(min=0))
-
-    ################################################################
-    ################ TODO
-    ################################################################
 
     @property
     def cooling_electricity_consumption(self) -> np.ndarray:
