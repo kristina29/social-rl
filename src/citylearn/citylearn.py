@@ -710,23 +710,36 @@ class CityLearnEnv(Environment, Env):
                 'cost_function': 'electricity_consumption',
                 'value': CostFunction.electricity_consumption(b.net_electricity_consumption)[-1] / \
                          CostFunction.electricity_consumption(b.net_electricity_consumption_without_storage)[-1],
+                'net_value': CostFunction.electricity_consumption(b.net_electricity_consumption)[-1],
+                'net_value_without_storage': CostFunction.electricity_consumption(b.net_electricity_consumption_without_storage)[-1]
             }, {
                 'name': b.name,
                 'cost_function': 'zero_net_energy',
                 'value': CostFunction.zero_net_energy(b.net_electricity_consumption)[-1] / \
                          CostFunction.zero_net_energy(b.net_electricity_consumption_without_storage)[-1],
+                'net_value': CostFunction.zero_net_energy(b.net_electricity_consumption)[-1],
+                'net_value_without_storage': CostFunction.zero_net_energy(b.net_electricity_consumption_without_storage)[-1]
             }, {
                 'name': b.name,
                 'cost_function': 'carbon_emissions',
                 'value': CostFunction.carbon_emissions(b.net_electricity_consumption_emission)[-1] / \
                          CostFunction.carbon_emissions(b.net_electricity_consumption_without_storage_emission)[-1] \
                     if sum(b.carbon_intensity.carbon_intensity) != 0 else None,
+                'net_value': CostFunction.carbon_emissions(b.net_electricity_consumption_emission)[-1] \
+                    if sum(b.carbon_intensity.carbon_intensity) != 0 else None,
+                'net_value_without_storage': CostFunction.carbon_emissions(b.net_electricity_consumption_without_storage_emission)[-1] \
+                    if sum(b.carbon_intensity.carbon_intensity) != 0 else None
             }, {
                 'name': b.name,
                 'cost_function': 'cost',
                 'value': CostFunction.cost(b.net_electricity_consumption_cost)[-1] / \
                          CostFunction.cost(b.net_electricity_consumption_without_storage_cost)[-1] \
                     if sum(b.pricing.electricity_pricing) != 0 else None,
+                'net_value': CostFunction.cost(b.net_electricity_consumption_cost)[-1] \
+                    if sum(b.pricing.electricity_pricing) != 0 else None,
+                'net_value_without_storage':
+                    CostFunction.cost(b.net_electricity_consumption_without_storage_cost)[-1] \
+                        if sum(b.pricing.electricity_pricing) != 0 else None,
             }]
 
         building_level = pd.DataFrame(building_level)
@@ -737,26 +750,38 @@ class CityLearnEnv(Environment, Env):
             'cost_function': 'ramping',
             'value': CostFunction.ramping(self.net_electricity_consumption)[-1] / \
                      CostFunction.ramping(self.net_electricity_consumption_without_storage)[-1],
+            'net_value': CostFunction.ramping(self.net_electricity_consumption)[-1],
+            'net_value_without_storage': CostFunction.ramping(self.net_electricity_consumption_without_storage)[-1]
         }, {
             'cost_function': '1 - load_factor',
             'value': CostFunction.load_factor(self.net_electricity_consumption)[-1] / \
                      CostFunction.load_factor(self.net_electricity_consumption_without_storage)[-1],
+            'net_value': CostFunction.load_factor(self.net_electricity_consumption)[-1],
+            'net_value_without_storage': CostFunction.load_factor(self.net_electricity_consumption_without_storage)[-1]
         }, {
             'cost_function': 'average_daily_peak',
             'value': CostFunction.average_daily_peak(self.net_electricity_consumption)[-1] / \
                      CostFunction.average_daily_peak(self.net_electricity_consumption_without_storage)[-1],
+            'net_value': CostFunction.average_daily_peak(self.net_electricity_consumption)[-1],
+            'net_value_without_storage': CostFunction.average_daily_peak(self.net_electricity_consumption_without_storage)[-1]
         }, {
             'cost_function': 'peak_demand',
             'value': CostFunction.peak_demand(self.net_electricity_consumption)[-1] / \
                      CostFunction.peak_demand(self.net_electricity_consumption_without_storage)[-1],
+            'net_value': CostFunction.peak_demand(self.net_electricity_consumption)[-1],
+            'net_value_without_storage':
+                CostFunction.peak_demand(self.net_electricity_consumption_without_storage)[-1]
         }, {
             'cost_function': '1 - average_daily_renewable_share',
             'value': CostFunction.average_daily_renewable_share(self.net_renewable_electricity_share)[-1] / \
                      CostFunction.average_daily_renewable_share(self.net_renewable_electricity_share_without_storage)[-1],
+            'net_value': CostFunction.average_daily_renewable_share(self.net_renewable_electricity_share)[-1],
+            'net_value_without_storage':
+                CostFunction.average_daily_renewable_share(self.net_renewable_electricity_share_without_storage)[-1]
         }])
 
         district_level = pd.concat([district_level, building_level], ignore_index=True, sort=False)
-        district_level = district_level.groupby(['cost_function'])[['value']].mean().reset_index()
+        district_level = district_level.groupby(['cost_function'])[['value', 'net_value', 'net_value_without_storage']].mean().reset_index()
         district_level['name'] = 'District'
         district_level['level'] = 'district'
         cost_functions = pd.concat([district_level, building_level], ignore_index=True, sort=False)
