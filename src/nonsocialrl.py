@@ -10,7 +10,7 @@ from citylearn.data import DataSet
 from citylearn.utilities import get_active_parts
 from citylearn.wrappers import TabularQLearningWrapper
 from options import parseOptions_nonsocial
-from utils import set_schema_buildings, set_active_observations, plot_simulation_summary
+from utils import set_schema_buildings, set_active_observations, plot_simulation_summary, save_kpis
 
 
 def train(dataset_name, random_seed, building_count, episodes, active_observations, exclude_tql,
@@ -40,8 +40,14 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
     print('SAC model trained!')
 
     # plot summary and compare with other control results
-    filename = "plots_" + datetime.now().strftime("%Y%m%dT%H%M%S")
+    filename = f'plots_{datetime.now().strftime("%Y%m%dT%H%M%S")}'
     plot_simulation_summary(all_envs, filename)
+
+    # save KPIs as csv
+    filename = f'kpis_{datetime.now().strftime("%Y%m%dT%H%M%S")}.csv'
+    save_kpis(all_envs, filename)
+    print(f'KPIs saved to {filename}')
+
 
 
 def preprocessing(schema, building_count, random_seed, active_observations):
@@ -138,14 +144,14 @@ if __name__ == '__main__':
         exclude_rbc = bool(int(sys.argv[6]))
         active_observations = [sys.argv[7]]
 
-    if False:
+    if True:
         DATASET_NAME = 'nydata'
         exclude_rbc = 1
         exclude_tql = 1
-        building_count = 2
+        building_count = 1
         episodes = 2
         seed = 2
-        active_observations = ['renewable_energy_produced', 'non_renewable_energy_produced']
+        active_observations = ['renewable_energy_produced']
 
     train(DATASET_NAME, seed, building_count, episodes, active_observations, exclude_tql, exclude_rbc)
 
