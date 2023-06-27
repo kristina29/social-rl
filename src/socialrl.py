@@ -66,7 +66,7 @@ def preprocessing(schema, building_count, demonstrators_count, random_seed, acti
     if active_observations is not None:
         schema, active_observations = set_active_observations(schema, active_observations)
     else:
-        active_observations = get_active_parts(schema)
+        active_observations = get_active_parts(schema, 'observations')
     print(f'Active observations:', active_observations)
 
     return schema
