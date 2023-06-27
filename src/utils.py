@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import seaborn as sns
 
+from citylearn.utilities import get_active_parts
+
 
 def set_schema_buildings(
         schema: dict, count: int, seed: int

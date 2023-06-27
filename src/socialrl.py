@@ -6,9 +6,10 @@ from datetime import datetime
 from citylearn.agents.db2_sac import SACDB2
 from citylearn.citylearn import CityLearnEnv
 from citylearn.data import DataSet
+from citylearn.utilities import get_active_parts
 from options import parseOptions_social
 from utils import set_schema_buildings, set_active_observations, plot_simulation_summary, set_schema_demonstrators, \
-    get_active_parts
+    save_kpis
 from nonsocialrl import train_tql, train_rbc, train_sac
 
 
@@ -42,8 +43,13 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
     all_envs['SAC_DB2'] = train_sacdb2(schema, episodes, random_seed)
 
     # plot summary and compare with other control results
-    filename = "plots_" + datetime.now().strftime("%Y%m%dT%H%M%S")
+    filename = f'plots_{datetime.now().strftime("%Y%m%dT%H%M%S")}'
     plot_simulation_summary(all_envs, filename)
+
+    # save KPIs as csv
+    filename = f'kpis_{datetime.now().strftime("%Y%m%dT%H%M%S")}.csv'
+    save_kpis(all_envs, filename)
+    print(f'KPIs saved to {filename}')
 
 
 def preprocessing(schema, building_count, demonstrators_count, random_seed, active_observations):
@@ -102,6 +108,17 @@ if __name__ == '__main__':
         exclude_rbc = bool(int(sys.argv[7]))
         exclude_sac = bool(int(sys.argv[8]))
         active_observations = [sys.argv[9]]
+
+    if True:
+        DATASET_NAME = 'nydata'
+        exclude_rbc = 1
+        exclude_tql = 1
+        exclude_sac = 1
+        demonstrators_count = 1
+        building_count = 1
+        episodes = 2
+        seed = 2
+        active_observations = ['renewable_energy_produced', 'non_renewable_energy_produced']
 
     train(DATASET_NAME, seed, building_count, demonstrators_count, episodes, active_observations, exclude_tql,
           exclude_rbc, exclude_sac)
