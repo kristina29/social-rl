@@ -566,7 +566,7 @@ class CityLearnEnv(Environment, Env):
             'direct_solar_irradiance', 'direct_solar_irradiance_predicted_6h',
             'direct_solar_irradiance_predicted_12h', 'direct_solar_irradiance_predicted_24h',
             'wind_speed', 'wind_speed_predicted_6h', 'wind_speed_predicted_12h', 'wind_speed_predicted_24h',
-            'carbon_intensity',
+            'carbon_intensity', 'renewable_energy_produced', 'non_renewable_energy_produced', 'renewable_energy_share'
         ]
 
     def step(self, actions: List[List[float]]) -> Tuple[List[List[float]], List[float], bool, dict]:
