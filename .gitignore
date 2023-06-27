@@ -24,6 +24,7 @@ thesis/figures/~$figures.pptx
 .DS_Store
 plots_*
 src/plots_*
+src/kpis_*
 src/.idea/
 src/.ipynb_checkpoints/
 src/__pycache__/
