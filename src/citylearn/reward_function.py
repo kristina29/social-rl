@@ -172,9 +172,8 @@ class PricePenaltyReward(RewardFunction):
         Notes
         -----
         Reward value is calculated as :math:`[\textrm{min}(-e_0*p_0, 0), \dots, \textrm{min}(-e_n*p_n, 0)]`
-        where :math:`e` is `electricity_consumption_without_storage_and_pv`, :math:`p` is `electricity_pricing`
+        where :math:`e` is `net_electricity_consumption`, :math:`p` is `electricity_pricing`
         and :math:`n` is the number of agents.
         """
-        reward = [min(b.net_electricity_consumption_without_storage_and_pv_cost[b.time_step] * -1, 0)
-                  for b in self.env.buildings]
+        reward = [min(b.net_electricity_consumption_cost[b.time_step] * -1, 0) for b in self.env.buildings]
         return reward
