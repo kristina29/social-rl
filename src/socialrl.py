@@ -98,7 +98,7 @@ if __name__ == '__main__':
     active_observations = opts.observations
 
     # only when used in pycharm for testing
-    if len(sys.argv) == 10:
+    if len(sys.argv) == 10 and False:
         DATASET_NAME = sys.argv[1]
         seed = int(sys.argv[2])
         building_count = int(sys.argv[3])
