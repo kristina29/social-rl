@@ -1,11 +1,13 @@
-scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230622T191141.pdf experiments/SAC/06_scalable_fuel_mix/plots_20230622T191141.pdf
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230622T194928.pdf experiments/SAC/06_scalable_fuel_mix/plots_20230622T194928.pdf
 
-scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/kpis_20230622T191145.csv experiments/SAC/06_scalable_fuel_mix/kpis_20230622T191145.csv
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/kpis_20230622T194939.csv experiments/SAC/06_scalable_fuel_mix/kpis_20230622T194939.csv
 
 
 
 
 scp src/citylearn/data/nydata/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata/
+
+scp src/citylearn/data/nydata/schema.json klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata/schema.json
 
 scp src/job.sh klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/
 
