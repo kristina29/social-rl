@@ -34,7 +34,7 @@ class Building(Environment):
         pricing : Pricing, optional
             Energy pricing and forecasts time series.
         fuel_mix : FuelMix, optional
-            Energy produced with renewable sources and not renewable sources time series.
+            Energy produced with renewable sources and not renewable sources and renwable energy share time series.
         dhw_storage : StorageTank, optional
             Hot water storage object for domestic hot water.
         cooling_storage : StorageTank, optional
