@@ -266,6 +266,12 @@ class Building(Environment):
         ], axis = 0)
 
     @property
+    def net_electricity_consumption_positive_without_storage(self) -> np.ndarray:
+        """max(net_electricity_consumption_without_storage, 0) time series, in [kWh]."""
+
+        return self.net_electricity_consumption_without_storage.clip(min=0)
+
+    @property
     def net_electricity_consumption_emission(self) -> List[float]:
         """Carbon dioxide emmission from `net_electricity_consumption` time series, in [kg_co2]."""
 
@@ -287,6 +293,40 @@ class Building(Environment):
         """
 
         return self.__net_electricity_consumption
+
+    @property
+    def net_electricity_consumption_positive(self) -> List[float]:
+        """max(net_electricity_consumption, 0) time series, in [kWh]."""
+
+        return list(np.array(self.net_electricity_consumption).clip(min=0))
+
+    @property
+    def used_pv_electricity(self) -> np.ndarray:
+        """ Actual used self-produced PV energy time series, in [kWh], positive values
+
+        Notes
+        -----
+        used_pv_electricity = max(min(`net_electricity_consumption` - `solar_generation`,
+                                      -`solar_generation`),
+                                  0)
+        """
+
+        return np.stack((self.net_electricity_consumption - self.solar_generation,
+                         -1* self.solar_generation)).min(axis=0).clip(min=0)
+
+    @property
+    def used_pv_electricity_without_storage(self) -> np.ndarray:
+        """ Actual used self-produced PV energy time series, in [kWh], positive values
+
+        Notes
+        -----
+        used_pv_electricity = max(min(`net_electricity_consumption_without_storage` - `solar_generation`,
+                                      -`solar_generation`),
+                                  0)
+        """
+
+        return np.stack((self.net_electricity_consumption_without_storage - self.solar_generation,
+                         -1 * self.solar_generation)).min(axis=0).clip(min=0)
 
     @property
     def cooling_electricity_consumption(self) -> List[float]:
@@ -1037,6 +1077,7 @@ class Building(Environment):
                     + self.electrical_storage.electricity_consumption[self.time_step] \
                         + self.energy_simulation.non_shiftable_load[self.time_step] \
                             + self.__solar_generation[self.time_step]
+
         self.__net_electricity_consumption.append(net_electricity_consumption)
 
         # net electriciy consumption cost
