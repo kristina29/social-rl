@@ -264,6 +264,14 @@ class CityLearnEnv(Environment, Env):
                                                                                                          min_count=1).to_numpy()
 
     @property
+    def net_electricity_consumption_positive_without_storage(self) -> np.ndarray:
+        """Summed max(`Building.net_electricity_consumption_without_storage`, 0) time series, in [kWh]."""
+
+        return pd.DataFrame([b.net_electricity_consumption_positive_without_storage for b in self.buildings]).sum(
+            axis=0,
+            min_count=1).to_numpy()
+
+    @property
     def net_electricity_consumption_emission(self) -> List[float]:
         """Summed `Building.net_electricity_consumption_emission` time series, in [kg_co2]."""
 
@@ -282,28 +290,22 @@ class CityLearnEnv(Environment, Env):
         return self.__net_electricity_consumption
 
     @property
+    def net_electricity_consumption_positive(self) -> List[float]:
+        """Summed max(`Building.net_electricity_consumption`, 0) time series, in [kWh]."""
+
+        return self.__net_electricity_consumption_positive
+
+    @property
     def net_renewable_electricity_consumption_without_storage(self) -> np.ndarray:
         """net renewable electricity consumption in the absence of flexibility provided by storage devices time series, in [kWh].
 
         Notes
         -----
-        net_renewable_electricity_consumption_without_storage = min(`net_electricity_consumption_without_storage`, `renewable_energy_produced`)
+        net_renewable_electricity_consumption_without_storage = min(`net_electricity_consumption_without_storage`, `renewable_energy_produced`) + `used_pv_electricity_without_storage`
         """
 
-        return np.stack((self.net_electricity_consumption_without_storage,
-                         self.buildings[0].fuel_mix.renewable_energy_produced)).min(axis=0).clip(min=0)
-
-    @property
-    def net_non_renewable_electricity_consumption_without_storage(self) -> np.ndarray:
-        """net non renewable electricity consumption in the absence of flexibility provided by storage devices time series, in [kWh].
-
-        Notes
-        -----
-        net_non_renewable_electricity_consumption = net_electricity_consumption_without_storage - `net_renewable_electricity_consumption`
-        """
-
-        return (self.net_electricity_consumption_without_storage - self.net_renewable_electricity_consumption).clip(
-            min=0)
+        return np.stack((self.net_electricity_consumption_positive_without_storage,
+                         self.buildings[0].fuel_mix.renewable_energy_produced)).min(axis=0) + self.used_pv_electricity_without_storage
 
     @property
     def net_renewable_electricity_share_without_storage(self) -> List[float]:
@@ -312,12 +314,11 @@ class CityLearnEnv(Environment, Env):
         Notes
         -----
         net_renewable_electricity_share_without_storage = `net_renewable_electricity_consumption_without_storage`
-                                                            / `net_electricity_consumption_without_storage`
+                                                            / (`net_electricity_consumption_positive_without_storage` +
+                                                            `used_pv_electricity_without_storage`)
         """
-
-        return list((
-                    self.net_renewable_electricity_consumption_without_storage / self.net_electricity_consumption_without_storage).clip(
-            min=0))
+        return list((self.net_renewable_electricity_consumption_without_storage /
+                     (self.net_electricity_consumption_positive_without_storage + self.used_pv_electricity_without_storage)).clip(min=0))
 
     @property
     def net_renewable_electricity_consumption(self) -> np.ndarray:
@@ -325,22 +326,11 @@ class CityLearnEnv(Environment, Env):
 
         Notes
         -----
-        net_renewable_electricity_consumption = min(`net_electricity_consumption`, `renewable_energy_produced`)
+        net_renewable_electricity_consumption = min(`net_electricity_consumption_positive`, `renewable_energy_produced`) + `used_pv_electricity`
         """
 
-        return np.stack((self.net_electricity_consumption,
-                         self.buildings[0].fuel_mix.renewable_energy_produced)).min(axis=0).clip(min=0)
-
-    @property
-    def net_non_renewable_electricity_consumption(self) -> np.ndarray:
-        """net non renewable electricity consumption time series, in [kWh].
-
-        Notes
-        -----
-        net_non_renewable_electricity_consumption = net_electricity_consumption - `net_renewable_electricity_consumption`
-        """
-
-        return (self.net_electricity_consumption - self.net_renewable_electricity_consumption).clip(min=0)
+        return np.stack((self.net_electricity_consumption_positive,
+                         self.buildings[0].fuel_mix.renewable_energy_produced)).min(axis=0) + self.used_pv_electricity
 
     @property
     def net_renewable_electricity_share(self) -> List[float]:
@@ -348,10 +338,24 @@ class CityLearnEnv(Environment, Env):
 
         Notes
         -----
-        net_renewable_electricity_share = `net_renewable_electricity_consumption` / `net_electricity_consumption`
+        net_renewable_electricity_share = `net_renewable_electricity_consumption` / (`net_electricity_consumption_positive` +
+                                                                                    `used_pv_electricity`)
         """
 
-        return list((self.net_renewable_electricity_consumption / self.net_electricity_consumption).clip(min=0))
+        return list((self.net_renewable_electricity_consumption /
+                     (self.net_electricity_consumption_positive + self.used_pv_electricity)).clip(min=0))
+
+    @property
+    def used_pv_electricity(self) -> np.ndarray:
+        """Summed `Building.used_pv_electricity` time series, in [kWh]."""
+        return pd.DataFrame([b.used_pv_electricity for b in self.buildings]).sum(axis=0,
+                                                                                 min_count=1).to_numpy()
+
+    @property
+    def used_pv_electricity_without_storage(self) -> np.ndarray:
+        """Summed `Building.used_pv_electricity_without_storage` time series, in [kWh]."""
+        return pd.DataFrame([b.used_pv_electricity_without_storage for b in self.buildings]).sum(axis=0,
+                                                                                                 min_count=1).to_numpy()
 
     @property
     def cooling_electricity_consumption(self) -> np.ndarray:
@@ -817,6 +821,7 @@ class CityLearnEnv(Environment, Env):
         self.__net_electricity_consumption = []
         self.__net_electricity_consumption_cost = []
         self.__net_electricity_consumption_emission = []
+        self.__net_electricity_consumption_positive = []
         self.update_variables()
 
         return self.observations
@@ -833,6 +838,10 @@ class CityLearnEnv(Environment, Env):
         # net electriciy consumption emission
         self.__net_electricity_consumption_emission.append(
             sum([b.net_electricity_consumption_emission[self.time_step] for b in self.buildings]))
+
+        # positive net electriciy consumption
+        self.__net_electricity_consumption_positive.append(
+            sum([b.net_electricity_consumption_positive[self.time_step] for b in self.buildings]))
 
     def load_agent(self) -> 'citylearn.agents.base.Agent':
         """Return :class:`Agent` or sub class object as defined by the `schema`.
