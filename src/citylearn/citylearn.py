@@ -301,15 +301,16 @@ class CityLearnEnv(Environment, Env):
 
         Notes
         -----
-        net_renewable_electricity_consumption_without_storage = min(`net_electricity_consumption_without_storage`, `renewable_energy_produced`) + `used_pv_electricity_without_storage`
+        net_renewable_electricity_consumption_without_storage = min(`net_electricity_consumption_positive_without_storage`,
+                                                                    `renewable_energy_produced`) +
+                                                                    `used_pv_electricity_without_storage`
         """
 
-        return np.stack((self.net_electricity_consumption_positive_without_storage,
-                         self.buildings[0].fuel_mix.renewable_energy_produced)).min(axis=0) + self.used_pv_electricity_without_storage
+        return self.net_renewable_electricity_grid_consumption_without_storage + self.used_pv_electricity_without_storage
 
     @property
     def net_renewable_electricity_share_without_storage(self) -> List[float]:
-        """net renewable electricity share in the absence of flexibility provided by storage devices  time series.
+        """net renewable electricity share in the absence of flexibility provided by storage devices time series.
 
         Notes
         -----
@@ -321,6 +322,34 @@ class CityLearnEnv(Environment, Env):
                      (self.net_electricity_consumption_positive_without_storage + self.used_pv_electricity_without_storage)).clip(min=0))
 
     @property
+    def net_renewable_electricity_grid_consumption_without_storage(self) -> np.ndarray:
+        """net renewable electricity consumption of the grid in the absence of flexibility provided by storage devices
+           time series, in [kWh].
+
+        Notes
+        -----
+        net_renewable_electricity_grid_consumption_without_storage = min(`net_electricity_consumption_positive_without_storage`,
+                                                                    `renewable_energy_produced`)
+        """
+
+        return np.stack((self.net_electricity_consumption_positive_without_storage,
+                         self.buildings[0].fuel_mix.renewable_energy_produced)).min(axis=0)
+
+    @property
+    def net_renewable_electricity_grid_share_without_storage(self) -> List[float]:
+        """net renewable electricity share of the grid in the absence of flexibility provided by storage devices
+           time series.
+
+                Notes
+                -----
+                net_renewable_electricity_grid_share_without_storage = `net_renewable_electricity_grid_consumption_without_storage`
+                                                                    / `net_electricity_consumption_positive_without_storage`
+        """
+
+        return list((self.net_renewable_electricity_grid_consumption_without_storage /
+                     self.net_electricity_consumption_positive_without_storage).clip(min=0))
+
+    @property
     def net_renewable_electricity_consumption(self) -> np.ndarray:
         """net renewable electricity consumption time series, in [kWh].
 
@@ -329,8 +358,7 @@ class CityLearnEnv(Environment, Env):
         net_renewable_electricity_consumption = min(`net_electricity_consumption_positive`, `renewable_energy_produced`) + `used_pv_electricity`
         """
 
-        return np.stack((self.net_electricity_consumption_positive,
-                         self.buildings[0].fuel_mix.renewable_energy_produced)).min(axis=0) + self.used_pv_electricity
+        return self.net_renewable_electricity_grid_consumption + self.used_pv_electricity
 
     @property
     def net_renewable_electricity_share(self) -> List[float]:
@@ -344,6 +372,30 @@ class CityLearnEnv(Environment, Env):
 
         return list((self.net_renewable_electricity_consumption /
                      (self.net_electricity_consumption_positive + self.used_pv_electricity)).clip(min=0))
+
+    @property
+    def net_renewable_electricity_grid_consumption(self) -> np.ndarray:
+        """net renewable electricity consumption of the grid time series, in [kWh].
+
+        Notes
+        -----
+        net_renewable_electricity_grid_consumption = min(`net_electricity_consumption_positive`, `renewable_energy_produced`)
+        """
+
+        return np.stack((self.net_electricity_consumption_positive,
+                         self.buildings[0].fuel_mix.renewable_energy_produced)).min(axis=0)
+
+    @property
+    def net_renewable_electricity_grid_share(self) -> List[float]:
+        """net renewable electricity share of the grid time series.
+
+        Notes
+        -----
+        net_renewable_electricity_grid_share = `net_renewable_electricity_grid_consumption` / `net_electricity_consumption_positive`
+        """
+
+        return list((self.net_renewable_electricity_grid_consumption /
+                     self.net_electricity_consumption_positive).clip(min=0))
 
     @property
     def used_pv_electricity(self) -> np.ndarray:
@@ -782,6 +834,13 @@ class CityLearnEnv(Environment, Env):
             'net_value': CostFunction.average_daily_renewable_share(self.net_renewable_electricity_share)[-1],
             'net_value_without_storage':
                 CostFunction.average_daily_renewable_share(self.net_renewable_electricity_share_without_storage)[-1]
+        }, {
+            'cost_function': '1 - average_daily_renewable_share_grid',
+            'value': CostFunction.average_daily_renewable_share(self.net_renewable_electricity_grid_share)[-1] / \
+                     CostFunction.average_daily_renewable_share(self.net_renewable_electricity_grid_share_without_storage)[-1],
+            'net_value': CostFunction.average_daily_renewable_share(self.net_renewable_electricity_grid_share)[-1],
+            'net_value_without_storage':
+                CostFunction.average_daily_renewable_share(self.net_renewable_electricity_grid_share_without_storage)[-1]
         }])
 
         district_level = pd.concat([district_level, building_level], ignore_index=True, sort=False)

@@ -144,11 +144,11 @@ if __name__ == '__main__':
         exclude_rbc = bool(int(sys.argv[6]))
         active_observations = [sys.argv[7]]
 
-    if False:
+    if True:
         DATASET_NAME = 'nydata'
         exclude_rbc = 1
         exclude_tql = 1
-        building_count = 1
+        building_count = 2
         episodes = 2
         seed = 2
         active_observations = ['renewable_energy_produced', 'non_renewable_energy_produced']
