@@ -1,3 +1,22 @@
-scp klietz10@134.2.168.242:/mnt/qb/work/ludwig/klietz10/src/data/S2S_data/ecmwf_s2s_100m_wind_spd_fcst_w_VI_and_rea_DAILY_stmon_02.nc /data/S2S_data/
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230704T145132.pdf experiments/DB2_SAC/12_without_pv/plots_20230704T145132.pdf
 
-scp src/citylearn/data/test/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/test/
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/kpis_20230704T145159.csv experiments/DB2_SAC/12_without_pv/kpis_20230704T145159.csv
+
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230704T135811.pdf experiments/plots_20230704T135811.pdf
+
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/kpis_20230704T135838.csv experiments/kpis_20230704T135838.csv
+
+
+
+
+scp src/citylearn/data/nydata/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata/
+
+
+scp src/citylearn/data/nydata_no_pv/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata_no_pv/ 
+
+
+scp src/citylearn/data/nydata/schema.json klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata/schema.json
+
+scp src/job.sh klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/
+
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/electricity_consumption* experiments/Explore_Demand/per_building/

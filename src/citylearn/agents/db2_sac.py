@@ -78,7 +78,6 @@ class SACDB2(SAC):
 
                 for _ in range(self.update_per_time_step):
                     o = self.update_step(i)
-                    print(type(o))
 
                     # Use demonstrator actions for updating policy
                     for demonstrator_policy in self.demonstrator_policy_net:
