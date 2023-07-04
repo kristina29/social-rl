@@ -242,7 +242,6 @@ class Pricing:
         self.electricity_pricing_predicted_12h = np.array(predictions[12], dtype=float)
         self.electricity_pricing_predicted_24h = np.array(predictions[24], dtype=float)
 
-
 class CarbonIntensity:
     """`Building` `carbon_intensity` data class.
 
@@ -264,18 +263,14 @@ class FuelMix:
     ----------
     renewable_energy_produced : np.array
         Renewable energy production time series in [kWh].
-    non_renewable_energy_produced : np.array
-        Non-Renewable energy production prediction time series in [kWh].
     renewable_energy_share: np.array
         Renewable energy share of total energy produced.
     """
 
-    def __init__(self, renewable_energy_produced: Iterable[float], non_renewable_energy_produced: Iterable[float],
-                 renewable_energy_share: Iterable[float]):
+    def __init__(self, renewable_energy_produced: Iterable[float], renewable_energy_share: Iterable[float]):
         r"""Initialize `FuelMix`."""
 
         self.renewable_energy_produced = np.array(renewable_energy_produced, dtype = float)
-        self.non_renewable_energy_produced = np.array(non_renewable_energy_produced, dtype=float)
         self.renewable_energy_share = np.array(renewable_energy_share, dtype=float)
 
     def scale_to_buildings(self, sum_medians: float) -> None:
@@ -288,4 +283,3 @@ class FuelMix:
                 Sum of the medians of net energy consumption of all included buildings.
         """
         self.renewable_energy_produced = self.renewable_energy_share * sum_medians
-        self.non_renewable_energy_produced = (1 - self.renewable_energy_share) * sum_medians

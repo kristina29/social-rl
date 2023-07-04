@@ -136,14 +136,14 @@ def read_fuel_data(load_dir) -> pd.DataFrame:
     fuel['Other [kWh]'] = fuel[['Dual Fuel', 'Natural Gas', 'Nuclear', 'Other Fossil Fuels']].sum(axis=1) * 1000
     fuel['Renewable Share'] = fuel['Renewable Sources [kWh]'] / (fuel['Renewable Sources [kWh]'] + fuel['Other [kWh]'])
     fuel = fuel.drop(columns=['Hydro', 'Wind', 'Other Renewables', 'Dual Fuel', 'Natural Gas', 'Nuclear',
-                              'Other Fossil Fuels'])
+                              'Other Fossil Fuels', 'Other [kWh]'])
 
     return fuel
 
 
 if __name__ == '__main__':
     weather_filepath = '../datasets/weather_ny_42.30_-74.37_2021.csv'
-    weather_save_filepath = 'citylearn/data/nydata/weather2.csv'
+    weather_save_filepath = 'citylearn/data/nydata/weather.csv'
     preprocess_data(weather_filepath, weather_save_filepath, weather=True)
 
     fuel_mix_dirpath = '../datasets/fuel_mix_ny_2021'
