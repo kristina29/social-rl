@@ -190,7 +190,7 @@ ax.set_xlabel('DNI [$W/m^2$]')
 pricing_new = pd.read_csv('citylearn/data/nydata/pricing.csv')['Electricity Pricing [$]']
 
 fossil_share = 1-fuel_mix['Renewable Share']
-alpha = 10
+alpha = 20
 pricing_new = pricing_new + alpha * fossil_share
 
 # set minimum price to 0.2
