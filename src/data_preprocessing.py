@@ -3,6 +3,8 @@ import os
 import numpy as np
 import pandas as pd
 
+from utils import get_predictions
+
 pd.options.mode.chained_assignment = None  # default='warn'
 
 WEATHER_VARS = ['Outdoor Drybulb Temperature [C]',
@@ -52,7 +54,11 @@ def preprocess_data(load_path, save_path, weather) -> pd.DataFrame:
     df = correct_time_series_start(df)
 
     if weather:
-        df = add_predictions(df, weather=True)
+        for var in WEATHER_VARS:
+            predictions = get_predictions(list(df[var]))
+            for pred_horizon in predictions.keys():
+                col_name = f'{pred_horizon}h Prediction {var}'
+                df[col_name] = predictions[pred_horizon]
 
     # drop not needed columns
     df = df.drop(columns=['Datetime', 'Year', 'Month', 'Day', 'Hour', 'Minute', 'Day Type'])
@@ -84,28 +90,6 @@ def add_daytype(df) -> pd.DataFrame:
     df['Day Type'] = df['Datetime'].dt.dayofweek
     df['Day Type'] = df['Day Type'] + 2
     df.loc[df['Day Type'] == 8, ['Day Type']] = 1
-
-    return df
-
-
-def add_predictions(df, weather) -> pd.DataFrame:
-    # First just real values
-    # TODO: add noise or real predictions
-
-    if weather:
-        vars = WEATHER_VARS
-    else:
-        vars = ['Electricity Pricing [$]']
-
-    for variable in vars:
-        for pred_horizon in [6, 12, 24]:
-            col_name = f'{pred_horizon}h Prediction {variable}'
-            df[col_name] = df.loc[:, variable]
-            df[col_name] = df[col_name].shift(-pred_horizon)
-
-            # fill missing prediction values with the actual ones at the time the forecast addresses
-            for i in df[np.isnan(df[col_name])].index:
-                df.loc[i, col_name] = df.loc[i + pred_horizon - 24][variable]
 
     return df
 
@@ -165,7 +149,11 @@ def adapt_price(load_path, save_path, fuel_mix, alpha=6) -> None:
 
     # set minimum price to 0.2
     price['Electricity Pricing [$]'] = price['Electricity Pricing [$]'] - price['Electricity Pricing [$]'].min() + 0.2
-    price = add_predictions(price, weather=False)
+
+    predictions = get_predictions(list(price['Electricity Pricing [$]']))
+    for pred_horizon in predictions.keys():
+        col_name = f'{pred_horizon}h Prediction Electricity Pricing [$]'
+        price[col_name] = predictions[pred_horizon]
 
     price.to_csv(save_path, index=False)
     print(f'File saved under {save_path}')
@@ -173,7 +161,7 @@ def adapt_price(load_path, save_path, fuel_mix, alpha=6) -> None:
 
 if __name__ == '__main__':
     weather_filepath = '../datasets/weather_ny_42.30_-74.37_2021.csv'
-    weather_save_filepath = 'citylearn/data/nydata/weather.csv'
+    weather_save_filepath = 'citylearn/data/nydata/weather2.csv'
     preprocess_data(weather_filepath, weather_save_filepath, weather=True)
 
     fuel_mix_dirpath = '../datasets/fuel_mix_ny_2021'
@@ -181,6 +169,6 @@ if __name__ == '__main__':
     fuel_mix = preprocess_data(fuel_mix_dirpath, fuel_mix_save_filepath, weather=False)
 
     price_filepath = 'citylearn/data/test/pricing.csv'
-    price_save_filepath = 'citylearn/data/nydata/pricing.csv'
-    adapt_price(price_filepath, price_save_filepath, fuel_mix)
+    price_save_filepath = 'citylearn/data/nydata/pricing2.csv'
+    #adapt_price(price_filepath, price_save_filepath, fuel_mix)
 
