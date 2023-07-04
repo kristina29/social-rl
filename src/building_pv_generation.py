@@ -56,4 +56,4 @@ for b_id in range(1,18):
     G_STC = 1000.   # (W/m2)
 
     building_data['Solar Generation [W/kW]'] = list(P_STC * df['eta_rel'] * (df['poa_global'] / G_STC))
-    building_data.to_csv(f'citylearn/data/nydata_new_buildings/Building_{b_id}.csv')
+    building_data.to_csv(f'citylearn/data/nydata_new_buildings/Building_{b_id}.csv', index=False)
