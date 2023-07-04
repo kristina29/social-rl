@@ -123,14 +123,7 @@ if ny_data:
 ##################################################
 fuel_mix = pd.read_csv('citylearn/data/nydata/fuelmix.csv')
 
-sum = np.array(fuel_mix['Renewable Sources']+fuel_mix['Other'])
-fig, ax = plt.subplots()
-ax.plot(np.arange(sum.size), sum)
-ax.set_title('Total Energy produced')
-ax.set_ylabel('Energy produced [$MW$]')
-ax.set_xlabel('Time step')
-
-percent = np.array(fuel_mix['Renewable Sources']/sum)*100
+percent = np.array(fuel_mix['Renewable Share'])*100
 fig, ax = plt.subplots()
 ax.plot(np.arange(percent.size), percent)
 ax.set_title('$\%$ Renweable Energy from total produced Energy')
@@ -139,6 +132,55 @@ ax.set_xlabel('Time step')
 
 print(f'Min Renewable %: {percent.min()}')
 print(f'Max Renewable %: {percent.max()}')
+
+##################################################
+# ORIGINAL WEATHER DATA
+##################################################
+weather_orig = pd.read_csv('citylearn/data/citylearn_challenge_2022_phase_all/weather.csv')
+dhi = np.array(weather_orig['Diffuse Solar Radiation [W/m2]'])
+dni = np.array(weather_orig['Direct Solar Radiation [W/m2]'])
+
+# Correlation DHI - Solar generation B1
+solar_generation = np.array(pd.read_csv('citylearn/data/citylearn_challenge_2022_phase_all/Building_1.csv')['Solar Generation [W/kW]'])
+fig, ax = plt.subplots()
+ax.scatter(dhi, solar_generation, s=1)
+ax.set_title('Solar generation Building 1 vs. DHI (original data)')
+ax.set_ylabel('Solar generation [$W/kW$]')
+ax.set_xlabel('DHI [$W/m^2$]')
+
+fig, ax = plt.subplots()
+ax.scatter(dni, solar_generation, s=1)
+ax.set_title('Solar generation Building 1 vs. DNI (original data)')
+ax.set_ylabel('Solar generation [$W/kW$]')
+ax.set_xlabel('DNI [$W/m^2$]')
+
+# Correlation DHI - Solar generation B6
+solar_generation = np.array(pd.read_csv('citylearn/data/citylearn_challenge_2022_phase_all/Building_6.csv')['Solar Generation [W/kW]'])
+fig, ax = plt.subplots()
+ax.scatter(dhi, solar_generation, s=1)
+ax.set_title('Solar generation Building 6 vs. DHI (original data)')
+ax.set_ylabel('Solar generation [$W/kW$]')
+ax.set_xlabel('DHI [$W/m^2$]')
+
+fig, ax = plt.subplots()
+ax.scatter(dni, solar_generation, s=1)
+ax.set_title('Solar generation Building 6 vs. DNI (origianl data)')
+ax.set_ylabel('Solar generation [$W/kW$]')
+ax.set_xlabel('DNI [$W/m^2$]')
+
+# Correlation DHI - Solar generation B14
+solar_generation = np.array(pd.read_csv('citylearn/data/citylearn_challenge_2022_phase_all/Building_14.csv')['Solar Generation [W/kW]'])
+fig, ax = plt.subplots()
+ax.scatter(dhi, solar_generation, s=1)
+ax.set_title('Solar generation Building 14 vs. DHI (original data)')
+ax.set_ylabel('Solar generation [$W/kW$]')
+ax.set_xlabel('DHI [$W/m^2$]')
+
+fig, ax = plt.subplots()
+ax.scatter(dni, solar_generation, s=1)
+ax.set_title('Solar generation Building 14 vs. DNI (original data)')
+ax.set_ylabel('Solar generation [$W/kW$]')
+ax.set_xlabel('DNI [$W/m^2$]')
 
 ##################################################
 # PREPROCESSED NY WEATHER DATA
