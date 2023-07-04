@@ -1,6 +1,5 @@
 import os
 
-import numpy as np
 import pandas as pd
 
 from citylearn.utilities import get_predictions
@@ -54,6 +53,10 @@ def preprocess_data(load_path, save_path, weather) -> pd.DataFrame:
     df = correct_time_series_start(df)
 
     if weather:
+        df.to_csv('../datasets/building_data_test/weather_ny.csv')
+        df.drop(columns=['GHI'])
+        print(f'File saved under ../datasets/building_data_test/weather_ny.csv')
+
         for var in WEATHER_VARS:
             predictions = get_predictions(list(df[var]))
             for pred_horizon in predictions.keys():
@@ -143,7 +146,7 @@ def read_fuel_data(load_dir) -> pd.DataFrame:
 
 if __name__ == '__main__':
     weather_filepath = '../datasets/weather_ny_42.30_-74.37_2021.csv'
-    weather_save_filepath = 'citylearn/data/nydata/weather.csv'
+    weather_save_filepath = 'citylearn/data/nydata/weather2.csv'
     preprocess_data(weather_filepath, weather_save_filepath, weather=True)
 
     fuel_mix_dirpath = '../datasets/fuel_mix_ny_2021'
