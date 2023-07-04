@@ -1,6 +1,6 @@
 import math
 import os
-from typing import Tuple, List, Mapping
+from typing import Tuple, List, Mapping, Iterable
 
 import numpy as np
 import pandas as pd
@@ -10,6 +10,8 @@ from citylearn.citylearn import CityLearnEnv
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import seaborn as sns
+
+from citylearn.utilities import get_active_parts
 
 
 def set_schema_buildings(
@@ -109,21 +111,6 @@ def set_schema_demonstrators(
             schema['buildings'][b]['demonstrator'] = False
 
     return schema, demonstrators
-
-
-def get_active_parts(schema, key='observations'):
-    active_parts = []
-    all_parts = schema[key]
-
-    # parameter that defines if the object is active
-    active_param = 'active'
-    if key=='buildings': #
-        active_param = 'include'
-
-    for part in all_parts:
-        active_parts.append(part) if all_parts[part][active_param] else None
-
-    return active_parts
 
 
 def set_schema_simulation_period(
@@ -246,7 +233,9 @@ def get_kpis(env: CityLearnEnv) -> pd.DataFrame:
     # names of KPIs to retrieve from evaluate function
     kpi_names = [
         'electricity_consumption', 'cost', 'carbon_emissions',
-        'average_daily_peak', 'ramping', '1 - load_factor'
+        'average_daily_peak', 'ramping', '1 - load_factor',
+        '1 - average_daily_renewable_share',
+        '1 - average_daily_renewable_share_grid'
     ]
     kpis = kpis[
         (kpis['cost_function'].isin(kpi_names))
@@ -254,6 +243,8 @@ def get_kpis(env: CityLearnEnv) -> pd.DataFrame:
 
     # round up the values to 3 decimal places for readability
     kpis['value'] = kpis['value'].round(3)
+    kpis['net_value'] = kpis['net_value'].round(3)
+    kpis['net_value_without_storage'] = kpis['net_value_without_storage'].round(3)
 
     # rename the column that defines the KPIs
     kpis = kpis.rename(columns={'cost_function': 'kpi'})
@@ -285,6 +276,7 @@ def plot_building_kpis(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
         kpis['building_id'] = kpis['name'].str.split('_', expand=True)[1]
         kpis['building_id'] = kpis['building_id'].astype(int).astype(str)
         kpis['env_id'] = k
+        kpis = kpis.drop(columns=['net_value', 'net_value_without_storage'])
         kpis_list.append(kpis)
 
     kpis = pd.concat(kpis_list, ignore_index=True, sort=False)
@@ -351,6 +343,7 @@ def plot_district_kpis(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
         kpis = get_kpis(v)
         kpis = kpis[kpis['level'] == 'district'].copy()
         kpis['env_id'] = k
+        kpis = kpis.drop(columns=['net_value', 'net_value_without_storage'])
         kpis_list.append(kpis)
 
     kpis = pd.concat(kpis_list, ignore_index=True, sort=False)
@@ -375,7 +368,7 @@ def plot_district_kpis(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
             p.get_width(), ha='left', va='center'
         )
 
-    ax.legend(loc='upper left', bbox_to_anchor=(1.3, 1.0), framealpha=0.0)
+    ax.legend(loc='upper left', bbox_to_anchor=(1.1, 1.0), framealpha=0.0)
     fig.suptitle('KPIs at district-level', fontsize=16)
     plt.tight_layout()
 
@@ -524,10 +517,10 @@ def save_multi_image(filename):
     for fig in figs:
         fig.savefig(pp, format='pdf')
     pp.close()
-    print("Plots saved in file", filename + '.pdf')
+    print("Plots saved in file", f'{filename}.pdf')
 
 
-def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], filename):
+def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], filename: str):
     """Plots KPIs, load and battery SoC profiles for different control agents.
 
     Parameters
@@ -535,11 +528,37 @@ def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], filename):
     envs: Mapping[str, CityLearnEnv]
         Mapping of user-defined control agent names to environments
         the agents have been used to control.
+    filename: str
+        Name of the file where plots should be stored
     """
 
     plot_building_kpis(envs)
-    plot_building_load_profiles(envs)
-    plot_battery_soc_profiles(envs)
+    # plot_building_load_profiles(envs)
+    # plot_battery_soc_profiles(envs)
     plot_district_kpis(envs)
-    plot_district_load_profiles(envs)
+    # plot_district_load_profiles(envs)
     save_multi_image(filename)
+
+def save_kpis(envs: Mapping[str, CityLearnEnv], filename):
+    """Saves KPIs for different control agents as CSV.
+
+    Parameters
+    -----c-----
+    envs: Mapping[str, CityLearnEnv]
+        Mapping of user-defined control agent names to environments
+        the agents have been used to control.
+    filename: str
+        Name of CSV file where KPIs should be stored
+    """
+
+    kpis_list = []
+
+    for k, v in envs.items():
+        kpis = get_kpis(v)
+        kpis['env_id'] = k
+        kpis_list.append(kpis)
+
+    kpis = pd.concat(kpis_list, ignore_index=True, sort=False)
+    kpis.to_csv(filename, index=False)
+
+
