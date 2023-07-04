@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from utils import get_predictions
+from citylearn.utilities import get_predictions
 
 pd.options.mode.chained_assignment = None  # default='warn'
 
@@ -141,24 +141,6 @@ def read_fuel_data(load_dir) -> pd.DataFrame:
     return fuel
 
 
-def adapt_price(load_path, save_path, fuel_mix, alpha=6) -> None:
-    price = pd.read_csv(load_path)
-    fossil_share = fuel_mix['Other [kWh]']/(fuel_mix['Renewable Sources [kWh]']+fuel_mix['Other [kWh]'])
-
-    price['Electricity Pricing [$]'] = price['Electricity Pricing [$]'] + alpha * fossil_share
-
-    # set minimum price to 0.2
-    price['Electricity Pricing [$]'] = price['Electricity Pricing [$]'] - price['Electricity Pricing [$]'].min() + 0.2
-
-    predictions = get_predictions(list(price['Electricity Pricing [$]']))
-    for pred_horizon in predictions.keys():
-        col_name = f'{pred_horizon}h Prediction Electricity Pricing [$]'
-        price[col_name] = predictions[pred_horizon]
-
-    price.to_csv(save_path, index=False)
-    print(f'File saved under {save_path}')
-
-
 if __name__ == '__main__':
     weather_filepath = '../datasets/weather_ny_42.30_-74.37_2021.csv'
     weather_save_filepath = 'citylearn/data/nydata/weather2.csv'
@@ -167,8 +149,4 @@ if __name__ == '__main__':
     fuel_mix_dirpath = '../datasets/fuel_mix_ny_2021'
     fuel_mix_save_filepath = 'citylearn/data/nydata/fuelmix.csv'
     fuel_mix = preprocess_data(fuel_mix_dirpath, fuel_mix_save_filepath, weather=False)
-
-    price_filepath = 'citylearn/data/test/pricing.csv'
-    price_save_filepath = 'citylearn/data/nydata/pricing2.csv'
-    #adapt_price(price_filepath, price_save_filepath, fuel_mix)
 

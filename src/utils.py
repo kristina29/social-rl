@@ -1,6 +1,6 @@
 import math
 import os
-from typing import Tuple, List, Mapping
+from typing import Tuple, List, Mapping, Iterable
 
 import numpy as np
 import pandas as pd
@@ -562,26 +562,3 @@ def save_kpis(envs: Mapping[str, CityLearnEnv], filename):
     kpis.to_csv(filename, index=False)
 
 
-def get_predictions(values: List[float]) -> dict:
-    """Gets 6h, 12h, and 24h predictions of the values.
-
-        Parameters
-        -----c-----
-        values: List[String]
-            Values for which the predictions will be generated.
-    """
-
-    # TODO: add noise or real predictions
-    result = {}
-    for pred_horizon in [6, 12, 24]:
-        df = pd.DataFrame({'orig_values': values,
-                           'shifted_values': values})
-        df['shifted_values'] = df['shifted_values'].shift(-pred_horizon)
-
-        # fill missing prediction values with the actual ones at the time the forecast addresses
-        for i in df[np.isnan(df['shifted_values'])].index:
-            df.loc[i, 'shifted_values'] = df.loc[i + pred_horizon - 24]['orig_values']
-
-        result[pred_horizon] = list(df['shifted_values'])
-
-    return result

@@ -1030,6 +1030,10 @@ class CityLearnEnv(Environment, Env):
                         pricing = pd.read_csv(os.path.join(root_directory, building_schema['pricing'])).iloc[
                                   simulation_start_time_step:simulation_end_time_step + 1].copy()
                         pricing = Pricing(*pricing.values.T)
+
+                        if building_schema.get('pricing_weight_fossil', None) is not None and fuel_mix is not None:
+                            pricing.weight_by_fossil_share(building_schema['pricing_weight_fossil'],
+                                                           fuel_mix.renewable_energy_share)
                     else:
                         pricing = None
 

@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from datetime import datetime
+
+from citylearn.utilities import get_predictions
 from utils import save_multi_image
 
 save = True
@@ -195,16 +197,23 @@ ax.set_xlabel('DNI [$W/m^2$]')
 
 pricing_new = pd.read_csv('citylearn/data/nydata/pricing.csv')['Electricity Pricing [$]']
 
+fossil_share = 1-fuel_mix['Renewable Share']
+alpha = 10
+pricing_new = pricing_new + alpha * fossil_share
+
+# set minimum price to 0.2
+pricing_new = pricing_new - pricing_new.min() + 0.2
+
 fig, ax = plt.subplots()
 ax.plot(np.arange(len(pricing_new)), pricing_new)
-ax.set_title('Electricity Pricing [$] - Weighted by Fossil Energy share')
+ax.set_title(f'Electricity Pricing [$] - Weighted by Fossil Energy share (factor = {alpha})')
 ax.set_ylabel('$')
 ax.set_xlabel('Time step')
 
 fig, ax = plt.subplots()
 ax.plot(np.arange(168), pricing_new[:168], label='Prices influenced by fossil energy')
 ax.plot(np.arange(168), pricing[:168], label='Old prices')
-ax.set_title('Electricity Pricing [$] - Original vs. Weighted by Fossil Energy share')
+ax.set_title(f'Electricity Pricing [$] - Original vs. Weighted by Fossil Energy share (factor = {alpha})')
 ax.set_ylabel('$')
 ax.set_xticks(np.arange(0, len(ticks)))
 ax.xaxis.set_tick_params(length=0)

@@ -1,5 +1,7 @@
-from typing import List
+from typing import List, Iterable
 
+import numpy as np
+import pandas as pd
 import simplejson as json
 
 
@@ -71,3 +73,28 @@ def get_active_parts(schema: dict, key: str) -> List[str]:
         active_parts.append(part) if all_parts[part][active_param] else None
 
     return active_parts
+
+
+def get_predictions(values: Iterable[float]) -> dict:
+    """Gets 6h, 12h, and 24h predictions of the values.
+
+        Parameters
+        -----c-----
+        values: Iterable[String]
+            Values for which the predictions will be generated.
+    """
+
+    # TODO: add noise or real predictions
+    result = {}
+    for pred_horizon in [6, 12, 24]:
+        df = pd.DataFrame({'orig_values': values,
+                           'shifted_values': values})
+        df['shifted_values'] = df['shifted_values'].shift(-pred_horizon)
+
+        # fill missing prediction values with the actual ones at the time the forecast addresses
+        for i in df[np.isnan(df['shifted_values'])].index:
+            df.loc[i, 'shifted_values'] = df.loc[i + pred_horizon - 24]['orig_values']
+
+        result[pred_horizon] = list(df['shifted_values'])
+
+    return result
