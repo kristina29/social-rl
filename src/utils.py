@@ -1,6 +1,6 @@
 import math
 import os
-from typing import Tuple, List, Mapping
+from typing import Tuple, List, Mapping, Iterable
 
 import numpy as np
 import pandas as pd
@@ -560,3 +560,5 @@ def save_kpis(envs: Mapping[str, CityLearnEnv], filename):
 
     kpis = pd.concat(kpis_list, ignore_index=True, sort=False)
     kpis.to_csv(filename, index=False)
+
+

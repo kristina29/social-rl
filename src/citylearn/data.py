@@ -4,7 +4,8 @@ import shutil
 from typing import Iterable, List, Union
 import numpy as np
 
-from citylearn.utilities import read_json
+from citylearn.utilities import read_json, get_predictions
+
 
 class DataSet:
     __ROOT_DIRECTORY = os.path.join(os.path.dirname(__file__),'data')
@@ -216,6 +217,31 @@ class Pricing:
         self.electricity_pricing_predicted_6h = np.array(electricity_pricing_predicted_6h, dtype = float)
         self.electricity_pricing_predicted_12h = np.array(electricity_pricing_predicted_12h, dtype = float)
         self.electricity_pricing_predicted_24h = np.array(electricity_pricing_predicted_24h, dtype = float)
+
+    def weight_by_fossil_share(self, pricing_weight_fossil: float, renewable_share: Iterable[float]):
+        """Scale the eletricity price by the share of fossil energy by factor `pricing_weight_fossil`.
+            The higher the share of fossil energy produced, the higher the price.
+
+            Parameters
+            ----------
+            pricing_weight_fossil: float
+                Factor by which the price should be scaled.
+            renewable_share: Iterable[float]
+                Time series of the renewable energy production share.
+        """
+
+        fossil_share = 1-renewable_share
+
+        self.electricity_pricing = self.electricity_pricing + pricing_weight_fossil * fossil_share
+
+        # set minimum price to 0.2
+        self.electricity_pricing = self.electricity_pricing - self.electricity_pricing.min() + 0.2
+
+        predictions = get_predictions(self.electricity_pricing)
+        self.electricity_pricing_predicted_6h = np.array(predictions[6], dtype=float)
+        self.electricity_pricing_predicted_12h = np.array(predictions[12], dtype=float)
+        self.electricity_pricing_predicted_24h = np.array(predictions[24], dtype=float)
+
 
 class CarbonIntensity:
     """`Building` `carbon_intensity` data class.
