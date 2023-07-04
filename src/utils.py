@@ -234,7 +234,8 @@ def get_kpis(env: CityLearnEnv) -> pd.DataFrame:
     kpi_names = [
         'electricity_consumption', 'cost', 'carbon_emissions',
         'average_daily_peak', 'ramping', '1 - load_factor',
-        '1 - average_daily_renewable_share'
+        '1 - average_daily_renewable_share',
+        '1 - average_daily_renewable_share_grid'
     ]
     kpis = kpis[
         (kpis['cost_function'].isin(kpi_names))
@@ -367,7 +368,7 @@ def plot_district_kpis(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
             p.get_width(), ha='left', va='center'
         )
 
-    ax.legend(loc='upper left', bbox_to_anchor=(1.3, 1.0), framealpha=0.0)
+    ax.legend(loc='upper left', bbox_to_anchor=(1.1, 1.0), framealpha=0.0)
     fig.suptitle('KPIs at district-level', fontsize=16)
     plt.tight_layout()
 
