@@ -368,7 +368,7 @@ def plot_district_kpis(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
             p.get_width(), ha='left', va='center'
         )
 
-    ax.legend(loc='upper left', bbox_to_anchor=(1.3, 1.0), framealpha=0.0)
+    ax.legend(loc='upper left', bbox_to_anchor=(1.1, 1.0), framealpha=0.0)
     fig.suptitle('KPIs at district-level', fontsize=16)
     plt.tight_layout()
 
