@@ -234,8 +234,9 @@ class Pricing:
 
         self.electricity_pricing = self.electricity_pricing + pricing_weight_fossil * fossil_share
 
-        # set minimum price to 0.2
-        self.electricity_pricing = self.electricity_pricing - self.electricity_pricing.min() + 0.2
+        # normalize prices between 0 and 1
+        self.electricity_pricing = (self.electricity_pricing - np.min(self.electricity_pricing)) / \
+                                   (np.max(self.electricity_pricing) - np.min(self.electricity_pricing))
 
         predictions = get_predictions(self.electricity_pricing)
         self.electricity_pricing_predicted_6h = np.array(predictions[6], dtype=float)
