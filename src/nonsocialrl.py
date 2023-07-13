@@ -145,13 +145,13 @@ if __name__ == '__main__':
         active_observations = [sys.argv[7]]
 
     if False:
-        DATASET_NAME = 'nydata'
+        DATASET_NAME = 'nydata_new_buildings'
         exclude_rbc = 1
         exclude_tql = 1
         building_count = 1
         episodes = 2
         seed = 2
-        active_observations = ['renewable_energy_produced', 'non_renewable_energy_produced']
+        active_observations = ['renewable_energy_produced']
 
     train(DATASET_NAME, seed, building_count, episodes, active_observations, exclude_tql, exclude_rbc)
 

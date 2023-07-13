@@ -7,9 +7,9 @@ weather_ny_42.30_-74.37_2021.csv	https://nsrdb.nrel.gov/data-viewer
 					With input: 	Latitude 42.3
 							Longitude -74.37
 							USA Continental & Mexico
-							Attributes DHI, DNI, Relative Humidity, Temperature, Wind Speed
+							Attributes GHI, DHI, DNI, Relative Humidity, Temperature, Wind Speed
 							Year 2021
 							Interval 5 minutes
 							Convert UTC to Local Time
-					retrieved on the 07. June 2023
+					retrieved on the 04. July 2023
 					More info: https://nsrdb.nrel.gov/data-sets/us-data
