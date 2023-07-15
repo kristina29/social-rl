@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from datetime import datetime
+from sklearn import preprocessing
+
 
 from utils import save_multi_image
 
@@ -233,6 +235,55 @@ ax.set_ylabel('Solar generation [$W/kW$]')
 ax.set_xlabel('DNI [$W/m^2$]')
 
 ##################################################
+# PREPROCESSED NY WEATHER DATA OWN BUILDINGS
+##################################################
+ny_weather_prep = pd.read_csv('citylearn/data/nydata/weather.csv')
+dhi = np.array(ny_weather_prep['Diffuse Solar Radiation [W/m2]'])
+dni = np.array(ny_weather_prep['Direct Solar Radiation [W/m2]'])
+
+# Correlation DHI - Solar generation B1
+solar_generation = np.array(pd.read_csv('citylearn/data/nydata_new_buildings/Building_1.csv')['Solar Generation [W/kW]'])
+fig, ax = plt.subplots()
+ax.scatter(dhi, solar_generation, s=1)
+ax.set_title('Solar generation Building 1 vs. DHI (NY data, own buildings)')
+ax.set_ylabel('Solar generation [$W/kW$]')
+ax.set_xlabel('DHI [$W/m^2$]')
+
+fig, ax = plt.subplots()
+ax.scatter(dni, solar_generation, s=1)
+ax.set_title('Solar generation Building 1 vs. DNI (NY data, own buildings)')
+ax.set_ylabel('Solar generation [$W/kW$]')
+ax.set_xlabel('DNI [$W/m^2$]')
+
+# Correlation DHI - Solar generation B6
+solar_generation = np.array(pd.read_csv('citylearn/data/nydata_new_buildings/Building_6.csv')['Solar Generation [W/kW]'])
+fig, ax = plt.subplots()
+ax.scatter(dhi, solar_generation, s=1)
+ax.set_title('Solar generation Building 6 vs. DHI (NY data, own buildings)')
+ax.set_ylabel('Solar generation [$W/kW$]')
+ax.set_xlabel('DHI [$W/m^2$]')
+
+fig, ax = plt.subplots()
+ax.scatter(dni, solar_generation, s=1)
+ax.set_title('Solar generation Building 6 vs. DNI (NY data, own buildings)')
+ax.set_ylabel('Solar generation [$W/kW$]')
+ax.set_xlabel('DNI [$W/m^2$]')
+
+# Correlation DHI - Solar generation B14
+solar_generation = np.array(pd.read_csv('citylearn/data/nydata_new_buildings/Building_14.csv')['Solar Generation [W/kW]'])
+fig, ax = plt.subplots()
+ax.scatter(dhi, solar_generation, s=1)
+ax.set_title('Solar generation Building 14 vs. DHI (NY data, own buildings)')
+ax.set_ylabel('Solar generation [$W/kW$]')
+ax.set_xlabel('DHI [$W/m^2$]')
+
+fig, ax = plt.subplots()
+ax.scatter(dni, solar_generation, s=1)
+ax.set_title('Solar generation Building 14 vs. DNI (NY data, own buildings)')
+ax.set_ylabel('Solar generation [$W/kW$]')
+ax.set_xlabel('DNI [$W/m^2$]')
+
+##################################################
 # PRICING DATA
 ##################################################
 
@@ -242,8 +293,9 @@ fossil_share = 1-fuel_mix['Renewable Share']
 alpha = 20
 pricing_new = pricing_new + alpha * fossil_share
 
-# set minimum price to 0.2
-pricing_new = pricing_new - pricing_new.min() + 0.2
+# normalize between 0 and 1
+pricing_new = (pricing_new - np.min(pricing_new)) / (np.max(pricing_new) - np.min(pricing_new))
+
 
 fig, ax = plt.subplots()
 ax.plot(np.arange(len(pricing_new)), pricing_new)
@@ -254,11 +306,12 @@ ax.set_xlabel('Time step')
 fig, ax = plt.subplots()
 ax.plot(np.arange(168), pricing_new[:168], label='Prices influenced by fossil energy')
 ax.plot(np.arange(168), pricing[:168], label='Old prices')
-ax.set_title(f'Electricity Pricing [$] - Original vs. Weighted by Fossil Energy share (factor = {alpha})')
+ax.set_title(f'Electricity Pricing [$] (factor = {alpha})')
 ax.set_ylabel('$')
 ax.set_xticks(np.arange(0, len(ticks)))
 ax.xaxis.set_tick_params(length=0)
 ax.set_xticklabels(ticks, rotation=0)
+ax.legend()
 [l.set_visible(False) for (i,l) in enumerate(ax.get_xticklabels()) if (i-18) % 24 != 0]
 
 if save:

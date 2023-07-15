@@ -177,3 +177,17 @@ class PricePenaltyReward(RewardFunction):
         """
         reward = [min(b.net_electricity_consumption_cost[b.time_step] * -1, 0) for b in self.env.buildings]
         return reward
+
+
+class PriceAndSolarPenaltyReward(RewardFunction):
+    def __init__(self, env: CityLearnEnv, **kwargs):
+        super().__init__(env, **kwargs)
+
+        self.alpha = self.kwargs['alpha']
+        self.pricepenalty = PricePenaltyReward(env)
+        self.solarpenalty = SolarPenaltyReward(env)
+
+    def calculate(self) -> List[float]:
+        reward = self.alpha * np.array(self.pricepenalty.calculate()) +\
+                 (1-self.alpha) * np.array(self.solarpenalty.calculate())
+        return reward.tolist()
