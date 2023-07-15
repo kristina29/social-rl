@@ -36,7 +36,14 @@ WEATHER_FINAL_ORDER = ['Wind Speed [m/s]',
 
 def preprocess_data(load_path, save_path, weather) -> pd.DataFrame:
     if weather:
-        df = pd.read_csv(load_path, skiprows=2)
+        if isinstance(load_path, list):
+            all_dfs = []
+            for filename in load_path:
+                temp_df = pd.read_csv(filename, skiprows=2)
+                all_dfs.append(temp_df)
+            df = pd.concat(all_dfs).groupby(['Month', 'Day', 'Year', 'Hour', 'Minute'], as_index=False).median()
+        else:
+            df = pd.read_csv(load_path, skiprows=2)
 
         # rename columns to match citylearn framework
         df = df.rename(columns={'Temperature': WEATHER_VARS[0],
@@ -46,7 +53,6 @@ def preprocess_data(load_path, save_path, weather) -> pd.DataFrame:
                                 'Wind Speed': WEATHER_VARS[4]})
     else:
         df = read_fuel_data(load_path)
-
 
     df = median_by_hour(df)
     df = add_daytype(df)
@@ -145,9 +151,14 @@ def read_fuel_data(load_dir) -> pd.DataFrame:
 
 
 if __name__ == '__main__':
-    weather_filepath = '../datasets/weather_ny_42.30_-74.37_2021.csv'
-    weather_save_filepath = 'citylearn/data/nydata/weather2.csv'
+    weather_dir = '../datasets/'
+    weather_filepath = f'{weather_dir}weather_ny_42.30_-74.37_2021.csv'
+    weather_save_filepath = 'citylearn/data/nydata/weather.csv'
     preprocess_data(weather_filepath, weather_save_filepath, weather=True)
+
+    weather_filenames = [f'{weather_dir}{filename}' for filename in os.listdir(weather_dir) if filename.startswith('weather_ny_')]
+    weather_save_filepath = f'citylearn/data/nydata/weather_{len(weather_filenames)}locs_median.csv'
+    preprocess_data(weather_filenames, weather_save_filepath, weather=True)
 
     fuel_mix_dirpath = '../datasets/fuel_mix_ny_2021'
     fuel_mix_save_filepath = 'citylearn/data/nydata/fuelmix.csv'
