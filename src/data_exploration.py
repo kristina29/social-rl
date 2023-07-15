@@ -74,6 +74,11 @@ ax1.xaxis.set_tick_params(length=0)
 ax1.set_xticklabels(ticks, rotation=0)
 [l.set_visible(False) for (i,l) in enumerate(ax1.get_xticklabels()) if (i-18) % 24 != 0]
 
+if save:
+    filename = "../datasets/data_exploration_plots/citylearn-challenge-2022-plots_" + datetime.now().strftime("%Y%m%dT%H%M%S")
+    save_multi_image(filename)
+else:
+    plt.show()
 
 ##################################################
 # REAL DATA FROM NEW YORK ISO AND NREL
@@ -120,6 +125,58 @@ if ny_data:
     ax.set_ylabel('Other renewables energy [$MW$]')
     ax.set_xlabel('DNI [$W/m^2$]')
 
+    # include new weather files
+    ny_weather2 = pd.read_csv('../datasets/weather_ny_40.86_-72.57_2021.csv', skiprows=2)
+    ny_weather2['Time Stamp'] = pd.to_datetime(ny_weather2[['Month', 'Day', 'Year', 'Hour', 'Minute']].astype(str).apply(' '.join, 1), format='%m %d %Y %H %M')
+    ny_weather2 = ny_weather2.drop(columns=['Month', 'Day', 'Year', 'Hour', 'Minute'])
+    ny_weather3 = pd.read_csv('../datasets/weather_ny_42.44_-78.45_2021.csv', skiprows=2)
+    ny_weather3['Time Stamp'] = pd.to_datetime(
+        ny_weather3[['Month', 'Day', 'Year', 'Hour', 'Minute']].astype(str).apply(' '.join, 1), format='%m %d %Y %H %M')
+    ny_weather3 = ny_weather3.drop(columns=['Month', 'Day', 'Year', 'Hour', 'Minute'])
+    ny_weather4 = pd.read_csv('../datasets/weather_ny_44.86_-73.61_2021.csv', skiprows=2)
+    ny_weather4['Time Stamp'] = pd.to_datetime(
+        ny_weather4[['Month', 'Day', 'Year', 'Hour', 'Minute']].astype(str).apply(' '.join, 1), format='%m %d %Y %H %M')
+    ny_weather4 = ny_weather4.drop(columns=['Month', 'Day', 'Year', 'Hour', 'Minute'])
+    ny_weather5 = pd.read_csv('../datasets/weather_ny_41.14_-73.91_2021.csv', skiprows=2)
+    ny_weather5['Time Stamp'] = pd.to_datetime(
+        ny_weather5[['Month', 'Day', 'Year', 'Hour', 'Minute']].astype(str).apply(' '.join, 1), format='%m %d %Y %H %M')
+    ny_weather5 = ny_weather5.drop(columns=['Month', 'Day', 'Year', 'Hour', 'Minute'])
+    ny_weather6 = pd.read_csv('../datasets/weather_ny_43.10_-75.33_2021.csv', skiprows=2)
+    ny_weather6['Time Stamp'] = pd.to_datetime(
+        ny_weather6[['Month', 'Day', 'Year', 'Hour', 'Minute']].astype(str).apply(' '.join, 1), format='%m %d %Y %H %M')
+    ny_weather6 = ny_weather6.drop(columns=['Month', 'Day', 'Year', 'Hour', 'Minute'])
+    ny_weather7 = pd.read_csv('../datasets/weather_ny_43.14_-73.97_2021.csv', skiprows=2)
+    ny_weather7['Time Stamp'] = pd.to_datetime(
+        ny_weather7[['Month', 'Day', 'Year', 'Hour', 'Minute']].astype(str).apply(' '.join, 1), format='%m %d %Y %H %M')
+    ny_weather7 = ny_weather7.drop(columns=['Month', 'Day', 'Year', 'Hour', 'Minute'])
+    ny_weather8 = pd.read_csv('../datasets/weather_ny_43.38_-76.31_2021.csv', skiprows=2)
+    ny_weather8['Time Stamp'] = pd.to_datetime(
+        ny_weather8[['Month', 'Day', 'Year', 'Hour', 'Minute']].astype(str).apply(' '.join, 1), format='%m %d %Y %H %M')
+    ny_weather8 = ny_weather8.drop(columns=['Month', 'Day', 'Year', 'Hour', 'Minute'])
+
+    ny_weather_mean = pd.concat([ny_weather, ny_weather2, ny_weather3, ny_weather4, ny_weather5, ny_weather6,
+                                 ny_weather7, ny_weather8]).groupby('Time Stamp', as_index=False).median()
+
+    joined = pd.merge(fuel, ny_weather_mean, on='Time Stamp', sort=True)
+
+    fig, ax = plt.subplots()
+    ax.scatter(joined['Wind Speed'], joined['Wind'], s=1)
+    ax.set_title('Wind energy vs. wind speed (8 measure locs median)')
+    ax.set_ylabel('Wind energy [$MW$]')
+    ax.set_xlabel('Wind speed [$m/s$]')
+
+    fig, ax = plt.subplots()
+    ax.scatter(joined['DHI'], joined['Other Renewables'], s=1)
+    ax.set_title('Other renewables energy vs. DHI (8 measure locs median)')
+    ax.set_ylabel('Other renewables energy [$MW$]')
+    ax.set_xlabel('DHI [$W/m^2$]')
+
+    fig, ax = plt.subplots()
+    ax.scatter(joined['DNI'], joined['Other Renewables'], s=1)
+    ax.set_title('Other renewables energy vs. DNI (8 measure locs median)')
+    ax.set_ylabel('Other renewables energy [$MW$]')
+    ax.set_xlabel('DNI [$W/m^2$]')
+
 
 ##################################################
 # PREPROCESSED FUEL MIX DATA
@@ -135,6 +192,13 @@ ax.set_xlabel('Time step')
 
 print(f'Min Renewable %: {percent.min()}')
 print(f'Max Renewable %: {percent.max()}')
+
+if save:
+    filename = "../datasets/data_exploration_plots/ny-data-plots_" + datetime.now().strftime(
+        "%Y%m%dT%H%M%S")
+    save_multi_image(filename)
+else:
+    plt.show()
 
 ##################################################
 # ORIGINAL WEATHER DATA
@@ -167,7 +231,7 @@ ax.set_xlabel('DHI [$W/m^2$]')
 
 fig, ax = plt.subplots()
 ax.scatter(dni, solar_generation, s=1)
-ax.set_title('Solar generation Building 6 vs. DNI (origianl data)')
+ax.set_title('Solar generation Building 6 vs. DNI (original data)')
 ax.set_ylabel('Solar generation [$W/kW$]')
 ax.set_xlabel('DNI [$W/m^2$]')
 
@@ -283,6 +347,13 @@ ax.set_title('Solar generation Building 14 vs. DNI (NY data, own buildings)')
 ax.set_ylabel('Solar generation [$W/kW$]')
 ax.set_xlabel('DNI [$W/m^2$]')
 
+if save:
+    filename = "../datasets/data_exploration_plots/buildings-pv-production-plots_" + datetime.now().strftime(
+        "%Y%m%dT%H%M%S")
+    save_multi_image(filename)
+else:
+    plt.show()
+
 ##################################################
 # PRICING DATA
 ##################################################
@@ -314,8 +385,29 @@ ax.set_xticklabels(ticks, rotation=0)
 ax.legend()
 [l.set_visible(False) for (i,l) in enumerate(ax.get_xticklabels()) if (i-18) % 24 != 0]
 
+fig, ax = plt.subplots()
+ax.scatter(fuel_mix['Renewable Share'], pricing_new, s=1)
+ax.set_title('Weighted electricity price vs. renewable share')
+ax.set_xlabel('Renewable Share')
+ax.set_ylabel('Weighted electricity price [$]')
+
+solar_generation = np.array(pd.read_csv('citylearn/data/nydata/Building_1.csv')['Solar Generation [W/kW]'])
+fig, ax = plt.subplots()
+ax.scatter(solar_generation, pricing_new, s=1)
+ax.set_title('Weighted electricity price vs. solar generation B1 (NY data)')
+ax.set_xlabel('Solar Generation of Building 1 [$W/kW$]')
+ax.set_ylabel('Weighted electricity price [$]')
+
+solar_generation = np.array(pd.read_csv('citylearn/data/nydata_new_buildings/Building_1.csv')['Solar Generation [W/kW]'])
+fig, ax = plt.subplots()
+ax.scatter(solar_generation, pricing_new, s=1)
+ax.set_title('Weighted electricity price vs. solar generation B1 (NY data, own buildings)')
+ax.set_xlabel('Solar Generation of Building 1 [$W/kW$]')
+ax.set_ylabel('Weighted electricity price [$]')
+
+
 if save:
-    filename = "../datasets/data_exploration_plots/exploration-plots_" + datetime.now().strftime("%Y%m%dT%H%M%S")
+    filename = "../datasets/data_exploration_plots/pricing-plots_" + datetime.now().strftime("%Y%m%dT%H%M%S")
     save_multi_image(filename)
 else:
     plt.show()
