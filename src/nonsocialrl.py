@@ -134,18 +134,8 @@ if __name__ == '__main__':
     exclude_rbc = opts.exclude_rbc
     active_observations = opts.observations
 
-    # only when used in pycharm for testing
-    if len(sys.argv) == 8 and False:
-        DATASET_NAME = sys.argv[1]
-        seed = int(sys.argv[2])
-        building_count = int(sys.argv[3])
-        episodes = int(sys.argv[4])
-        exclude_tql = bool(int(sys.argv[5]))
-        exclude_rbc = bool(int(sys.argv[6]))
-        active_observations = [sys.argv[7]]
-
     if False:
-        DATASET_NAME = 'nydata_new_buildings'
+        DATASET_NAME = 'nydata'
         exclude_rbc = 1
         exclude_tql = 1
         building_count = 1

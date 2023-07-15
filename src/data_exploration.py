@@ -244,19 +244,9 @@ fossil_share = 1-fuel_mix['Renewable Share']
 alpha = 20
 pricing_new = pricing_new + alpha * fossil_share
 
+# normalize between 0 and 1
 pricing_new = (pricing_new - np.min(pricing_new)) / (np.max(pricing_new) - np.min(pricing_new))
 
-# set minimum price to 0.2
-#pricing_new = pricing_new - pricing_new.min() + 0.2
-#pricing_new = preprocessing.normalize(np.array(pricing_new))
-print(f'Old min price: {pricing.min()}')
-print(f'Old max price: {pricing.max()}')
-print(f'Old mean price: {pricing.mean()}')
-print(f'Old std price: {pricing.std()}')
-print(f'New min price: {pricing_new.min()}')
-print(f'New max price: {pricing_new.max()}')
-print(f'New mean price: {pricing_new.mean()}')
-print(f'New std price: {pricing_new.std()}')
 
 fig, ax = plt.subplots()
 ax.plot(np.arange(len(pricing_new)), pricing_new)
@@ -267,11 +257,12 @@ ax.set_xlabel('Time step')
 fig, ax = plt.subplots()
 ax.plot(np.arange(168), pricing_new[:168], label='Prices influenced by fossil energy')
 ax.plot(np.arange(168), pricing[:168], label='Old prices')
-ax.set_title(f'Electricity Pricing [$] - Original vs. Weighted by Fossil Energy share (factor = {alpha})')
+ax.set_title(f'Electricity Pricing [$] (factor = {alpha})')
 ax.set_ylabel('$')
 ax.set_xticks(np.arange(0, len(ticks)))
 ax.xaxis.set_tick_params(length=0)
 ax.set_xticklabels(ticks, rotation=0)
+ax.legend()
 [l.set_visible(False) for (i,l) in enumerate(ax.get_xticklabels()) if (i-18) % 24 != 0]
 
 if save:
