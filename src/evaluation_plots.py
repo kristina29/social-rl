@@ -20,21 +20,10 @@ if __name__ == '__main__':
         agent = parser.agent
 
     if True:
-        experiment_dirs = ['15_reward_price_pv/alpha0/old_buildings',
-                           '15_reward_price_pv/alpha025/old_buildings',
-                           '15_reward_price_pv/alpha05/old_buildings',
-                           '15_reward_price_pv/alpha075/old_buildings',
-                           '09_new_kpi_final_reward']
         experiment_dirs = ['09_new_kpi_final_reward',
                            '16_weather_8locs/standard_buildings',
-                           '13_new_buildings',
+                           '14_normalize_price/new_buildings',
                            '16_weather_8locs/new_buildings']
-        experiment_dirs = ['09_new_kpi_final_reward',
-                           '12_without_pv']
-        experiment_dirs = ['09_new_kpi_final_reward',
-                           '14_normalize_price/standard_buildings',
-                           '13_new_buildings',
-                           '14_normalize_price/new_buildings']
         agentdir = 'SAC_DB2'
         agent = 'SAC'
 
@@ -75,6 +64,7 @@ if __name__ == '__main__':
 
     fig, ax = plt.subplots()
     rects = ax.bar(names, values, label=names)
+    ax.axhline(1, c='grey', linestyle="--")
     ax.bar_label(rects, padding=3)
     ax.set_title('1 - average_daily_renewable_share [net_value/net_value_without_storage]')
     for tick in ax.get_xticklabels():
@@ -107,6 +97,7 @@ if __name__ == '__main__':
 
     fig, ax = plt.subplots()
     rects = ax.bar(names, values, label=names)
+    ax.axhline(1, c='grey', linestyle="--")
     ax.bar_label(rects, padding=3)
     ax.set_title('1 - average_daily_renewable_share_grid [net_value/net_value_without_storage]')
     for tick in ax.get_xticklabels():
