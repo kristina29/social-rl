@@ -3,7 +3,6 @@ from argparse import ArgumentParser
 
 import pandas as pd
 import matplotlib.pyplot as plt
-import numpy as np
 
 EXPERIMENT_BASE_DIR = '../experiments/'
 
@@ -30,6 +29,12 @@ if __name__ == '__main__':
                            '16_weather_8locs/standard_buildings',
                            '13_new_buildings',
                            '16_weather_8locs/new_buildings']
+        experiment_dirs = ['09_new_kpi_final_reward',
+                           '12_without_pv']
+        experiment_dirs = ['09_new_kpi_final_reward',
+                           '14_normalize_price/standard_buildings',
+                           '13_new_buildings',
+                           '14_normalize_price/new_buildings']
         agentdir = 'SAC_DB2'
         agent = 'SAC'
 
@@ -56,6 +61,9 @@ if __name__ == '__main__':
     rects = ax.bar(names, values, label=names)
     ax.bar_label(rects, padding=3)
     ax.set_title('1 - average_daily_renewable_share [net_value]')
+    for tick in ax.get_xticklabels():
+        tick.set_rotation(45)
+    plt.savefig('1.png', bbox_inches="tight")
 
     # plot 1-avarage_daily_renewable share net_value/net_value_without_storage
     values = []
@@ -69,6 +77,42 @@ if __name__ == '__main__':
     rects = ax.bar(names, values, label=names)
     ax.bar_label(rects, padding=3)
     ax.set_title('1 - average_daily_renewable_share [net_value/net_value_without_storage]')
+    for tick in ax.get_xticklabels():
+        tick.set_rotation(45)
+
+    plt.savefig('2.png', bbox_inches="tight")
+
+    # plot 1-avarage_daily_renewable_share_grid net_value
+    values = []
+    names = []
+    for key, value in kpis.items():
+        values.append(round(value.loc['1 - average_daily_renewable_share_grid', 'net_value'], 3))
+        names.append(key)
+
+    fig, ax = plt.subplots()
+    rects = ax.bar(names, values, label=names)
+    ax.bar_label(rects, padding=3)
+    ax.set_title('1 - average_daily_renewable_share_grid [net_value]')
+    for tick in ax.get_xticklabels():
+        tick.set_rotation(45)
+    plt.savefig('3.png', bbox_inches="tight")
+
+    # plot 1-avarage_daily_renewable share net_value/net_value_without_storage
+    values = []
+    names = []
+    for key, value in kpis.items():
+        values.append(round(value.loc['1 - average_daily_renewable_share_grid', 'net_value'] /
+                            value.loc['1 - average_daily_renewable_share_grid', 'net_value_without_storage'], 3))
+        names.append(key)
+
+    fig, ax = plt.subplots()
+    rects = ax.bar(names, values, label=names)
+    ax.bar_label(rects, padding=3)
+    ax.set_title('1 - average_daily_renewable_share_grid [net_value/net_value_without_storage]')
+    for tick in ax.get_xticklabels():
+        tick.set_rotation(45)
+
+    plt.savefig('4.png', bbox_inches="tight")
 
 
 
