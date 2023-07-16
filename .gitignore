@@ -34,6 +34,7 @@ src/citylearn/assets/
 src/citylearn/__pycache__/
 src/citylearn/agents/__pycache__/
 src/b_net_electricity_consumption.csv
+src/*.png
 kpis_*.csv
 logs/
 LaTeXTemplates_masters-doctoral-thesis_v2/
