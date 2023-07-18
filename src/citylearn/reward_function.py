@@ -179,6 +179,30 @@ class PricePenaltyReward(RewardFunction):
         return reward
 
 
+class FossilPenaltyReward(RewardFunction):
+    def __init__(self, env: CityLearnEnv):
+        super().__init__(env)
+
+    def calculate(self) -> List[float]:
+        r"""The reward is defined to minimize the share of fossil energy in the total electricity consumption.
+
+        The reward is the share of renewable energy (including used PV of buildings) at the current time step.
+
+        Returns
+        -------
+        reward: List[float]
+            Reward for transition to current timestep.
+
+        Notes
+        -----
+        Reward value is calculated as :math:`[e_{r}, \dots, e_{r}]`
+        where :math:`e_r` is `net renewable share` (same reward for all agents).
+        """
+        reward = [self.env.net_renewable_electricity_share[self.env.time_step]] * len(self.env.buildings)
+
+        return reward
+
+
 class PriceAndSolarPenaltyReward(RewardFunction):
     def __init__(self, env: CityLearnEnv, **kwargs):
         super().__init__(env, **kwargs)
