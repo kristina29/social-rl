@@ -539,7 +539,6 @@ class Building(Environment):
     def fuel_mix(self, fuel_mix: FuelMix):
         if fuel_mix is None:
             self.__fuel_mix = FuelMix(np.zeros(len(self.energy_simulation.hour), dtype=float),
-                                      np.zeros(len(self.energy_simulation.hour), dtype=float),
                                       np.zeros(len(self.energy_simulation.hour), dtype=float))
         else:
             self.__fuel_mix = fuel_mix
