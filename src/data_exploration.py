@@ -12,8 +12,8 @@ from mpl_toolkits.basemap import Basemap
 from utils import save_multi_image
 
 save = True
-challenge_data = True
-ny_data = True
+challenge_data = False
+ny_data = False
 
 ##################################################
 # DATA CITYLEARN CHALLENGE 2022
@@ -332,25 +332,33 @@ ax.set_xlabel('DNI [$W/m^2$]')
 # Sum produced solar energy new buildings vs old buildings
 buildings_filenames_old = glob.glob('citylearn/data/nydata/Building_*.csv')
 buildings_filenames_new = glob.glob('citylearn/data/nydata_new_buildings/Building_*.csv')
+buildings_filenames_new2 = glob.glob('citylearn/data/nydata_new_buildings2/Building_*.csv')
 
 all_buildings_old = []
 all_buildings_new = []
+all_buildings_new2 = []
 for i, file in enumerate(buildings_filenames_old):
     all_buildings_old.append(pd.read_csv(file))
     all_buildings_new.append(pd.read_csv(buildings_filenames_new[i]))
+    all_buildings_new2.append(pd.read_csv(buildings_filenames_new2[i]))
 
 all_buildings_old_pvprod = pd.concat(all_buildings_old).reset_index().groupby('index', as_index=False).sum()[
     'Solar Generation [W/kW]']
 all_buildings_new_pvprod = pd.concat(all_buildings_new).reset_index().groupby('index', as_index=False).sum()[
     'Solar Generation [W/kW]']
+all_buildings_new2_pvprod = pd.concat(all_buildings_new2).reset_index().groupby('index', as_index=False).sum()[
+    'Solar Generation [W/kW]']
 
 fig, ax = plt.subplots()
 ax.plot(np.arange(len(all_buildings_old_pvprod)), all_buildings_old_pvprod, label='Original buildings')
 ax.plot(np.arange(len(all_buildings_new_pvprod)), all_buildings_new_pvprod, label='Own buildings')
+ax.plot(np.arange(len(all_buildings_new2_pvprod)), all_buildings_new2_pvprod, label='Own buildings 2')
 ax.axhline(all_buildings_old_pvprod.mean(), c='red')
-ax.text(0, all_buildings_old_pvprod.mean()+0.1, 'Mean of original buildings', rotation=0)
+ax.text(0, all_buildings_old_pvprod.mean()+0.1, f'Mean of original buildings {all_buildings_old_pvprod.mean()}', rotation=0)
 ax.axhline(all_buildings_new_pvprod.mean(), c='red')
-ax.text(0, all_buildings_new_pvprod.mean()+0.1, 'Mean of own buildings', rotation=0)
+ax.text(0, all_buildings_new_pvprod.mean()+0.1, f'Mean of own buildings {all_buildings_new_pvprod.mean()}', rotation=0)
+ax.axhline(all_buildings_new2_pvprod.mean(), c='red')
+ax.text(0, all_buildings_new2_pvprod.mean()+0.1, f'Mean of own buildings 2 {all_buildings_new2_pvprod.mean()}', rotation=0)
 ax.set_title('Sum of PV production of all buildings')
 ax.set_xlabel('Time step')
 ax.set_ylabel('PV production [W/kW]')

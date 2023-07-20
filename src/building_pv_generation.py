@@ -52,11 +52,11 @@ for b_id in range(1, 18):
     building_data = pd.read_csv(f'citylearn/data/nydata/Building_{b_id}.csv')
 
     # Set the desired array size:
-    P_STC = building_data['Solar Generation [W/kW]'].max()  # (W)
+    P_STC = building_data['Solar Generation [W/kW]'].max() + 500 # (W)
     print(b_id, P_STC)
 
     # and the irradiance level needed to achieve this output:
     G_STC = 1000.  # (W/m2)
 
     building_data['Solar Generation [W/kW]'] = list(P_STC * df['eta_rel'] * (df['poa_global'] / G_STC))
-    building_data.to_csv(f'citylearn/data/nydata_new_buildings/Building_{b_id}.csv', index=False)
+    building_data.to_csv(f'citylearn/data/nydata_new_buildings2/Building_{b_id}.csv', index=False)
