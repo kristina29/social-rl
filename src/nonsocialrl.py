@@ -2,6 +2,10 @@ import sys
 import time
 
 from datetime import datetime
+
+from matplotlib import pyplot as plt
+import numpy as np
+
 from citylearn.agents.q_learning import TabularQLearning
 from citylearn.agents.rbc import OptimizedRBC
 from citylearn.agents.sac import SAC
@@ -27,6 +31,8 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
     schema = preprocessing(schema, building_count, random_seed, active_observations)
 
     all_envs = {}
+    all_losses = {}
+    all_rewards = {}
     # Train rule-based control (RBC) agent for comparison
     if not exclude_rbc:
         all_envs['RBC'] = train_rbc(schema, episodes)
@@ -36,12 +42,12 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
         all_envs['TQL'] = train_tql(schema, active_observations, episodes)
 
     # Train soft actor-critic (SAC) agent
-    all_envs['SAC'] = train_sac(schema, episodes, random_seed)
+    all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'] = train_sac(schema, episodes, random_seed)
     print('SAC model trained!')
 
     # plot summary and compare with other control results
     filename = f'plots_{datetime.now().strftime("%Y%m%dT%H%M%S")}'
-    plot_simulation_summary(all_envs, filename)
+    plot_simulation_summary(all_envs, all_losses, all_rewards, filename)
 
     # save KPIs as csv
     filename = f'kpis_{datetime.now().strftime("%Y%m%dT%H%M%S")}.csv'
@@ -116,9 +122,9 @@ def train_tql(schema, active_observations, episodes):
 def train_sac(schema, episodes, random_seed):
     env = CityLearnEnv(schema)
     sac_model = SAC(env=env, seed=random_seed)
-    sac_model.learn(episodes=episodes, deterministic_finish=True)
+    losses, rewards = sac_model.learn(episodes=episodes, deterministic_finish=True)
 
-    return env
+    return env, losses, rewards
 
 
 if __name__ == '__main__':
