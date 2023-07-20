@@ -20,15 +20,16 @@ if __name__ == '__main__':
         agent = parser.agent
 
     if True:
-        experiment_dirs = ['09_new_kpi_final_reward',
-                           '16_weather_8locs/standard_buildings',
-                           '14_normalize_price/new_buildings',
-                           '16_weather_8locs/new_buildings']
+        experiment_dirs = ['16_weather_8locs/standard_buildings',
+                           '17_fossilpenalty/old_buildings',
+                           '16_weather_8locs/new_buildings',
+                           '17_fossilpenalty/new_buildings']
         agentdir = 'SAC_DB2'
         agent = 'SAC'
 
     kpis = {}
     for dir in experiment_dirs:
+        print(dir)
         kpi_filenames = glob.glob(f'{EXPERIMENT_BASE_DIR}{agentdir}/{dir}/kpis_*.csv')
 
         if len(kpi_filenames) > 1:
