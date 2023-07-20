@@ -1,6 +1,6 @@
-scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230718T205439.pdf experiments/SAC_DB2/17_fossilpenalty/old_buildings/plots_20230718T205439.pdf
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230720T152617.pdf experiments/SAC_DB2/16_weather_8locs/new_buildings2/plots_20230720T152617.pdf
 
-scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/kpis_20230718T205505.csv experiments/SAC_DB2/17_fossilpenalty/old_buildings/kpis_20230718T205505.csv
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/kpis_20230720T152646.csv experiments/SAC_DB2/16_weather_8locs/new_buildings2/kpis_20230720T152646.csv
 
 scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230704T135811.pdf experiments/plots_20230704T135811.pdf
 
@@ -12,6 +12,8 @@ scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/kpis_20230704T1
 scp src/citylearn/data/nydata/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata/
 
 scp src/citylearn/data/nydata_new_buildings/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata_new_buildings/ 
+
+scp src/citylearn/data/nydata_new_buildings2/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata_new_buildings2/ 
 
 
 
