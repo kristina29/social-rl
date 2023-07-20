@@ -23,6 +23,9 @@ scp src/citylearn/data/nydata/schema.json klietz10@134.2.168.52:/mnt/qb/work/lud
 scp src/citylearn/data/nydata_new_buildings2/schema.json klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata_new_buildings2/schema.json
 
 
+scp src/citylearn/data/citylearn_challenge_2022_phase_all/schema.json klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/citylearn_challenge_2022_phase_all/schema.json
+
+
 
 
 scp src/citylearn/data/nydata/schema.json klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata/schema.json
