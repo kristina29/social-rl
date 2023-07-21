@@ -23,7 +23,6 @@ thesis/.DS_Store
 thesis/old/
 thesis/figures/~$figures.pptx
 .DS_Store
-plots_*
 src/plots_*
 src/kpis_*
 src/.idea/
@@ -34,6 +33,6 @@ src/citylearn/assets/
 src/citylearn/__pycache__/
 src/citylearn/agents/__pycache__/
 src/b_net_electricity_consumption.csv
-kpis_*.csv
+src/*.png
 logs/
 LaTeXTemplates_masters-doctoral-thesis_v2/

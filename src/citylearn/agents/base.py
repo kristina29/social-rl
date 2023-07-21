@@ -100,7 +100,7 @@ class Agent(Environment):
     def learn(
             self, episodes: int = None, keep_env_history: bool = None, env_history_directory: Union[str, Path] = None, 
             deterministic: bool = None, deterministic_finish: bool = None, logging_level: int = None
-        ):
+        ) -> (Mapping[str, List[float]], List[float]):
         """Train agent.
 
         Parameters
@@ -116,7 +116,14 @@ class Agent(Environment):
         deterministic_finish: bool, default: False
             Indicator to take deterministic actions in the final episode.
         logging_level: int, default: 30
-            Logging level where increasing the number silences lower level information.      
+            Logging level where increasing the number silences lower level information.
+
+        Return values
+        ----------
+        losses: Mapping[str, List[float]]
+            Mapping of neural-network name to loss values of training steps.
+        rewards: List[float]
+            Reward value per training step.
         """
         
         episodes = 1 if episodes is None else episodes
@@ -132,6 +139,8 @@ class Agent(Environment):
         else:
             pass
 
+        losses = None
+        rewards = []
         for episode in range(episodes):
             deterministic = deterministic or (deterministic_finish and episode >= episodes - 1)
             observations = self.env.reset()
@@ -140,11 +149,19 @@ class Agent(Environment):
                 actions = self.predict(observations, deterministic=deterministic)
 
                 # apply actions to citylearn_env
-                next_observations, rewards, _, _ = self.env.step(actions)
+                next_observations, rewards_new, _, _ = self.env.step(actions)
+                rewards.extend(rewards_new)
 
                 # update
                 if not deterministic:
-                    self.update(observations, actions, rewards, next_observations, done=self.env.done)
+                    new_losses = self.update(observations, actions, rewards_new, next_observations, done=self.env.done)
+
+                    if losses is None:
+                        losses = new_losses
+                    else:
+                        for name, value in new_losses.items():
+                            losses[name].extend(value)
+
                 else:
                     pass
 
@@ -154,7 +171,7 @@ class Agent(Environment):
                     f'Time step: {self.env.time_step}/{self.env.time_steps - 1},'\
                         f' Episode: {episode}/{episodes - 1},'\
                             f' Actions: {actions},'\
-                                f' Rewards: {rewards}'
+                                f' Rewards: {rewards_new}'
                 )
 
             # store episode's env to disk
@@ -162,6 +179,8 @@ class Agent(Environment):
                 self.__save_env(episode, env_history_directory)
             else:
                 pass
+
+        return losses, rewards
 
     def get_env_history(self, directory: Path, episodes: List[int] = None):
         env_history = ()
@@ -212,8 +231,13 @@ class Agent(Environment):
         assert logging_level >= 0, 'logging_level must be >= 0'
         LOGGER.setLevel(logging_level)
 
-    def update(self, *args, **kwargs):
+    def update(self, *args, **kwargs) -> Mapping[str, List[float]]:
         """Update replay buffer and networks.
+
+        Return value
+        ------
+        losses: Mapping[str, List[float]]
+            Mapping of neural-network name to loss values of training steps.
         
         Notes
         -----

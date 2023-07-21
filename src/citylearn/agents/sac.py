@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Mapping
 import numpy as np
 import numpy.typing as npt
 
@@ -54,7 +54,7 @@ class SAC(RLC):
         self.set_networks()
 
     def update(self, observations: List[List[float]], actions: List[List[float]], reward: List[float],
-               next_observations: List[List[float]], done: bool):
+               next_observations: List[List[float]], done: bool) -> Mapping[str, List[float]]:
         r"""Update replay buffer.
 
         Parameters
@@ -69,10 +69,18 @@ class SAC(RLC):
             Current time step observations.
         done : bool
             Indication that episode has ended.
+
+        Return value
+        ------------
+        losses: Mapping[str, List[float]]
+            Mapping of neural-network name to loss values of training steps.
         """
 
         # Run once the regression model has been fitted
         # Normalize all the observations using periodical normalization, one-hot encoding, or -1, 1 scaling. It also removes observations that are not necessary (solar irradiance if there are no solar PV panels).
+        q1_losses = []
+        q2_losses = []
+        policy_losses = []
 
         for i, (o, a, r, n) in enumerate(zip(observations, actions, reward, next_observations)):
             o = self.get_encoded_observations(i, o)
@@ -95,10 +103,15 @@ class SAC(RLC):
                     pass
 
                 for _ in range(self.update_per_time_step):
-                    self.update_step(i)
+                    _, q1_loss, q2_loss, policy_loss = self.update_step(i)
+                    q1_losses.append(q1_loss)
+                    q2_losses.append(q2_loss)
+                    policy_losses.append(policy_loss)
 
             else:
                 pass
+
+        return {'q1_losses': q1_losses, 'q2_losses': q2_losses, 'policy_losses': policy_losses}
 
     def normalize(self, i):
         # calculate normalized observations and rewards
@@ -119,7 +132,7 @@ class SAC(RLC):
         ) for o, a, r, n, d in self.replay_buffer[i].buffer]
         self.normalized[i] = True
 
-    def update_step(self, i) -> List[List[float]]:
+    def update_step(self, i) -> (List[List[float]], float, float, float):
         o, a, r, n, d = self.replay_buffer[i].sample(self.batch_size)
         tensor = torch.cuda.FloatTensor if self.device.type == 'cuda' else torch.FloatTensor
         o = tensor(o).to(self.device)
@@ -171,7 +184,7 @@ class SAC(RLC):
                                        self.soft_q_net2[i].parameters()):
             target_param.data.copy_(target_param.data * (1.0 - self.tau) + param.data * self.tau)
 
-        return o
+        return o, q1_loss.item(), q2_loss.item(), policy_loss.item()
 
     def predict(self, observations: List[List[float]], deterministic: bool = None):
         r"""Provide actions for current time step.
