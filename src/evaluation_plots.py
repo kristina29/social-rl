@@ -21,9 +21,9 @@ if __name__ == '__main__':
 
     if True:
         experiment_dirs = ['16_weather_8locs/standard_buildings',
-                           '18_limit_observations/version1/old_buildings',
+                           '19_tolovski_reward/old_buildings',
                            '16_weather_8locs/new_buildings2',
-                           '18_limit_observations/version1/new_buildings2']
+                           '19_tolovski_reward/new_buildings2']
         agentdir = 'SAC_DB2'
         agent = 'SAC'
 

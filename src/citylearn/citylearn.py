@@ -562,6 +562,12 @@ class CityLearnEnv(Environment, Env):
         return pd.DataFrame([b.solar_generation for b in self.buildings]).sum(axis=0, min_count=1).to_numpy()
 
     @property
+    def renewable_generation(self) -> np.ndarray:
+        """Summend `Building.solar_generation, in [kWh]` + `FuelMix.renewable_energy_produced, in [kWh]`"""
+
+        return self.buildings[0].fuel_mix.renewable_energy_produced[:len(self.solar_generation)] + self.solar_generation
+
+    @property
     def demonstrator_count(self) -> int:
         """Number of buildings that act as demonstrator in training"""
         counter = 0
