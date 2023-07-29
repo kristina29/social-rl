@@ -232,10 +232,11 @@ def get_kpis(env: CityLearnEnv) -> pd.DataFrame:
 
     # names of KPIs to retrieve from evaluate function
     kpi_names = [
-        'electricity_consumption', 'cost', 'carbon_emissions',
+        'electricity_consumption', 'cost',
         'average_daily_peak', 'ramping', '1 - load_factor',
         '1 - average_daily_renewable_share',
-        '1 - average_daily_renewable_share_grid'
+        '1 - average_daily_renewable_share_grid',
+        'used_pv_of_total_share'
     ]
     kpis = kpis[
         (kpis['cost_function'].isin(kpi_names))

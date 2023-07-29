@@ -413,6 +413,40 @@ class CityLearnEnv(Environment, Env):
                                                                                                  min_count=1).to_numpy()
 
     @property
+    def used_pv_of_total_share(self) -> List[float]:
+        """ Share of used PV energy of produced PV energy time series.
+
+         Notes
+        -----
+        share_used_pv_of_total = Summed `Building.used_pv_electricity` / (- Summed `Building.solar_generation`)
+
+        Values where solar_generation are set to 1 (otw nan due to dividing by 0)
+        """
+
+        no_solar_gen_idx = [i for i, v in enumerate(self.solar_generation) if v == 0]
+        result = self.used_pv_electricity / (-1 * self.solar_generation)
+        result[no_solar_gen_idx] = 1.
+        return result
+
+    @property
+    def used_pv_of_total_share_without_storage(self) -> List[float]:
+        """ Share of used PV energy of produced PV in the absence of flexibility provided by storage devices
+            energy time series.
+
+         Notes
+        -----
+        share_used_pv_of_total = Summed `Building.used_pv_electricity_without_storage` /
+                                        (- Summed `Building.solar_generation`)
+
+    Values where solar_generation are set to 1 (otw nan due to dividing by 0)
+        """
+
+        no_solar_gen_idx = [i for i, v in enumerate(self.solar_generation) if v == 0]
+        result = self.used_pv_electricity_without_storage / (-1 * self.solar_generation)
+        result[no_solar_gen_idx] = 1.
+        return result
+
+    @property
     def cooling_electricity_consumption(self) -> np.ndarray:
         """Summed `Building.cooling_electricity_consumption` time series, in [kWh]."""
 
@@ -808,6 +842,17 @@ class CityLearnEnv(Environment, Env):
                 'net_value_without_storage':
                     CostFunction.cost(b.net_electricity_consumption_without_storage_cost)[-1] \
                         if sum(b.pricing.electricity_pricing) != 0 else None,
+            }, {
+                'name': b.name,
+                'cost_function': 'used_pv_of_total_share',
+                'value': CostFunction.cost(b.used_pv_of_total_share)[-1] / \
+                         CostFunction.cost(b.used_pv_of_total_share_without_storage)[-1] \
+                    if sum(b.solar_generation) != 0 else None,
+                'net_value': CostFunction.cost(b.used_pv_of_total_share)[-1] \
+                    if sum(b.solar_generation) != 0 else None,
+                'net_value_without_storage':
+                    CostFunction.cost(b.used_pv_of_total_share_without_storage)[-1] \
+                        if sum(b.solar_generation) != 0 else None,
             }]
 
         building_level = pd.DataFrame(building_level)
