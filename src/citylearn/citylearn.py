@@ -845,13 +845,13 @@ class CityLearnEnv(Environment, Env):
             }, {
                 'name': b.name,
                 'cost_function': 'used_pv_of_total_share',
-                'value': CostFunction.cost(b.used_pv_of_total_share)[-1] / \
-                         CostFunction.cost(b.used_pv_of_total_share_without_storage)[-1] \
+                'value': CostFunction.used_pv_of_total_share(b.used_pv_of_total_share)[-1] / \
+                         CostFunction.used_pv_of_total_share(b.used_pv_of_total_share_without_storage)[-1] \
                     if sum(b.solar_generation) != 0 else None,
-                'net_value': CostFunction.cost(b.used_pv_of_total_share)[-1] \
+                'net_value': CostFunction.used_pv_of_total_share(b.used_pv_of_total_share)[-1] \
                     if sum(b.solar_generation) != 0 else None,
                 'net_value_without_storage':
-                    CostFunction.cost(b.used_pv_of_total_share_without_storage)[-1] \
+                    CostFunction.used_pv_of_total_share(b.used_pv_of_total_share_without_storage)[-1] \
                         if sum(b.solar_generation) != 0 else None,
             }]
 

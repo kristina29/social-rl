@@ -144,7 +144,7 @@ if __name__ == '__main__':
         DATASET_NAME = 'nydata'
         exclude_rbc = 1
         exclude_tql = 1
-        building_count = 1
+        building_count = 2
         episodes = 2
         seed = 2
         active_observations = ['renewable_energy_produced']
