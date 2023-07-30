@@ -1,6 +1,6 @@
-scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230727T182207.pdf experiments/SAC_DB2/19_tolovski_reward/old_buildings/plots_20230727T182207.pdf
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230730T202942.pdf experiments/SAC_DB2/16_weather_8locs/standard_buildings/plots_20230730T202942.pdf
 
-scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/kpis_20230727T182250.csv experiments/SAC_DB2/19_tolovski_reward/old_buildings/kpis_20230727T182250.csv
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/kpis_20230730T203015.csv experiments/SAC_DB2/16_weather_8locs/standard_buildings/kpis_20230730T203015.csv
 
 scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230704T135811.pdf experiments/plots_20230704T135811.pdf
 
@@ -27,7 +27,3 @@ scp src/citylearn/data/nydata/schema.json klietz10@134.2.168.52:/mnt/qb/work/lud
 scp src/job.sh klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/
 
 scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/electricity_consumption* experiments/Explore_Demand/per_building/
-
-vagrant scp tcml_singularity_rl_lecture bceff57:.
-
-scp ./tcml_singularity_rl_lecture/* stud54@tcml-master01.uni-tuebingen.de:~/Hockey/tcml_singularity_rl_lecture/
