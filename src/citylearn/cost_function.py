@@ -302,7 +302,7 @@ class CostFunction:
 
         data = pd.DataFrame({'pv_used_share': share_used_pv_of_total})
         data['group'] = (data.index / daily_time_step).astype(int)
-        data = data.groupby(['group'])[['renewable_share']].mean()
+        data = data.groupby(['group'])[['pv_used_share']].mean()
         data['pv_used_share'] = 1 - data['pv_used_share']
 
         data['pv_used_share'] = data['pv_used_share'].rolling(window=data.shape[0], min_periods=1).mean()
