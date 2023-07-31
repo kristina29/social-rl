@@ -236,7 +236,7 @@ def get_kpis(env: CityLearnEnv) -> pd.DataFrame:
         'average_daily_peak', 'ramping', '1 - load_factor',
         '1 - average_daily_renewable_share',
         '1 - average_daily_renewable_share_grid',
-        'used_pv_of_total_share'
+        '1 - used_pv_of_total_share'
     ]
     kpis = kpis[
         (kpis['cost_function'].isin(kpi_names))

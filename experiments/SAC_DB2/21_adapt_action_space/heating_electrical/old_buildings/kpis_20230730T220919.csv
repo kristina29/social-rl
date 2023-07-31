@@ -6,25 +6,25 @@ average_daily_peak,0.995,12.222,12.285,District,district,RBC
 cost,1.068,4209.757,3974.754,District,district,RBC
 electricity_consumption,1.071,7631.664,7185.277,District,district,RBC
 ramping,1.048,22167.218,21144.066,District,district,RBC
-used_pv_of_total_share,1.111,0.195,0.175,District,district,RBC
+1 - used_pv_of_total_share,1.111,0.195,0.175,District,district,RBC
 electricity_consumption,1.11,4882.562,4398.032,Building_7,building,RBC
 cost,1.107,2685.002,2425.044,Building_7,building,RBC
-used_pv_of_total_share,1.077,0.216,0.2,Building_7,building,RBC
+1 - used_pv_of_total_share,1.077,0.216,0.2,Building_7,building,RBC
 electricity_consumption,1.081,6202.145,5739.114,Building_8,building,RBC
 cost,1.075,3458.576,3217.242,Building_8,building,RBC
-used_pv_of_total_share,1.111,0.21,0.189,Building_8,building,RBC
+1 - used_pv_of_total_share,1.111,0.21,0.189,Building_8,building,RBC
 electricity_consumption,1.094,5427.23,4959.714,Building_9,building,RBC
 cost,1.088,3046.081,2799.573,Building_9,building,RBC
-used_pv_of_total_share,1.144,0.219,0.192,Building_9,building,RBC
+1 - used_pv_of_total_share,1.144,0.219,0.192,Building_9,building,RBC
 electricity_consumption,1.045,10225.324,9785.675,Building_10,building,RBC
 cost,1.043,5625.746,5395.103,Building_10,building,RBC
-used_pv_of_total_share,1.108,0.202,0.182,Building_10,building,RBC
+1 - used_pv_of_total_share,1.108,0.202,0.182,Building_10,building,RBC
 electricity_consumption,1.061,7459.202,7027.247,Building_13,building,RBC
 cost,1.061,3961.578,3733.325,Building_13,building,RBC
-used_pv_of_total_share,1.12,0.156,0.139,Building_13,building,RBC
+1 - used_pv_of_total_share,1.12,0.156,0.139,Building_13,building,RBC
 electricity_consumption,1.035,11593.523,11201.882,Building_17,building,RBC
 cost,1.032,6481.559,6278.236,Building_17,building,RBC
-used_pv_of_total_share,1.109,0.166,0.15,Building_17,building,RBC
+1 - used_pv_of_total_share,1.109,0.166,0.15,Building_17,building,RBC
 1 - average_daily_renewable_share,0.998,0.569,0.57,District,district,SAC
 1 - average_daily_renewable_share_grid,0.989,0.738,0.747,District,district,SAC
 1 - load_factor,0.99,0.866,0.874,District,district,SAC
@@ -32,25 +32,25 @@ average_daily_peak,0.923,11.342,12.285,District,district,SAC
 cost,0.971,3858.087,3974.754,District,district,SAC
 electricity_consumption,0.977,7021.173,7185.277,District,district,SAC
 ramping,0.981,20749.147,21144.066,District,district,SAC
-used_pv_of_total_share,0.866,0.152,0.175,District,district,SAC
+1 - used_pv_of_total_share,0.866,0.152,0.175,District,district,SAC
 electricity_consumption,1.006,4423.089,4398.032,Building_7,building,SAC
 cost,1.004,2433.604,2425.044,Building_7,building,SAC
-used_pv_of_total_share,0.932,0.187,0.2,Building_7,building,SAC
+1 - used_pv_of_total_share,0.932,0.187,0.2,Building_7,building,SAC
 electricity_consumption,0.963,5526.996,5739.114,Building_8,building,SAC
 cost,0.957,3078.681,3217.242,Building_8,building,SAC
-used_pv_of_total_share,0.857,0.162,0.189,Building_8,building,SAC
+1 - used_pv_of_total_share,0.857,0.162,0.189,Building_8,building,SAC
 electricity_consumption,0.952,4722.568,4959.714,Building_9,building,SAC
 cost,0.943,2640.452,2799.573,Building_9,building,SAC
-used_pv_of_total_share,0.845,0.162,0.192,Building_9,building,SAC
+1 - used_pv_of_total_share,0.845,0.162,0.192,Building_9,building,SAC
 electricity_consumption,0.971,9501.533,9785.675,Building_10,building,SAC
 cost,0.969,5226.925,5395.103,Building_10,building,SAC
-used_pv_of_total_share,0.839,0.153,0.182,Building_10,building,SAC
+1 - used_pv_of_total_share,0.839,0.153,0.182,Building_10,building,SAC
 electricity_consumption,0.982,6899.807,7027.247,Building_13,building,SAC
 cost,0.979,3655.885,3733.325,Building_13,building,SAC
-used_pv_of_total_share,0.909,0.127,0.139,Building_13,building,SAC
+1 - used_pv_of_total_share,0.909,0.127,0.139,Building_13,building,SAC
 electricity_consumption,0.987,11053.044,11201.882,Building_17,building,SAC
 cost,0.974,6112.971,6278.236,Building_17,building,SAC
-used_pv_of_total_share,0.815,0.122,0.15,Building_17,building,SAC
+1 - used_pv_of_total_share,0.815,0.122,0.15,Building_17,building,SAC
 1 - average_daily_renewable_share,0.997,0.568,0.57,District,district,SAC_DB2
 1 - average_daily_renewable_share_grid,0.986,0.736,0.747,District,district,SAC_DB2
 1 - load_factor,0.984,0.86,0.874,District,district,SAC_DB2
@@ -58,22 +58,22 @@ average_daily_peak,0.899,11.05,12.285,District,district,SAC_DB2
 cost,0.954,3809.048,3974.754,District,district,SAC_DB2
 electricity_consumption,0.964,6960.829,7185.277,District,district,SAC_DB2
 ramping,0.985,20835.145,21144.066,District,district,SAC_DB2
-used_pv_of_total_share,0.845,0.149,0.175,District,district,SAC_DB2
+1 - used_pv_of_total_share,0.845,0.149,0.175,District,district,SAC_DB2
 electricity_consumption,0.981,4312.668,4398.032,Building_7,building,SAC_DB2
 cost,0.974,2361.255,2425.044,Building_7,building,SAC_DB2
-used_pv_of_total_share,0.934,0.187,0.2,Building_7,building,SAC_DB2
+1 - used_pv_of_total_share,0.934,0.187,0.2,Building_7,building,SAC_DB2
 electricity_consumption,0.958,5495.747,5739.114,Building_8,building,SAC_DB2
 cost,0.95,3056.774,3217.242,Building_8,building,SAC_DB2
-used_pv_of_total_share,0.869,0.164,0.189,Building_8,building,SAC_DB2
+1 - used_pv_of_total_share,0.869,0.164,0.189,Building_8,building,SAC_DB2
 electricity_consumption,0.899,4458.367,4959.714,Building_9,building,SAC_DB2
 cost,0.882,2469.756,2799.573,Building_9,building,SAC_DB2
-used_pv_of_total_share,0.741,0.142,0.192,Building_9,building,SAC_DB2
+1 - used_pv_of_total_share,0.741,0.142,0.192,Building_9,building,SAC_DB2
 electricity_consumption,0.98,9593.381,9785.675,Building_10,building,SAC_DB2
 cost,0.978,5274.491,5395.103,Building_10,building,SAC_DB2
-used_pv_of_total_share,0.892,0.163,0.182,Building_10,building,SAC_DB2
+1 - used_pv_of_total_share,0.892,0.163,0.182,Building_10,building,SAC_DB2
 electricity_consumption,0.992,6972.817,7027.247,Building_13,building,SAC_DB2
 cost,0.975,3639.41,3733.325,Building_13,building,SAC_DB2
-used_pv_of_total_share,0.856,0.119,0.139,Building_13,building,SAC_DB2
+1 - used_pv_of_total_share,0.856,0.119,0.139,Building_13,building,SAC_DB2
 electricity_consumption,0.976,10931.994,11201.882,Building_17,building,SAC_DB2
 cost,0.964,6052.606,6278.236,Building_17,building,SAC_DB2
-used_pv_of_total_share,0.778,0.117,0.15,Building_17,building,SAC_DB2
+1 - used_pv_of_total_share,0.778,0.117,0.15,Building_17,building,SAC_DB2

@@ -844,7 +844,7 @@ class CityLearnEnv(Environment, Env):
                         if sum(b.pricing.electricity_pricing) != 0 else None,
             }, {
                 'name': b.name,
-                'cost_function': 'used_pv_of_total_share',
+                'cost_function': '1 - used_pv_of_total_share',
                 'value': CostFunction.used_pv_of_total_share(b.used_pv_of_total_share)[-1] / \
                          CostFunction.used_pv_of_total_share(b.used_pv_of_total_share_without_storage)[-1] \
                     if sum(b.solar_generation) != 0 else None,
