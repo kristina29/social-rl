@@ -232,10 +232,11 @@ def get_kpis(env: CityLearnEnv) -> pd.DataFrame:
 
     # names of KPIs to retrieve from evaluate function
     kpi_names = [
-        'electricity_consumption', 'cost', 'carbon_emissions',
+        'electricity_consumption', 'cost',
         'average_daily_peak', 'ramping', '1 - load_factor',
         '1 - average_daily_renewable_share',
-        '1 - average_daily_renewable_share_grid'
+        '1 - average_daily_renewable_share_grid',
+        'used_pv_of_total_share'
     ]
     kpis = kpis[
         (kpis['cost_function'].isin(kpi_names))
@@ -400,16 +401,20 @@ def plot_building_load_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
 
     for i, ax in enumerate(fig.axes):
         for k, v in envs.items():
-            y = v.buildings[i].net_electricity_consumption
+            y = v.buildings[i].net_electricity_consumption[:168]
             x = range(len(y))
             ax.plot(x, y, label=k)
 
-        y = v.buildings[i].net_electricity_consumption_without_storage
+        y = v.buildings[i].net_electricity_consumption_without_storage[:168]
         ax.plot(x, y, label='Baseline')
         ax.set_title(v.buildings[i].name)
-        ax.set_xlabel('Time step')
+        ax.set_xlabel('Time')
         ax.set_ylabel('kWh')
-        ax.xaxis.set_major_locator(ticker.MultipleLocator(24))
+        ticks = get_weekday_ticks()
+        ax.set_xticks(np.arange(0, len(ticks)))
+        ax.xaxis.set_tick_params(length=0)
+        ax.set_xticklabels(ticks, rotation=0)
+        [l.set_visible(False) for (i, l) in enumerate(ax.get_xticklabels()) if (i - 18) % 24 != 0]
 
         if i == building_count - 1:
             ax.legend(
@@ -422,6 +427,17 @@ def plot_building_load_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
     plt.tight_layout()
 
     return fig
+
+
+def get_weekday_ticks():
+    ticks = ['Mo'] * 24
+    ticks.extend(['Tue'] * 24)
+    ticks.extend(['Wed'] * 24)
+    ticks.extend(['Thur'] * 24)
+    ticks.extend(['Fri'] * 24)
+    ticks.extend(['Sat'] * 24)
+    ticks.extend(['Sun'] * 24)
+    return ticks
 
 
 def plot_district_load_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
@@ -444,15 +460,19 @@ def plot_district_load_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
     fig, ax = plt.subplots(1, 1, figsize=figsize)
 
     for k, v in envs.items():
-        y = v.net_electricity_consumption
+        y = v.net_electricity_consumption[:168]
         x = range(len(y))
         ax.plot(x, y, label=k)
 
-    y = v.net_electricity_consumption_without_storage
+    y = v.net_electricity_consumption_without_storage[:168]
     ax.plot(x, y, label='Baseline')
-    ax.set_xlabel('Time step')
+    ax.set_xlabel('Time')
     ax.set_ylabel('kWh')
-    ax.xaxis.set_major_locator(ticker.MultipleLocator(24))
+    ticks = get_weekday_ticks()
+    ax.set_xticks(np.arange(0, len(ticks)))
+    ax.xaxis.set_tick_params(length=0)
+    ax.set_xticklabels(ticks, rotation=0)
+    [l.set_visible(False) for (i, l) in enumerate(ax.get_xticklabels()) if (i - 18) % 24 != 0]
     ax.legend(loc='upper left', bbox_to_anchor=(1.0, 1.0), framealpha=0.0)
 
     fig.suptitle('District-level net electricty consumption profile', fontsize=14)
@@ -484,16 +504,20 @@ def plot_battery_soc_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
 
     for i, ax in enumerate(fig.axes):
         for k, v in envs.items():
-            soc = np.array(v.buildings[i].electrical_storage.soc)
+            soc = np.array(v.buildings[i].electrical_storage.soc)[:168]
             capacity = v.buildings[i].electrical_storage.capacity_history[0]
             y = soc / capacity
             x = range(len(y))
             ax.plot(x, y, label=k)
 
         ax.set_title(v.buildings[i].name)
-        ax.set_xlabel('Time step')
+        ax.set_xlabel('Time')
         ax.set_ylabel('SoC')
-        ax.xaxis.set_major_locator(ticker.MultipleLocator(24))
+        ticks = get_weekday_ticks()
+        ax.set_xticks(np.arange(0, len(ticks)))
+        ax.xaxis.set_tick_params(length=0)
+        ax.set_xticklabels(ticks, rotation=0)
+        [l.set_visible(False) for (i, l) in enumerate(ax.get_xticklabels()) if (i - 18) % 24 != 0]
 
         if i == building_count - 1:
             ax.legend(
@@ -506,6 +530,49 @@ def plot_battery_soc_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
     plt.tight_layout()
 
     return fig
+
+
+def plot_lossesOrRewards(values: Mapping[str, Iterable[float]], key: str) -> List[plt.Figure]:
+    r"""Creates one figure over time of the values for each agent.
+
+        Parameters
+        ----------
+        values : Mapping[str, Iterable[float]]
+            Loss or reward values for each trained agent over time.
+        key : str
+            Key indicating if losses or rewards should be plotted
+
+        Return values
+        ----------
+        List of the created figures
+    """
+
+    figs = []
+    for env_name, env_values in values.items():
+        fig, ax = plt.subplots()
+        if isinstance(env_values, list):
+            # plot rewards
+            N = int(len(env_values) / 50)
+            ax.plot(np.arange(len(env_values) - N + 1) * N, running_mean(env_values, N))
+            ax.set_ylabel(f'{key} value (running mean over {N} values)')
+            ax.set_xlabel(f'Time step (actual {len(env_values)})')
+        else:
+            # plot losses
+            for nn_name, nn_values in env_values.items():
+                ax.plot(np.arange(len(nn_values)), nn_values, label=nn_name)
+            ax.legend()
+            ax.set_ylabel(f'{key} value')
+            ax.set_xlabel('Time step')
+        ax.set_title(f'{env_name} {key} values')
+        ax.grid(axis='y')
+        figs.append(fig)
+
+    return figs
+
+
+def running_mean(x, N):
+    cumsum = np.cumsum(np.insert(x, 0, 0))
+    return (cumsum[N:] - cumsum[:-N]) / float(N)
 
 
 # save all produces figures as pdf
@@ -521,7 +588,8 @@ def save_multi_image(filename):
     print("Plots saved in file", f'{filename}.pdf')
 
 
-def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], filename: str):
+def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], losses: Mapping[str, Mapping[str, List[float]]],
+                            rewards: Mapping[str, List[float]], filename: str):
     """Plots KPIs, load and battery SoC profiles for different control agents.
 
     Parameters
@@ -529,16 +597,24 @@ def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], filename: str):
     envs: Mapping[str, CityLearnEnv]
         Mapping of user-defined control agent names to environments
         the agents have been used to control.
+    losses: Mapping[str, Mapping[str, List[float]]]
+        Mapping of user-defined control agent names to Mapping of neural-network name to loss values of training steps.
+    rewards: Mapping[str, List[float]]
+        Mapping of user-defined control agent names to rewards of training steps.
     filename: str
         Name of the file where plots should be stored
     """
 
     plot_building_kpis(envs)
-    # plot_building_load_profiles(envs)
-    # plot_battery_soc_profiles(envs)
+    plot_building_load_profiles(envs)
+    plot_battery_soc_profiles(envs)
     plot_district_kpis(envs)
-    # plot_district_load_profiles(envs)
+    plot_district_load_profiles(envs)
+    plot_lossesOrRewards(losses, key='loss')
+    plot_lossesOrRewards(rewards, key='reward')
+
     save_multi_image(filename)
+
 
 def save_kpis(envs: Mapping[str, CityLearnEnv], filename):
     """Saves KPIs for different control agents as CSV.
@@ -561,5 +637,3 @@ def save_kpis(envs: Mapping[str, CityLearnEnv], filename):
 
     kpis = pd.concat(kpis_list, ignore_index=True, sort=False)
     kpis.to_csv(filename, index=False)
-
-

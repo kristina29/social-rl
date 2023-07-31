@@ -316,7 +316,8 @@ class Building(Environment):
 
     @property
     def used_pv_electricity_without_storage(self) -> np.ndarray:
-        """ Actual used self-produced PV energy time series, in [kWh], positive values
+        """ Actual used self-produced PV energy in the absence of flexibility provided by storage devices time series,
+            in [kWh], positive values
 
         Notes
         -----
@@ -327,6 +328,37 @@ class Building(Environment):
 
         return np.stack((self.net_electricity_consumption_without_storage - self.solar_generation,
                          -1 * self.solar_generation)).min(axis=0).clip(min=0)
+
+    @property
+    def used_pv_of_total_share(self) -> List[float]:
+        """ Share of used PV energy of produced PV energy time series
+
+        Notes
+        -----
+        share_used_pv_of_total = `used_pv_electricity` / (- `solar_generation`)
+
+        Values where solar_generation are set to 1 (otw nan due to dividing by 0)
+        """
+        no_solar_gen_idx = [i for i, v in enumerate(self.solar_generation) if v == 0]
+        result = self.used_pv_electricity / (-1 * self.solar_generation)
+        result[no_solar_gen_idx] = 1.
+        return list(result)
+
+    @property
+    def used_pv_of_total_share_without_storage(self) -> List[float]:
+        """ Share of used PV energy of produced PV energy in the absence of flexibility provided by storage devices
+            time series with
+
+        Notes
+        -----
+        share_used_pv_of_total = `used_pv_electricity_without_storage` / (- `solar_generation`)
+
+        Values where solar_generation are set to 1 (otw nan due to dividing by 0)
+        """
+        no_solar_gen_idx = [i for i, v in enumerate(self.solar_generation) if v == 0]
+        result = self.used_pv_electricity_without_storage / (-1 * self.solar_generation)
+        result[no_solar_gen_idx] = 1.
+        return list(result)
 
     @property
     def cooling_electricity_consumption(self) -> List[float]:
@@ -539,7 +571,6 @@ class Building(Environment):
     def fuel_mix(self, fuel_mix: FuelMix):
         if fuel_mix is None:
             self.__fuel_mix = FuelMix(np.zeros(len(self.energy_simulation.hour), dtype=float),
-                                      np.zeros(len(self.energy_simulation.hour), dtype=float),
                                       np.zeros(len(self.energy_simulation.hour), dtype=float))
         else:
             self.__fuel_mix = fuel_mix

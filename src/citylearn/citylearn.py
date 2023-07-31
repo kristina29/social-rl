@@ -319,7 +319,9 @@ class CityLearnEnv(Environment, Env):
                                                             `used_pv_electricity_without_storage`)
         """
         return list((self.net_renewable_electricity_consumption_without_storage /
-                     (self.net_electricity_consumption_positive_without_storage + self.used_pv_electricity_without_storage)).clip(min=0))
+                     (
+                                 self.net_electricity_consumption_positive_without_storage + self.used_pv_electricity_without_storage)).clip(
+            min=0))
 
     @property
     def net_renewable_electricity_grid_consumption_without_storage(self) -> np.ndarray:
@@ -370,8 +372,8 @@ class CityLearnEnv(Environment, Env):
                                                                                     `used_pv_electricity`)
         """
 
-        return list((self.net_renewable_electricity_consumption /
-                     (self.net_electricity_consumption_positive + self.used_pv_electricity)).clip(min=0))
+        return list(np.nan_to_num((self.net_renewable_electricity_consumption /
+                                   (self.net_electricity_consumption_positive + self.used_pv_electricity)).clip(min=0)))
 
     @property
     def net_renewable_electricity_grid_consumption(self) -> np.ndarray:
@@ -383,7 +385,8 @@ class CityLearnEnv(Environment, Env):
         """
 
         return np.stack((self.net_electricity_consumption_positive,
-                         self.buildings[0].fuel_mix.renewable_energy_produced)).min(axis=0)
+                         self.buildings[0].fuel_mix.renewable_energy_produced[
+                         :len(self.net_electricity_consumption_positive)])).min(axis=0)
 
     @property
     def net_renewable_electricity_grid_share(self) -> List[float]:
@@ -408,6 +411,40 @@ class CityLearnEnv(Environment, Env):
         """Summed `Building.used_pv_electricity_without_storage` time series, in [kWh]."""
         return pd.DataFrame([b.used_pv_electricity_without_storage for b in self.buildings]).sum(axis=0,
                                                                                                  min_count=1).to_numpy()
+
+    @property
+    def used_pv_of_total_share(self) -> List[float]:
+        """ Share of used PV energy of produced PV energy time series.
+
+         Notes
+        -----
+        share_used_pv_of_total = Summed `Building.used_pv_electricity` / (- Summed `Building.solar_generation`)
+
+        Values where solar_generation are set to 1 (otw nan due to dividing by 0)
+        """
+
+        no_solar_gen_idx = [i for i, v in enumerate(self.solar_generation) if v == 0]
+        result = self.used_pv_electricity / (-1 * self.solar_generation)
+        result[no_solar_gen_idx] = 1.
+        return result
+
+    @property
+    def used_pv_of_total_share_without_storage(self) -> List[float]:
+        """ Share of used PV energy of produced PV in the absence of flexibility provided by storage devices
+            energy time series.
+
+         Notes
+        -----
+        share_used_pv_of_total = Summed `Building.used_pv_electricity_without_storage` /
+                                        (- Summed `Building.solar_generation`)
+
+    Values where solar_generation are set to 1 (otw nan due to dividing by 0)
+        """
+
+        no_solar_gen_idx = [i for i, v in enumerate(self.solar_generation) if v == 0]
+        result = self.used_pv_electricity_without_storage / (-1 * self.solar_generation)
+        result[no_solar_gen_idx] = 1.
+        return result
 
     @property
     def cooling_electricity_consumption(self) -> np.ndarray:
@@ -557,6 +594,12 @@ class CityLearnEnv(Environment, Env):
         """Summed `Building.solar_generation, in [kWh]`."""
 
         return pd.DataFrame([b.solar_generation for b in self.buildings]).sum(axis=0, min_count=1).to_numpy()
+
+    @property
+    def renewable_generation(self) -> np.ndarray:
+        """Summend `Building.solar_generation, in [kWh]` + `FuelMix.renewable_energy_produced, in [kWh]`"""
+
+        return self.buildings[0].fuel_mix.renewable_energy_produced[:len(self.solar_generation)] + self.solar_generation
 
     @property
     def demonstrator_count(self) -> int:
@@ -767,14 +810,16 @@ class CityLearnEnv(Environment, Env):
                 'value': CostFunction.electricity_consumption(b.net_electricity_consumption)[-1] / \
                          CostFunction.electricity_consumption(b.net_electricity_consumption_without_storage)[-1],
                 'net_value': CostFunction.electricity_consumption(b.net_electricity_consumption)[-1],
-                'net_value_without_storage': CostFunction.electricity_consumption(b.net_electricity_consumption_without_storage)[-1]
+                'net_value_without_storage':
+                    CostFunction.electricity_consumption(b.net_electricity_consumption_without_storage)[-1]
             }, {
                 'name': b.name,
                 'cost_function': 'zero_net_energy',
                 'value': CostFunction.zero_net_energy(b.net_electricity_consumption)[-1] / \
                          CostFunction.zero_net_energy(b.net_electricity_consumption_without_storage)[-1],
                 'net_value': CostFunction.zero_net_energy(b.net_electricity_consumption)[-1],
-                'net_value_without_storage': CostFunction.zero_net_energy(b.net_electricity_consumption_without_storage)[-1]
+                'net_value_without_storage':
+                    CostFunction.zero_net_energy(b.net_electricity_consumption_without_storage)[-1]
             }, {
                 'name': b.name,
                 'cost_function': 'carbon_emissions',
@@ -783,8 +828,9 @@ class CityLearnEnv(Environment, Env):
                     if sum(b.carbon_intensity.carbon_intensity) != 0 else None,
                 'net_value': CostFunction.carbon_emissions(b.net_electricity_consumption_emission)[-1] \
                     if sum(b.carbon_intensity.carbon_intensity) != 0 else None,
-                'net_value_without_storage': CostFunction.carbon_emissions(b.net_electricity_consumption_without_storage_emission)[-1] \
-                    if sum(b.carbon_intensity.carbon_intensity) != 0 else None
+                'net_value_without_storage':
+                    CostFunction.carbon_emissions(b.net_electricity_consumption_without_storage_emission)[-1] \
+                        if sum(b.carbon_intensity.carbon_intensity) != 0 else None
             }, {
                 'name': b.name,
                 'cost_function': 'cost',
@@ -796,6 +842,17 @@ class CityLearnEnv(Environment, Env):
                 'net_value_without_storage':
                     CostFunction.cost(b.net_electricity_consumption_without_storage_cost)[-1] \
                         if sum(b.pricing.electricity_pricing) != 0 else None,
+            }, {
+                'name': b.name,
+                'cost_function': 'used_pv_of_total_share',
+                'value': CostFunction.used_pv_of_total_share(b.used_pv_of_total_share)[-1] / \
+                         CostFunction.used_pv_of_total_share(b.used_pv_of_total_share_without_storage)[-1] \
+                    if sum(b.solar_generation) != 0 else None,
+                'net_value': CostFunction.used_pv_of_total_share(b.used_pv_of_total_share)[-1] \
+                    if sum(b.solar_generation) != 0 else None,
+                'net_value_without_storage':
+                    CostFunction.used_pv_of_total_share(b.used_pv_of_total_share_without_storage)[-1] \
+                        if sum(b.solar_generation) != 0 else None,
             }]
 
         building_level = pd.DataFrame(building_level)
@@ -819,7 +876,8 @@ class CityLearnEnv(Environment, Env):
             'value': CostFunction.average_daily_peak(self.net_electricity_consumption)[-1] / \
                      CostFunction.average_daily_peak(self.net_electricity_consumption_without_storage)[-1],
             'net_value': CostFunction.average_daily_peak(self.net_electricity_consumption)[-1],
-            'net_value_without_storage': CostFunction.average_daily_peak(self.net_electricity_consumption_without_storage)[-1]
+            'net_value_without_storage':
+                CostFunction.average_daily_peak(self.net_electricity_consumption_without_storage)[-1]
         }, {
             'cost_function': 'peak_demand',
             'value': CostFunction.peak_demand(self.net_electricity_consumption)[-1] / \
@@ -830,21 +888,25 @@ class CityLearnEnv(Environment, Env):
         }, {
             'cost_function': '1 - average_daily_renewable_share',
             'value': CostFunction.average_daily_renewable_share(self.net_renewable_electricity_share)[-1] / \
-                     CostFunction.average_daily_renewable_share(self.net_renewable_electricity_share_without_storage)[-1],
+                     CostFunction.average_daily_renewable_share(self.net_renewable_electricity_share_without_storage)[
+                         -1],
             'net_value': CostFunction.average_daily_renewable_share(self.net_renewable_electricity_share)[-1],
             'net_value_without_storage':
                 CostFunction.average_daily_renewable_share(self.net_renewable_electricity_share_without_storage)[-1]
         }, {
             'cost_function': '1 - average_daily_renewable_share_grid',
             'value': CostFunction.average_daily_renewable_share(self.net_renewable_electricity_grid_share)[-1] / \
-                     CostFunction.average_daily_renewable_share(self.net_renewable_electricity_grid_share_without_storage)[-1],
+                     CostFunction.average_daily_renewable_share(
+                         self.net_renewable_electricity_grid_share_without_storage)[-1],
             'net_value': CostFunction.average_daily_renewable_share(self.net_renewable_electricity_grid_share)[-1],
             'net_value_without_storage':
-                CostFunction.average_daily_renewable_share(self.net_renewable_electricity_grid_share_without_storage)[-1]
+                CostFunction.average_daily_renewable_share(self.net_renewable_electricity_grid_share_without_storage)[
+                    -1]
         }])
 
         district_level = pd.concat([district_level, building_level], ignore_index=True, sort=False)
-        district_level = district_level.groupby(['cost_function'])[['value', 'net_value', 'net_value_without_storage']].mean().reset_index()
+        district_level = district_level.groupby(['cost_function'])[
+            ['value', 'net_value', 'net_value_without_storage']].mean().reset_index()
         district_level['name'] = 'District'
         district_level['level'] = 'district'
         cost_functions = pd.concat([district_level, building_level], ignore_index=True, sort=False)
@@ -1039,7 +1101,7 @@ class CityLearnEnv(Environment, Env):
 
                     # observation and action metadata
                     inactive_observations = [] if building_schema.get('inactive_observations', None) is None else \
-                    building_schema['inactive_observations']
+                        building_schema['inactive_observations']
                     inactive_actions = [] if building_schema.get('inactive_actions', None) is None else building_schema[
                         'inactive_actions']
                     observation_metadata = {s: False if s in inactive_observations else True for s in observations}
@@ -1047,7 +1109,7 @@ class CityLearnEnv(Environment, Env):
 
                     # construct building
                     building_type = 'citylearn.citylearn.Building' if building_schema.get('type', None) is None else \
-                    building_schema['type']
+                        building_schema['type']
                     building_type_module = '.'.join(building_type.split('.')[0:-1])
                     building_type_name = building_type.split('.')[-1]
                     demonstrator = building_schema['demonstrator']
@@ -1090,14 +1152,14 @@ class CityLearnEnv(Environment, Env):
                             attributes['seconds_per_time_step'] = seconds_per_time_step
                             device = constructor(**attributes)
                             autosize = False if building_schema[name].get('autosize', None) is None else \
-                            building_schema[name]['autosize']
+                                building_schema[name]['autosize']
                             building.__setattr__(name, device)
 
                             if autosize:
                                 autosizer = device_metadata[name]['autosizer']
                                 autosize_kwargs = {} if building_schema[name].get('autosize_attributes',
                                                                                   None) is None else \
-                                building_schema[name]['autosize_attributes']
+                                    building_schema[name]['autosize_attributes']
                                 autosizer(**autosize_kwargs)
                             else:
                                 pass
