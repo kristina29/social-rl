@@ -13,8 +13,8 @@ from utils import set_schema_buildings, set_active_observations, plot_simulation
 from nonsocialrl import train_tql, train_rbc, train_sac
 
 
-def train(dataset_name, random_seed, building_count, demonstrators_count, episodes, active_observations, exclude_tql,
-          exclude_rbc, exclude_sac):
+def train(dataset_name, random_seed, building_count, demonstrators_count, episodes, active_observations, batch_size,
+          exclude_tql, exclude_rbc, exclude_sac):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
 
@@ -39,10 +39,11 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
 
     # Train soft actor-critic (SAC) agent for comparison
     if not exclude_sac:
-        all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'] = train_sac(schema, episodes, random_seed)
+        all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'] = train_sac(schema, episodes, random_seed, batch_size)
 
     # Train SAC agent with decision-biasing
-    all_envs['SAC_DB2'], all_losses['SAC_DB2'], all_rewards['SAC_DB2'] = train_sacdb2(schema, episodes, random_seed)
+    all_envs['SAC_DB2'], all_losses['SAC_DB2'], all_rewards['SAC_DB2'] = train_sacdb2(schema, episodes, random_seed,
+                                                                                      batch_size)
 
     # plot summary and compare with other control results
     filename = f'plots_{datetime.now().strftime("%Y%m%dT%H%M%S")}'
@@ -76,7 +77,7 @@ def preprocessing(schema, building_count, demonstrators_count, random_seed, acti
 
 def train_sacdb2(schema, episodes, random_seed):
     env = CityLearnEnv(schema)
-    sacdb2_model = SACDB2(env=env, seed=random_seed)
+    sacdb2_model = SACDB2(env=env, seed=random_seed, batch_size=batch_size)
     losses, rewards = sacdb2_model.learn(episodes=episodes, deterministic_finish=True)
 
     print('SAC DB2 model trained!')
@@ -98,18 +99,7 @@ if __name__ == '__main__':
     exclude_rbc = opts.exclude_rbc
     exclude_sac = opts.exclude_sac
     active_observations = opts.observations
-
-    # only when used in pycharm for testing
-    if len(sys.argv) == 10 and False:
-        DATASET_NAME = sys.argv[1]
-        seed = int(sys.argv[2])
-        building_count = int(sys.argv[3])
-        demonstrators_count = int(sys.argv[4])
-        episodes = int(sys.argv[5])
-        exclude_tql = bool(int(sys.argv[6]))
-        exclude_rbc = bool(int(sys.argv[7]))
-        exclude_sac = bool(int(sys.argv[8]))
-        active_observations = [sys.argv[9]]
+    batch_size = opts.batch
 
     if False:
         DATASET_NAME = 'nydata'
@@ -121,9 +111,10 @@ if __name__ == '__main__':
         episodes = 2
         seed = 2
         active_observations = ['renewable_energy_produced']
+        batch_size = 256
 
-    train(DATASET_NAME, seed, building_count, demonstrators_count, episodes, active_observations, exclude_tql,
-          exclude_rbc, exclude_sac)
+    train(DATASET_NAME, seed, building_count, demonstrators_count, episodes, active_observations, batch_size,
+          exclude_tql, exclude_rbc, exclude_sac)
 
     # get the end time
     et = time.time()
