@@ -75,7 +75,7 @@ def preprocessing(schema, building_count, demonstrators_count, random_seed, acti
     return schema
 
 
-def train_sacdb2(schema, episodes, random_seed):
+def train_sacdb2(schema, episodes, random_seed, batch_size):
     env = CityLearnEnv(schema)
     sacdb2_model = SACDB2(env=env, seed=random_seed, batch_size=batch_size)
     losses, rewards = sacdb2_model.learn(episodes=episodes, deterministic_finish=True)
