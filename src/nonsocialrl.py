@@ -17,7 +17,7 @@ from options import parseOptions_nonsocial
 from utils import set_schema_buildings, set_active_observations, plot_simulation_summary, save_kpis
 
 
-def train(dataset_name, random_seed, building_count, episodes, active_observations, exclude_tql,
+def train(dataset_name, random_seed, building_count, episodes, active_observations, batch_size, exclude_tql,
           exclude_rbc):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
@@ -35,14 +35,14 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
     all_rewards = {}
     # Train rule-based control (RBC) agent for comparison
     if not exclude_rbc:
-        all_envs['RBC'] = train_rbc(schema, episodes)
+        all_envs['RBC'] = train_rbc(schema, episodes, batch_size)
 
     # Train tabular Q-Learning (TQL) agent for comparison
     if not exclude_tql:
         all_envs['TQL'] = train_tql(schema, active_observations, episodes)
 
     # Train soft actor-critic (SAC) agent
-    all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'] = train_sac(schema, episodes, random_seed)
+    all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'] = train_sac(schema, episodes, random_seed, batch_size)
     print('SAC model trained!')
 
     # plot summary and compare with other control results
@@ -119,9 +119,9 @@ def train_tql(schema, active_observations, episodes):
     return env
 
 
-def train_sac(schema, episodes, random_seed):
+def train_sac(schema, episodes, random_seed, batch_size):
     env = CityLearnEnv(schema)
-    sac_model = SAC(env=env, seed=random_seed, autotune_entropy=True)
+    sac_model = SAC(env=env, seed=random_seed, autotune_entropy=True, batch_size=batch_size)
     losses, rewards = sac_model.learn(episodes=episodes, deterministic_finish=True)
 
     return env, losses, rewards
@@ -139,6 +139,7 @@ if __name__ == '__main__':
     exclude_tql = opts.exclude_tql
     exclude_rbc = opts.exclude_rbc
     active_observations = opts.observations
+    batch_size = opts.batch
 
     if True:
         DATASET_NAME = 'nydata'
@@ -148,8 +149,10 @@ if __name__ == '__main__':
         episodes = 2
         seed = 2
         active_observations = ['renewable_energy_produced']
+        batch_size = 256
 
-    train(DATASET_NAME, seed, building_count, episodes, active_observations, exclude_tql, exclude_rbc)
+    print(batch_size)
+    train(DATASET_NAME, seed, building_count, episodes, active_observations, batch_size, exclude_tql, exclude_rbc)
 
     # get the end time
     et = time.time()
