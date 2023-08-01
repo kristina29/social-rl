@@ -102,7 +102,7 @@ if __name__ == '__main__':
     batch_size = opts.batch
     autotune_entropy = opts.autotune
 
-    if True:
+    if False:
         DATASET_NAME = 'nydata'
         exclude_rbc = 1
         exclude_tql = 1
