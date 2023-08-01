@@ -91,7 +91,7 @@ class TestEnv1(Environment, Env):
 
 if __name__ == '__main__':
     env = TestEnv1(simulation_end_time_step=1)
-    agent = SAC(env=env, seed=2, start_training_time_step=0, end_exploration_time_step=0, batch_size=1, alpha=0)
+    agent = SAC(env=env, seed=2, start_training_time_step=0, end_exploration_time_step=0, batch_size=1, alpha=0, autotune_entropy=True)
     losses, rewards = agent.learn(episodes=100, deterministic_finish=True)
 
     fig, ax = plt.subplots()
