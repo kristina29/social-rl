@@ -121,7 +121,7 @@ def train_tql(schema, active_observations, episodes):
 
 def train_sac(schema, episodes, random_seed):
     env = CityLearnEnv(schema)
-    sac_model = SAC(env=env, seed=random_seed)
+    sac_model = SAC(env=env, seed=random_seed, autotune_entropy=True)
     losses, rewards = sac_model.learn(episodes=episodes, deterministic_finish=True)
 
     return env, losses, rewards
@@ -140,7 +140,7 @@ if __name__ == '__main__':
     exclude_rbc = opts.exclude_rbc
     active_observations = opts.observations
 
-    if False:
+    if True:
         DATASET_NAME = 'nydata'
         exclude_rbc = 1
         exclude_tql = 1
