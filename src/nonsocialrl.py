@@ -121,7 +121,7 @@ def train_tql(schema, active_observations, episodes):
 
 def train_sac(schema, episodes, random_seed, batch_size):
     env = CityLearnEnv(schema)
-    sac_model = SAC(env=env, seed=random_seed, batch_size=batch_size)
+    sac_model = SAC(env=env, seed=random_seed, autotune_entropy=True, batch_size=batch_size)
     losses, rewards = sac_model.learn(episodes=episodes, deterministic_finish=True)
 
     return env, losses, rewards
