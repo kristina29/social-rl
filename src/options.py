@@ -42,10 +42,12 @@ def parseOptions_social():
 
 def add_nonsocial_options(optParser):
     optParser.add_option('-s', '--schema', action='store', type='string', dest='schema',
-                         default='test',
+                         default='nydata',
                          help='Name of the directory including the schema and data files')
     optParser.add_option('-r', '--randomseed', action='store', type='int', dest='seed',
                          help='Random seed to create reproducible results. If not defined, no fixed seed is used.')
+    optParser.add_option('--batch', action='store', type='int', dest='batch',
+                         help='Batch size.')
     optParser.add_option('-b', '--buildings', action='store', type='int', dest='buildings',
                          help='Number of random selected buildings to include in training (between 1 and 15). '
                               'If not defined, all buildings are included.')

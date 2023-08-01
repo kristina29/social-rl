@@ -7,7 +7,7 @@ from citylearn.agents.marlisa import MARLISA
 from citylearn.reward_function import MARL
 from utils import set_schema_buildings, set_schema_simulation_period, set_active_observations, plot_simulation_summary
 
-DATASET_NAME = 'test'
+DATASET_NAME = 'nydata'
 schema = DataSet.get_schema(DATASET_NAME)
 root_directory = schema['root_directory']
 
