@@ -140,14 +140,15 @@ if __name__ == '__main__':
     exclude_rbc = opts.exclude_rbc
     active_observations = opts.observations
 
-    if False:
+    if True:
         DATASET_NAME = 'nydata'
-        exclude_rbc = 1
+        exclude_rbc = 0
         exclude_tql = 1
         building_count = 2
         episodes = 2
         seed = 2
-        active_observations = ['renewable_energy_produced']
+        active_observations = ['hour', 'electricity_pricing', 'electricity_pricing_predicted_6h',
+                               'electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
 
     train(DATASET_NAME, seed, building_count, episodes, active_observations, exclude_tql, exclude_rbc)
 
