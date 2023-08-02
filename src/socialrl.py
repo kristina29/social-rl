@@ -108,7 +108,7 @@ if __name__ == '__main__':
     clip_gradient = opts.clipgradient
     kaiming_initialization = opts.kaiming
 
-    if False:
+    if True:
         DATASET_NAME = 'nydata'
         exclude_rbc = 1
         exclude_tql = 1
