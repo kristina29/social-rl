@@ -100,7 +100,7 @@ class SACDB2(SAC):
                             self.soft_q_net2[i](o, demonstrator_actions)
                         )
                         q_demonstrator = q_demonstrator + self.imitation_lr * (1-q_demonstrator)
-                        policy_loss = (self.alpha * log_pi - q_demonstrator).mean()
+                        policy_loss = (self.alpha[i] * log_pi - q_demonstrator).mean()
                         self.policy_optimizer[i].zero_grad()
                         policy_loss.backward()
                         self.policy_optimizer[i].step()
@@ -118,5 +118,3 @@ class SACDB2(SAC):
             if self.env.buildings[i].demonstrator:
                 self.demonstrator_policy_net[demonstrator_count] = self.policy_net[i]
                 demonstrator_count += 1
-
-
