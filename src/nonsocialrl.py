@@ -1,10 +1,6 @@
-import sys
 import time
 
 from datetime import datetime
-
-from matplotlib import pyplot as plt
-import numpy as np
 
 from citylearn.agents.q_learning import TabularQLearning
 from citylearn.agents.rbc import OptimizedRBC
@@ -17,8 +13,8 @@ from options import parseOptions_nonsocial
 from utils import set_schema_buildings, set_active_observations, plot_simulation_summary, save_kpis
 
 
-def train(dataset_name, random_seed, building_count, episodes, active_observations, exclude_tql,
-          exclude_rbc):
+def train(dataset_name, random_seed, building_count, episodes, active_observations, batch_size, autotune_entropy,
+          exclude_tql, exclude_rbc):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
 
@@ -42,7 +38,8 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
         all_envs['TQL'] = train_tql(schema, active_observations, episodes)
 
     # Train soft actor-critic (SAC) agent
-    all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'] = train_sac(schema, episodes, random_seed)
+    all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'] = train_sac(schema, episodes, random_seed, batch_size,
+                                                                       autotune_entropy)
     print('SAC model trained!')
 
     # plot summary and compare with other control results
@@ -119,9 +116,9 @@ def train_tql(schema, active_observations, episodes):
     return env
 
 
-def train_sac(schema, episodes, random_seed):
+def train_sac(schema, episodes, random_seed, batch_size, autotune_entropy):
     env = CityLearnEnv(schema)
-    sac_model = SAC(env=env, seed=random_seed)
+    sac_model = SAC(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy)
     losses, rewards = sac_model.learn(episodes=episodes, deterministic_finish=True)
 
     return env, losses, rewards
@@ -139,17 +136,22 @@ if __name__ == '__main__':
     exclude_tql = opts.exclude_tql
     exclude_rbc = opts.exclude_rbc
     active_observations = opts.observations
+    batch_size = opts.batch
+    autotune_entropy = opts.autotune
 
     if False:
         DATASET_NAME = 'nydata'
-        exclude_rbc = 1
+        exclude_rbc = 0
         exclude_tql = 1
         building_count = 2
         episodes = 2
         seed = 2
-        active_observations = ['renewable_energy_produced']
+        autotune_entropy = True
+        active_observations = ['hour', 'electricity_pricing', 'electricity_pricing_predicted_6h',
+                               'electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
+        batch_size = 1024
 
-    train(DATASET_NAME, seed, building_count, episodes, active_observations, exclude_tql, exclude_rbc)
+    train(DATASET_NAME, seed, building_count, episodes, active_observations, batch_size, autotune_entropy, exclude_tql, exclude_rbc)
 
     # get the end time
     et = time.time()

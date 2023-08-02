@@ -63,6 +63,7 @@ class SACDB2(SAC):
         q1_losses = []
         q2_losses = []
         policy_losses = []
+        alpha_losses = []
 
         for i, (o, a, r, n) in enumerate(zip(observations, actions, reward, next_observations)):
             o = self.get_encoded_observations(i, o)
@@ -85,10 +86,11 @@ class SACDB2(SAC):
                     pass
 
                 for _ in range(self.update_per_time_step):
-                    o, q1_loss, q2_loss, policy_loss = self.update_step(i)
+                    o, q1_loss, q2_loss, policy_loss, alpha_loss = self.update_step(i)
                     q1_losses.append(q1_loss)
                     q2_losses.append(q2_loss)
                     policy_losses.append(policy_loss)
+                    alpha_losses.append(alpha_loss)
 
                     # Use demonstrator actions for updating policy
                     for demonstrator_policy in self.demonstrator_policy_net:
@@ -98,7 +100,7 @@ class SACDB2(SAC):
                             self.soft_q_net2[i](o, demonstrator_actions)
                         )
                         q_demonstrator = q_demonstrator + self.imitation_lr * (1-q_demonstrator)
-                        policy_loss = (self.alpha * log_pi - q_demonstrator).mean()
+                        policy_loss = (self.alpha[i] * log_pi - q_demonstrator).mean()
                         self.policy_optimizer[i].zero_grad()
                         policy_loss.backward()
                         self.policy_optimizer[i].step()
@@ -106,7 +108,8 @@ class SACDB2(SAC):
             else:
                 pass
 
-        return {'q1_losses': q1_losses, 'q2_losses': q2_losses, 'policy_losses': policy_losses}
+        return {'q1_losses': q1_losses, 'q2_losses': q2_losses, 'policy_losses': policy_losses,
+                'alpha_losses': alpha_losses}
 
 
     def set_demonstrator_policies(self):
@@ -115,5 +118,3 @@ class SACDB2(SAC):
             if self.env.buildings[i].demonstrator:
                 self.demonstrator_policy_net[demonstrator_count] = self.policy_net[i]
                 demonstrator_count += 1
-
-
