@@ -17,7 +17,7 @@ from citylearn.rl import PolicyNetwork, ReplayBuffer, SoftQNetwork
 
 
 class SAC(RLC):
-    def __init__(self, autotune_entropy: bool=False, *args, **kwargs):
+    def __init__(self, autotune_entropy: bool=False, clip_gradient: bool=False, *args, **kwargs):
         r"""Initialize :class:`SAC`.
 
         Parameters
@@ -35,6 +35,7 @@ class SAC(RLC):
 
         # internally defined
         self.autotune_entropy = autotune_entropy
+        self.clip_gradient = clip_gradient
         self.normalized = [False for _ in self.action_space]
         self.soft_q_criterion = nn.SmoothL1Loss()
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -164,11 +165,21 @@ class SAC(RLC):
         q2_pred = self.soft_q_net2[i](o, a)
         q1_loss = self.soft_q_criterion(q1_pred, q_target)
         q2_loss = self.soft_q_criterion(q2_pred, q_target)
+
         self.soft_q_optimizer1[i].zero_grad()
         q1_loss.backward()
+
+        # Gradient Value Clipping
+        if self.clip_gradient:
+            nn.utils.clip_grad_value_(self.soft_q_net1[i].parameters(), clip_value=1.0)
         self.soft_q_optimizer1[i].step()
+
         self.soft_q_optimizer2[i].zero_grad()
         q2_loss.backward()
+
+        # Gradient Value Clipping
+        if self.clip_gradient:
+            nn.utils.clip_grad_value_(self.soft_q_net2[i].parameters(), clip_value=1.0)
         self.soft_q_optimizer2[i].step()
 
         # Update Policy
@@ -180,6 +191,9 @@ class SAC(RLC):
         policy_loss = (self.alpha[i] * log_pi - q_new_actions).mean()
         self.policy_optimizer[i].zero_grad()
         policy_loss.backward()
+        # Gradient Value Clipping
+        if self.clip_gradient:
+            nn.utils.clip_grad_value_(self.policy_net[i].parameters(), clip_value=1.0)
         self.policy_optimizer[i].step()
 
         if self.autotune_entropy:
