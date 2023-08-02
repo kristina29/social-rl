@@ -14,7 +14,7 @@ from utils import set_schema_buildings, set_active_observations, plot_simulation
 
 
 def train(dataset_name, random_seed, building_count, episodes, active_observations, batch_size, autotune_entropy,
-          clip_gradient, exclude_tql, exclude_rbc):
+          clip_gradient, kaiming_initialization, exclude_tql, exclude_rbc):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
 
@@ -39,7 +39,8 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
 
     # Train soft actor-critic (SAC) agent
     all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'] = train_sac(schema, episodes, random_seed, batch_size,
-                                                                       autotune_entropy, clip_gradient)
+                                                                       autotune_entropy, clip_gradient,
+                                                                       kaiming_initialization)
     print('SAC model trained!')
 
     # plot summary and compare with other control results
@@ -116,10 +117,10 @@ def train_tql(schema, active_observations, episodes):
     return env
 
 
-def train_sac(schema, episodes, random_seed, batch_size, autotune_entropy, clip_gradient):
+def train_sac(schema, episodes, random_seed, batch_size, autotune_entropy, clip_gradient, kaiming_initialization):
     env = CityLearnEnv(schema)
     sac_model = SAC(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
-                    clip_gradient=clip_gradient)
+                    clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization)
     losses, rewards = sac_model.learn(episodes=episodes, deterministic_finish=True)
 
     return env, losses, rewards
@@ -140,12 +141,13 @@ if __name__ == '__main__':
     batch_size = opts.batch
     autotune_entropy = opts.autotune
     clip_gradient = opts.clipgradient
+    kaiming_initialization = opts.kaiming
 
     if False:
         DATASET_NAME = 'nydata'
         exclude_rbc = 0
         exclude_tql = 1
-        building_count = 1
+        building_count = 2
         episodes = 2
         seed = 2
         autotune_entropy = False
@@ -153,9 +155,10 @@ if __name__ == '__main__':
         #                       'electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
         batch_size = 256
         clip_gradient = False
+        kaiming_initialization = False
 
     train(DATASET_NAME, seed, building_count, episodes, active_observations, batch_size, autotune_entropy, clip_gradient,
-          exclude_tql, exclude_rbc)
+          kaiming_initialization, exclude_tql, exclude_rbc)
 
     # get the end time
     et = time.time()

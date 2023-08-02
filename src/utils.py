@@ -532,15 +532,51 @@ def plot_battery_soc_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
     return fig
 
 
-def plot_lossesOrRewards(values: Mapping[str, Iterable[float]], key: str) -> List[plt.Figure]:
-    r"""Creates one figure over time of the values for each agent.
+def plot_rewards(rewards: Mapping[str, List[List[float]]], envs: Mapping[str, CityLearnEnv]) -> List[plt.Figure]:
+    r"""Creates one figure over time of the rewards for each agent.
 
         Parameters
         ----------
-        values : Mapping[str, Iterable[float]]
-            Loss or reward values for each trained agent over time.
-        key : str
-            Key indicating if losses or rewards should be plotted
+        rewards : Mapping[str, List[float]]
+            Reward values for each building of each trained agent over time.
+        envs: Mapping[str, CityLearnEnv]
+            Mapping of user-defined control agent names to environments
+            the agents have been used to control.
+
+        Return values
+        ----------
+        List of the created figures
+    """
+    figs = []
+    for env_name, env_rewards in rewards.items():
+        buldings = envs[env_name].buildings
+        for building_index, rewards in enumerate(env_rewards):
+            fig, ax = plt.subplots()
+
+            N = int(len(rewards) / 50)
+            ax.plot(np.arange(len(rewards) - N + 1) * N, running_mean(rewards, N))
+            ax.set_ylabel(f'Reward value (running mean over {N} values)')
+            ax.set_xlabel(f'Time step (actual {len(rewards)})')
+
+            ax.set_title(f'{env_name} - {buldings[building_index].name} reward values')
+            ax.grid(axis='y')
+            figs.append(fig)
+
+    return figs
+
+def plot_losses(losses: Mapping[str, Mapping[int, Mapping[str, List[float]]]], envs: Mapping[str, CityLearnEnv]) -> List[plt.Figure]:
+    r"""Creates one figure over time of the losses for each building for each agent.
+
+        Parameters
+        ----------
+        losses : Mapping[str, Mapping[int, Mapping[str, List[float]]]]
+            Loss values for each trained agent over time.
+                Mapping from agent name to all losses of this agent.
+                Mapping from building index to all losses of this building.
+                Mapping from neural network name to losses of this network.
+        envs: Mapping[str, CityLearnEnv]
+            Mapping of user-defined control agent names to environments
+            the agents have been used to control.
 
         Return values
         ----------
@@ -548,24 +584,18 @@ def plot_lossesOrRewards(values: Mapping[str, Iterable[float]], key: str) -> Lis
     """
 
     figs = []
-    for env_name, env_values in values.items():
-        fig, ax = plt.subplots()
-        if isinstance(env_values, list):
-            # plot rewards
-            N = int(len(env_values) / 50)
-            ax.plot(np.arange(len(env_values) - N + 1) * N, running_mean(env_values, N))
-            ax.set_ylabel(f'{key} value (running mean over {N} values)')
-            ax.set_xlabel(f'Time step (actual {len(env_values)})')
-        else:
-            # plot losses
-            for nn_name, nn_values in env_values.items():
+    for env_name, env_values in losses.items():
+        buldings = envs[env_name].buildings
+        for building_index, building_losses in env_values.items():
+            fig, ax = plt.subplots()
+            for nn_name, nn_values in building_losses.items():
                 ax.plot(np.arange(len(nn_values)), nn_values, label=nn_name)
             ax.legend()
-            ax.set_ylabel(f'{key} value')
+            ax.set_ylabel(f'Loss value')
             ax.set_xlabel('Time step')
-        ax.set_title(f'{env_name} {key} values')
-        ax.grid(axis='y')
-        figs.append(fig)
+            ax.set_title(f'{env_name} - {buldings[building_index].name} loss values')
+            ax.grid(axis='y')
+            figs.append(fig)
 
     return figs
 
@@ -610,8 +640,8 @@ def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], losses: Mapping[st
     plot_battery_soc_profiles(envs)
     plot_district_kpis(envs)
     plot_district_load_profiles(envs)
-    plot_lossesOrRewards(losses, key='loss')
-    plot_lossesOrRewards(rewards, key='reward')
+    plot_losses(losses, envs)
+    plot_rewards(rewards, envs)
 
     save_multi_image(filename)
 

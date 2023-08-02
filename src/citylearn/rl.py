@@ -18,6 +18,7 @@ class PolicyNetwork(nn.Module):
                  action_space, 
                  action_scaling_coef, 
                  hidden_dim = [400,300],
+                 kaiming_initialization = False,
                  init_w = 3e-3, 
                  log_std_min = -20, 
                  log_std_max = 2, 
@@ -35,13 +36,15 @@ class PolicyNetwork(nn.Module):
         self.mean_linear = nn.Linear(hidden_dim[1], num_actions)
         self.log_std_linear = nn.Linear(hidden_dim[1], num_actions)
 
-        #self.mean_linear.weight.data.uniform_(-init_w, init_w)
-        #self.mean_linear.bias.data.uniform_(-init_w, init_w)
+        if kaiming_initialization:
+            init.kaiming_normal_(self.mean_linear.weight, mode='fan_in')
+            init.kaiming_normal_(self.log_std_linear.weight, mode='fan_in')
+        else:
+            self.mean_linear.weight.data.uniform_(-init_w, init_w)
+            self.mean_linear.bias.data.uniform_(-init_w, init_w)
 
-        #self.log_std_linear.weight.data.uniform_(-init_w, init_w)
-        #self.log_std_linear.bias.data.uniform_(-init_w, init_w)
-        init.kaiming_normal_(self.mean_linear.weight, mode='fan_in')
-        init.kaiming_normal_(self.log_std_linear.weight, mode='fan_in')
+            self.log_std_linear.weight.data.uniform_(-init_w, init_w)
+            self.log_std_linear.bias.data.uniform_(-init_w, init_w)
 
         self.action_scale = torch.FloatTensor(
             action_scaling_coef * (action_space.high - action_space.low) / 2.)
@@ -116,7 +119,7 @@ class RegressionBuffer:
         return len(self.x)
     
 class SoftQNetwork(nn.Module):
-    def __init__(self, num_inputs, num_actions, hidden_size=[400,300], init_w=3e-3):
+    def __init__(self, num_inputs, num_actions, hidden_size=[400,300], kaiming_initialization=False, init_w=3e-3):
         super(SoftQNetwork, self).__init__()
         
         self.linear1 = nn.Linear(num_inputs + num_actions, hidden_size[0])
@@ -124,9 +127,13 @@ class SoftQNetwork(nn.Module):
         self.linear3 = nn.Linear(hidden_size[1], 1)
         self.ln1 = nn.LayerNorm(hidden_size[0])
         self.ln2 = nn.LayerNorm(hidden_size[1])
-        
-        self.linear3.weight.data.uniform_(-init_w, init_w)
-        self.linear3.bias.data.uniform_(-init_w, init_w)
+
+        if kaiming_initialization:
+            init.kaiming_normal_(self.linear3.weight, mode='fan_in')
+            init.kaiming_normal_(self.linear3.weight, mode='fan_in')
+        else:
+            self.linear3.weight.data.uniform_(-init_w, init_w)
+            self.linear3.bias.data.uniform_(-init_w, init_w)
         
     def forward(self, state, action):
         x = torch.cat([state, action], 1)
