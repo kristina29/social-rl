@@ -42,7 +42,7 @@ def parseOptions_social():
 
 def add_nonsocial_options(optParser):
     optParser.add_option('-s', '--schema', action='store', type='string', dest='schema',
-                         default='test',
+                         default='nydata',
                          help='Name of the directory including the schema and data files')
     optParser.add_option('-r', '--randomseed', action='store', type='int', dest='seed',
                          help='Random seed to create reproducible results. If not defined, no fixed seed is used.')
