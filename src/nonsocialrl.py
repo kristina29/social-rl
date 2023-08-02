@@ -31,7 +31,7 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
     all_rewards = {}
     # Train rule-based control (RBC) agent for comparison
     if not exclude_rbc:
-        all_envs['RBC'] = train_rbc(schema, episodes, batch_size)
+        all_envs['RBC'] = train_rbc(schema, episodes)
 
     # Train tabular Q-Learning (TQL) agent for comparison
     if not exclude_tql:
@@ -141,14 +141,15 @@ if __name__ == '__main__':
 
     if False:
         DATASET_NAME = 'nydata'
-        exclude_rbc = 1
+        exclude_rbc = 0
         exclude_tql = 1
         building_count = 2
         episodes = 2
         seed = 2
-        active_observations = ['renewable_energy_produced']
-        batch_size = 256
         autotune_entropy = True
+        active_observations = ['hour', 'electricity_pricing', 'electricity_pricing_predicted_6h',
+                               'electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
+        batch_size = 1024
 
     train(DATASET_NAME, seed, building_count, episodes, active_observations, batch_size, autotune_entropy, exclude_tql, exclude_rbc)
 
