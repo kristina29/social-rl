@@ -60,6 +60,8 @@ def add_nonsocial_options(optParser):
                          help='Do not train a rule-based control agent for comparison.')
     optParser.add_option('--autotune', action='store_true', default=False, dest='autotune',
                          help='Autotune the entropy value of the SAC agent.')
+    optParser.add_option('--clipgradient', action='store_true', default=False, dest='clipgradient',
+                         help='Clip gradients during training.')
     optParser.add_option('-o', '--observation', action='extend', type='string', dest='observations',
                          help='Comma separated list of observations that should be active. '
                               'If not defined, the full observation space (as defined in the schema file) is used.')
