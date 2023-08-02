@@ -1,6 +1,6 @@
-scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230802T095605.pdf experiments/SAC_DB2/22_increase_batch_size/1024_autotune/new_buildings2/plots_20230802T095605.pdf
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230802T133450.pdf experiments/SAC_DB2/25_kaiming_init/new_buildings2/plots_20230802T133450.pdf
 
-scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/kpis_20230802T095636.csv experiments/SAC_DB2/22_increase_batch_size/1024_autotune/new_buildings2/kpis_20230802T095636.csv
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/kpis_20230802T133521.csv experiments/SAC_DB2/25_kaiming_init/new_buildings2/kpis_20230802T133521.csv
 
 scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230704T135811.pdf experiments/plots_20230704T135811.pdf
 

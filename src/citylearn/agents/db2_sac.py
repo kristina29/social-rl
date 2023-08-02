@@ -36,7 +36,7 @@ class SACDB2(SAC):
         self.set_demonstrator_policies()
 
     def update(self, observations: List[List[float]], actions: List[List[float]], reward: List[float],
-               next_observations: List[List[float]], done: bool) -> Mapping[str, List[float]]:
+               next_observations: List[List[float]], done: bool) -> Mapping[int, Mapping[str, List[float]]]:
         r"""Update replay buffer.
 
         Parameters
@@ -54,18 +54,20 @@ class SACDB2(SAC):
 
         Return value
         ------
-        losses: Mapping[str, List[float]]
-            Mapping of neural-network name to loss values of training steps.
+        losses: Mapping[int, Mapping[str, List[float]]]
+            Mapping of index to Mapping from neural-network name to loss values of training steps.
         """
 
         # Run once the regression model has been fitted
         # Normalize all the observations using periodical normalization, one-hot encoding, or -1, 1 scaling. It also removes observations that are not necessary (solar irradiance if there are no solar PV panels).
-        q1_losses = []
-        q2_losses = []
-        policy_losses = []
-        alpha_losses = []
+        losses = {}
 
         for i, (o, a, r, n) in enumerate(zip(observations, actions, reward, next_observations)):
+            current_losses = {'q1_losses': [],
+                              'q2_losses': [],
+                              'policy_losses': [],
+                              'alpha_losses': []}
+
             o = self.get_encoded_observations(i, o)
             n = self.get_encoded_observations(i, n)
 
@@ -87,10 +89,10 @@ class SACDB2(SAC):
 
                 for _ in range(self.update_per_time_step):
                     o, q1_loss, q2_loss, policy_loss, alpha_loss = self.update_step(i)
-                    q1_losses.append(q1_loss)
-                    q2_losses.append(q2_loss)
-                    policy_losses.append(policy_loss)
-                    alpha_losses.append(alpha_loss)
+                    current_losses['q1_losses'].append(q1_loss)
+                    current_losses['q2_losses'].append(q2_loss)
+                    current_losses['policy_losses'].append(policy_loss)
+                    current_losses['alpha_losses'].append(alpha_loss)
 
                     # Use demonstrator actions for updating policy
                     for demonstrator_policy in self.demonstrator_policy_net:
@@ -108,8 +110,9 @@ class SACDB2(SAC):
             else:
                 pass
 
-        return {'q1_losses': q1_losses, 'q2_losses': q2_losses, 'policy_losses': policy_losses,
-                'alpha_losses': alpha_losses}
+            losses[i] = current_losses
+
+        return losses
 
 
     def set_demonstrator_policies(self):
