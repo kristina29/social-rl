@@ -5,6 +5,7 @@ import numpy as np
 try:
     import torch
     from torch.distributions import Normal
+    from torch.nn import init
     import torch.nn as nn
     import torch.nn.functional as F
 except ImportError:
@@ -34,11 +35,13 @@ class PolicyNetwork(nn.Module):
         self.mean_linear = nn.Linear(hidden_dim[1], num_actions)
         self.log_std_linear = nn.Linear(hidden_dim[1], num_actions)
 
-        self.mean_linear.weight.data.uniform_(-init_w, init_w)
-        self.mean_linear.bias.data.uniform_(-init_w, init_w)
+        #self.mean_linear.weight.data.uniform_(-init_w, init_w)
+        #self.mean_linear.bias.data.uniform_(-init_w, init_w)
 
-        self.log_std_linear.weight.data.uniform_(-init_w, init_w)
-        self.log_std_linear.bias.data.uniform_(-init_w, init_w)
+        #self.log_std_linear.weight.data.uniform_(-init_w, init_w)
+        #self.log_std_linear.bias.data.uniform_(-init_w, init_w)
+        init.kaiming_normal_(self.mean_linear.weight, mode='fan_in')
+        init.kaiming_normal_(self.log_std_linear.weight, mode='fan_in')
 
         self.action_scale = torch.FloatTensor(
             action_scaling_coef * (action_space.high - action_space.low) / 2.)

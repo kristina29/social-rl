@@ -148,11 +148,11 @@ if __name__ == '__main__':
         building_count = 1
         episodes = 2
         seed = 2
-        autotune_entropy = True
+        autotune_entropy = False
         active_observations = ['hour']#, 'electricity_pricing', 'electricity_pricing_predicted_6h',
         #                       'electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
         batch_size = 256
-        clip_gradient = True
+        clip_gradient = False
 
     train(DATASET_NAME, seed, building_count, episodes, active_observations, batch_size, autotune_entropy, clip_gradient,
           exclude_tql, exclude_rbc)
