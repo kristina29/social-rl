@@ -8,7 +8,7 @@ from citylearn.data import DataSet
 from citylearn.utilities import get_active_parts
 from options import parseOptions_social
 from utils import set_schema_buildings, set_active_observations, plot_simulation_summary, set_schema_demonstrators, \
-    save_kpis
+    save_kpis, save_results
 from nonsocialrl import train_tql, train_rbc, train_sac
 
 
@@ -48,14 +48,7 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
                                                                                       clip_gradient,
                                                                                       kaiming_initialization)
 
-    # plot summary and compare with other control results
-    filename = f'plots_{datetime.now().strftime("%Y%m%dT%H%M%S")}'
-    plot_simulation_summary(all_envs, all_losses, all_rewards, filename)
-
-    # save KPIs as csv
-    filename = f'kpis_{datetime.now().strftime("%Y%m%dT%H%M%S")}.csv'
-    save_kpis(all_envs, filename)
-    print(f'KPIs saved to {filename}')
+    save_results(all_envs, all_losses, all_rewards)
 
 
 def preprocessing(schema, building_count, demonstrators_count, random_seed, active_observations):
@@ -108,7 +101,7 @@ if __name__ == '__main__':
     clip_gradient = opts.clipgradient
     kaiming_initialization = opts.kaiming
 
-    if False:
+    if True:
         DATASET_NAME = 'nydata'
         exclude_rbc = 1
         exclude_tql = 1

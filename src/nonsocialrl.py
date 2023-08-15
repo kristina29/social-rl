@@ -1,7 +1,5 @@
 import time
 
-from datetime import datetime
-
 from citylearn.agents.q_learning import TabularQLearning
 from citylearn.agents.rbc import OptimizedRBC
 from citylearn.agents.sac import SAC
@@ -10,7 +8,7 @@ from citylearn.data import DataSet
 from citylearn.utilities import get_active_parts
 from citylearn.wrappers import TabularQLearningWrapper
 from options import parseOptions_nonsocial
-from utils import set_schema_buildings, set_active_observations, plot_simulation_summary, save_kpis
+from utils import set_schema_buildings, set_active_observations, save_results
 
 
 def train(dataset_name, random_seed, building_count, episodes, active_observations, batch_size, autotune_entropy,
@@ -41,17 +39,8 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
     all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'] = train_sac(schema, episodes, random_seed, batch_size,
                                                                        autotune_entropy, clip_gradient,
                                                                        kaiming_initialization)
-    print('SAC model trained!')
 
-    # plot summary and compare with other control results
-    filename = f'plots_{datetime.now().strftime("%Y%m%dT%H%M%S")}'
-    plot_simulation_summary(all_envs, all_losses, all_rewards, filename)
-
-    # save KPIs as csv
-    filename = f'kpis_{datetime.now().strftime("%Y%m%dT%H%M%S")}.csv'
-    save_kpis(all_envs, filename)
-    print(f'KPIs saved to {filename}')
-
+    save_results(all_envs, all_losses, all_rewards)
 
 
 def preprocessing(schema, building_count, random_seed, active_observations):
@@ -122,6 +111,8 @@ def train_sac(schema, episodes, random_seed, batch_size, autotune_entropy, clip_
     sac_model = SAC(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
                     clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization)
     losses, rewards = sac_model.learn(episodes=episodes, deterministic_finish=True)
+
+    print('SAC model trained!')
 
     return env, losses, rewards
 
