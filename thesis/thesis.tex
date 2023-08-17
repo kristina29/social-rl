@@ -159,6 +159,9 @@ Thesis period: 01.06.2023~-~01.12.2023
 \todo[inline]{TODO}
 \begin{tabbing}
 \textbf{FACTOTUM}\hspace{1cm}\=Schrott\kill
+\textbf{KL divergence}\>Kullback-Leibler divergence \\
+\textbf{KPI}\>Key Performance Index \textcolor{red}{TODO} \\
+\textbf{kWh}\>Kilowatt per Hour \textcolor{red}{TODO}\\
 \textbf{MDP}\>Markov decision process \\
 \textbf{RL}\>Reinforcement learning \\
 \textbf{SAC}\>Soft actor-critic \\
@@ -218,54 +221,36 @@ Referenzen: \cite{SaaSchTue97,TueConSaa96ismis,SchTueSaa98preprint}
 %% 
 \chapter{Background}
 \label{Background}
+\todo[inline]{Begriffserklärung: renewable energy (wind, solar, bla)}
 This chapter provides the necessary background knowledge to comprehend our approach to the presented problem. First, we introduce the fundamental concepts of reinforcement learning (RL), often modeled as finite Markov decision processes (MDP). However, considering the limitations of this traditional framework in handling continuous state and action spaces, we also delve into the soft actor-critic method as a promising solution.
 \todo[inline]{TODO}
 
-\section{Reinforcement Learning}
-As defined by Sutton and Barto \cite{sutton2018reinforcement}, RL is a machine learning method that aims to choose actions to maximize a numerical reward. RL agents learn these actions through a trial-and-error approach based on the received rewards. Also, actions may, besides the immediate reward, influence the long-term reward. In contrast to supervised methods, it does not need labeled data for learning and does not try to discover inherent structure in data as unsupervised methods.
-
-\begin{figure}[htb]
-     \center
-     \includegraphics[width=\textwidth]{figures/rl_overview.pdf}
-  \caption{In RL, the agent observes the state of the environment $s_t$ at timestep $t$ via the observation $o_t$. The policy $\pi$ determines the agent's action $a_t$, which in turn determines the next state $s_{t+1}$ of the environment and the environment sends an reward $r_t$ to the agent. The policy of the agent is trained using the observation, the action, and the reward,}
-  \label{fig:rl_overview}
-\end{figure}
-
-\noindent
-Figure \ref{fig:rl_overview} shows the general RL approach. RL problems are often formulated as finite MDPs, 
-%defined by a tuple $(\mathcal{S}, \mathcal{A}, p, r)$, 
-where the agent interacts with the environment over a series of time steps. At each time step $t$, the agent observes the current state of the environment, denoted as $s_t \in \mathcal{S}$. Based on this state, the agent selects an action $a_t \in \mathcal{A}$. We assume, that the set of possible actions $\mathcal{A}$ is the same in all states. As a consequence of the chosen action, the agent receives at the next time step a numerical reward $r_{t+1}\in\mathcal{R} \subset \mathbb{R}$ and a new state $s_{t+1}$.
-
-\todo[inline]{discrete spaces, markov property}
-
-The dynamics of the MDP are captured by a function $p: \mathcal{S}\times\mathcal{R}\times\mathcal{S}\times\mathcal{A} \rightarrow [0,1]$. This function represents the probability of transitioning from state $s\in\mathcal{S}$ to state $s'\in\mathcal{S}$ and receiving reward $r\in\mathcal{R}$ when the action $a\in\mathcal{A}$ is taken:
-\begin{equation}
-p(s', r \mid s,a)=P(s_t=s', r_t=r \mid s_{t-1}=s, a_{t-1}=a)
-\end{equation}
-Using the dynamics function $p$, we can calculate additional quantities of interest. The state-transition probability defined as function $p: \mathcal{S}\times\mathcal{S}\times\mathcal{A} \rightarrow [0,1]$ is the probability of transitioning to state $s'$ when action $a$ is taken, given the current state is $s$: 
-\begin{equation}
-p(s'\mid s,a)=P(s_t=s'\mid s_{t-1}=s, a_{t-1}=a) = \sum_{r\in\mathcal{R}}p(s',r \mid s,a)
-\end{equation}
-Furthermore, we can calculate the expected reward for a given state-action pair $(s,a)$ as function $r: \mathcal{S}\times\mathcal{A}\rightarrow \mathbb{R}$: 
-\begin{equation}
-r(s,a)=\mathbb{E}[r_t\mid s_{t-1}=s,a_{t-1}=a]=\sum_{r\in\mathcal{R}}r\sum_{s'\in\mathcal{S}}p(s',r\mid s,a)
-\end{equation}
-
-\begin{itemize}
-\item Goal: maximize expected discounted return $G_t = R_{t+1}+\gamma R_{t+2}+\gamma^2R_{t+3}+... = \sum_{k=0}^{\infty}\gamma^kR_{t+k+1}$ with discount rate $0 \leq \gamma \leq 1$
-\end{itemize} 
-
-
-The policy $\pi: \mathcal{S}=p(a_t|s_t)$ determines the action, which may also be deterministic. Also, reacting to the received action, the environment sends the agent a reward signal $r_t$. The agent's policy is trained to maximize the discounted total reward. 
-
-
-\todo[inline]{TODO Continuous action - 335, continuous state ---$>$ function approximation}
 \input{Background}
 \cleardoublepage
 
 %% 
 \input{MM}
+\section{CityLearn Framework}
+\subsection{Presentation}
+The CityLearn framework aims to provide a standarized environment for multi-agent RL applications in the demand-side energy management. For this, input datasets of building energy consumptions, weather and weather forecasts, and solar generation of buildings should be provided. The framework passes these information as state values to the agents (see Chapter \ref{sec:reinforcement-learning}) and calculates a number of Key Performance Indices (KPI) based on the actions taken by the agents. Thereby, the framework provides flexibility for different goals. Individual reward functions can be defined, own data can be used and also own agents can be defined. These agents can either be multi-agent, so each building is defined as one agent, or central-agent, where all buildings are controlled by a single agent. The building data defines the electricity needed for non-shiftable devices, water heating, and space cooling and heating at each time step. Via storage devices for electricity, heating, or cooling, the buildings can load und unload these in their actions and thus optimize their energy consumption. Addtionally, each building can have a \textcolor{red}{PV} as additional energy source to the energy provided by the grid. If more energy is produced by the PV then used from the building, the overflow is wasted: No energy sharing between buildings is possible. \todo[inline]{KPIs implemented and used in appendix (oder halt hier, kp)}
+
+\subsection{Adaptions}
+Since our goal was to maximize the use of renewable energy and this was not possible with the current state of the CityLearn framework, we had to introduce some adaptions regarding the state space of the environment and the KPIs.
+
+First of all, we added the fuel mix of the energy provided by the grid as input data. This includes the produced renewable energy in kilowatt per hour (kWh) and the share of available renewable energy of the total produced amount of energy. 
+
+\section{Datasets}
+\subsection{Building data}
+\subsection{PV production}
+\subsection{Weather data}
+\subsection{Fuelmix}
+\subsection{Energy prices}
 \cleardoublepage
+
+\section{Implemented Agents}
+\subsection{SAC Baseline}
+\subsection{\textcolor{red}{Social Agent I}}
+\subsection{\textcolor{red}{Social Agent II}}
 
 %%
 \input{results}
