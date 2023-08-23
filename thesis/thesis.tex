@@ -165,6 +165,7 @@ Thesis period: 01.06.2023~-~01.12.2023
 \textbf{KPI}\>Key performance indicator \\
 \textbf{kWh}\>Kilowatt hour \\
 \textbf{MDP}\>Markov decision process \\
+\textbf{NY}\> New York \\
 \textbf{PV}\> Photovoltaic \\
 \textbf{RL}\>Reinforcement learning \\
 \textbf{SAC}\>Soft actor-critic \\
@@ -275,7 +276,9 @@ Nominal power & Maximum amount of electric power that the battery can use to cha
 
 \subsection{Fuelmix and Weather data}
 \label{sec:weather-data}
-The fuel mix data we used is obtained from the \textcolor{red}{NY-ISO}, retrieved on the 7th of June 2023. The original data provides the produced energy in MW for each of the energy sources dual fuel, natural gas, nuclear, \textcolor{red}{other fossil fuels}, wind, hydro, and \textcolor{red}{other renewables} for a time interval of 5 minutes for 2021. Since we are only interested in renewable (wind, hydro, other renewables) or non-renewable (all others) energy produced, we summed these values up and calculated the value in kWh. \todo[inline]{kW vs MW vs kWh????} To meed the hourly time steps of the building data, we calculated the hourly mean of the values, because \textcolor{red}{???}. The final fuelmix data contains the hourly amount of energy produced with renewable sources in kWh and the share of renewable energy produced calculated as the absolute amount of renewable energy produced devided by the total produced energy.. Note, that this data does not include the solar generation of the buildings described in Chapter \ref{sec:building-data}, but only the renewable energy from the grid. 
+The fuel mix data we used is obtained from the \textcolor{red}{NY-ISO}, retrieved on the 7th of June 2023. The original data provides the produced energy in MW for each of the energy sources dual fuel, natural gas, nuclear, \textcolor{red}{other fossil fuels}, wind, hydro, and \textcolor{red}{other renewables} for a time interval of 5 minutes for 2021 in the New York (NY) state. Since we are only interested in renewable (wind, hydro, other renewables) or non-renewable (all others) energy produced, we summed these values up and calculated the value in kWh. \todo[inline]{kW vs MW vs kWh????} To meed the hourly time steps of the building data, we calculated the hourly mean of the values, because \textcolor{red}{???}. The final fuelmix data contains the hourly amount of energy produced with renewable sources in kWh and the share of renewable energy produced calculated as the absolute amount of renewable energy produced devided by the total produced energy. The renewable share is calculated on the original time steps of five minutes, so for the final dataset here also the median per hour was calculated. Note, that this data does not include the solar generation of the buildings described in Chapter \ref{sec:building-data}, but only the renewable energy from the grid. 
+
+As weather data, we used data from the New York state too, in order to encourage correlation between the weather and the produced amount of renewable energy. We obtained the data from the \textcolor{red}{NSRDB}. 
 
 \subsection{Energy prices}
 \cleardoublepage
