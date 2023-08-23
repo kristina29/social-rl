@@ -1,7 +1,8 @@
 import os
 
-import numpy as np
 import pandas as pd
+
+from citylearn.utilities import get_predictions
 
 pd.options.mode.chained_assignment = None  # default='warn'
 
@@ -35,7 +36,14 @@ WEATHER_FINAL_ORDER = ['Wind Speed [m/s]',
 
 def preprocess_data(load_path, save_path, weather) -> pd.DataFrame:
     if weather:
-        df = pd.read_csv(load_path, skiprows=2)
+        if isinstance(load_path, list):
+            all_dfs = []
+            for filename in load_path:
+                temp_df = pd.read_csv(filename, skiprows=2)
+                all_dfs.append(temp_df)
+            df = pd.concat(all_dfs).groupby(['Month', 'Day', 'Year', 'Hour', 'Minute'], as_index=False).median()
+        else:
+            df = pd.read_csv(load_path, skiprows=2)
 
         # rename columns to match citylearn framework
         df = df.rename(columns={'Temperature': WEATHER_VARS[0],
@@ -46,13 +54,20 @@ def preprocess_data(load_path, save_path, weather) -> pd.DataFrame:
     else:
         df = read_fuel_data(load_path)
 
-
     df = median_by_hour(df)
     df = add_daytype(df)
     df = correct_time_series_start(df)
 
     if weather:
-        df = add_predictions(df, weather=True)
+        df.to_csv('../datasets/building_data_test/weather_ny.csv')
+        df.drop(columns=['GHI'])
+        print(f'File saved under ../datasets/building_data_test/weather_ny.csv')
+
+        for var in WEATHER_VARS:
+            predictions = get_predictions(list(df[var]))
+            for pred_horizon in predictions.keys():
+                col_name = f'{pred_horizon}h Prediction {var}'
+                df[col_name] = predictions[pred_horizon]
 
     # drop not needed columns
     df = df.drop(columns=['Datetime', 'Year', 'Month', 'Day', 'Hour', 'Minute', 'Day Type'])
@@ -60,6 +75,7 @@ def preprocess_data(load_path, save_path, weather) -> pd.DataFrame:
     if weather:
         # reorder to match citylearn
         df = df[WEATHER_FINAL_ORDER]
+
 
     df.to_csv(save_path, index=False)
     print(f'File saved under {save_path}')
@@ -83,28 +99,6 @@ def add_daytype(df) -> pd.DataFrame:
     df['Day Type'] = df['Datetime'].dt.dayofweek
     df['Day Type'] = df['Day Type'] + 2
     df.loc[df['Day Type'] == 8, ['Day Type']] = 1
-
-    return df
-
-
-def add_predictions(df, weather) -> pd.DataFrame:
-    # First just real values
-    # TODO: add noise or real predictions
-
-    if weather:
-        vars = WEATHER_VARS
-    else:
-        vars = ['Electricity Pricing [$]']
-
-    for variable in vars:
-        for pred_horizon in [6, 12, 24]:
-            col_name = f'{pred_horizon}h Prediction {variable}'
-            df[col_name] = df.loc[:, variable]
-            df[col_name] = df[col_name].shift(-pred_horizon)
-
-            # fill missing prediction values with the actual ones at the time the forecast addresses
-            for i in df[np.isnan(df[col_name])].index:
-                df.loc[i, col_name] = df.loc[i + pred_horizon - 24][variable]
 
     return df
 
@@ -149,36 +143,24 @@ def read_fuel_data(load_dir) -> pd.DataFrame:
     # group by renewable and not renewable and convert given MW into kWh
     fuel['Renewable Sources [kWh]'] = fuel[['Hydro', 'Wind', 'Other Renewables']].sum(axis=1) * 1000
     fuel['Other [kWh]'] = fuel[['Dual Fuel', 'Natural Gas', 'Nuclear', 'Other Fossil Fuels']].sum(axis=1) * 1000
+    fuel['Renewable Share'] = fuel['Renewable Sources [kWh]'] / (fuel['Renewable Sources [kWh]'] + fuel['Other [kWh]'])
     fuel = fuel.drop(columns=['Hydro', 'Wind', 'Other Renewables', 'Dual Fuel', 'Natural Gas', 'Nuclear',
-                                'Other Fossil Fuels'])
+                              'Other Fossil Fuels', 'Other [kWh]'])
 
     return fuel
 
 
-def adapt_price(load_path, save_path, fuel_mix, alpha=6) -> None:
-    price = pd.read_csv(load_path)
-    fossil_share = fuel_mix['Other [kWh]']/(fuel_mix['Renewable Sources [kWh]']+fuel_mix['Other [kWh]'])
-
-    price['Electricity Pricing [$]'] = price['Electricity Pricing [$]'] + alpha * fossil_share
-
-    # set minimum price to 0.2
-    price['Electricity Pricing [$]'] = price['Electricity Pricing [$]'] - price['Electricity Pricing [$]'].min() + 0.2
-    price = add_predictions(price, weather=False)
-
-    price.to_csv(save_path, index=False)
-    print(f'File saved under {save_path}')
-
-
 if __name__ == '__main__':
-    weather_filepath = '../datasets/weather_ny_42.30_-74.37_2021.csv'
+    weather_dir = '../datasets/'
+    weather_filepath = f'{weather_dir}weather_ny_42.30_-74.37_2021.csv'
     weather_save_filepath = 'citylearn/data/nydata/weather.csv'
     preprocess_data(weather_filepath, weather_save_filepath, weather=True)
+
+    weather_filenames = [f'{weather_dir}{filename}' for filename in os.listdir(weather_dir) if filename.startswith('weather_ny_')]
+    weather_save_filepath = f'citylearn/data/nydata/weather_{len(weather_filenames)}locs_median.csv'
+    preprocess_data(weather_filenames, weather_save_filepath, weather=True)
 
     fuel_mix_dirpath = '../datasets/fuel_mix_ny_2021'
     fuel_mix_save_filepath = 'citylearn/data/nydata/fuelmix.csv'
     fuel_mix = preprocess_data(fuel_mix_dirpath, fuel_mix_save_filepath, weather=False)
-
-    price_filepath = 'citylearn/data/test/pricing.csv'
-    price_save_filepath = 'citylearn/data/nydata/pricing.csv'
-    adapt_price(price_filepath, price_save_filepath, fuel_mix)
 

@@ -4,7 +4,8 @@ import shutil
 from typing import Iterable, List, Union
 import numpy as np
 
-from citylearn.utilities import read_json
+from citylearn.utilities import read_json, get_predictions
+
 
 class DataSet:
     __ROOT_DIRECTORY = os.path.join(os.path.dirname(__file__),'data')
@@ -217,6 +218,31 @@ class Pricing:
         self.electricity_pricing_predicted_12h = np.array(electricity_pricing_predicted_12h, dtype = float)
         self.electricity_pricing_predicted_24h = np.array(electricity_pricing_predicted_24h, dtype = float)
 
+    def weight_by_fossil_share(self, pricing_weight_fossil: float, renewable_share: Iterable[float]):
+        """Scale the eletricity price by the share of fossil energy by factor `pricing_weight_fossil`.
+            The higher the share of fossil energy produced, the higher the price.
+
+            Parameters
+            ----------
+            pricing_weight_fossil: float
+                Factor by which the price should be scaled.
+            renewable_share: Iterable[float]
+                Time series of the renewable energy production share.
+        """
+
+        fossil_share = 1-renewable_share
+
+        self.electricity_pricing = self.electricity_pricing + pricing_weight_fossil * fossil_share
+
+        # normalize prices between 0 and 1
+        self.electricity_pricing = (self.electricity_pricing - np.min(self.electricity_pricing)) / \
+                                   (np.max(self.electricity_pricing) - np.min(self.electricity_pricing))
+
+        predictions = get_predictions(self.electricity_pricing)
+        self.electricity_pricing_predicted_6h = np.array(predictions[6], dtype=float)
+        self.electricity_pricing_predicted_12h = np.array(predictions[12], dtype=float)
+        self.electricity_pricing_predicted_24h = np.array(predictions[24], dtype=float)
+
 class CarbonIntensity:
     """`Building` `carbon_intensity` data class.
 
@@ -238,12 +264,23 @@ class FuelMix:
     ----------
     renewable_energy_produced : np.array
         Renewable energy production time series in [kWh].
-    non_renewable_energy_produced : np.array
-        Non-Renewable energy production prediction time series in [kWh].
+    renewable_energy_share: np.array
+        Renewable energy share of total energy produced.
     """
 
-    def __init__(self, renewable_energy_produced: Iterable[float], non_renewable_energy_produced: Iterable[float]):
+    def __init__(self, renewable_energy_produced: Iterable[float], renewable_energy_share: Iterable[float]):
         r"""Initialize `FuelMix`."""
 
         self.renewable_energy_produced = np.array(renewable_energy_produced, dtype = float)
-        self.non_renewable_energy_produced = np.array(non_renewable_energy_produced, dtype=float)
+        self.renewable_energy_share = np.array(renewable_energy_share, dtype=float)
+
+    def scale_to_buildings(self, sum_medians: float) -> None:
+        """Scale the renewable and non-renewable energy production to
+            the sum of the median consumed energy of all included buildings.
+
+            Parameters
+            ----------
+            sum_medians: float
+                Sum of the medians of net energy consumption of all included buildings.
+        """
+        self.renewable_energy_produced = self.renewable_energy_share * sum_medians
