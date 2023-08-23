@@ -1,6 +1,8 @@
 import inspect
 import math
 from typing import List, Mapping, Tuple, Union
+
+import pandas as pd
 from gym import spaces
 import numpy as np
 from citylearn.base import Environment
@@ -32,7 +34,7 @@ class Building(Environment):
         pricing : Pricing, optional
             Energy pricing and forecasts time series.
         fuel_mix : FuelMix, optional
-            Energy produced with renewable sources and not reneable sources time series.
+            Energy produced with renewable sources and not renewable sources and renwable energy share time series.
         dhw_storage : StorageTank, optional
             Hot water storage object for domestic hot water.
         cooling_storage : StorageTank, optional
@@ -128,7 +130,7 @@ class Building(Environment):
 
     @property
     def fuel_mix(self) -> FuelMix:
-        """Energy produced with renewable sources and not renewable sources time series."""
+        """Energy produced with renewable sources and not renewable sources and renewable share time series."""
 
         return self.__fuel_mix
 
@@ -264,6 +266,12 @@ class Building(Environment):
         ], axis = 0)
 
     @property
+    def net_electricity_consumption_positive_without_storage(self) -> np.ndarray:
+        """max(net_electricity_consumption_without_storage, 0) time series, in [kWh]."""
+
+        return self.net_electricity_consumption_without_storage.clip(min=0)
+
+    @property
     def net_electricity_consumption_emission(self) -> List[float]:
         """Carbon dioxide emmission from `net_electricity_consumption` time series, in [kg_co2]."""
 
@@ -287,70 +295,70 @@ class Building(Environment):
         return self.__net_electricity_consumption
 
     @property
-    def net_renewable_electricity_consumption_without_storage(self) -> np.ndarray:
-        """net renewable electricity consumption in the absence of flexibility provided by storage devices time series, in [kWh].
+    def net_electricity_consumption_positive(self) -> List[float]:
+        """max(net_electricity_consumption, 0) time series, in [kWh]."""
 
-        Notes
-        -----
-        net_renewable_electricity_consumption_without_storage = min(`net_electricity_consumption_without_storage`, `renewable_energy_produced`)
-        """
-
-        return np.stack((self.net_electricity_consumption_without_storage, self.__fuel_mix.renewable_energy_produced)).min(axis=0)
+        return list(np.array(self.net_electricity_consumption).clip(min=0))
 
     @property
-    def net_non_renewable_electricity_consumption_without_storage(self) -> np.ndarray:
-        """net non renewable electricity consumption in the absence of flexibility provided by storage devices time series, in [kWh].
+    def used_pv_electricity(self) -> np.ndarray:
+        """ Actual used self-produced PV energy time series, in [kWh], positive values
 
         Notes
         -----
-        net_non_renewable_electricity_consumption = net_electricity_consumption_without_storage - `net_renewable_electricity_consumption`
+        used_pv_electricity = max(min(`net_electricity_consumption` - `solar_generation`,
+                                      -`solar_generation`),
+                                  0)
         """
 
-        return self.net_electricity_consumption_without_storage - self.net_renewable_electricity_consumption
+        return np.stack((self.net_electricity_consumption - self.solar_generation,
+                         -1* self.solar_generation)).min(axis=0).clip(min=0)
 
     @property
-    def net_renewable_electricity_share_without_storage(self) -> List[float]:
-        """net renewable electricity share in the absence of flexibility provided by storage devices  time series.
+    def used_pv_electricity_without_storage(self) -> np.ndarray:
+        """ Actual used self-produced PV energy in the absence of flexibility provided by storage devices time series,
+            in [kWh], positive values
 
         Notes
         -----
-        net_renewable_electricity_share = `net_renewable_electricity_consumption` / `net_electricity_consumption_without_storage`
+        used_pv_electricity = max(min(`net_electricity_consumption_without_storage` - `solar_generation`,
+                                      -`solar_generation`),
+                                  0)
         """
 
-        return list(self.net_renewable_electricity_consumption / self.net_electricity_consumption_without_storage)
+        return np.stack((self.net_electricity_consumption_without_storage - self.solar_generation,
+                         -1 * self.solar_generation)).min(axis=0).clip(min=0)
 
     @property
-    def net_renewable_electricity_consumption(self) -> np.ndarray:
-        """net renewable electricity consumption time series, in [kWh].
+    def used_pv_of_total_share(self) -> List[float]:
+        """ Share of used PV energy of produced PV energy time series
 
         Notes
         -----
-        net_renewable_electricity_consumption = min(`net_electricity_consumption`, `renewable_energy_produced`)
-        """
+        share_used_pv_of_total = `used_pv_electricity` / (- `solar_generation`)
 
-        return np.stack((self.net_electricity_consumption, self.__fuel_mix.renewable_energy_produced)).min(axis=0)
+        Values where solar_generation are set to 1 (otw nan due to dividing by 0)
+        """
+        no_solar_gen_idx = [i for i, v in enumerate(self.solar_generation) if v == 0]
+        result = self.used_pv_electricity / (-1 * self.solar_generation)
+        result[no_solar_gen_idx] = 1.
+        return list(result)
 
     @property
-    def net_non_renewable_electricity_consumption(self) -> np.ndarray:
-        """net non renewable electricity consumption time series, in [kWh].
+    def used_pv_of_total_share_without_storage(self) -> List[float]:
+        """ Share of used PV energy of produced PV energy in the absence of flexibility provided by storage devices
+            time series with
 
         Notes
         -----
-        net_non_renewable_electricity_consumption = net_electricity_consumption - `net_renewable_electricity_consumption`
+        share_used_pv_of_total = `used_pv_electricity_without_storage` / (- `solar_generation`)
+
+        Values where solar_generation are set to 1 (otw nan due to dividing by 0)
         """
-
-        return self.net_electricity_consumption - self.net_renewable_electricity_consumption
-
-    @property
-    def net_renewable_electricity_share(self) -> List[float]:
-        """net renewable electricity share time series.
-
-        Notes
-        -----
-        net_renewable_electricity_share = `net_renewable_electricity_consumption` / `net_electricity_consumption`
-        """
-
-        return list(self.net_renewable_electricity_consumption / self.net_electricity_consumption)
+        no_solar_gen_idx = [i for i, v in enumerate(self.solar_generation) if v == 0]
+        result = self.used_pv_electricity_without_storage / (-1 * self.solar_generation)
+        result[no_solar_gen_idx] = 1.
+        return list(result)
 
     @property
     def cooling_electricity_consumption(self) -> List[float]:
@@ -1100,6 +1108,7 @@ class Building(Environment):
                     + self.electrical_storage.electricity_consumption[self.time_step] \
                         + self.energy_simulation.non_shiftable_load[self.time_step] \
                             + self.__solar_generation[self.time_step]
+
         self.__net_electricity_consumption.append(net_electricity_consumption)
 
         # net electriciy consumption cost

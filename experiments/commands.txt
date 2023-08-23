@@ -1,7 +1,29 @@
-scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230616T163046.pdf experiments/SAC/05_pricing_reward_new_KPI/plots_20230616T163046.pdf
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230802T133450.pdf experiments/SAC_DB2/25_kaiming_init/new_buildings2/plots_20230802T133450.pdf
+
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/kpis_20230802T133521.csv experiments/SAC_DB2/25_kaiming_init/new_buildings2/kpis_20230802T133521.csv
+
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230704T135811.pdf experiments/plots_20230704T135811.pdf
+
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/kpis_20230704T135838.csv experiments/kpis_20230704T135838.csv
+
+
+
 
 scp src/citylearn/data/nydata/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata/
 
+scp src/citylearn/data/nydata_new_buildings2/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata_new_buildings2/ 
+
+
+
+scp src/citylearn/data/nydata/schema.json klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata/schema.json
+
+scp src/citylearn/data/nydata_new_buildings2/schema.json klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata_new_buildings2/schema.json
+
+
+
+
+scp src/citylearn/data/nydata/schema.json klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata/schema.json
+
 scp src/job.sh klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/
 
-scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/electricity_consumption20230620T143319.csv experiments/Explore_Demand/01
+

@@ -276,6 +276,35 @@ class CostFunction:
         data['group'] = (data.index / daily_time_step).astype(int)
         data = data.groupby(['group'])[['renewable_share']].mean()
         data['renewable_share'] = 1-data['renewable_share']
+
         data['renewable_share'] = data['renewable_share'].rolling(window=data.shape[0], min_periods=1).mean()
 
         return data['renewable_share'].tolist()
+
+    @staticmethod
+    def used_pv_of_total_share(share_used_pv_of_total: List[float], daily_time_step: int = None) -> List[float]:
+        r"""Difference between 1 and the Mean of daily share of used PV electricity of the total produced PV electricity.
+
+        Parameters
+        ----------
+        share_used_pv_of_total : List[float]
+            Share of used PV electricity time series.
+        daily_time_step : int, default: 24
+            Number of time steps in a day.
+
+        Returns
+        -------
+        used_pv_of_total_share : List[float]
+            1-Average daily share of used PV electricity.
+        """
+
+        daily_time_step = 24 if daily_time_step is None else daily_time_step
+
+        data = pd.DataFrame({'pv_used_share': share_used_pv_of_total})
+        data['group'] = (data.index / daily_time_step).astype(int)
+        data = data.groupby(['group'])[['pv_used_share']].mean()
+        data['pv_used_share'] = 1 - data['pv_used_share']
+
+        data['pv_used_share'] = data['pv_used_share'].rolling(window=data.shape[0], min_periods=1).mean()
+
+        return data['pv_used_share'].tolist()

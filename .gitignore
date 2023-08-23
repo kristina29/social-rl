@@ -3,8 +3,10 @@ literature
 commands.txt
 CityLearn-master/
 datasets/fuel_mix_ny_2021/
-datasets/weather_ny_42.30_-74.37_2021.csv
+datasets/weather_ny_*.csv
 datasets/data_exploration_plots/
+datasets/building_data_test/
+experiments/Explore_Demand/
 formelles/
 thesis/*.bbl
 thesis/*.blg
@@ -21,8 +23,8 @@ thesis/.DS_Store
 thesis/old/
 thesis/figures/~$figures.pptx
 .DS_Store
-plots_*
 src/plots_*
+src/kpis_*
 src/.idea/
 src/.ipynb_checkpoints/
 src/__pycache__/
@@ -31,4 +33,6 @@ src/citylearn/assets/
 src/citylearn/__pycache__/
 src/citylearn/agents/__pycache__/
 src/b_net_electricity_consumption.csv
+src/*.png
+logs/
 LaTeXTemplates_masters-doctoral-thesis_v2/
