@@ -26,4 +26,4 @@ scp src/citylearn/data/nydata/schema.json klietz10@134.2.168.52:/mnt/qb/work/lud
 
 scp src/job.sh klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/
 
-scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/electricity_consumption* experiments/Explore_Demand/per_building/
+
