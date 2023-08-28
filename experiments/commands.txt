@@ -1,6 +1,6 @@
-scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230731T001020.pdf experiments/SAC_DB2/20_e4/old_buildings/plots_20230731T001020.pdf
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230802T133450.pdf experiments/SAC_DB2/25_kaiming_init/new_buildings2/plots_20230802T133450.pdf
 
-scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/kpis_20230731T001058.csv experiments/SAC_DB2/20_e4/old_buildings/kpis_20230731T001058.csv
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/kpis_20230802T133521.csv experiments/SAC_DB2/25_kaiming_init/new_buildings2/kpis_20230802T133521.csv
 
 scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230704T135811.pdf experiments/plots_20230704T135811.pdf
 
@@ -26,4 +26,4 @@ scp src/citylearn/data/nydata/schema.json klietz10@134.2.168.52:/mnt/qb/work/lud
 
 scp src/job.sh klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/
 
-scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/electricity_consumption* experiments/Explore_Demand/per_building/
+
