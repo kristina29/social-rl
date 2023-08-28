@@ -480,6 +480,49 @@ def plot_district_load_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
     return fig
 
 
+def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> plt.Figure:
+    """Plots renewable share KPIs over time for different control agents.
+
+    Parameters
+    ----------
+    envs: Mapping[str, CityLearnEnv]
+        Mapping of user-defined control agent names to environments
+        the agents have been used to control.
+    grid: bool
+        Indicates if renewable share only from grid or total (including building PVs) should be plottet
+
+    Returns
+    -------
+    fig: plt.Figure
+        Figure containing plotted axes.
+    """
+
+    #figsize = (5.0, 1.5)
+    fig, ax = plt.subplots(1, 1)#, figsize=figsize)
+
+    for k, v in envs.items():
+        if grid:
+            y = running_mean(v.net_renewable_electricity_grid_shareare, 160)
+        else:
+            y = running_mean(v.net_renewable_electricity_share, 160)
+        x = range(len(y))
+        ax.plot(x, y, label=k)
+
+    if grid:
+        y = running_mean(v.net_renewable_electricity_grid_share_without_storage, 160)
+    else:
+        y = running_mean(v.net_renewable_electricity_share_without_storage, 160)
+    ax.plot(x, y, label='Baseline')
+    ax.set_xlabel('Time')
+    ax.set_ylabel('%')
+    ax.xaxis.set_tick_params(length=0)
+    ax.legend(loc='upper left', bbox_to_anchor=(1.0, 1.0), framealpha=0.0)
+
+    fig.suptitle('District-level renewable energy share', fontsize=14)
+    plt.tight_layout()
+    return fig
+
+
 def plot_battery_soc_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
     """Plots building-level battery SoC profiles from different control agents.
 
@@ -640,6 +683,8 @@ def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], losses: Mapping[st
     plot_battery_soc_profiles(envs)
     plot_district_kpis(envs)
     plot_district_load_profiles(envs)
+    plot_renewable_share(envs)
+    plot_renewable_share(envs, grid=True)
     plot_losses(losses, envs)
     plot_rewards(rewards, envs)
 
