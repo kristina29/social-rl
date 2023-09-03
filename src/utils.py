@@ -502,7 +502,7 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
 
     for k, v in envs.items():
         if grid:
-            y = running_mean(v.net_renewable_electricity_grid_shareare, 160)
+            y = running_mean(v.net_renewable_electricity_grid_share, 160)
         else:
             y = running_mean(v.net_renewable_electricity_share, 160)
         x = range(len(y))
