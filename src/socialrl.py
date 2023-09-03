@@ -13,7 +13,7 @@ from nonsocialrl import train_tql, train_rbc, train_sac
 
 
 def train(dataset_name, random_seed, building_count, demonstrators_count, episodes, active_observations, batch_size,
-          autotune_entropy, clip_gradient, kaiming_initialization, exclude_tql, exclude_rbc, exclude_sac):
+          autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc, exclude_sac):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
 
@@ -40,13 +40,13 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
     if not exclude_sac:
         all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'] = train_sac(schema, episodes, random_seed, batch_size,
                                                                            autotune_entropy, clip_gradient,
-                                                                           kaiming_initialization)
+                                                                           kaiming_initialization, l2_loss)
 
     # Train SAC agent with decision-biasing
     all_envs['SAC_DB2'], all_losses['SAC_DB2'], all_rewards['SAC_DB2'] = train_sacdb2(schema, episodes, random_seed,
                                                                                       batch_size, autotune_entropy,
                                                                                       clip_gradient,
-                                                                                      kaiming_initialization)
+                                                                                      kaiming_initialization, l2_loss)
 
     save_results(all_envs, all_losses, all_rewards)
 
@@ -71,10 +71,11 @@ def preprocessing(schema, building_count, demonstrators_count, random_seed, acti
     return schema
 
 
-def train_sacdb2(schema, episodes, random_seed, batch_size, autotune_entropy, clip_gradient, kaiming_initialization):
+def train_sacdb2(schema, episodes, random_seed, batch_size, autotune_entropy, clip_gradient, kaiming_initialization,
+                 l2_loss):
     env = CityLearnEnv(schema)
     sacdb2_model = SACDB2(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
-                          clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization)
+                          clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss)
     losses, rewards = sacdb2_model.learn(episodes=episodes, deterministic_finish=True)
 
     print('SAC DB2 model trained!')
@@ -100,6 +101,7 @@ if __name__ == '__main__':
     autotune_entropy = opts.autotune
     clip_gradient = opts.clipgradient
     kaiming_initialization = opts.kaiming
+    l2_loss = opts.l2_loss
 
     if True:
         DATASET_NAME = 'nydata'
@@ -115,9 +117,10 @@ if __name__ == '__main__':
         autotune_entropy = False
         clip_gradient = False
         kaiming_initialization = False
+        l2_loss = True
 
     train(DATASET_NAME, seed, building_count, demonstrators_count, episodes, active_observations, batch_size,
-          autotune_entropy, clip_gradient, kaiming_initialization, exclude_tql, exclude_rbc, exclude_sac)
+          autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc, exclude_sac)
 
     # get the end time
     et = time.time()
