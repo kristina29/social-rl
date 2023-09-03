@@ -500,11 +500,29 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
 
     for k, v in envs.items():
         if grid:
-            y = running_mean(v.net_renewable_electricity_grid_share/v.buildings[0].fuel_mix.renewable_energy_share, 160)
+            could_used = 0
+            for b in v.buildings:
+                e = np.array(b.net_electricity_consumption)
+                ec = np.array(b.electrical_storage.capacity_history)
+                es = np.array(b.electrical_storage.soc)
+                could_used += (ec - es) + np.clip(e, 0., None) - np.clip(b.electrical_storage_electricity_consumption,
+                                                                         0., None)
+            could_have_used = (v.buildings[0].fuel_mix.renewable_energy_produced / could_used).clip(None, 1.)
+            used = (v.net_renewable_electricity_grid_consumption / could_used).clip(None, 1.)
+            y = running_mean(used / could_have_used, 160)
         else:
-            y = running_mean(v.net_renewable_electricity_share/v.buildings[0].fuel_mix.renewable_energy_share, 160)
+            could_used = 0
+            for b in v.buildings:
+                e = np.array(b.net_electricity_consumption)
+                ec = np.array(b.electrical_storage.capacity_history)
+                es = np.array(b.electrical_storage.soc)
+                could_used += (ec-es) + np.clip(e, 0., None) - np.clip(b.electrical_storage_electricity_consumption, 0., None)
+            could_have_used = ((v.buildings[0].fuel_mix.renewable_energy_produced+v.solar_generation*-1)/could_used).clip(None, 1.)
+            used = (v.net_renewable_electricity_consumption/could_used).clip(None, 1.)
+            y = running_mean(used/could_have_used, 160)
         x = range(len(y))
         ax.plot(x, y, label=k)
+        ax.set_ylim(0, 1)
 
     if grid:
         y = running_mean(
@@ -512,10 +530,10 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
     else:
         y = running_mean(
             v.net_renewable_electricity_share_without_storage/v.buildings[0].fuel_mix.renewable_energy_share, 160)
-    ax.plot(x, y, label='Baseline')
+    # ax.plot(x, y, label='Baseline')
 
-    available_renewable_share = running_mean(v.buildings[0].fuel_mix.renewable_energy_share, 160)
-    ax.plot(x, available_renewable_share, label='Available renewable share')
+    # available_renewable_share = running_mean(v.buildings[0].fuel_mix.renewable_energy_share, 160)
+    # ax.plot(x, available_renewable_share, label='Available renewable share')
 
     ax.set_xlabel('Time')
     ax.set_ylabel('%')
