@@ -502,23 +502,33 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
 
     for k, v in envs.items():
         if grid:
-            y = running_mean(v.net_renewable_electricity_grid_shareare, 160)
+            y = running_mean(v.net_renewable_electricity_grid_share/v.buildings[0].fuel_mix.renewable_energy_share, 160)
         else:
-            y = running_mean(v.net_renewable_electricity_share, 160)
+            y = running_mean(v.net_renewable_electricity_share/v.buildings[0].fuel_mix.renewable_energy_share, 160)
         x = range(len(y))
         ax.plot(x, y, label=k)
 
     if grid:
-        y = running_mean(v.net_renewable_electricity_grid_share_without_storage, 160)
+        y = running_mean(
+            v.net_renewable_electricity_grid_share_without_storage/v.buildings[0].fuel_mix.renewable_energy_share, 160)
     else:
-        y = running_mean(v.net_renewable_electricity_share_without_storage, 160)
+        y = running_mean(
+            v.net_renewable_electricity_share_without_storage/v.buildings[0].fuel_mix.renewable_energy_share, 160)
     ax.plot(x, y, label='Baseline')
+
+    available_renewable_share = running_mean(v.buildings[0].fuel_mix.renewable_energy_share, 160)
+    ax.plot(x, available_renewable_share, label='Available renewable share')
+
     ax.set_xlabel('Time')
     ax.set_ylabel('%')
     ax.xaxis.set_tick_params(length=0)
     ax.legend(loc='upper left', bbox_to_anchor=(1.0, 1.0), framealpha=0.0)
 
-    fig.suptitle('District-level renewable energy share', fontsize=14)
+    if grid:
+        title = 'District-level renewable energy share grid /  available share'
+    else:
+        title = 'District-level renewable energy share /  available share'
+    fig.suptitle(title, fontsize=14)
     plt.tight_layout()
     return fig
 
