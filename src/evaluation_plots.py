@@ -21,17 +21,9 @@ if __name__ == '__main__':
 
     if True:
         experiment_dirs = ['16_weather_8locs/standard_buildings',
-                           '20_e4/old_buildings',
-                           '22_increase_batch_size/1024/old_buildings',
-                           '23_autotune/old_buildings',
-                           '24_gradientclip/old_buildings',
-                           '25_kaiming_init/old_buildings',
+                           '26_l2loss/old_buildings',
                            '16_weather_8locs/new_buildings2',
-                           '20_e4/new_buildings2',
-                           '22_increase_batch_size/1024/new_buildings2',
-                           '23_autotune/new_buildings2',
-                           '24_gradientclip/new_buildings2',
-                           '25_kaiming_init/new_buildings2']
+                           '26_l2loss/new_buildings2']
         ref_dirs = ['16_weather_8locs/standard_buildings',
                     '16_weather_8locs/new_buildings2']
         n_refs = len(ref_dirs)
