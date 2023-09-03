@@ -1,6 +1,12 @@
+<<<<<<< HEAD
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230802T230710.pdf experiments/SAC_DB2/20_e4/old_buildings/plots_20230802T230710.pdf
+
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/kpis_20230802T230752.csv experiments/SAC_DB2/20_e4/old_buildings/kpis_20230802T230752.csv
+=======
 scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230903T083848.pdf experiments/SAC_DB2/26_l2loss/plots_20230903T083848.pdf
 
 scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/kpis_20230903T083925.csv experiments/SAC_DB2/26_l2loss/kpis_20230903T083925.csv
+>>>>>>> 9915ad332e992892f6abc9e4605fdec3975db228
 
 scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230704T135811.pdf experiments/plots_20230704T135811.pdf
 

@@ -1,0 +1,64 @@
+kpi,value,net_value,net_value_without_storage,name,level,env_id
+1 - average_daily_renewable_share,1.021,0.575,0.563,District,district,RBC
+1 - average_daily_renewable_share_grid,1.015,0.744,0.732,District,district,RBC
+1 - load_factor,0.991,0.853,0.861,District,district,RBC
+average_daily_peak,1.005,12.946,12.886,District,district,RBC
+cost,1.071,4036.305,3800.622,District,district,RBC
+electricity_consumption,1.076,7250.908,6800.73,District,district,RBC
+ramping,1.062,23434.554,22069.976,District,district,RBC
+electricity_consumption,1.107,4988.937,4506.632,Building_3,building,RBC
+cost,1.098,2829.041,2577.541,Building_3,building,RBC
+electricity_consumption,1.099,5446.748,4957.951,Building_5,building,RBC
+cost,1.091,3057.285,2802.562,Building_5,building,RBC
+electricity_consumption,1.11,4882.561,4398.032,Building_7,building,RBC
+cost,1.107,2685.002,2425.044,Building_7,building,RBC
+electricity_consumption,1.081,6202.145,5739.114,Building_8,building,RBC
+cost,1.075,3458.576,3217.242,Building_8,building,RBC
+electricity_consumption,1.045,10225.323,9785.675,Building_10,building,RBC
+cost,1.043,5625.746,5395.103,Building_10,building,RBC
+electricity_consumption,1.057,7417.12,7015.827,Building_11,building,RBC
+cost,1.053,4116.929,3908.629,Building_11,building,RBC
+electricity_consumption,1.035,11593.523,11201.882,Building_17,building,RBC
+cost,1.032,6481.559,6278.236,Building_17,building,RBC
+1 - average_daily_renewable_share,0.998,0.563,0.563,District,district,SAC
+1 - average_daily_renewable_share_grid,0.999,0.732,0.732,District,district,SAC
+1 - load_factor,0.972,0.837,0.861,District,district,SAC
+average_daily_peak,0.884,11.396,12.886,District,district,SAC
+cost,0.96,3624.707,3800.622,District,district,SAC
+electricity_consumption,0.972,6571.762,6800.73,District,district,SAC
+ramping,0.975,21523.484,22069.976,District,district,SAC
+electricity_consumption,0.961,4331.639,4506.632,Building_3,building,SAC
+cost,0.957,2466.879,2577.541,Building_3,building,SAC
+electricity_consumption,1.025,5079.521,4957.951,Building_5,building,SAC
+cost,1.011,2833.334,2802.562,Building_5,building,SAC
+electricity_consumption,0.986,4338.338,4398.032,Building_7,building,SAC
+cost,0.97,2351.269,2425.044,Building_7,building,SAC
+electricity_consumption,0.948,5440.249,5739.114,Building_8,building,SAC
+cost,0.938,3016.829,3217.242,Building_8,building,SAC
+electricity_consumption,0.948,9279.774,9785.675,Building_10,building,SAC
+cost,0.936,5047.622,5395.103,Building_10,building,SAC
+electricity_consumption,0.987,6923.976,7015.827,Building_11,building,SAC
+cost,0.975,3811.185,3908.629,Building_11,building,SAC
+electricity_consumption,0.947,10608.838,11201.882,Building_17,building,SAC
+cost,0.931,5845.831,6278.236,Building_17,building,SAC
+1 - average_daily_renewable_share,0.996,0.561,0.563,District,district,SAC_DB2
+1 - average_daily_renewable_share_grid,0.991,0.726,0.732,District,district,SAC_DB2
+1 - load_factor,0.978,0.842,0.861,District,district,SAC_DB2
+average_daily_peak,0.871,11.224,12.886,District,district,SAC_DB2
+cost,0.952,3605.019,3800.622,District,district,SAC_DB2
+electricity_consumption,0.966,6538.449,6800.73,District,district,SAC_DB2
+ramping,0.991,21863.119,22069.976,District,district,SAC_DB2
+electricity_consumption,0.973,4385.79,4506.632,Building_3,building,SAC_DB2
+cost,0.959,2472.487,2577.541,Building_3,building,SAC_DB2
+electricity_consumption,1.012,5016.612,4957.951,Building_5,building,SAC_DB2
+cost,0.999,2798.651,2802.562,Building_5,building,SAC_DB2
+electricity_consumption,0.973,4280.35,4398.032,Building_7,building,SAC_DB2
+cost,0.953,2311.676,2425.044,Building_7,building,SAC_DB2
+electricity_consumption,0.923,5297.628,5739.114,Building_8,building,SAC_DB2
+cost,0.914,2939.617,3217.242,Building_8,building,SAC_DB2
+electricity_consumption,0.943,9225.965,9785.675,Building_10,building,SAC_DB2
+cost,0.931,5020.434,5395.103,Building_10,building,SAC_DB2
+electricity_consumption,0.985,6909.517,7015.827,Building_11,building,SAC_DB2
+cost,0.975,3809.636,3908.629,Building_11,building,SAC_DB2
+electricity_consumption,0.951,10653.284,11201.882,Building_17,building,SAC_DB2
+cost,0.937,5882.632,6278.236,Building_17,building,SAC_DB2
