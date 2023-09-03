@@ -11,8 +11,8 @@ from options import parseOptions_nonsocial
 from utils import set_schema_buildings, set_active_observations, save_results
 
 
-def train(dataset_name, random_seed, building_count, episodes, active_observations, batch_size, autotune_entropy,
-          clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc):
+def train(dataset_name, random_seed, building_count, episodes, active_observations, batch_size, discount,
+          autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
 
@@ -36,9 +36,14 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
         all_envs['TQL'] = train_tql(schema, active_observations, episodes)
 
     # Train soft actor-critic (SAC) agent
-    all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'] = train_sac(schema, episodes, random_seed, batch_size,
-                                                                       autotune_entropy, clip_gradient,
-                                                                       kaiming_initialization, l2_loss)
+    all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'] = train_sac(schema=schema, episodes=episodes,
+                                                                       random_seed=random_seed,
+                                                                       batch_size=batch_size,
+                                                                       discount=discount,
+                                                                       autotune_entropy=autotune_entropy,
+                                                                       clip_gradient=clip_gradient,
+                                                                       kaiming_initialization=kaiming_initialization,
+                                                                       l2_loss=l2_loss)
     print('SAC model trained!')
 
     save_results(all_envs, all_losses, all_rewards)
@@ -107,11 +112,12 @@ def train_tql(schema, active_observations, episodes):
     return env
 
 
-def train_sac(schema, episodes, random_seed, batch_size, autotune_entropy, clip_gradient, kaiming_initialization,
-              l2_loss):
+def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
+              kaiming_initialization, l2_loss):
     env = CityLearnEnv(schema)
     sac_model = SAC(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
-                    clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss)
+                    clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
+                    discount=discount)
     losses, rewards = sac_model.learn(episodes=episodes, deterministic_finish=True)
 
     print('SAC model trained!')
@@ -145,15 +151,15 @@ if __name__ == '__main__':
         episodes = 2
         seed = 2
         autotune_entropy = False
-        active_observations = ['hour']#, 'electricity_pricing', 'electricity_pricing_predicted_6h',
+        active_observations = ['hour']  # , 'electricity_pricing', 'electricity_pricing_predicted_6h',
         #                       'electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
         batch_size = 256
         clip_gradient = False
         kaiming_initialization = False
         l2_loss = False
 
-    train(DATASET_NAME, seed, building_count, episodes, active_observations, batch_size, autotune_entropy, clip_gradient,
-          kaiming_initialization, l2_loss, exclude_tql, exclude_rbc)
+    train(DATASET_NAME, seed, building_count, episodes, active_observations, batch_size, discount, autotune_entropy,
+          clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc)
 
     # get the end time
     et = time.time()

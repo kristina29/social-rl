@@ -48,6 +48,8 @@ def add_nonsocial_options(optParser):
                          help='Random seed to create reproducible results. If not defined, no fixed seed is used.')
     optParser.add_option('--batch', action='store', type='int', dest='batch',
                          help='Batch size.')
+    optParser.add_option('--discount', action='store', type='float', dest='discount', default='0.99',
+                         help='Discount factor')
     optParser.add_option('-b', '--buildings', action='store', type='int', dest='buildings',
                          help='Number of random selected buildings to include in training (between 1 and 15). '
                               'If not defined, all buildings are included.')
