@@ -31,12 +31,7 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
     all_rewards = {}
     # Train rule-based control (RBC) agent for comparison
     if not exclude_rbc:
-        if 'hour' not in active_observations:
-            schema_rbc = preprocessing(schema, building_count, demonstrators_count, random_seed,
-                                       active_observations.extend('hour'))
-        else:
-            schema_rbc = schema
-        all_envs['RBC'] = train_rbc(schema_rbc, episodes)
+        all_envs['RBC'] = train_rbc(schema, episodes)
 
     # Train tabular Q-Learning (TQL) agent for comparison
     if not exclude_tql:
@@ -132,7 +127,7 @@ if __name__ == '__main__':
         episodes = 2
         discount = 0.99
         seed = 2
-        active_observations = ['renewable_energy_produced', 'hour']
+        active_observations = ['renewable_energy_produced']
         batch_size = 256
         autotune_entropy = True
         clip_gradient = False

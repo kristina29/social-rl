@@ -75,6 +75,7 @@ def get_bins(schema, key, active_parts=None):
 
 
 def train_rbc(schema, episodes):
+    schema['observations']['hour']['active'] = True
     env = CityLearnEnv(schema)
     rbc_model = OptimizedRBC(env)
     rbc_model.learn(episodes=episodes)
