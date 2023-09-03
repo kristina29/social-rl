@@ -21,9 +21,21 @@ if __name__ == '__main__':
 
     if True:
         experiment_dirs = ['16_weather_8locs/standard_buildings',
-                           '18_limit_observations/version1/old_buildings',
+                           '20_e4/old_buildings',
+                           '22_increase_batch_size/1024/old_buildings',
+                           '23_autotune/old_buildings',
+                           '24_gradientclip/old_buildings',
+                           '25_kaiming_init/old_buildings',
                            '16_weather_8locs/new_buildings2',
-                           '18_limit_observations/version1/new_buildings2']
+                           '20_e4/new_buildings2',
+                           '22_increase_batch_size/1024/new_buildings2',
+                           '23_autotune/new_buildings2',
+                           '24_gradientclip/new_buildings2',
+                           '25_kaiming_init/new_buildings2']
+        ref_dirs = ['16_weather_8locs/standard_buildings',
+                    '16_weather_8locs/new_buildings2']
+        n_refs = len(ref_dirs)
+        length = 1/n_refs
         agentdir = 'SAC_DB2'
         agent = 'SAC'
 
@@ -40,20 +52,6 @@ if __name__ == '__main__':
         df = df[(df['env_id'] == agent) & (df['level'] == 'district')]
         kpis[dir] = df
 
-    # plot 1-avarage_daily_renewable share net_value
-    values = []
-    names = []
-    for key,value in kpis.items():
-        values.append(round(value.loc['1 - average_daily_renewable_share', 'net_value'], 3))
-        names.append(key)
-
-    fig, ax = plt.subplots()
-    rects = ax.bar(names, values, label=names)
-    ax.bar_label(rects, padding=3)
-    ax.set_title('1 - average_daily_renewable_share [net_value]')
-    for tick in ax.get_xticklabels():
-        tick.set_rotation(45)
-    plt.savefig('1.png', bbox_inches="tight")
 
     # plot 1-avarage_daily_renewable share net_value/net_value_without_storage
     values = []
@@ -64,29 +62,21 @@ if __name__ == '__main__':
         names.append(key)
 
     fig, ax = plt.subplots()
+    ax.grid(which='major', axis='y', linestyle='--')
+    ax.set_axisbelow(True)
     rects = ax.bar(names, values, label=names)
-    ax.axhline(1, c='grey', linestyle="--")
+
+    for i in range(n_refs):
+        ax.axhline(values[names.index(ref_dirs[i])], xmin=0+i*length, xmax=1-length*(n_refs-i-1), c='red',
+                   linewidth=0.7, linestyle="-")
     ax.bar_label(rects, padding=3)
+    ax.set_ylim(0.95,1.05)
     ax.set_title('1 - average_daily_renewable_share [net_value/net_value_without_storage]')
     for tick in ax.get_xticklabels():
-        tick.set_rotation(45)
+        tick.set_rotation(90)
 
-    plt.savefig('2.png', bbox_inches="tight")
+    plt.savefig('1.png', bbox_inches="tight")
 
-    # plot 1-avarage_daily_renewable_share_grid net_value
-    values = []
-    names = []
-    for key, value in kpis.items():
-        values.append(round(value.loc['1 - average_daily_renewable_share_grid', 'net_value'], 3))
-        names.append(key)
-
-    fig, ax = plt.subplots()
-    rects = ax.bar(names, values, label=names)
-    ax.bar_label(rects, padding=3)
-    ax.set_title('1 - average_daily_renewable_share_grid [net_value]')
-    for tick in ax.get_xticklabels():
-        tick.set_rotation(45)
-    plt.savefig('3.png', bbox_inches="tight")
 
     # plot 1-avarage_daily_renewable share net_value/net_value_without_storage
     values = []
@@ -97,14 +87,64 @@ if __name__ == '__main__':
         names.append(key)
 
     fig, ax = plt.subplots()
+    ax.grid(which='major', axis='y', linestyle='--')
+    ax.set_axisbelow(True)
     rects = ax.bar(names, values, label=names)
-    ax.axhline(1, c='grey', linestyle="--")
+    for i in range(n_refs):
+        ax.axhline(values[names.index(ref_dirs[i])], xmin=0 + i * length, xmax=1 - length * (n_refs - i - 1), c='red',
+                   linewidth=0.7, linestyle="-")
     ax.bar_label(rects, padding=3)
+    ax.set_ylim(0.95, 1.05)
     ax.set_title('1 - average_daily_renewable_share_grid [net_value/net_value_without_storage]')
     for tick in ax.get_xticklabels():
-        tick.set_rotation(45)
+        tick.set_rotation(90)
 
-    plt.savefig('4.png', bbox_inches="tight")
+    plt.savefig('2.png', bbox_inches="tight")
+
+    # plot 1-used_pv_of_total_share net_value
+    if '1 - used_pv_of_total_share' in value:
+        values = []
+        names = []
+        for key, value in kpis.items():
+            values.append(round(value.loc['1 - used_pv_of_total_share', 'net_value'], 3))
+            names.append(key)
+
+        fig, ax = plt.subplots()
+        ax.grid(which='major', axis='y', linestyle='--')
+        ax.set_axisbelow(True)
+        rects = ax.bar(names, values, label=names)
+        for i in range(n_refs):
+            ax.axhline(values[names.index(ref_dirs[i])], xmin=0 + i * length, xmax=1 - length * (n_refs - i - 1),
+                       c='red', linewidth=0.7, linestyle="-")
+        ax.bar_label(rects, padding=3)
+        ax.set_ylim(0, 0.2)
+        ax.set_title('1 - used_pv_of_total_share [net_value]')
+        for tick in ax.get_xticklabels():
+            tick.set_rotation(90)
+        plt.savefig('3.png', bbox_inches="tight")
+
+        # plot 1-used_pv_of_total_share share net_value/net_value_without_storage
+        values = []
+        names = []
+        for key, value in kpis.items():
+            values.append(round(value.loc['1 - used_pv_of_total_share', 'net_value'] /
+                                value.loc['1 - used_pv_of_total_share', 'net_value_without_storage'], 3))
+            names.append(key)
+
+        fig, ax = plt.subplots()
+        ax.grid(which='major', axis='y', linestyle='--')
+        ax.set_axisbelow(True)
+        rects = ax.bar(names, values, label=names)
+        for i in range(n_refs):
+            ax.axhline(values[names.index(ref_dirs[i])], xmin=0 + i * length, xmax=1 - length * (n_refs - i - 1),
+                       c='red', linewidth=0.7, linestyle="-")
+        ax.bar_label(rects, padding=3)
+        ax.set_ylim(0.75, 1.05)
+        ax.set_title('1 - used_pv_of_total_share [net_value/net_value_without_storage]')
+        for tick in ax.get_xticklabels():
+            tick.set_rotation(90)
+
+        plt.savefig('4.png', bbox_inches="tight")
 
 
 

@@ -17,7 +17,8 @@ from citylearn.rl import PolicyNetwork, ReplayBuffer, SoftQNetwork
 
 
 class SAC(RLC):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, autotune_entropy: bool=False, clip_gradient: bool=False, kaiming_initialization: bool=False,
+                 l2_loss: bool=False, *args, **kwargs):
         r"""Initialize :class:`SAC`.
 
         Parameters
@@ -34,8 +35,14 @@ class SAC(RLC):
         super().__init__(*args, **kwargs)
 
         # internally defined
+        self.autotune_entropy = autotune_entropy
+        self.clip_gradient = clip_gradient
+        self.kaiming_initialization = kaiming_initialization
         self.normalized = [False for _ in self.action_space]
-        self.soft_q_criterion = nn.SmoothL1Loss()
+        if l2_loss:
+            self.soft_q_criterion = nn.MSELoss()
+        else:
+            self.soft_q_criterion = nn.SmoothL1Loss()
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.replay_buffer = [ReplayBuffer(int(self.replay_buffer_capacity)) for _ in self.action_space]
         self.soft_q_net1 = [None for _ in self.action_space]
@@ -51,10 +58,13 @@ class SAC(RLC):
         self.norm_std = [None for _ in self.action_space]
         self.r_norm_mean = [None for _ in self.action_space]
         self.r_norm_std = [None for _ in self.action_space]
+        self.alpha = [self.alpha for _ in self.action_space]
+        self.log_alpha = [None for _ in self.action_space]
+        self.alpha_optimizer = [None for _ in self.action_space]
         self.set_networks()
 
     def update(self, observations: List[List[float]], actions: List[List[float]], reward: List[float],
-               next_observations: List[List[float]], done: bool) -> Mapping[str, List[float]]:
+               next_observations: List[List[float]], done: bool) -> Mapping[int, Mapping[str, List[float]]]:
         r"""Update replay buffer.
 
         Parameters
@@ -72,17 +82,20 @@ class SAC(RLC):
 
         Return value
         ------------
-        losses: Mapping[str, List[float]]
-            Mapping of neural-network name to loss values of training steps.
+        losses: Mapping[int, Mapping[str, List[float]]]
+            Mapping of index to Mapping from neural-network name to loss values of training steps.
         """
 
         # Run once the regression model has been fitted
         # Normalize all the observations using periodical normalization, one-hot encoding, or -1, 1 scaling. It also removes observations that are not necessary (solar irradiance if there are no solar PV panels).
-        q1_losses = []
-        q2_losses = []
-        policy_losses = []
+        losses = {}
 
         for i, (o, a, r, n) in enumerate(zip(observations, actions, reward, next_observations)):
+            current_losses = {'q1_losses': [],
+                              'q2_losses': [],
+                              'policy_losses': [],
+                              'alpha_losses': []}
+
             o = self.get_encoded_observations(i, o)
             n = self.get_encoded_observations(i, n)
 
@@ -103,15 +116,17 @@ class SAC(RLC):
                     pass
 
                 for _ in range(self.update_per_time_step):
-                    _, q1_loss, q2_loss, policy_loss = self.update_step(i)
-                    q1_losses.append(q1_loss)
-                    q2_losses.append(q2_loss)
-                    policy_losses.append(policy_loss)
-
+                    _, q1_loss, q2_loss, policy_loss, alpha_loss = self.update_step(i)
+                    current_losses['q1_losses'].append(q1_loss)
+                    current_losses['q2_losses'].append(q2_loss)
+                    current_losses['policy_losses'].append(policy_loss)
+                    current_losses['alpha_losses'].append(alpha_loss)
             else:
                 pass
 
-        return {'q1_losses': q1_losses, 'q2_losses': q2_losses, 'policy_losses': policy_losses}
+            losses[i] = current_losses
+
+        return losses
 
     def normalize(self, i):
         # calculate normalized observations and rewards
@@ -132,7 +147,7 @@ class SAC(RLC):
         ) for o, a, r, n, d in self.replay_buffer[i].buffer]
         self.normalized[i] = True
 
-    def update_step(self, i) -> (List[List[float]], float, float, float):
+    def update_step(self, i) -> (List[List[float]], float, float, float, float):
         o, a, r, n, d = self.replay_buffer[i].sample(self.batch_size)
         tensor = torch.cuda.FloatTensor if self.device.type == 'cuda' else torch.FloatTensor
         o = tensor(o).to(self.device)
@@ -149,7 +164,7 @@ class SAC(RLC):
             target_q_values = torch.min(
                 self.target_soft_q_net1[i](n, new_next_actions),
                 self.target_soft_q_net2[i](n, new_next_actions),
-            ) - self.alpha * new_log_pi
+            ) - self.alpha[i] * new_log_pi
             q_target = r + (1 - d) * self.discount * target_q_values
 
         # Update Soft Q-Networks
@@ -157,11 +172,21 @@ class SAC(RLC):
         q2_pred = self.soft_q_net2[i](o, a)
         q1_loss = self.soft_q_criterion(q1_pred, q_target)
         q2_loss = self.soft_q_criterion(q2_pred, q_target)
+
         self.soft_q_optimizer1[i].zero_grad()
         q1_loss.backward()
+
+        # Gradient Value Clipping
+        if self.clip_gradient:
+            nn.utils.clip_grad_value_(self.soft_q_net1[i].parameters(), clip_value=1.0)
         self.soft_q_optimizer1[i].step()
+
         self.soft_q_optimizer2[i].zero_grad()
         q2_loss.backward()
+
+        # Gradient Value Clipping
+        if self.clip_gradient:
+            nn.utils.clip_grad_value_(self.soft_q_net2[i].parameters(), clip_value=1.0)
         self.soft_q_optimizer2[i].step()
 
         # Update Policy
@@ -170,10 +195,23 @@ class SAC(RLC):
             self.soft_q_net1[i](o, new_actions),
             self.soft_q_net2[i](o, new_actions)
         )
-        policy_loss = (self.alpha * log_pi - q_new_actions).mean()
+        policy_loss = (self.alpha[i] * log_pi - q_new_actions).mean()
         self.policy_optimizer[i].zero_grad()
         policy_loss.backward()
+        # Gradient Value Clipping
+        if self.clip_gradient:
+            nn.utils.clip_grad_value_(self.policy_net[i].parameters(), clip_value=1.0)
         self.policy_optimizer[i].step()
+
+        if self.autotune_entropy:
+            alpha_loss = (-self.log_alpha[i] * (log_pi + self.target_entropy[i]).detach()).mean()
+
+            self.alpha_optimizer[i].zero_grad()
+            alpha_loss.backward()
+            self.alpha_optimizer[i].step()
+            self.alpha[i] = self.log_alpha[i].exp().item()
+        else:
+            alpha_loss = torch.tensor(0.)
 
         # Soft Updates
         for target_param, param in zip(self.target_soft_q_net1[i].parameters(),
@@ -184,7 +222,7 @@ class SAC(RLC):
                                        self.soft_q_net2[i].parameters()):
             target_param.data.copy_(target_param.data * (1.0 - self.tau) + param.data * self.tau)
 
-        return o, q1_loss.item(), q2_loss.item(), policy_loss.item()
+        return o, q1_loss.item(), q2_loss.item(), policy_loss.item(), alpha_loss.item()
 
     def predict(self, observations: List[List[float]], deterministic: bool = None):
         r"""Provide actions for current time step.
@@ -262,7 +300,7 @@ class SAC(RLC):
             observation_dimension = self.observation_dimension[i] + internal_observation_count
             # init networks
             self.soft_q_net1[i] = SoftQNetwork(observation_dimension, self.action_dimension[i],
-                                               self.hidden_dimension).to(self.device)
+                                               self.hidden_dimension, self.kaiming_initialization).to(self.device)
             self.soft_q_net2[i] = SoftQNetwork(observation_dimension, self.action_dimension[i],
                                                self.hidden_dimension).to(self.device)
             self.target_soft_q_net1[i] = SoftQNetwork(observation_dimension, self.action_dimension[i],
@@ -282,7 +320,15 @@ class SAC(RLC):
             self.soft_q_optimizer1[i] = optim.Adam(self.soft_q_net1[i].parameters(), lr=self.lr)
             self.soft_q_optimizer2[i] = optim.Adam(self.soft_q_net2[i].parameters(), lr=self.lr)
             self.policy_optimizer[i] = optim.Adam(self.policy_net[i].parameters(), lr=self.lr)
-            self.target_entropy[i] = -np.prod(self.action_space[i].shape).item()
+
+            # Based on https://docs.cleanrl.dev/rl-algorithms/sac/#implementation-details
+            if self.autotune_entropy:
+                # self.target_entropy[i] = -torch.prod(torch.tensor(self.action_space[i].shape)).item()
+                self.target_entropy[i] = -torch.Tensor(self.action_space[i].shape)
+                self.log_alpha[i] = torch.zeros(1, requires_grad=True)
+                self.alpha[i] = self.log_alpha[i].exp().item()
+                self.alpha_optimizer[i] = optim.Adam([self.log_alpha[i]], lr=self.lr)
+
 
     def set_encoders(self) -> List[List[Encoder]]:
         encoders = super().set_encoders()

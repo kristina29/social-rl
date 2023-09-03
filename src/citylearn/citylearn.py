@@ -320,7 +320,7 @@ class CityLearnEnv(Environment, Env):
         """
         return list((self.net_renewable_electricity_consumption_without_storage /
                      (
-                                 self.net_electricity_consumption_positive_without_storage + self.used_pv_electricity_without_storage)).clip(
+                             self.net_electricity_consumption_positive_without_storage + self.used_pv_electricity_without_storage)).clip(
             min=0))
 
     @property
@@ -411,6 +411,40 @@ class CityLearnEnv(Environment, Env):
         """Summed `Building.used_pv_electricity_without_storage` time series, in [kWh]."""
         return pd.DataFrame([b.used_pv_electricity_without_storage for b in self.buildings]).sum(axis=0,
                                                                                                  min_count=1).to_numpy()
+
+    @property
+    def used_pv_of_total_share(self) -> List[float]:
+        """ Share of used PV energy of produced PV energy time series.
+
+         Notes
+        -----
+        share_used_pv_of_total = Summed `Building.used_pv_electricity` / (- Summed `Building.solar_generation`)
+
+        Values where solar_generation are set to 1 (otw nan due to dividing by 0)
+        """
+
+        no_solar_gen_idx = [i for i, v in enumerate(self.solar_generation) if v == 0]
+        result = self.used_pv_electricity / (-1 * self.solar_generation)
+        result[no_solar_gen_idx] = 1.
+        return result
+
+    @property
+    def used_pv_of_total_share_without_storage(self) -> List[float]:
+        """ Share of used PV energy of produced PV in the absence of flexibility provided by storage devices
+            energy time series.
+
+         Notes
+        -----
+        share_used_pv_of_total = Summed `Building.used_pv_electricity_without_storage` /
+                                        (- Summed `Building.solar_generation`)
+
+    Values where solar_generation are set to 1 (otw nan due to dividing by 0)
+        """
+
+        no_solar_gen_idx = [i for i, v in enumerate(self.solar_generation) if v == 0]
+        result = self.used_pv_electricity_without_storage / (-1 * self.solar_generation)
+        result[no_solar_gen_idx] = 1.
+        return result
 
     @property
     def cooling_electricity_consumption(self) -> np.ndarray:
@@ -560,6 +594,12 @@ class CityLearnEnv(Environment, Env):
         """Summed `Building.solar_generation, in [kWh]`."""
 
         return pd.DataFrame([b.solar_generation for b in self.buildings]).sum(axis=0, min_count=1).to_numpy()
+
+    @property
+    def renewable_generation(self) -> np.ndarray:
+        """Summend `Building.solar_generation, in [kWh]` + `FuelMix.renewable_energy_produced, in [kWh]`"""
+
+        return self.buildings[0].fuel_mix.renewable_energy_produced[:len(self.solar_generation)] + self.solar_generation
 
     @property
     def demonstrator_count(self) -> int:
@@ -802,6 +842,17 @@ class CityLearnEnv(Environment, Env):
                 'net_value_without_storage':
                     CostFunction.cost(b.net_electricity_consumption_without_storage_cost)[-1] \
                         if sum(b.pricing.electricity_pricing) != 0 else None,
+            }, {
+                'name': b.name,
+                'cost_function': '1 - used_pv_of_total_share',
+                'value': CostFunction.used_pv_of_total_share(b.used_pv_of_total_share)[-1] / \
+                         CostFunction.used_pv_of_total_share(b.used_pv_of_total_share_without_storage)[-1] \
+                    if sum(b.solar_generation) != 0 else None,
+                'net_value': CostFunction.used_pv_of_total_share(b.used_pv_of_total_share)[-1] \
+                    if sum(b.solar_generation) != 0 else None,
+                'net_value_without_storage':
+                    CostFunction.used_pv_of_total_share(b.used_pv_of_total_share_without_storage)[-1] \
+                        if sum(b.solar_generation) != 0 else None,
             }]
 
         building_level = pd.DataFrame(building_level)

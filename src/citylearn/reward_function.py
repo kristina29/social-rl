@@ -203,6 +203,31 @@ class FossilPenaltyReward(RewardFunction):
         return reward
 
 
+class TolovskiReward(RewardFunction):
+    def __init__(self, env: CityLearnEnv):
+        super().__init__(env)
+
+    def calculate(self) -> List[float]:
+        r"""The reward is defined to minimize the squared difference between the produced amount of renewable energy
+            and the total amount of used energy.
+
+            Returns
+            -------
+            reward: List[float]
+                Reward for transition to current timestep.
+
+            Notes
+            -----
+            Reward value is calculated as :math:`[-(e_{r}-e_{d})^2, \dots,-(e_{r}-e_{d})^2]`
+            where :math:`e_r` is `net renewable production` and :math:`e_d` is `net energy demand`
+            (same reward for all agents).
+        """
+        reward = [-1 * (self.env.renewable_generation[self.env.time_step] -
+                        self.env.net_electricity_consumption_positive[self.env.time_step])**2] * len(self.env.buildings)
+
+        return reward
+
+
 class PriceAndSolarPenaltyReward(RewardFunction):
     def __init__(self, env: CityLearnEnv, **kwargs):
         super().__init__(env, **kwargs)
@@ -212,6 +237,18 @@ class PriceAndSolarPenaltyReward(RewardFunction):
         self.solarpenalty = SolarPenaltyReward(env)
 
     def calculate(self) -> List[float]:
+        r"""The reward is defined to minimize the price paid for the electricity consumption, minimize electricity
+            consumption and maximize solar generation.
+
+            The reward combines the PricePenaltyReward with factor :math:`\alpha` with the
+            SolarPenaltyReward with factor (1-:math:`\alpha`).
+
+            Returns
+            -------
+            reward: List[float]
+                Reward for transition to current timestep.
+
+            """
         reward = self.alpha * np.array(self.pricepenalty.calculate()) +\
                  (1-self.alpha) * np.array(self.solarpenalty.calculate())
         return reward.tolist()
