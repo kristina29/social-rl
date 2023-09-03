@@ -18,7 +18,7 @@ from citylearn.rl import PolicyNetwork, ReplayBuffer, SoftQNetwork
 
 class SAC(RLC):
     def __init__(self, autotune_entropy: bool=False, clip_gradient: bool=False, kaiming_initialization: bool=False,
-                 *args, **kwargs):
+                 l2_loss: bool=False, *args, **kwargs):
         r"""Initialize :class:`SAC`.
 
         Parameters
@@ -39,7 +39,10 @@ class SAC(RLC):
         self.clip_gradient = clip_gradient
         self.kaiming_initialization = kaiming_initialization
         self.normalized = [False for _ in self.action_space]
-        self.soft_q_criterion = nn.SmoothL1Loss()
+        if l2_loss:
+            self.soft_q_criterion = nn.MSELoss()
+        else:
+            self.soft_q_criterion = nn.SmoothL1Loss()
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.replay_buffer = [ReplayBuffer(int(self.replay_buffer_capacity)) for _ in self.action_space]
         self.soft_q_net1 = [None for _ in self.action_space]
