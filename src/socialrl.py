@@ -105,14 +105,14 @@ if __name__ == '__main__':
 
     if False:
         DATASET_NAME = 'nydata'
-        exclude_rbc = 1
+        exclude_rbc = 0
         exclude_tql = 1
-        exclude_sac = 0
+        exclude_sac = 1
         demonstrators_count = 1
         building_count = 2
         episodes = 2
         seed = 2
-        active_observations = ['renewable_energy_produced']
+        active_observations = ['renewable_energy_produced', 'hour']
         batch_size = 256
         autotune_entropy = True
         clip_gradient = False
