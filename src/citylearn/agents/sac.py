@@ -320,10 +320,11 @@ class SAC(RLC):
             self.soft_q_optimizer1[i] = optim.Adam(self.soft_q_net1[i].parameters(), lr=self.lr)
             self.soft_q_optimizer2[i] = optim.Adam(self.soft_q_net2[i].parameters(), lr=self.lr)
             self.policy_optimizer[i] = optim.Adam(self.policy_net[i].parameters(), lr=self.lr)
-            self.target_entropy[i] = -torch.prod(torch.tensor(self.action_space[i].shape)).item()
 
             # Based on https://docs.cleanrl.dev/rl-algorithms/sac/#implementation-details
             if self.autotune_entropy:
+                # self.target_entropy[i] = -torch.prod(torch.tensor(self.action_space[i].shape)).item()
+                self.target_entropy[i] = -torch.Tensor(self.action_space[i].shape)
                 self.log_alpha[i] = torch.zeros(1, requires_grad=True)
                 self.alpha[i] = self.log_alpha[i].exp().item()
                 self.alpha_optimizer[i] = optim.Adam([self.log_alpha[i]], lr=self.lr)
