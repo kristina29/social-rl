@@ -845,9 +845,9 @@ class CityLearnEnv(Environment, Env):
             }, {
                 'name': b.name,
                 'cost_function': '1 - used_pv_of_total_share',
-                #'value': CostFunction.used_pv_of_total_share(b.used_pv_of_total_share)[-1] / \
-                #         CostFunction.used_pv_of_total_share(b.used_pv_of_total_share_without_storage)[-1] \
-                #    if sum(b.solar_generation) != 0 else None,
+                'value': CostFunction.used_pv_of_total_share(b.used_pv_of_total_share)[-1] / \
+                         CostFunction.used_pv_of_total_share(b.used_pv_of_total_share_without_storage)[-1] \
+                    if sum(b.solar_generation) != 0 else None,
                 'net_value': CostFunction.used_pv_of_total_share(b.used_pv_of_total_share)[-1] \
                     if sum(b.solar_generation) != 0 else None,
                 'net_value_without_storage':
@@ -1142,8 +1142,6 @@ class CityLearnEnv(Environment, Env):
 
                     for name in device_metadata:
                         if building_schema.get(name, None) is None:
-                            device = None
-                        elif name == 'pv':
                             device = None
                         else:
                             device_type = building_schema[name]['type']

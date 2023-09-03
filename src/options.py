@@ -64,6 +64,8 @@ def add_nonsocial_options(optParser):
                          help='Clip gradients during training.')
     optParser.add_option('--kaiming', action='store_true', default=False, dest='kaiming',
                          help='Use kaiming initialization for the networks')
+    optParser.add_option('--l2', action='store_true', default=False, dest='l2_loss',
+                         help='Use l2 loss for critic networks')
     optParser.add_option('-o', '--observation', action='extend', type='string', dest='observations',
                          help='Comma separated list of observations that should be active. '
                               'If not defined, the full observation space (as defined in the schema file) is used.')
