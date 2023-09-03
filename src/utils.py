@@ -41,6 +41,8 @@ def set_schema_buildings(
     # set random seed
     if seed is not None:
         np.random.seed(seed)
+    else:
+        np.random.seed(27) #always get the same buildings for training
 
     # get all building names
     buildings = list(schema['buildings'].keys())
@@ -67,6 +69,8 @@ def set_schema_buildings(
             schema['buildings'][b]['include'] = True
         else:
             schema['buildings'][b]['include'] = False
+
+    np.random.seed()
 
     return schema, buildings
 
