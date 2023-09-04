@@ -8,12 +8,13 @@ from citylearn.data import DataSet
 from citylearn.utilities import get_active_parts
 from options import parseOptions_social
 from utils import set_schema_buildings, set_active_observations, plot_simulation_summary, set_schema_demonstrators, \
-    save_kpis
+    save_kpis, save_results
 from nonsocialrl import train_tql, train_rbc, train_sac
 
 
-def train(dataset_name, random_seed, building_count, demonstrators_count, episodes, active_observations, batch_size,
-          autotune_entropy, exclude_tql, exclude_rbc, exclude_sac):
+def train(dataset_name, random_seed, building_count, demonstrators_count, episodes, discount, active_observations,
+          batch_size, autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc,
+          exclude_sac):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
 
@@ -38,21 +39,27 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
 
     # Train soft actor-critic (SAC) agent for comparison
     if not exclude_sac:
-        all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'] = train_sac(schema, episodes, random_seed, batch_size,
-                                                                           autotune_entropy)
+        all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'] = train_sac(schema=schema, episodes=episodes,
+                                                                           random_seed=random_seed,
+                                                                           batch_size=batch_size,
+                                                                           discount=discount,
+                                                                           autotune_entropy=autotune_entropy,
+                                                                           clip_gradient=clip_gradient,
+                                                                           kaiming_initialization=kaiming_initialization,
+                                                                           l2_loss=l2_loss)
 
     # Train SAC agent with decision-biasing
-    all_envs['SAC_DB2'], all_losses['SAC_DB2'], all_rewards['SAC_DB2'] = train_sacdb2(schema, episodes, random_seed,
-                                                                                      batch_size, autotune_entropy)
+    all_envs['SAC_DB2'], all_losses['SAC_DB2'], all_rewards['SAC_DB2'] = train_sacdb2(schema=schema, episodes=episodes,
+                                                                                      random_seed=random_seed,
+                                                                                      batch_size=batch_size,
+                                                                                      discount=discount,
+                                                                                      autotune_entropy=autotune_entropy,
+                                                                                      clip_gradient=clip_gradient,
+                                                                                      kaiming_initialization=
+                                                                                      kaiming_initialization,
+                                                                                      l2_loss=l2_loss)
 
-    # plot summary and compare with other control results
-    filename = f'plots_{datetime.now().strftime("%Y%m%dT%H%M%S")}'
-    plot_simulation_summary(all_envs, all_losses, all_rewards, filename)
-
-    # save KPIs as csv
-    filename = f'kpis_{datetime.now().strftime("%Y%m%dT%H%M%S")}.csv'
-    save_kpis(all_envs, filename)
-    print(f'KPIs saved to {filename}')
+    save_results(all_envs, all_losses, all_rewards)
 
 
 def preprocessing(schema, building_count, demonstrators_count, random_seed, active_observations):
@@ -75,9 +82,13 @@ def preprocessing(schema, building_count, demonstrators_count, random_seed, acti
     return schema
 
 
-def train_sacdb2(schema, episodes, random_seed, batch_size, autotune_entropy):
+def train_sacdb2(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
+                 kaiming_initialization,
+                 l2_loss):
     env = CityLearnEnv(schema)
-    sacdb2_model = SACDB2(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy)
+    sacdb2_model = SACDB2(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
+                          clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
+                          discount=discount)
     losses, rewards = sacdb2_model.learn(episodes=episodes, deterministic_finish=True)
 
     print('SAC DB2 model trained!')
@@ -95,28 +106,39 @@ if __name__ == '__main__':
     building_count = opts.buildings
     demonstrators_count = opts.demonstrators
     episodes = opts.episodes
+    discount = opts.discount
     exclude_tql = opts.exclude_tql
     exclude_rbc = opts.exclude_rbc
     exclude_sac = opts.exclude_sac
     active_observations = opts.observations
     batch_size = opts.batch
     autotune_entropy = opts.autotune
+    clip_gradient = opts.clipgradient
+    kaiming_initialization = opts.kaiming
+    l2_loss = opts.l2_loss
 
     if False:
         DATASET_NAME = 'nydata'
-        exclude_rbc = 1
+        exclude_rbc = 0
         exclude_tql = 1
-        exclude_sac = 0
+        exclude_sac = 1
         demonstrators_count = 1
-        building_count = 1
+        building_count = 2
         episodes = 2
+        discount = 0.99
         seed = 2
         active_observations = ['renewable_energy_produced']
         batch_size = 256
         autotune_entropy = True
+        clip_gradient = False
+        kaiming_initialization = False
+        l2_loss = True
 
-    train(DATASET_NAME, seed, building_count, demonstrators_count, episodes, active_observations, batch_size,
-          autotune_entropy, exclude_tql, exclude_rbc, exclude_sac)
+    train(dataset_name=DATASET_NAME, random_seed=seed, building_count=building_count,
+          demonstrators_count=demonstrators_count, episodes=episodes, discount=discount,
+          active_observations=active_observations, batch_size=batch_size, autotune_entropy=autotune_entropy,
+          clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
+          exclude_tql=exclude_tql, exclude_rbc=exclude_rbc, exclude_sac=exclude_sac)
 
     # get the end time
     et = time.time()

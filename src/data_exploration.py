@@ -11,24 +11,31 @@ from mpl_toolkits.basemap import Basemap
 
 from utils import save_multi_image
 
-save = True
+save = False
 challenge_data = False
-ny_data = False
+ny_data = True
+timestamp = datetime.now().strftime("%Y%m%dT%H%M%S")
+
+def create_scatter_plot(ax, x,y):
+    ax.scatter(x, y, s=1)
+    m, b = np.polyfit(x, y, 1)
+    ax.plot(x, m * x + b, color='green')
+
 
 ##################################################
 # DATA CITYLEARN CHALLENGE 2022
 ##################################################
 
 if challenge_data:
-    weather = pd.read_csv('citylearn/data/test/weather.csv')
+    weather = pd.read_csv('citylearn/data/citylearn_challenge_2022_phase_all/weather.csv')
 
     # normalize carbon intensity between 0 and 1
-    carbon_intensity = pd.read_csv('citylearn/data/test/carbon_intensity.csv')['kg_CO2/kWh']
+    carbon_intensity = pd.read_csv('citylearn/data/citylearn_challenge_2022_phase_all/carbon_intensity.csv')['kg_CO2/kWh']
     carbon_intensity = (carbon_intensity - np.min(carbon_intensity)) / (
                 np.max(carbon_intensity) - np.min(carbon_intensity))
 
     # normalize prices between 0 and 1
-    pricing = pd.read_csv('citylearn/data/test/pricing.csv')['Electricity Pricing [$]']
+    pricing = pd.read_csv('citylearn/data/citylearn_challenge_2022_phase_all/pricing.csv')['Electricity Pricing [$]']
     # pricing = (pricing - np.min(pricing)) / (np.max(pricing) - np.min(pricing))
 
     # normalize direct solar radiation between 0 and 1
@@ -50,13 +57,13 @@ if challenge_data:
     ax1.set_ylabel('Values')
 
     fig2, ax2 = plt.subplots()
-    ax2.scatter(carbon_intensity, direct_solar, s=1)
-    ax2.set_title('Carbon intensity vs. direct solar radiation')
-    ax2.set_xlabel('Carbon intensity [$kg_CO2/kWh$]')
-    ax2.set_ylabel('Direct solar radiation [$W/M^2$]')
+    create_scatter_plot(ax2, direct_solar, carbon_intensity)
+    ax2.set_title('Direct solar radiation vs. carbon intensity')
+    ax2.set_ylabel('Carbon intensity [$kg_CO2/kWh$]')
+    ax2.set_xlabel('Direct solar radiation [$W/M^2$]')
 
     fig5, ax5 = plt.subplots()
-    ax5.scatter(direct_solar, diffuse_solar, s=1)
+    create_scatter_plot(ax5, direct_solar, diffuse_solar)
     ax5.set_title('Diffuse solar radiation vs. direct solar radiation')
     ax5.set_xlabel('Diffuse solar radiation [$W/M^2$]')
     ax5.set_ylabel('Direct solar radiation [$W/M^2$]')
@@ -65,23 +72,13 @@ if challenge_data:
     ax1.plot(xs[:168], pricing[0:168])
     ax1.set_title('Electricity Pricing of one week')
     ax1.set_ylabel('Electricity Price [$]')
-    ticks = pd.Series(pd.date_range(start=f'2021-01-01', end=f'2021-01-01 23:00:00', freq='H')).dt.time.astype(
-        str).tolist() * 7
-    ticks = ['Mo'] * 24
-    ticks.extend(['Tue'] * 24)
-    ticks.extend(['Wed'] * 24)
-    ticks.extend(['Thur'] * 24)
-    ticks.extend(['Fri'] * 24)
-    ticks.extend(['Sat'] * 24)
-    ticks.extend(['Sun'] * 24)
     ax1.set_xticks(np.arange(0, len(ticks)))
     ax1.xaxis.set_tick_params(length=0)
     ax1.set_xticklabels(ticks, rotation=0)
     [l.set_visible(False) for (i, l) in enumerate(ax1.get_xticklabels()) if (i - 18) % 24 != 0]
 
     if save:
-        filename = "../datasets/data_exploration_plots/citylearn-challenge-2022-plots_" + datetime.now().strftime(
-            "%Y%m%dT%H%M%S")
+        filename = "../datasets/data_exploration_plots/citylearn-challenge-2022-plots_" + timestamp
         save_multi_image(filename)
     else:
         plt.show()
@@ -114,19 +111,19 @@ if ny_data:
     joined = pd.merge(fuel, ny_weather, on='Time Stamp', sort=True)
 
     fig, ax = plt.subplots()
-    ax.scatter(joined['Wind Speed'], joined['Wind'], s=1)
+    create_scatter_plot(ax, joined['Wind Speed'], joined['Wind'])
     ax.set_title('Wind energy vs. wind speed')
     ax.set_ylabel('Wind energy [$MW$]')
     ax.set_xlabel('Wind speed [$m/s$]')
 
     fig, ax = plt.subplots()
-    ax.scatter(joined['DHI'], joined['Other Renewables'], s=1)
+    create_scatter_plot(ax, joined['DHI'], joined['Other Renewables'])
     ax.set_title('Other renewables energy vs. DHI')
     ax.set_ylabel('Other renewables energy [$MW$]')
     ax.set_xlabel('DHI [$W/m^2$]')
 
     fig, ax = plt.subplots()
-    ax.scatter(joined['DNI'], joined['Other Renewables'], s=1)
+    create_scatter_plot(ax, joined['DNI'], joined['Other Renewables'])
     ax.set_title('Other renewables energy vs. DNI')
     ax.set_ylabel('Other renewables energy [$MW$]')
     ax.set_xlabel('DNI [$W/m^2$]')
@@ -167,19 +164,19 @@ if ny_data:
     joined = pd.merge(fuel, ny_weather_mean, on='Time Stamp', sort=True)
 
     fig, ax = plt.subplots()
-    ax.scatter(joined['Wind Speed'], joined['Wind'], s=1)
+    create_scatter_plot(ax, joined['Wind Speed'], joined['Wind'])
     ax.set_title('Wind energy vs. wind speed (8 measure locs median)')
     ax.set_ylabel('Wind energy [$MW$]')
     ax.set_xlabel('Wind speed [$m/s$]')
 
     fig, ax = plt.subplots()
-    ax.scatter(joined['DHI'], joined['Other Renewables'], s=1)
+    create_scatter_plot(ax, joined['DHI'], joined['Other Renewables'])
     ax.set_title('Other renewables energy vs. DHI (8 measure locs median)')
     ax.set_ylabel('Other renewables energy [$MW$]')
     ax.set_xlabel('DHI [$W/m^2$]')
 
     fig, ax = plt.subplots()
-    ax.scatter(joined['DNI'], joined['Other Renewables'], s=1)
+    create_scatter_plot(ax, joined['DNI'], joined['Other Renewables'])
     ax.set_title('Other renewables energy vs. DNI (8 measure locs median)')
     ax.set_ylabel('Other renewables energy [$MW$]')
     ax.set_xlabel('DNI [$W/m^2$]')
@@ -211,11 +208,11 @@ if ny_data:
     ax.set_xlabel('Time step')
 
     print(f'Min Renewable %: {percent.min()}')
-    print(f'Max Renewable %: {percent.max()}')
+    print(f'Mean Renewable %: {percent.mean()}')
+    print(f'Median Renewable %: {np.median(percent)}')
 
     if save:
-        filename = "../datasets/data_exploration_plots/ny-data-plots_" + datetime.now().strftime(
-            "%Y%m%dT%H%M%S")
+        filename = "../datasets/data_exploration_plots/ny-data-plots_" + timestamp
         save_multi_image(filename)
     else:
         plt.show()
@@ -223,39 +220,40 @@ if ny_data:
 ##################################################
 # ORIGINAL WEATHER DATA
 ##################################################
-weather_orig = pd.read_csv('citylearn/data/citylearn_challenge_2022_phase_all/weather.csv')
-dhi = np.array(weather_orig['Diffuse Solar Radiation [W/m2]'])
-dni = np.array(weather_orig['Direct Solar Radiation [W/m2]'])
+if challenge_data:
+    weather_orig = pd.read_csv('citylearn/data/citylearn_challenge_2022_phase_all/weather.csv')
+    dhi = np.array(weather_orig['Diffuse Solar Radiation [W/m2]'])
+    dni = np.array(weather_orig['Direct Solar Radiation [W/m2]'])
 
-# Correlation DHI - Solar generation B1
-solar_generation = np.array(
-    pd.read_csv('citylearn/data/citylearn_challenge_2022_phase_all/Building_1.csv')['Solar Generation [W/kW]'])
-fig, ax = plt.subplots()
-ax.scatter(dhi, solar_generation, s=1)
-ax.set_title('Solar generation Building 1 vs. DHI (original data)')
-ax.set_ylabel('Solar generation [$W/kW$]')
-ax.set_xlabel('DHI [$W/m^2$]')
+    # Correlation DHI - Solar generation B1
+    solar_generation = np.array(
+        pd.read_csv('citylearn/data/citylearn_challenge_2022_phase_all/Building_1.csv')['Solar Generation [W/kW]'])
+    fig, ax = plt.subplots()
+    create_scatter_plot(ax, dhi, solar_generation)
+    ax.set_title('Solar generation Building 1 vs. DHI (original data)')
+    ax.set_ylabel('Solar generation [$W/kW$]')
+    ax.set_xlabel('DHI [$W/m^2$]')
 
-fig, ax = plt.subplots()
-ax.scatter(dni, solar_generation, s=1)
-ax.set_title('Solar generation Building 1 vs. DNI (original data)')
-ax.set_ylabel('Solar generation [$W/kW$]')
-ax.set_xlabel('DNI [$W/m^2$]')
+    fig, ax = plt.subplots()
+    create_scatter_plot(ax, dni, solar_generation)
+    ax.set_title('Solar generation Building 1 vs. DNI (original data)')
+    ax.set_ylabel('Solar generation [$W/kW$]')
+    ax.set_xlabel('DNI [$W/m^2$]')
 
-# Correlation DHI - Solar generation B6
-solar_generation = np.array(
-    pd.read_csv('citylearn/data/citylearn_challenge_2022_phase_all/Building_6.csv')['Solar Generation [W/kW]'])
-fig, ax = plt.subplots()
-ax.scatter(dhi, solar_generation, s=1)
-ax.set_title('Solar generation Building 6 vs. DHI (original data)')
-ax.set_ylabel('Solar generation [$W/kW$]')
-ax.set_xlabel('DHI [$W/m^2$]')
+    # Correlation DHI - Solar generation B6
+    solar_generation = np.array(
+        pd.read_csv('citylearn/data/citylearn_challenge_2022_phase_all/Building_6.csv')['Solar Generation [W/kW]'])
+    fig, ax = plt.subplots()
+    create_scatter_plot(ax, dhi, solar_generation)
+    ax.set_title('Solar generation Building 6 vs. DHI (original data)')
+    ax.set_ylabel('Solar generation [$W/kW$]')
+    ax.set_xlabel('DHI [$W/m^2$]')
 
-fig, ax = plt.subplots()
-ax.scatter(dni, solar_generation, s=1)
-ax.set_title('Solar generation Building 6 vs. DNI (original data)')
-ax.set_ylabel('Solar generation [$W/kW$]')
-ax.set_xlabel('DNI [$W/m^2$]')
+    fig, ax = plt.subplots()
+    create_scatter_plot(ax, dni, solar_generation)
+    ax.set_title('Solar generation Building 6 vs. DNI (original data)')
+    ax.set_ylabel('Solar generation [$W/kW$]')
+    ax.set_xlabel('DNI [$W/m^2$]')
 
 ##################################################
 # PREPROCESSED NY WEATHER DATA
@@ -264,33 +262,34 @@ ny_weather_prep = pd.read_csv('citylearn/data/nydata/weather.csv')
 dhi = np.array(ny_weather_prep['Diffuse Solar Radiation [W/m2]'])
 dni = np.array(ny_weather_prep['Direct Solar Radiation [W/m2]'])
 
-# Correlation DHI - Solar generation B1
-solar_generation = np.array(pd.read_csv('citylearn/data/nydata/Building_1.csv')['Solar Generation [W/kW]'])
-fig, ax = plt.subplots()
-ax.scatter(dhi, solar_generation, s=1)
-ax.set_title('Solar generation Building 1 vs. DHI (NY data)')
-ax.set_ylabel('Solar generation [$W/kW$]')
-ax.set_xlabel('DHI [$W/m^2$]')
+if challenge_data:
+    # Correlation DHI - Solar generation B1
+    solar_generation = np.array(pd.read_csv('citylearn/data/nydata/Building_1.csv')['Solar Generation [W/kW]'])
+    fig, ax = plt.subplots()
+    create_scatter_plot(ax, dhi, solar_generation)
+    ax.set_title('Solar generation Building 1 vs. DHI (NY data)')
+    ax.set_ylabel('Solar generation [$W/kW$]')
+    ax.set_xlabel('DHI [$W/m^2$]')
 
-fig, ax = plt.subplots()
-ax.scatter(dni, solar_generation, s=1)
-ax.set_title('Solar generation Building 1 vs. DNI (NY data)')
-ax.set_ylabel('Solar generation [$W/kW$]')
-ax.set_xlabel('DNI [$W/m^2$]')
+    fig, ax = plt.subplots()
+    create_scatter_plot(ax, dni, solar_generation)
+    ax.set_title('Solar generation Building 1 vs. DNI (NY data)')
+    ax.set_ylabel('Solar generation [$W/kW$]')
+    ax.set_xlabel('DNI [$W/m^2$]')
 
-# Correlation DHI - Solar generation B6
-solar_generation = np.array(pd.read_csv('citylearn/data/nydata/Building_6.csv')['Solar Generation [W/kW]'])
-fig, ax = plt.subplots()
-ax.scatter(dhi, solar_generation, s=1)
-ax.set_title('Solar generation Building 6 vs. DHI (NY data)')
-ax.set_ylabel('Solar generation [$W/kW$]')
-ax.set_xlabel('DHI [$W/m^2$]')
+    # Correlation DHI - Solar generation B6
+    solar_generation = np.array(pd.read_csv('citylearn/data/nydata/Building_6.csv')['Solar Generation [W/kW]'])
+    fig, ax = plt.subplots()
+    create_scatter_plot(ax, dhi, solar_generation)
+    ax.set_title('Solar generation Building 6 vs. DHI (NY data)')
+    ax.set_ylabel('Solar generation [$W/kW$]')
+    ax.set_xlabel('DHI [$W/m^2$]')
 
-fig, ax = plt.subplots()
-ax.scatter(dni, solar_generation, s=1)
-ax.set_title('Solar generation Building 6 vs. DNI (NY data)')
-ax.set_ylabel('Solar generation [$W/kW$]')
-ax.set_xlabel('DNI [$W/m^2$]')
+    fig, ax = plt.subplots()
+    create_scatter_plot(ax, dni, solar_generation)
+    ax.set_title('Solar generation Building 6 vs. DNI (NY data)')
+    ax.set_ylabel('Solar generation [$W/kW$]')
+    ax.set_xlabel('DNI [$W/m^2$]')
 
 ##################################################
 # PREPROCESSED NY WEATHER DATA OWN BUILDINGS
@@ -301,31 +300,68 @@ dni = np.array(ny_weather_prep['Direct Solar Radiation [W/m2]'])
 
 # Correlation DHI - Solar generation B1
 solar_generation = np.array(
-    pd.read_csv('citylearn/data/nydata_new_buildings/Building_1.csv')['Solar Generation [W/kW]'])
+    pd.read_csv('citylearn/data/nydata_new_buildings2/Building_1.csv')['Solar Generation [W/kW]'])
 fig, ax = plt.subplots()
-ax.scatter(dhi, solar_generation, s=1)
-ax.set_title('Solar generation Building 1 vs. DHI (NY data, own buildings)')
+create_scatter_plot(ax, dhi, solar_generation)
+ax.set_title('Solar generation Building 1 vs. DHI (NY data, own buildings2)')
 ax.set_ylabel('Solar generation [$W/kW$]')
 ax.set_xlabel('DHI [$W/m^2$]')
 
 fig, ax = plt.subplots()
-ax.scatter(dni, solar_generation, s=1)
-ax.set_title('Solar generation Building 1 vs. DNI (NY data, own buildings)')
+create_scatter_plot(ax, dni, solar_generation)
+ax.set_title('Solar generation Building 1 vs. DNI (NY data, own buildings2)')
 ax.set_ylabel('Solar generation [$W/kW$]')
 ax.set_xlabel('DNI [$W/m^2$]')
 
 # Correlation DHI - Solar generation B6
 solar_generation = np.array(
-    pd.read_csv('citylearn/data/nydata_new_buildings/Building_6.csv')['Solar Generation [W/kW]'])
+    pd.read_csv('citylearn/data/nydata_new_buildings2/Building_6.csv')['Solar Generation [W/kW]'])
 fig, ax = plt.subplots()
-ax.scatter(dhi, solar_generation, s=1)
-ax.set_title('Solar generation Building 6 vs. DHI (NY data, own buildings)')
+create_scatter_plot(ax, dhi, solar_generation)
+ax.set_title('Solar generation Building 6 vs. DHI (NY data, own buildings2)')
 ax.set_ylabel('Solar generation [$W/kW$]')
 ax.set_xlabel('DHI [$W/m^2$]')
 
 fig, ax = plt.subplots()
-ax.scatter(dni, solar_generation, s=1)
-ax.set_title('Solar generation Building 6 vs. DNI (NY data, own buildings)')
+create_scatter_plot(ax, dni, solar_generation)
+ax.set_title('Solar generation Building 6 vs. DNI (NY data, own buildings2)')
+ax.set_ylabel('Solar generation [$W/kW$]')
+ax.set_xlabel('DNI [$W/m^2$]')
+
+##################################################
+# PREPROCESSED NY WEATHER DATA 8 LOCS OWN BUILDINGS
+##################################################
+ny_weather_prep = pd.read_csv('citylearn/data/nydata/weather_8locs_median.csv')
+dhi = np.array(ny_weather_prep['Diffuse Solar Radiation [W/m2]'])
+dni = np.array(ny_weather_prep['Direct Solar Radiation [W/m2]'])
+
+# Correlation DHI - Solar generation B1
+solar_generation = np.array(
+    pd.read_csv('citylearn/data/nydata_new_buildings2/Building_1.csv')['Solar Generation [W/kW]'])
+fig, ax = plt.subplots()
+create_scatter_plot(ax, dhi, solar_generation)
+ax.set_title('Solar generation Building 1 vs. DHI (NY data 8 locs median, own buildings2)')
+ax.set_ylabel('Solar generation [$W/kW$]')
+ax.set_xlabel('DHI [$W/m^2$]')
+
+fig, ax = plt.subplots()
+create_scatter_plot(ax, dni, solar_generation)
+ax.set_title('Solar generation Building 1 vs. DNI (NY data 8 locs median, own buildings2)')
+ax.set_ylabel('Solar generation [$W/kW$]')
+ax.set_xlabel('DNI [$W/m^2$]')
+
+# Correlation DHI - Solar generation B6
+solar_generation = np.array(
+    pd.read_csv('citylearn/data/nydata_new_buildings2/Building_6.csv')['Solar Generation [W/kW]'])
+fig, ax = plt.subplots()
+create_scatter_plot(ax, dhi, solar_generation)
+ax.set_title('Solar generation Building 6 vs. DHI (NY data 8 locs median, own buildings2)')
+ax.set_ylabel('Solar generation [$W/kW$]')
+ax.set_xlabel('DHI [$W/m^2$]')
+
+fig, ax = plt.subplots()
+create_scatter_plot(ax, dni, solar_generation)
+ax.set_title('Solar generation Building 6 vs. DNI (NY data 8 locs median, own buildings2)')
 ax.set_ylabel('Solar generation [$W/kW$]')
 ax.set_xlabel('DNI [$W/m^2$]')
 
@@ -365,8 +401,7 @@ ax.set_ylabel('PV production [W/kW]')
 ax.legend()
 
 if save:
-    filename = "../datasets/data_exploration_plots/buildings-pv-production-plots_" + datetime.now().strftime(
-        "%Y%m%dT%H%M%S")
+    filename = "../datasets/data_exploration_plots/buildings-pv-production-plots_" + timestamp
     save_multi_image(filename)
 else:
     plt.show()
@@ -374,6 +409,15 @@ else:
 ##################################################
 # PRICING DATA
 ##################################################
+ticks = pd.Series(pd.date_range(start=f'2021-01-01', end=f'2021-01-01 23:00:00', freq='H')).dt.time.astype(
+        str).tolist() * 7
+ticks = ['Mo'] * 24
+ticks.extend(['Tue'] * 24)
+ticks.extend(['Wed'] * 24)
+ticks.extend(['Thur'] * 24)
+ticks.extend(['Fri'] * 24)
+ticks.extend(['Sat'] * 24)
+ticks.extend(['Sun'] * 24)
 
 pricing_new = pd.read_csv('citylearn/data/nydata/pricing.csv')['Electricity Pricing [$]']
 
@@ -381,8 +425,20 @@ fossil_share = 1 - fuel_mix['Renewable Share']
 alpha = 20
 pricing_new = pricing_new + alpha * fossil_share
 
+hours = []
+h = 1
+for i in range(len(pricing_new)):
+    hours.append(h)
+    h+=1
+    if h == 25:
+        h=1
+hours = np.array(hours)
+fig, ax = plt.subplots()
+create_scatter_plot(ax, hours, pricing_new)
+
 # normalize between 0 and 1
 pricing_new = (pricing_new - np.min(pricing_new)) / (np.max(pricing_new) - np.min(pricing_new))
+pricing = pd.read_csv('citylearn/data/citylearn_challenge_2022_phase_all/pricing.csv')['Electricity Pricing [$]']
 
 fig, ax = plt.subplots()
 ax.plot(np.arange(len(pricing_new)), pricing_new)
@@ -402,28 +458,28 @@ ax.legend()
 [l.set_visible(False) for (i, l) in enumerate(ax.get_xticklabels()) if (i - 18) % 24 != 0]
 
 fig, ax = plt.subplots()
-ax.scatter(fuel_mix['Renewable Share'], pricing_new, s=1)
+create_scatter_plot(ax, fuel_mix['Renewable Share'], pricing_new)
 ax.set_title('Weighted electricity price vs. renewable share')
 ax.set_xlabel('Renewable Share')
 ax.set_ylabel('Weighted electricity price [$]')
 
 solar_generation = np.array(pd.read_csv('citylearn/data/nydata/Building_1.csv')['Solar Generation [W/kW]'])
 fig, ax = plt.subplots()
-ax.scatter(solar_generation, pricing_new, s=1)
+create_scatter_plot(ax, solar_generation, pricing_new)
 ax.set_title('Weighted electricity price vs. solar generation B1 (NY data)')
 ax.set_xlabel('Solar Generation of Building 1 [$W/kW$]')
 ax.set_ylabel('Weighted electricity price [$]')
 
 solar_generation = np.array(
-    pd.read_csv('citylearn/data/nydata_new_buildings/Building_1.csv')['Solar Generation [W/kW]'])
+    pd.read_csv('citylearn/data/nydata_new_buildings2/Building_1.csv')['Solar Generation [W/kW]'])
 fig, ax = plt.subplots()
-ax.scatter(solar_generation, pricing_new, s=1)
-ax.set_title('Weighted electricity price vs. solar generation B1 (NY data, own buildings)')
+create_scatter_plot(ax, solar_generation, pricing_new)
+ax.set_title('Weighted electricity price vs. solar generation B1 (NY data, own buildings2)')
 ax.set_xlabel('Solar Generation of Building 1 [$W/kW$]')
 ax.set_ylabel('Weighted electricity price [$]')
 
 if save:
-    filename = "../datasets/data_exploration_plots/pricing-plots_" + datetime.now().strftime("%Y%m%dT%H%M%S")
+    filename = "../datasets/data_exploration_plots/pricing-plots_" + timestamp
     save_multi_image(filename)
 else:
     plt.show()
