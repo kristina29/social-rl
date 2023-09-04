@@ -20,12 +20,11 @@ if __name__ == '__main__':
         agent = parser.agent
 
     if True:
-        experiment_dirs = ['16_weather_8locs/standard_buildings',
-                           '26_l2loss/old_buildings',
-                           '16_weather_8locs/new_buildings2',
-                           '26_l2loss/new_buildings2']
-        ref_dirs = ['16_weather_8locs/standard_buildings',
-                    '16_weather_8locs/new_buildings2']
+        experiment_dirs = ['26_l2loss/new_buildings2',
+                           '27_discount/l2_loss/98',
+                           '27_discount/l2_loss/97',
+                           '27_discount/l2_loss/96',]
+        ref_dirs = ['26_l2loss/new_buildings2']
         n_refs = len(ref_dirs)
         length = 1/n_refs
         agentdir = 'SAC_DB2'

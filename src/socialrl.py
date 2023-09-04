@@ -117,7 +117,7 @@ if __name__ == '__main__':
     kaiming_initialization = opts.kaiming
     l2_loss = opts.l2_loss
 
-    if True:
+    if False:
         DATASET_NAME = 'nydata'
         exclude_rbc = 0
         exclude_tql = 1
@@ -127,7 +127,7 @@ if __name__ == '__main__':
         episodes = 2
         discount = 0.99
         seed = 2
-        active_observations = ['renewable_energy_produced', 'hour']
+        active_observations = ['renewable_energy_produced']
         batch_size = 256
         autotune_entropy = True
         clip_gradient = False
