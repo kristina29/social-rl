@@ -80,7 +80,7 @@ def get_predictions(values: Iterable[float]) -> dict:
 
         Parameters
         -----c-----
-        values: Iterable[String]
+        values: Iterable[float]
             Values for which the predictions will be generated.
     """
 
