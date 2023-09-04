@@ -88,7 +88,7 @@ def train_sacdb2(schema, episodes, random_seed, batch_size, discount, autotune_e
     env = CityLearnEnv(schema)
     sacdb2_model = SACDB2(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
                           clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
-                          discount=discount)
+                          discount=discount, start_training_time_step=1, end_exploration_time_step=7000)
     losses, rewards = sacdb2_model.learn(episodes=episodes, deterministic_finish=True)
 
     print('SAC DB2 model trained!')
@@ -127,7 +127,7 @@ if __name__ == '__main__':
         episodes = 2
         discount = 0.99
         seed = 2
-        active_observations = ['renewable_energy_produced']
+        active_observations = ['electricity_pricing', 'hour']
         batch_size = 256
         autotune_entropy = True
         clip_gradient = False

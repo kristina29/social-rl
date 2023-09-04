@@ -302,7 +302,7 @@ class SAC(RLC):
         internal_observation_count = 0 if internal_observation_count is None else internal_observation_count
 
         for i in range(len(self.action_dimension)):
-            observation_dimension = self.observation_dimension[i] + internal_observation_count
+            observation_dimension = self.observation_dimension[i] + internal_observation_count #1
             # init networks
             self.soft_q_net1[i] = SoftQNetwork(observation_dimension, self.action_dimension[i],
                                                self.hidden_dimension, self.kaiming_initialization).to(self.device)

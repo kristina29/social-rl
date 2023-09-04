@@ -254,6 +254,7 @@ class RLC(Agent):
 
                 else:
                     e.append(Normalize(s.low[i], s.high[i]))
+                    #e.append(Normalize(0, 5))
 
             encoders.append(e)
 
