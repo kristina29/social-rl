@@ -117,8 +117,8 @@ if __name__ == '__main__':
     kaiming_initialization = opts.kaiming
     l2_loss = opts.l2_loss
 
-    if False:
-        DATASET_NAME = 'nydata'
+    if True:
+        DATASET_NAME = 'testenv'
         exclude_rbc = 0
         exclude_tql = 1
         exclude_sac = 1
