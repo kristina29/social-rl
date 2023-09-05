@@ -14,8 +14,8 @@ if __name__ == '__main__':
                                     'DHW Heating [kWh]', 'Cooling Load [kWh]', 'Heating Load [kWh]',
                                     'Solar Generation [W/kW]'])
 
-    pricing.loc[pricing['Hour'].isin([6, 7, 8]), 'Electricity Pricing [$]'] = 0.
-    pricing.loc[pricing['Hour'].isin([1, 2, 3, 4, 5, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+    pricing.loc[pricing['Hour'].isin([1, 2, 3, 4, 5, 6, 7, 8]), 'Electricity Pricing [$]'] = 0.
+    pricing.loc[pricing['Hour'].isin([9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
                                       24]), 'Electricity Pricing [$]'] = 300.
 
     predictions = get_predictions(pricing['Electricity Pricing [$]'])
