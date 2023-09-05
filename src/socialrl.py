@@ -1,14 +1,11 @@
 import time
 
-from datetime import datetime
-
 from citylearn.agents.db2_sac import SACDB2
 from citylearn.citylearn import CityLearnEnv
 from citylearn.data import DataSet
 from citylearn.utilities import get_active_parts
 from options import parseOptions_social
-from utils import set_schema_buildings, set_active_observations, plot_simulation_summary, set_schema_demonstrators, \
-    save_kpis, save_results
+from utils import set_schema_buildings, set_active_observations, set_schema_demonstrators, save_results
 from nonsocialrl import train_tql, train_rbc, train_sac
 
 
