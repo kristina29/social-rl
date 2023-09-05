@@ -1,14 +1,11 @@
 import time
 
-from datetime import datetime
-
 from citylearn.agents.db2_sac import SACDB2
 from citylearn.citylearn import CityLearnEnv
 from citylearn.data import DataSet
 from citylearn.utilities import get_active_parts
 from options import parseOptions_social
-from utils import set_schema_buildings, set_active_observations, plot_simulation_summary, set_schema_demonstrators, \
-    save_kpis, save_results
+from utils import set_schema_buildings, set_active_observations, set_schema_demonstrators, save_results
 from nonsocialrl import train_tql, train_rbc, train_sac
 
 
@@ -88,7 +85,8 @@ def train_sacdb2(schema, episodes, random_seed, batch_size, discount, autotune_e
     env = CityLearnEnv(schema)
     sacdb2_model = SACDB2(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
                           clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
-                          discount=discount)
+                          discount=discount)#,
+                          #start_training_time_step=1, end_exploration_time_step=7000)
     losses, rewards = sacdb2_model.learn(episodes=episodes, deterministic_finish=True)
 
     print('SAC DB2 model trained!')

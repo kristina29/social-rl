@@ -1,16 +1,17 @@
 import math
 import os
 import pickle
-from typing import Tuple, List, Mapping, Iterable
+from typing import Tuple, List, Mapping
 from datetime import datetime
 
 import numpy as np
 import pandas as pd
+
+from citylearn.building import Building
 from matplotlib.backends.backend_pdf import PdfPages
 
 from citylearn.citylearn import CityLearnEnv
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
 import seaborn as sns
 
 from citylearn.utilities import get_active_parts
@@ -478,6 +479,18 @@ def plot_district_load_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
     return fig
 
 
+def get_possible_battery_input(building: Building, excluded_used_pv: bool) -> np.ndarray:
+    ec = np.array(building.electrical_storage.capacity_history)
+    es = np.array(building.electrical_storage.soc)
+    battery_input = np.minimum(np.clip((ec - es), 0., None), building.electrical_storage.get_max_input_power())
+
+    if excluded_used_pv:
+        return battery_input + building.net_electricity_consumption_without_storage_and_pv
+    else:
+        return np.maximum(battery_input + building.net_electricity_consumption_without_storage_and_pv -
+                          building.solar_generation*-1, 0.)
+
+
 def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> plt.Figure:
     """Plots renewable share KPIs over time for different control agents.
 
@@ -487,7 +500,7 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
         Mapping of user-defined control agent names to environments
         the agents have been used to control.
     grid: bool
-        Indicates if renewable share only from grid or total (including building PVs) should be plottet
+        Indicates if renewable share only from grid or total (including building PVs) should be plotte
 
     Returns
     -------
@@ -502,38 +515,27 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
         if grid:
             could_used = 0
             for b in v.buildings:
-                e = np.array(b.net_electricity_consumption)
-                ec = np.array(b.electrical_storage.capacity_history)
-                es = np.array(b.electrical_storage.soc)
-                could_used += (ec - es) + np.clip(e, 0., None) - np.clip(b.electrical_storage_electricity_consumption,
-                                                                         0., None)
-            could_have_used = (v.buildings[0].fuel_mix.renewable_energy_produced / could_used).clip(None, 1.)
-            used = (v.net_renewable_electricity_grid_consumption / could_used).clip(None, 1.)
+                could_used += get_possible_battery_input(b, excluded_used_pv=False)
+
+            could_have_used = np.minimum(v.buildings[0].fuel_mix.renewable_energy_produced,
+                                         could_used)
+            used = v.net_renewable_electricity_grid_consumption
             y = running_mean(used / could_have_used, 160)
         else:
             could_used = 0
+            solar_could_used = 0
             for b in v.buildings:
-                e = np.array(b.net_electricity_consumption)
-                ec = np.array(b.electrical_storage.capacity_history)
-                es = np.array(b.electrical_storage.soc)
-                could_used += (ec-es) + np.clip(e, 0., None) - np.clip(b.electrical_storage_electricity_consumption, 0., None)
-            could_have_used = ((v.buildings[0].fuel_mix.renewable_energy_produced+v.solar_generation*-1)/could_used).clip(None, 1.)
-            used = (v.net_renewable_electricity_consumption/could_used).clip(None, 1.)
+                b_demand = get_possible_battery_input(b, excluded_used_pv=True)
+                could_used += b_demand
+                solar_could_used += np.minimum(b.solar_generation * -1, b_demand)
+
+            could_have_used = np.minimum(v.buildings[0].fuel_mix.renewable_energy_produced+solar_could_used,
+                                         could_used)
+            used = v.net_renewable_electricity_consumption
             y = running_mean(used/could_have_used, 160)
         x = range(len(y))
         ax.plot(x, y, label=k)
         ax.set_ylim(0, 1)
-
-    if grid:
-        y = running_mean(
-            v.net_renewable_electricity_grid_share_without_storage/v.buildings[0].fuel_mix.renewable_energy_share, 160)
-    else:
-        y = running_mean(
-            v.net_renewable_electricity_share_without_storage/v.buildings[0].fuel_mix.renewable_energy_share, 160)
-    # ax.plot(x, y, label='Baseline')
-
-    # available_renewable_share = running_mean(v.buildings[0].fuel_mix.renewable_energy_share, 160)
-    # ax.plot(x, available_renewable_share, label='Available renewable share')
 
     ax.set_xlabel('Time')
     ax.set_ylabel('%')
@@ -541,12 +543,61 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
     ax.legend(loc='upper left', bbox_to_anchor=(1.0, 1.0), framealpha=0.0)
 
     if grid:
-        title = 'District-level renewable energy share grid /  available share'
+        title = 'District-level used renewable energy grid / available'
     else:
-        title = 'District-level renewable energy share /  available share'
+        title = 'District-level used renewable energy /  available'
     fig.suptitle(title, fontsize=14)
     plt.tight_layout()
     return fig
+
+
+def plot_used_pv_share(envs: Mapping[str, CityLearnEnv]) -> List[plt.Figure]:
+    """Plots used PV over time for each building for different control agents.
+
+    Parameters
+    ----------
+    envs: Mapping[str, CityLearnEnv]
+        Mapping of user-defined control agent names to environments
+        the agents have been used to control.
+
+    Returns
+    -------
+    figs: List[plt.Figure]
+        Figures containing plotted axes.
+    """
+
+    figs = []
+
+    for i in range(len(next(iter(envs.values())).buildings)):
+        fig, ax = plt.subplots(1, 1)
+        for k, v in envs.items():
+            b = v.buildings[i]
+
+            could_used = get_possible_battery_input(b, excluded_used_pv=True)
+
+            could_have_used = np.minimum(b.solar_generation * -1, could_used)
+            no_generation = np.where(b.solar_generation == 0)[0]
+            could_have_used[no_generation] = 1. # prevent errors
+
+            used = b.used_pv_electricity
+
+            share = used / could_have_used
+            share[no_generation] = np.nan
+
+            y = running_mean(share, 160)
+            x = range(len(y))
+            ax.plot(x, y, label=k)
+            ax.set_ylim(0, 1)
+
+        ax.set_xlabel('Time')
+        ax.set_ylabel('%')
+        ax.xaxis.set_tick_params(length=0)
+        ax.legend(loc='upper left', bbox_to_anchor=(1.0, 1.0), framealpha=0.0)
+        fig.suptitle(f'Used PV /  available share (Building {b.name})', fontsize=14)
+        plt.tight_layout()
+        figs.append(fig)
+
+    return figs
 
 
 def plot_battery_soc_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
@@ -672,7 +723,7 @@ def plot_losses(losses: Mapping[str, Mapping[int, Mapping[str, List[float]]]],
 
 
 def running_mean(x, N):
-    cumsum = np.cumsum(np.insert(x, 0, 0))
+    cumsum = np.nancumsum(np.insert(x, 0, 0))
     return (cumsum[N:] - cumsum[:-N]) / float(N)
 
 
@@ -713,6 +764,7 @@ def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], losses: Mapping[st
     plot_district_load_profiles(envs)
     plot_renewable_share(envs)
     plot_renewable_share(envs, grid=True)
+    plot_used_pv_share(envs)
     plot_losses(losses, envs)
     plot_rewards(rewards, envs)
 

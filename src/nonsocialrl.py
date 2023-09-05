@@ -118,7 +118,8 @@ def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entr
     env = CityLearnEnv(schema)
     sac_model = SAC(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
                     clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
-                    discount=discount)
+                    discount=discount) #,
+                    #start_training_time_step=1, end_exploration_time_step=7000)
     losses, rewards = sac_model.learn(episodes=episodes, deterministic_finish=True)
 
     print('SAC model trained!')
