@@ -478,7 +478,7 @@ def plot_district_load_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
     return fig
 
 
-def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> plt.Figure:
+def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False, pv: bool=False) -> plt.Figure:
     """Plots renewable share KPIs over time for different control agents.
 
     Parameters
@@ -488,6 +488,8 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
         the agents have been used to control.
     grid: bool
         Indicates if renewable share only from grid or total (including building PVs) should be plottet
+    pv: bool
+        Indicates if renewable share only from PV or total (including grid) should be plottet
 
     Returns
     -------
@@ -499,41 +501,33 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
     fig, ax = plt.subplots(1, 1)#, figsize=figsize)
 
     for k, v in envs.items():
+        could_used = 0
+        for b in v.buildings:
+            e = np.array(b.net_electricity_consumption)
+            ec = np.array(b.electrical_storage.capacity_history)
+            es = np.array(b.electrical_storage.soc)
+            could_used += np.clip((ec - es), 0., None) + np.clip(np.clip(e, 0., None) - np.clip(
+                b.electrical_storage_electricity_consumption, 0., None), 0., None)
+
         if grid:
-            could_used = 0
-            for b in v.buildings:
-                e = np.array(b.net_electricity_consumption)
-                ec = np.array(b.electrical_storage.capacity_history)
-                es = np.array(b.electrical_storage.soc)
-                could_used += (ec - es) + np.clip(e, 0., None) - np.clip(b.electrical_storage_electricity_consumption,
-                                                                         0., None)
             could_have_used = (v.buildings[0].fuel_mix.renewable_energy_produced / could_used).clip(None, 1.)
             used = (v.net_renewable_electricity_grid_consumption / could_used).clip(None, 1.)
             y = running_mean(used / could_have_used, 160)
+        elif pv:
+            could_have_used = ((v.solar_generation * -1) / could_used).clip(None, 1.)
+            no_generation = np.where(v.solar_generation == 0)[0]
+            could_have_used[no_generation] = 1.
+            used = (v.used_pv_electricity / could_used).clip(None, 1.)
+            share = used / could_have_used
+            share[no_generation] = 1.
+            y = running_mean(share, 160)
         else:
-            could_used = 0
-            for b in v.buildings:
-                e = np.array(b.net_electricity_consumption)
-                ec = np.array(b.electrical_storage.capacity_history)
-                es = np.array(b.electrical_storage.soc)
-                could_used += (ec-es) + np.clip(e, 0., None) - np.clip(b.electrical_storage_electricity_consumption, 0., None)
             could_have_used = ((v.buildings[0].fuel_mix.renewable_energy_produced+v.solar_generation*-1)/could_used).clip(None, 1.)
             used = (v.net_renewable_electricity_consumption/could_used).clip(None, 1.)
             y = running_mean(used/could_have_used, 160)
         x = range(len(y))
         ax.plot(x, y, label=k)
         ax.set_ylim(0, 1)
-
-    if grid:
-        y = running_mean(
-            v.net_renewable_electricity_grid_share_without_storage/v.buildings[0].fuel_mix.renewable_energy_share, 160)
-    else:
-        y = running_mean(
-            v.net_renewable_electricity_share_without_storage/v.buildings[0].fuel_mix.renewable_energy_share, 160)
-    # ax.plot(x, y, label='Baseline')
-
-    # available_renewable_share = running_mean(v.buildings[0].fuel_mix.renewable_energy_share, 160)
-    # ax.plot(x, available_renewable_share, label='Available renewable share')
 
     ax.set_xlabel('Time')
     ax.set_ylabel('%')
@@ -542,6 +536,8 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
 
     if grid:
         title = 'District-level renewable energy share grid /  available share'
+    elif pv:
+        title = 'District-level renewable energy share PV /  available share'
     else:
         title = 'District-level renewable energy share /  available share'
     fig.suptitle(title, fontsize=14)
@@ -713,6 +709,7 @@ def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], losses: Mapping[st
     plot_district_load_profiles(envs)
     plot_renewable_share(envs)
     plot_renewable_share(envs, grid=True)
+    plot_renewable_share(envs, pv=True)
     plot_losses(losses, envs)
     plot_rewards(rewards, envs)
 
