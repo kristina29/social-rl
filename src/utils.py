@@ -399,11 +399,11 @@ def plot_building_load_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
 
     for i, ax in enumerate(fig.axes):
         for k, v in envs.items():
-            y = v.buildings[i].net_electricity_consumption[:168]
+            y = v.buildings[i].net_electricity_consumption[-168:]
             x = range(len(y))
             ax.plot(x, y, label=k)
 
-        y = v.buildings[i].net_electricity_consumption_without_storage[:168]
+        y = v.buildings[i].net_electricity_consumption_without_storage[-168:]
         ax.plot(x, y, label='Baseline')
         ax.set_title(v.buildings[i].name)
         ax.set_xlabel('Time')
@@ -458,11 +458,11 @@ def plot_district_load_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
     fig, ax = plt.subplots(1, 1, figsize=figsize)
 
     for k, v in envs.items():
-        y = v.net_electricity_consumption[:168]
+        y = v.net_electricity_consumption[-168:]
         x = range(len(y))
         ax.plot(x, y, label=k)
 
-    y = v.net_electricity_consumption_without_storage[:168]
+    y = v.net_electricity_consumption_without_storage[-168:]
     ax.plot(x, y, label='Baseline')
     ax.set_xlabel('Time')
     ax.set_ylabel('kWh')
@@ -573,7 +573,7 @@ def plot_battery_soc_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
 
     for i, ax in enumerate(fig.axes):
         for k, v in envs.items():
-            soc = np.array(v.buildings[i].electrical_storage.soc)[:168]
+            soc = np.array(v.buildings[i].electrical_storage.soc)[-168:]
             capacity = v.buildings[i].electrical_storage.capacity_history[0]
             y = soc / capacity
             x = range(len(y))
