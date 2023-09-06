@@ -115,7 +115,7 @@ if __name__ == '__main__':
     kaiming_initialization = opts.kaiming
     l2_loss = opts.l2_loss
 
-    if False:
+    if True:
         DATASET_NAME = 'nydata'
         exclude_rbc = 0
         exclude_tql = 1
