@@ -520,32 +520,37 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
             could_have_used = np.minimum(v.buildings[0].fuel_mix.renewable_energy_produced,
                                          could_used)
             used = v.net_renewable_electricity_grid_consumption
-            y = running_mean(used / could_have_used, 160)
+            y, error, first_id = running_mean(used / could_have_used, 160)
 
-            if np.isnan(used).any() or np.isnan(y).any():
+            if error:
                 print('###########################################################################################')
                 print('###########################################################################################')
-                if np.isnan(used).any():
-                    used_id = np.argwhere(np.isnan(used))[0][0]
-                    print(f'First NaN id in used: {used_id}')
-                    print(f'could_used this id: {could_used[used_id]}')
-                    for b in v.buildings:
-                        print(f'{b.name} demand for this id: '
-                              f'{get_possible_battery_input(b, excluded_used_pv=False)[used_id]}')
-                        print(f'{b.name} net_electricity_consumption_without_storage_and_pv for this id: '
-                              f'{b.net_electricity_consumption_without_storage_and_pv[used_id]}')
-                        print(f'{b.name} solar_generation for this id: {b.solar_generation[used_id]}')
-                    print(f'could_have_used this id: {could_have_used[used_id]}')
-                    print(f'renewable_energy_produced for this id: '
-                          f'{v.buildings[0].fuel_mix.renewable_energy_produced[used_id]}')
-                    print(f'net_renewable_electricity_grid_consumption for this id: '
-                          f'{v.net_renewable_electricity_grid_consumption[used_id]}')
-                    print(f'used for this id: {used[used_id]}')
-                elif np.isnan(y).any():
-                    print(f'First NaN id in y: {np.argwhere(np.isnan(y))[0]}')
+                print(f'Value in used: {used[first_id]}')
+                print(f'Value in could_used: {could_used[first_id]}')
+                for b in v.buildings:
+                    print(f'{b.name} demand for this id: '
+                          f'{get_possible_battery_input(b, excluded_used_pv=False)[first_id]}')
+                    print(f'{b.name} net_electricity_consumption_without_storage_and_pv for this id: '
+                          f'{b.net_electricity_consumption_without_storage_and_pv[first_id]}')
+                    print(f'{b.name} solar_generation for this id: {b.solar_generation[first_id]}')
+                print(f'could_have_used this id: {could_have_used[first_id]}')
+                print(f'renewable_energy_produced for this id: '
+                        f'{v.buildings[0].fuel_mix.renewable_energy_produced[first_id]}')
+                print(f'net_renewable_electricity_grid_consumption for this id: '
+                        f'{v.net_renewable_electricity_grid_consumption[first_id]}')
 
-                if np.isnan(could_have_used).any():
-                    print(f'0 in could_have_used: {np.where(could_have_used == 0)[0]}')
+                dict = {'used': used,
+                        'could_used': could_used,
+                        'could_have_used': could_have_used,
+                        'buildings': v.buildings,
+                        'renewable_energy_produced': v.buildings[0].fuel_mix.renewable_energy_produced,
+                        'net_renewable_electricity_grid_consumption': v.net_renewable_electricity_grid_consumption}
+
+                r_filename = f'dict_inf_{datetime.now().strftime("%Y%m%dT%H%M%S")}.pkl'
+                with open(r_filename, 'wb') as fp:
+                    pickle.dump(dict, fp)
+                    print(f'dict saved to {r_filename}')
+
                 print('###########################################################################################')
                 print('###########################################################################################')
         else:
@@ -559,7 +564,7 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
             could_have_used = np.minimum(v.buildings[0].fuel_mix.renewable_energy_produced+solar_could_used,
                                          could_used)
             used = v.net_renewable_electricity_consumption
-            y = running_mean(used/could_have_used, 160)
+            y,_,_ = running_mean(used/could_have_used, 160)
         x = range(len(y))
         ax.plot(x, y, label=k)
         ax.set_ylim(0, 1)
@@ -611,7 +616,7 @@ def plot_used_pv_share(envs: Mapping[str, CityLearnEnv]) -> List[plt.Figure]:
             share = used / could_have_used
             share[no_generation] = np.nan
 
-            y = running_mean(share, 160)
+            y,_,_ = running_mean(share, 160)
             x = range(len(y))
             ax.plot(x, y, label=k)
             ax.set_ylim(0, 1)
@@ -701,7 +706,7 @@ def plot_rewards(rewards: Mapping[str, List[List[float]]], envs: Mapping[str, Ci
             fig, ax = plt.subplots()
 
             N = int(len(rewards) / 50)
-            ax.plot(np.arange(len(rewards) - N + 1) * N, running_mean(rewards, N))
+            ax.plot(np.arange(len(rewards) - N + 1) * N, running_mean(rewards, N)[0])
             ax.set_ylabel(f'Reward value (running mean over {N} values)')
             ax.set_xlabel(f'Time step (actual {len(rewards)})')
 
@@ -750,25 +755,28 @@ def plot_losses(losses: Mapping[str, Mapping[int, Mapping[str, List[float]]]],
 
 
 def running_mean(x, N):
+    error = False
     cumsum = np.nancumsum(np.insert(x, 0, 0))
     if np.isnan(cumsum).any():
+        error = True
         print(f'Nans in cumsum: {np.argwhere(np.isnan(cumsum))}')
         first_id = np.argwhere(np.isnan(cumsum))[0][0]
-        print(f'x value of first nan: {x[first_id]}')
-        r_filename = f'x_nan_{datetime.now()}.pkl'
+        print(f'x value of first nan-1: {x[first_id-1]}')
+        r_filename = f'x_nan_{datetime.now().strftime("%Y%m%dT%H%M%S")}.pkl'
         with open(r_filename, 'wb') as fp:
             pickle.dump(x, fp)
             print(f'x saved to {r_filename}')
     if np.isinf(cumsum).any():
+        error = True
         print(f'Inf in cumsum: {np.argwhere(np.isinf(cumsum))}')
         first_id = np.argwhere(np.isinf(cumsum))[0][0]
-        print(f'x value of first inf: {x[first_id]}')
-        r_filename = f'x_inf_{datetime.now()}.pkl'
+        print(f'x value of first inf-1: {x[first_id-1]}')
+        r_filename = f'x_inf_{datetime.now().strftime("%Y%m%dT%H%M%S")}.pkl'
         with open(r_filename, 'wb') as fp:
             pickle.dump(x, fp)
             print(f'x saved to {r_filename}')
 
-    return (cumsum[N:] - cumsum[:-N]) / float(N)
+    return (cumsum[N:] - cumsum[:-N]) / float(N), error, first_id-1
 
 
 # save all produces figures as pdf
