@@ -521,6 +521,28 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
                                          could_used)
             used = v.net_renewable_electricity_grid_consumption
             y = running_mean(used / could_have_used, 160)
+
+            if np.isnan(used).any() or np.isnan(y).any():
+                print('###########################################################################################')
+                print('###########################################################################################')
+                used_id = np.argwhere(np.isnan(used))[0]
+                print(f'First NaN id in used: {used_id}')
+                print(f'First NaN id in y: {np.argwhere(np.isnan(y))[0]}')
+                print(f'could_used this id: {could_used[used_id]}')
+                for b in v.buildings:
+                    print(f'{b.name} demand for this id: '
+                          f'{get_possible_battery_input(b, excluded_used_pv=False)[used_id]}')
+                    print(f'{b.name} net_electricity_consumption_without_storage_and_pv for this id: '
+                          f'{b.net_electricity_consumption_without_storage_and_pv[used_id]}')
+                    print(f'{b.name} solar_generation for this id: {b.solar_generation[used_id]}')
+                print(f'could_have_used this id: {could_have_used[used_id]}')
+                print(f'renewable_energy_produced for this id: '
+                      f'{v.buildings[0].fuel_mix.renewable_energy_produced[used_id]}')
+                print(f'net_renewable_electricity_grid_consumption for this id: '
+                      f'{v.net_renewable_electricity_grid_consumption[used_id]}')
+                print(f'used for this id: {used[used_id]}')
+                print('###########################################################################################')
+                print('###########################################################################################')
         else:
             could_used = 0
             solar_could_used = 0
