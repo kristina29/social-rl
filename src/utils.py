@@ -751,6 +751,15 @@ def plot_losses(losses: Mapping[str, Mapping[int, Mapping[str, List[float]]]],
 
 def running_mean(x, N):
     cumsum = np.nancumsum(np.insert(x, 0, 0))
+    if np.isnan(cumsum).any():
+        print(f'Nans in cumsum: {np.argwhere(np.isnan(cumsum))}')
+        first_id = np.argwhere(np.isnan(cumsum))[0][0]
+        print(f'x value of first nan: {x[first_id]}')
+    if np.isinf(cumsum).any():
+        print(f'Inf in cumsum: {np.argwhere(np.isinf(cumsum))}')
+        first_id = np.argwhere(np.isinf(cumsum))[0][0]
+        print(f'x value of first inf: {x[first_id]}')
+
     return (cumsum[N:] - cumsum[:-N]) / float(N)
 
 
