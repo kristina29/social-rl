@@ -593,7 +593,7 @@ def plot_used_pv_share(envs: Mapping[str, CityLearnEnv]) -> List[plt.Figure]:
         ax.set_ylabel('%')
         ax.xaxis.set_tick_params(length=0)
         ax.legend(loc='upper left', bbox_to_anchor=(1.0, 1.0), framealpha=0.0)
-        fig.suptitle(f'Used PV /  available share (Building {b.name})', fontsize=14)
+        fig.suptitle(f'Used PV /  available share ({b.name})', fontsize=14)
         plt.tight_layout()
         figs.append(fig)
 
