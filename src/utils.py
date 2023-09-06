@@ -756,6 +756,7 @@ def plot_losses(losses: Mapping[str, Mapping[int, Mapping[str, List[float]]]],
 
 def running_mean(x, N):
     error = False
+    first_id = None
     cumsum = np.nancumsum(np.insert(x, 0, 0))
     if np.isnan(cumsum).any():
         error = True
