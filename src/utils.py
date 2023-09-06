@@ -755,10 +755,18 @@ def running_mean(x, N):
         print(f'Nans in cumsum: {np.argwhere(np.isnan(cumsum))}')
         first_id = np.argwhere(np.isnan(cumsum))[0][0]
         print(f'x value of first nan: {x[first_id]}')
+        r_filename = f'x_nan_{datetime.now()}.pkl'
+        with open(r_filename, 'wb') as fp:
+            pickle.dump(x, fp)
+            print(f'x saved to {r_filename}')
     if np.isinf(cumsum).any():
         print(f'Inf in cumsum: {np.argwhere(np.isinf(cumsum))}')
         first_id = np.argwhere(np.isinf(cumsum))[0][0]
         print(f'x value of first inf: {x[first_id]}')
+        r_filename = f'x_inf_{datetime.now()}.pkl'
+        with open(r_filename, 'wb') as fp:
+            pickle.dump(x, fp)
+            print(f'x saved to {r_filename}')
 
     return (cumsum[N:] - cumsum[:-N]) / float(N)
 
