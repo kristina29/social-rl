@@ -525,22 +525,27 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
             if np.isnan(used).any() or np.isnan(y).any():
                 print('###########################################################################################')
                 print('###########################################################################################')
-                used_id = np.argwhere(np.isnan(used))[0]
-                print(f'First NaN id in used: {used_id}')
-                print(f'First NaN id in y: {np.argwhere(np.isnan(y))[0]}')
-                print(f'could_used this id: {could_used[used_id]}')
-                for b in v.buildings:
-                    print(f'{b.name} demand for this id: '
-                          f'{get_possible_battery_input(b, excluded_used_pv=False)[used_id]}')
-                    print(f'{b.name} net_electricity_consumption_without_storage_and_pv for this id: '
-                          f'{b.net_electricity_consumption_without_storage_and_pv[used_id]}')
-                    print(f'{b.name} solar_generation for this id: {b.solar_generation[used_id]}')
-                print(f'could_have_used this id: {could_have_used[used_id]}')
-                print(f'renewable_energy_produced for this id: '
-                      f'{v.buildings[0].fuel_mix.renewable_energy_produced[used_id]}')
-                print(f'net_renewable_electricity_grid_consumption for this id: '
-                      f'{v.net_renewable_electricity_grid_consumption[used_id]}')
-                print(f'used for this id: {used[used_id]}')
+                if np.isnan(used).any():
+                    used_id = np.argwhere(np.isnan(used))[0][0]
+                    print(f'First NaN id in used: {used_id}')
+                    print(f'could_used this id: {could_used[used_id]}')
+                    for b in v.buildings:
+                        print(f'{b.name} demand for this id: '
+                              f'{get_possible_battery_input(b, excluded_used_pv=False)[used_id]}')
+                        print(f'{b.name} net_electricity_consumption_without_storage_and_pv for this id: '
+                              f'{b.net_electricity_consumption_without_storage_and_pv[used_id]}')
+                        print(f'{b.name} solar_generation for this id: {b.solar_generation[used_id]}')
+                    print(f'could_have_used this id: {could_have_used[used_id]}')
+                    print(f'renewable_energy_produced for this id: '
+                          f'{v.buildings[0].fuel_mix.renewable_energy_produced[used_id]}')
+                    print(f'net_renewable_electricity_grid_consumption for this id: '
+                          f'{v.net_renewable_electricity_grid_consumption[used_id]}')
+                    print(f'used for this id: {used[used_id]}')
+                elif np.isnan(y).any():
+                    print(f'First NaN id in y: {np.argwhere(np.isnan(y))[0]}')
+
+                if np.isnan(could_have_used).any():
+                    print(f'0 in could_have_used: {np.where(could_have_used == 0)[0]}')
                 print('###########################################################################################')
                 print('###########################################################################################')
         else:
