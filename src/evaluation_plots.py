@@ -20,13 +20,11 @@ if __name__ == '__main__':
         agent = parser.agent
 
     if True:
-        experiment_dirs = ['23_autotune/new_buildings2',
-                           '15_reward_price_pv/alpha075/new_buildings2',
-                           '15_reward_price_pv/alpha05/new_buildings2',
-                           '15_reward_price_pv/alpha025/new_buildings2',
-                           '15_reward_price_pv/alpha0/new_buildings2',
+        experiment_dirs = ['15_reward_price_pv/alpha05/new_buildings2',
+                           '30_renewable_prod/reward_05pvprice/0.5',
+                           '30_renewable_prod/reward_05pvprice/1.5',
                            ]
-        ref_dirs = ['23_autotune/new_buildings2']
+        ref_dirs = ['15_reward_price_pv/alpha05/new_buildings2']
         n_refs = len(ref_dirs)
         length = 1/n_refs
         agentdir = 'SAC_DB2'
