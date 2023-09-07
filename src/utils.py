@@ -520,7 +520,6 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
             could_have_used = np.minimum(v.buildings[0].fuel_mix.renewable_energy_produced,
                                          could_used)
             used = v.net_renewable_electricity_grid_consumption
-            y = running_mean(used / could_have_used, 160)
         else:
             could_used = 0
             solar_could_used = 0
@@ -532,7 +531,10 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
             could_have_used = np.minimum(v.buildings[0].fuel_mix.renewable_energy_produced+solar_could_used,
                                          could_used)
             used = v.net_renewable_electricity_consumption
-            y = running_mean(used/could_have_used, 160)
+
+        share = used / could_have_used
+        share[share == np.inf] = 1.
+        y = running_mean(share, 160)
         x = range(len(y))
         ax.plot(x, y, label=k)
         ax.set_ylim(0, 1)
@@ -593,7 +595,7 @@ def plot_used_pv_share(envs: Mapping[str, CityLearnEnv]) -> List[plt.Figure]:
         ax.set_ylabel('%')
         ax.xaxis.set_tick_params(length=0)
         ax.legend(loc='upper left', bbox_to_anchor=(1.0, 1.0), framealpha=0.0)
-        fig.suptitle(f'Used PV /  available share (Building {b.name})', fontsize=14)
+        fig.suptitle(f'Used PV /  available share ({b.name})', fontsize=14)
         plt.tight_layout()
         figs.append(fig)
 

@@ -20,11 +20,13 @@ if __name__ == '__main__':
         agent = parser.agent
 
     if True:
-        experiment_dirs = ['26_l2loss/new_buildings2',
-                           '27_discount/l2_loss/98',
-                           '27_discount/l2_loss/97',
-                           '27_discount/l2_loss/96',]
-        ref_dirs = ['26_l2loss/new_buildings2']
+        experiment_dirs = ['23_autotune/new_buildings2',
+                           '15_reward_price_pv/alpha075/new_buildings2',
+                           '15_reward_price_pv/alpha05/new_buildings2',
+                           '15_reward_price_pv/alpha025/new_buildings2',
+                           '15_reward_price_pv/alpha0/new_buildings2',
+                           ]
+        ref_dirs = ['23_autotune/new_buildings2']
         n_refs = len(ref_dirs)
         length = 1/n_refs
         agentdir = 'SAC_DB2'
@@ -92,50 +94,32 @@ if __name__ == '__main__':
 
     plt.savefig('2.png', bbox_inches="tight")
 
-    # plot 1-used_pv_of_total_share net_value
-    if '1 - used_pv_of_total_share' in value:
-        values = []
-        names = []
-        for key, value in kpis.items():
-            values.append(round(value.loc['1 - used_pv_of_total_share', 'net_value'], 3))
-            names.append(key)
-
-        fig, ax = plt.subplots()
-        ax.grid(which='major', axis='y', linestyle='--')
-        ax.set_axisbelow(True)
-        rects = ax.bar(names, values, label=names)
-        for i in range(n_refs):
-            ax.axhline(values[names.index(ref_dirs[i])], xmin=0 + i * length, xmax=1 - length * (n_refs - i - 1),
-                       c='red', linewidth=0.7, linestyle="-")
-        ax.bar_label(rects, padding=3)
-        ax.set_ylim(0, 0.2)
-        ax.set_title('1 - used_pv_of_total_share [net_value]')
-        for tick in ax.get_xticklabels():
-            tick.set_rotation(90)
-        plt.savefig('3.png', bbox_inches="tight")
-
-        # plot 1-used_pv_of_total_share share net_value/net_value_without_storage
-        values = []
-        names = []
-        for key, value in kpis.items():
+    # plot 1-used_pv_of_total_share share net_value/net_value_without_storage
+    values = []
+    names = []
+    for key, value in kpis.items():
+        if '1 - used_pv_of_total_share' in value.index:
             values.append(round(value.loc['1 - used_pv_of_total_share', 'net_value'] /
                                 value.loc['1 - used_pv_of_total_share', 'net_value_without_storage'], 3))
             names.append(key)
 
-        fig, ax = plt.subplots()
-        ax.grid(which='major', axis='y', linestyle='--')
-        ax.set_axisbelow(True)
-        rects = ax.bar(names, values, label=names)
-        for i in range(n_refs):
+    fig, ax = plt.subplots()
+    ax.grid(which='major', axis='y', linestyle='--')
+    ax.set_axisbelow(True)
+    rects = ax.bar(names, values, label=names)
+    for i in range(n_refs):
+        try:
             ax.axhline(values[names.index(ref_dirs[i])], xmin=0 + i * length, xmax=1 - length * (n_refs - i - 1),
                        c='red', linewidth=0.7, linestyle="-")
-        ax.bar_label(rects, padding=3)
-        ax.set_ylim(0.75, 1.05)
-        ax.set_title('1 - used_pv_of_total_share [net_value/net_value_without_storage]')
-        for tick in ax.get_xticklabels():
-            tick.set_rotation(90)
+        except:
+            pass
+    ax.bar_label(rects, padding=3)
+    ax.set_ylim(0.75, 1.05)
+    ax.set_title('1 - used_pv_of_total_share [net_value/net_value_without_storage]')
+    for tick in ax.get_xticklabels():
+        tick.set_rotation(90)
 
-        plt.savefig('4.png', bbox_inches="tight")
+    plt.savefig('3.png', bbox_inches="tight")
 
 
 
