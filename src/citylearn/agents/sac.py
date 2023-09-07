@@ -1,3 +1,4 @@
+import math
 from typing import List, Mapping
 import numpy as np
 import numpy.typing as npt
@@ -18,7 +19,7 @@ from citylearn.rl import PolicyNetwork, ReplayBuffer, SoftQNetwork
 
 class SAC(RLC):
     def __init__(self, autotune_entropy: bool=False, clip_gradient: bool=False, kaiming_initialization: bool=False,
-                 *args, **kwargs):
+                 l2_loss: bool=False, *args, **kwargs):
         r"""Initialize :class:`SAC`.
 
         Parameters
@@ -39,7 +40,10 @@ class SAC(RLC):
         self.clip_gradient = clip_gradient
         self.kaiming_initialization = kaiming_initialization
         self.normalized = [False for _ in self.action_space]
-        self.soft_q_criterion = nn.SmoothL1Loss()
+        if l2_loss:
+            self.soft_q_criterion = nn.MSELoss()
+        else:
+            self.soft_q_criterion = nn.SmoothL1Loss()
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.replay_buffer = [ReplayBuffer(int(self.replay_buffer_capacity)) for _ in self.action_space]
         self.soft_q_net1 = [None for _ in self.action_space]
@@ -248,6 +252,10 @@ class SAC(RLC):
         else:
             actions = self.get_exploration_prediction(observations)
 
+        actions = np.array(actions)
+        actions = list(np.nan_to_num(actions, 0.))
+        for i, a in enumerate(actions):
+            actions[i] = list(a)
         self.actions = actions
         self.next_time_step()
         return actions
@@ -317,10 +325,11 @@ class SAC(RLC):
             self.soft_q_optimizer1[i] = optim.Adam(self.soft_q_net1[i].parameters(), lr=self.lr)
             self.soft_q_optimizer2[i] = optim.Adam(self.soft_q_net2[i].parameters(), lr=self.lr)
             self.policy_optimizer[i] = optim.Adam(self.policy_net[i].parameters(), lr=self.lr)
-            self.target_entropy[i] = -torch.prod(torch.tensor(self.action_space[i].shape)).item()
 
             # Based on https://docs.cleanrl.dev/rl-algorithms/sac/#implementation-details
             if self.autotune_entropy:
+                # self.target_entropy[i] = -torch.prod(torch.tensor(self.action_space[i].shape)).item()
+                self.target_entropy[i] = -torch.Tensor(self.action_space[i].shape)
                 self.log_alpha[i] = torch.zeros(1, requires_grad=True)
                 self.alpha[i] = self.log_alpha[i].exp().item()
                 self.alpha_optimizer[i] = optim.Adam([self.log_alpha[i]], lr=self.lr)
