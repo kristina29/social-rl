@@ -254,8 +254,10 @@
     }
   },
   "reward_function": {
-    "type": "citylearn.reward_function.PricePenaltyReward",
-    "attributes": null
+    "type": "citylearn.reward_function.PriceAndSolarPenaltyReward",
+    "attributes": {
+          "alpha": 0.5
+    }
   },
   "buildings": {
     "Building_1": {
