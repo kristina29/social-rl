@@ -21,9 +21,10 @@ if __name__ == '__main__':
 
     if True:
         experiment_dirs = ['23_autotune/new_buildings2',
-                           '27_discount/l1_loss/98',
-                           '27_discount/l1_loss/97',
-                           '27_discount/l1_loss/96',
+                           '15_reward_price_pv/alpha075/new_buildings2',
+                           '15_reward_price_pv/alpha05/new_buildings2',
+                           '15_reward_price_pv/alpha025/new_buildings2',
+                           '15_reward_price_pv/alpha0/new_buildings2',
                            ]
         ref_dirs = ['23_autotune/new_buildings2']
         n_refs = len(ref_dirs)
