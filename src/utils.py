@@ -479,7 +479,7 @@ def plot_district_load_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
     return fig
 
 
-def get_possible_battery_input(building: Building, excluded_used_pv: bool) -> np.ndarray:
+def get_possible_consumption(building: Building, excluded_used_pv: bool) -> np.ndarray:
     ec = np.array(building.electrical_storage.capacity_history)
     es = np.array(building.electrical_storage.soc)
     battery_input = np.minimum(np.clip((ec - es), 0., None), building.electrical_storage.get_max_input_power())
@@ -515,7 +515,7 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
         if grid:
             could_used = 0
             for b in v.buildings:
-                could_used += get_possible_battery_input(b, excluded_used_pv=False)
+                could_used += get_possible_consumption(b, excluded_used_pv=False)
 
             could_have_used = np.minimum(v.buildings[0].fuel_mix.renewable_energy_produced,
                                          could_used)
@@ -524,7 +524,7 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
             could_used = 0
             solar_could_used = 0
             for b in v.buildings:
-                b_demand = get_possible_battery_input(b, excluded_used_pv=True)
+                b_demand = get_possible_consumption(b, excluded_used_pv=True)
                 could_used += b_demand
                 solar_could_used += np.minimum(b.solar_generation * -1, b_demand)
 
@@ -575,7 +575,7 @@ def plot_used_pv_share(envs: Mapping[str, CityLearnEnv]) -> List[plt.Figure]:
         for k, v in envs.items():
             b = v.buildings[i]
 
-            could_used = get_possible_battery_input(b, excluded_used_pv=True)
+            could_used = get_possible_consumption(b, excluded_used_pv=True)
 
             could_have_used = np.minimum(b.solar_generation * -1, could_used)
             no_generation = np.where(b.solar_generation == 0)[0]

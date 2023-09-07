@@ -8,7 +8,7 @@ As defined by Sutton and Barto \cite{sutton2018reinforcement}, RL is a machine l
 \begin{figure}[htb]
      \center
      \includegraphics[width=\textwidth]{figures/rl_overview.pdf}
-  \caption{In RL, the agent observes the state of the environment $s_t$ at timestep $t$ via the observation $o_t$. The policy $\pi$ determines the agent's action $a_t$, which in turn determines the next state $s_{t+1}$ of the environment and the environment sends an reward $r_t$ to the agent. The policy of the agent is trained using the observation, the action, and the reward,}
+  \caption[Reinforcement Learning Overview]{In RL, the agent observes the state of the environment $s_t$ at timestep $t$ via the observation $o_t$. The policy $\pi$ determines the agent's action $a_t$, which in turn determines the next state $s_{t+1}$ of the environment and the environment sends an reward $r_t$ to the agent. The policy of the agent is trained using the observation, the action, and the reward,}
   \label{fig:rl_overview}
 \end{figure}
 
@@ -45,6 +45,7 @@ The policy $\pi: \mathcal{S}=p(a_t|s_t)$ determines the action, which may also b
 
 
 \subsection{Soft Actor-Critic}
+\label{sec:SAC}
 \todo[inline]{TODO Continuous spaces, argmax}
 Soft Actor-Critic (SAC) is a model-free RL algorithm based on the maximum entropy RL framework, which aims to maximize the maximum entropy objective:
 \begin{equation}
