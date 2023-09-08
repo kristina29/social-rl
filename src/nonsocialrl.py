@@ -1,19 +1,18 @@
-import sys
 import time
 
-from datetime import datetime
 from citylearn.agents.q_learning import TabularQLearning
 from citylearn.agents.rbc import OptimizedRBC
 from citylearn.agents.sac import SAC
 from citylearn.citylearn import CityLearnEnv
 from citylearn.data import DataSet
+from citylearn.utilities import get_active_parts
 from citylearn.wrappers import TabularQLearningWrapper
 from options import parseOptions_nonsocial
-from utils import set_schema_buildings, set_active_observations, plot_simulation_summary, get_active_parts
+from utils import set_schema_buildings, set_active_observations, save_results
 
 
-def train(dataset_name, random_seed, building_count, episodes, active_observations, exclude_tql,
-          exclude_rbc):
+def train(dataset_name, random_seed, building_count, episodes, active_observations, batch_size, discount,
+          autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
 
@@ -26,6 +25,8 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
     schema = preprocessing(schema, building_count, random_seed, active_observations)
 
     all_envs = {}
+    all_losses = {}
+    all_rewards = {}
     # Train rule-based control (RBC) agent for comparison
     if not exclude_rbc:
         all_envs['RBC'] = train_rbc(schema, episodes)
@@ -35,12 +36,17 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
         all_envs['TQL'] = train_tql(schema, active_observations, episodes)
 
     # Train soft actor-critic (SAC) agent
-    all_envs['SAC'] = train_sac(schema, episodes, random_seed)
+    all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'] = train_sac(schema=schema, episodes=episodes,
+                                                                       random_seed=random_seed,
+                                                                       batch_size=batch_size,
+                                                                       discount=discount,
+                                                                       autotune_entropy=autotune_entropy,
+                                                                       clip_gradient=clip_gradient,
+                                                                       kaiming_initialization=kaiming_initialization,
+                                                                       l2_loss=l2_loss)
     print('SAC model trained!')
 
-    # plot summary and compare with other control results
-    filename = "plots_" + datetime.now().strftime("%Y%m%dT%H%M%S")
-    plot_simulation_summary(all_envs, filename)
+    save_results(all_envs, all_losses, all_rewards)
 
 
 def preprocessing(schema, building_count, random_seed, active_observations):
@@ -50,7 +56,7 @@ def preprocessing(schema, building_count, random_seed, active_observations):
     if active_observations is not None:
         schema, active_observations = set_active_observations(schema, active_observations)
     else:
-        active_observations = get_active_parts(schema)
+        active_observations = get_active_parts(schema, 'observations')
     print(f'Active observations:', active_observations)
 
     return schema
@@ -69,6 +75,7 @@ def get_bins(schema, key, active_parts=None):
 
 
 def train_rbc(schema, episodes):
+    schema['observations']['hour']['active'] = True
     env = CityLearnEnv(schema)
     rbc_model = OptimizedRBC(env)
     rbc_model.learn(episodes=episodes)
@@ -106,12 +113,18 @@ def train_tql(schema, active_observations, episodes):
     return env
 
 
-def train_sac(schema, episodes, random_seed):
+def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
+              kaiming_initialization, l2_loss):
     env = CityLearnEnv(schema)
-    sac_model = SAC(env=env, seed=random_seed)
-    sac_model.learn(episodes=episodes, deterministic_finish=True)
+    sac_model = SAC(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
+                    clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
+                    discount=discount) #,
+                    #start_training_time_step=1, end_exploration_time_step=7000)
+    losses, rewards = sac_model.learn(episodes=episodes, deterministic_finish=True)
 
-    return env
+    print('SAC model trained!')
+
+    return env, losses, rewards
 
 
 if __name__ == '__main__':
@@ -126,22 +139,29 @@ if __name__ == '__main__':
     exclude_tql = opts.exclude_tql
     exclude_rbc = opts.exclude_rbc
     active_observations = opts.observations
+    batch_size = opts.batch
+    autotune_entropy = opts.autotune
+    clip_gradient = opts.clipgradient
+    kaiming_initialization = opts.kaiming
+    l2_loss = opts.l2_loss
 
-    # only when used in pycharm for testing
-    if len(sys.argv) == 8:
-        DATASET_NAME = sys.argv[1]
-        seed = int(sys.argv[2])
-        building_count = int(sys.argv[3])
-        episodes = int(sys.argv[4])
-        exclude_tql = bool(int(sys.argv[5]))
-        exclude_rbc = bool(int(sys.argv[6]))
-        active_observations = [sys.argv[7]]
+    if False:
+        DATASET_NAME = 'nydata'
+        exclude_rbc = 0
+        exclude_tql = 1
+        building_count = 2
+        episodes = 2
+        seed = 2
+        autotune_entropy = False
+        active_observations = ['hour']  # , 'electricity_pricing', 'electricity_pricing_predicted_6h',
+        #                       'electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
+        batch_size = 256
+        clip_gradient = False
+        kaiming_initialization = False
+        l2_loss = False
 
-    exclude_tql = 1
-    exclude_rbc = 1
-    episodes = 2
-
-    train(DATASET_NAME, seed, building_count, episodes, active_observations, exclude_tql, exclude_rbc)
+    train(DATASET_NAME, seed, building_count, episodes, active_observations, batch_size, discount, autotune_entropy,
+          clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc)
 
     # get the end time
     et = time.time()

@@ -2,6 +2,7 @@ from typing import List
 import numpy as np
 import pandas as pd
 
+
 class CostFunction:
     r"""Cost and energy flexibility functions that may be used to evaluate environment performance."""
 
@@ -33,10 +34,10 @@ class CostFunction:
         [nan, 100.0, 100.0, 500.0, 700.0]
         """
 
-        data = pd.DataFrame({'net_electricity_consumption':net_electricity_consumption})
+        data = pd.DataFrame({'net_electricity_consumption': net_electricity_consumption})
         data['ramping'] = data['net_electricity_consumption'] - data['net_electricity_consumption'].shift(1)
         data['ramping'] = data['ramping'].abs()
-        data['ramping'] = data['ramping'].rolling(window=data.shape[0],min_periods=1).sum()
+        data['ramping'] = data['ramping'].rolling(window=data.shape[0], min_periods=1).sum()
         return data['ramping'].tolist()
 
     @staticmethod
@@ -57,11 +58,12 @@ class CostFunction:
         """
 
         window = 730 if window is None else window
-        data = pd.DataFrame({'net_electricity_consumption':net_electricity_consumption})
-        data['group'] = (data.index/window).astype(int)
-        data = data.groupby(['group'])[['net_electricity_consumption']].agg(['mean','max'])
-        data['load_factor'] = 1 - (data[('net_electricity_consumption','mean')]/data[('net_electricity_consumption','max')])
-        data['load_factor'] = data['load_factor'].rolling(window=data.shape[0],min_periods=1).mean()
+        data = pd.DataFrame({'net_electricity_consumption': net_electricity_consumption})
+        data['group'] = (data.index / window).astype(int)
+        data = data.groupby(['group'])[['net_electricity_consumption']].agg(['mean', 'max'])
+        data['load_factor'] = 1 - (
+                    data[('net_electricity_consumption', 'mean')] / data[('net_electricity_consumption', 'max')])
+        data['load_factor'] = data['load_factor'].rolling(window=data.shape[0], min_periods=1).mean()
         return data['load_factor'].tolist()
 
     @staticmethod
@@ -82,10 +84,11 @@ class CostFunction:
         """
 
         daily_time_step = 24 if daily_time_step is None else daily_time_step
-        data = pd.DataFrame({'net_electricity_consumption':net_electricity_consumption})
-        data['group'] = (data.index/daily_time_step).astype(int)
+        data = pd.DataFrame({'net_electricity_consumption': net_electricity_consumption})
+        data['group'] = (data.index / daily_time_step).astype(int)
         data = data.groupby(['group'])[['net_electricity_consumption']].max()
-        data['net_electricity_consumption'] = data['net_electricity_consumption'].rolling(window=data.shape[0],min_periods=1).mean()
+        data['net_electricity_consumption'] = data['net_electricity_consumption'].rolling(window=data.shape[0],
+                                                                                          min_periods=1).mean()
         return data['net_electricity_consumption'].tolist()
 
     @staticmethod
@@ -106,10 +109,11 @@ class CostFunction:
         """
 
         window = 8760 if window is None else window
-        data = pd.DataFrame({'net_electricity_consumption':net_electricity_consumption})
-        data['group'] = (data.index/window).astype(int)
+        data = pd.DataFrame({'net_electricity_consumption': net_electricity_consumption})
+        data['group'] = (data.index / window).astype(int)
         data = data.groupby(['group'])[['net_electricity_consumption']].max()
-        data['net_electricity_consumption'] = data['net_electricity_consumption'].rolling(window=data.shape[0],min_periods=1).mean()
+        data['net_electricity_consumption'] = data['net_electricity_consumption'].rolling(window=data.shape[0],
+                                                                                          min_periods=1).mean()
         return data['net_electricity_consumption'].tolist()
 
     @staticmethod
@@ -135,8 +139,9 @@ class CostFunction:
         [100.0, 100.0, 300.0, 900.0, 1300.0, 1600.0]
         """
 
-        data = pd.DataFrame({'net_electricity_consumption':np.array(net_electricity_consumption).clip(min=0)})
-        data['electricity_consumption'] = data['net_electricity_consumption'].rolling(window=data.shape[0],min_periods=1).sum()
+        data = pd.DataFrame({'net_electricity_consumption': np.array(net_electricity_consumption).clip(min=0)})
+        data['electricity_consumption'] = data['net_electricity_consumption'].rolling(window=data.shape[0],
+                                                                                      min_periods=1).sum()
         return data['electricity_consumption'].tolist()
 
     @staticmethod
@@ -163,8 +168,8 @@ class CostFunction:
         [100.0, -100.0, 100.0, 700.0, 1100.0, 1400.0]
         """
 
-        data = pd.DataFrame({'net_electricity_consumption':np.array(net_electricity_consumption)})
-        data['zero_net_energy'] = data['net_electricity_consumption'].rolling(window=data.shape[0],min_periods=1).sum()
+        data = pd.DataFrame({'net_electricity_consumption': np.array(net_electricity_consumption)})
+        data['zero_net_energy'] = data['net_electricity_consumption'].rolling(window=data.shape[0], min_periods=1).sum()
         return data['zero_net_energy'].tolist()
 
     @staticmethod
@@ -188,8 +193,8 @@ class CostFunction:
         [100.0, 300.0, 500.0, 1100.0, 1500.0, 1800.0]
         """
 
-        data = pd.DataFrame({'carbon_emissions':np.array(carbon_emissions).clip(min=0)})
-        data['carbon_emissions'] = data['carbon_emissions'].rolling(window=data.shape[0],min_periods=1).sum()
+        data = pd.DataFrame({'carbon_emissions': np.array(carbon_emissions).clip(min=0)})
+        data['carbon_emissions'] = data['carbon_emissions'].rolling(window=data.shape[0], min_periods=1).sum()
         return data['carbon_emissions'].tolist()
 
     @staticmethod
@@ -213,8 +218,8 @@ class CostFunction:
         [100.0, 300.0, 500.0, 1100.0, 1500.0, 1800.0]
         """
 
-        data = pd.DataFrame({'cost':np.array(price).clip(min=0)})
-        data['cost'] = data['cost'].rolling(window=data.shape[0],min_periods=1).sum()
+        data = pd.DataFrame({'cost': np.array(price).clip(min=0)})
+        data['cost'] = data['cost'].rolling(window=data.shape[0], min_periods=1).sum()
         return data['cost'].tolist()
 
     @staticmethod
@@ -242,7 +247,64 @@ class CostFunction:
         [10000.0, 50000.0, 90000.0, 450000.0, 610000.0, 700000.0]
         """
 
-        data = pd.DataFrame({'net_electricity_consumption':np.array(net_electricity_consumption).clip(min=0)})
-        data['quadratic'] = data['net_electricity_consumption']**2
-        data['quadratic'] = data['quadratic'].rolling(window=data.shape[0],min_periods=1).sum()
+        data = pd.DataFrame({'net_electricity_consumption': np.array(net_electricity_consumption).clip(min=0)})
+        data['quadratic'] = data['net_electricity_consumption'] ** 2
+        data['quadratic'] = data['quadratic'].rolling(window=data.shape[0], min_periods=1).sum()
         return data['quadratic'].tolist()
+
+    @staticmethod
+    def average_daily_renewable_share(net_renewable_electricity_share: List[float],
+                                      daily_time_step: int = None) -> List[float]:
+        r"""Difference between 1 and the Mean of daily share of renewable electricity consumption of the total consumption.
+
+        Parameters
+        ----------
+        net_renewable_electricity_share : List[float]
+            Share of consumed Renweable Electricity time series.
+        daily_time_step : int, default: 24
+            Number of time steps in a day.
+
+        Returns
+        -------
+        average_daily_renewable_share : List[float]
+            1-Average daily share of renewable electricity consumption.
+            (equivalent to average daily share of non-renewable electricity consumption)
+        """
+
+        daily_time_step = 24 if daily_time_step is None else daily_time_step
+        data = pd.DataFrame({'renewable_share': net_renewable_electricity_share})
+        data['group'] = (data.index / daily_time_step).astype(int)
+        data = data.groupby(['group'])[['renewable_share']].mean()
+        data['renewable_share'] = 1-data['renewable_share']
+
+        data['renewable_share'] = data['renewable_share'].rolling(window=data.shape[0], min_periods=1).mean()
+
+        return data['renewable_share'].tolist()
+
+    @staticmethod
+    def used_pv_of_total_share(share_used_pv_of_total: List[float], daily_time_step: int = None) -> List[float]:
+        r"""Difference between 1 and the Mean of daily share of used PV electricity of the total produced PV electricity.
+
+        Parameters
+        ----------
+        share_used_pv_of_total : List[float]
+            Share of used PV electricity time series.
+        daily_time_step : int, default: 24
+            Number of time steps in a day.
+
+        Returns
+        -------
+        used_pv_of_total_share : List[float]
+            1-Average daily share of used PV electricity.
+        """
+
+        daily_time_step = 24 if daily_time_step is None else daily_time_step
+
+        data = pd.DataFrame({'pv_used_share': share_used_pv_of_total})
+        data['group'] = (data.index / daily_time_step).astype(int)
+        data = data.groupby(['group'])[['pv_used_share']].mean()
+        data['pv_used_share'] = 1 - data['pv_used_share']
+
+        data['pv_used_share'] = data['pv_used_share'].rolling(window=data.shape[0], min_periods=1).mean()
+
+        return data['pv_used_share'].tolist()
