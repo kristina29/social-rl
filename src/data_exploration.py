@@ -486,10 +486,10 @@ def analyze_pricing_data(save, timestamp):
 
 
 def analyze_own_building_data(save, timestamp):
-    y_min_load = 10000000000000000
-    y_max_load = -10000000
-    y_min_solar = 10000000000000000
-    y_max_solar = -10000000
+    y_min_gen = 10000000000000000
+    y_max_gen = -10000000
+
+    nominal_power = [4.0, 4.0, 4.0, 5.0, 4.0, 4.0, 4.0, 4.0, 4.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0]
 
     for i in range(1,18):
         data = pd.read_csv(f'citylearn/data/nydata_new_buildings2/Building_{i}.csv')
@@ -509,14 +509,21 @@ def analyze_own_building_data(save, timestamp):
 
         fig.tight_layout()
 
-        if data['Equipment Electric Power [kWh]'].min() < y_min_load:
-            y_min_load = data['Equipment Electric Power [kWh]'].min()
-        if data['Equipment Electric Power [kWh]'].max() > y_max_load:
-            y_max_load = data['Equipment Electric Power [kWh]'].max()
-        if data['Solar Generation [W/kW]'].min() < y_min_solar:
-            y_min_solar = data['Solar Generation [W/kW]'].min()
-        if data['Solar Generation [W/kW]'].max() > y_max_solar:
-            y_max_solar = data['Solar Generation [W/kW]'].max()
+        fig, ax = plt.subplots()
+        fig.set_figheight(5)
+        fig.set_figwidth(13)
+        fig.suptitle(f'Building {i} - Load vs. Solar Generation')
+        ax.plot(data['Equipment Electric Power [kWh]'], label='load')
+        ax.plot(nominal_power[i-1]*np.array(data['Solar Generation [W/kW]'])/1000, label='generation')
+        ax.legend()
+        ax.set_ylabel(f'kWh')
+        ax.set_xlabel(f'Time step')
+        ax.set_ylim([0, 9])
+
+        if (nominal_power[i-1]*np.array(data['Solar Generation [W/kW]'])/1000).min() < y_min_gen:
+            y_min_gen = (nominal_power[i-1]*np.array(data['Solar Generation [W/kW]'])/1000).min()
+        if (nominal_power[i-1]*np.array(data['Solar Generation [W/kW]'])/1000).max() > y_max_gen:
+            y_max_gen = (nominal_power[i-1]*np.array(data['Solar Generation [W/kW]'])/1000).max()
 
     if save:
         filename = "../datasets/data_exploration_plots/building-plots_" + timestamp
