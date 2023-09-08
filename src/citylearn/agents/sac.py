@@ -1,3 +1,4 @@
+import math
 from typing import List, Mapping
 import numpy as np
 import numpy.typing as npt
@@ -251,6 +252,10 @@ class SAC(RLC):
         else:
             actions = self.get_exploration_prediction(observations)
 
+        actions = np.array(actions)
+        actions = list(np.nan_to_num(actions, 0.))
+        for i, a in enumerate(actions):
+            actions[i] = list(a)
         self.actions = actions
         self.next_time_step()
         return actions
