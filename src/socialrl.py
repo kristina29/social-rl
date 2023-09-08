@@ -26,6 +26,7 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
     all_envs = {}
     all_losses = {}
     all_rewards = {}
+    all_eval_results = {}
     # Train rule-based control (RBC) agent for comparison
     if not exclude_rbc:
         all_envs['RBC'] = train_rbc(schema, episodes)
@@ -36,27 +37,18 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
 
     # Train soft actor-critic (SAC) agent for comparison
     if not exclude_sac:
-        all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'] = train_sac(schema=schema, episodes=episodes,
-                                                                           random_seed=random_seed,
-                                                                           batch_size=batch_size,
-                                                                           discount=discount,
-                                                                           autotune_entropy=autotune_entropy,
-                                                                           clip_gradient=clip_gradient,
-                                                                           kaiming_initialization=kaiming_initialization,
-                                                                           l2_loss=l2_loss)
+        all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'], all_eval_results['SAC'] = \
+            train_sac(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
+                      discount=discount, autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
+                      kaiming_initialization=kaiming_initialization, l2_loss=l2_loss)
 
     # Train SAC agent with decision-biasing
-    all_envs['SAC_DB2'], all_losses['SAC_DB2'], all_rewards['SAC_DB2'] = train_sacdb2(schema=schema, episodes=episodes,
-                                                                                      random_seed=random_seed,
-                                                                                      batch_size=batch_size,
-                                                                                      discount=discount,
-                                                                                      autotune_entropy=autotune_entropy,
-                                                                                      clip_gradient=clip_gradient,
-                                                                                      kaiming_initialization=
-                                                                                      kaiming_initialization,
-                                                                                      l2_loss=l2_loss, mode=mode)
+    all_envs['SAC_DB2'], all_losses['SAC_DB2'], all_rewards['SAC_DB2'], all_eval_results['SAC_DB2'] = \
+        train_sacdb2(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
+                     discount=discount, autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
+                     kaiming_initialization= kaiming_initialization, l2_loss=l2_loss, mode=mode)
 
-    save_results(all_envs, all_losses, all_rewards)
+    save_results(all_envs, all_losses, all_rewards, all_eval_results)
 
 
 def preprocessing(schema, building_count, demonstrators_count, random_seed, active_observations):
@@ -86,11 +78,11 @@ def train_sacdb2(schema, episodes, random_seed, batch_size, discount, autotune_e
                           clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
                           discount=discount, mode=mode)#,
                           #start_training_time_step=1, end_exploration_time_step=7000)
-    losses, rewards = sacdb2_model.learn(episodes=episodes, deterministic_finish=True)
+    losses, rewards, eval_results = sacdb2_model.learn(episodes=episodes, deterministic_finish=True)
 
     print('SAC DB2 model trained!')
 
-    return env, losses, rewards
+    return env, losses, rewards, eval_results
 
 
 if __name__ == '__main__':

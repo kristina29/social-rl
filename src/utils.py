@@ -724,6 +724,33 @@ def plot_losses(losses: Mapping[str, Mapping[int, Mapping[str, List[float]]]],
     return figs
 
 
+def plot_eval_results(results: Mapping[str, Mapping[str, List[float]]]) -> List[plt.Figure]:
+    """Plots KPIs during evaluation for different control agents.
+
+    Parameters
+    -----c-----
+    eval_results: Mapping[str, Mapping[str, List[float]]]
+        Mapping of user-defined control agent names to evalutation results of KPIs.
+
+    Return values
+    ----------
+    List of the created figures
+    """
+
+    figs = []
+    for agent, evaluation_results in results.items():
+        fig, ax = plt.subplots()
+        for kpi, values in evaluation_results.items():
+            ax.plot(values, label=kpi)
+        ax.legend()
+        ax.set_xlabel('Evaluation Iteration')
+        ax.set_ylabel('KPI Value')
+        ax.set_title(f'{agent} evaluation results during training')
+        figs.append(fig)
+
+    return figs
+
+
 def running_mean(x, N):
     cumsum = np.nancumsum(np.insert(x, 0, 0))
     return (cumsum[N:] - cumsum[:-N]) / float(N)
@@ -743,7 +770,8 @@ def save_multi_image(filename):
 
 
 def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], losses: Mapping[str, Mapping[str, List[float]]],
-                            rewards: Mapping[str, List[List[float]]], filename: str):
+                            rewards: Mapping[str, List[List[float]]],
+                            eval_results: Mapping[str, Mapping[str, List[float]]], filename: str):
     """Plots KPIs, load and battery SoC profiles for different control agents.
 
     Parameters
@@ -755,6 +783,8 @@ def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], losses: Mapping[st
         Mapping of user-defined control agent names to Mapping of neural-network name to loss values of training steps.
     rewards: Mapping[str, List[float]]
         Mapping of user-defined control agent names to rewards of training steps.
+    eval_results: Mapping[str, Mapping[str, List[float]]]
+        Mapping of user-defined control agent names to evalutation results of KPIs.
     filename: str
         Name of the file where plots should be stored
     """
@@ -769,6 +799,7 @@ def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], losses: Mapping[st
     plot_used_pv_share(envs)
     plot_losses(losses, envs)
     plot_rewards(rewards, envs)
+    plot_eval_results(eval_results)
 
     save_multi_image(filename)
 
@@ -797,13 +828,13 @@ def save_kpis(envs: Mapping[str, CityLearnEnv], filename):
 
 
 def save_results(envs: Mapping[str, CityLearnEnv], losses: Mapping[str, Mapping[str, List[float]]],
-                 rewards: Mapping[str, List[List[float]]]):
+                 rewards: Mapping[str, List[List[float]]], eval_results: Mapping[str, Mapping[str, List[float]]]):
 
     timestamp = datetime.now().strftime("%Y%m%dT%H%M%S")
 
     # plot summary and compare with other control results
     p_filename = f'plots_{timestamp}'
-    plot_simulation_summary(envs, losses, rewards, p_filename)
+    plot_simulation_summary(envs, losses, rewards, eval_results,  p_filename)
 
     # save KPIs as csv
     k_filename = f'kpis_{timestamp}.csv'
