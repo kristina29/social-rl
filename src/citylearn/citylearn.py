@@ -335,7 +335,7 @@ class CityLearnEnv(Environment, Env):
         """
 
         return np.stack((self.net_electricity_consumption_positive_without_storage,
-                         self.buildings[0].fuel_mix.renewable_energy_produced)).min(axis=0)
+                         self.buildings[0].fuel_mix.renewable_energy_produced[:len(self.net_electricity_consumption_positive_without_storage)])).min(axis=0)
 
     @property
     def net_renewable_electricity_grid_share_without_storage(self) -> List[float]:

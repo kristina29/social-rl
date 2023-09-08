@@ -120,11 +120,11 @@ def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entr
                     clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
                     discount=discount) #,
                     #start_training_time_step=1, end_exploration_time_step=7000)
-    losses, rewards = sac_model.learn(episodes=episodes, deterministic_finish=True)
+    losses, rewards, eval_results = sac_model.learn(episodes=episodes, deterministic_finish=True)
 
     print('SAC model trained!')
 
-    return env, losses, rewards
+    return env, losses, rewards, eval_results
 
 
 if __name__ == '__main__':
