@@ -105,9 +105,9 @@ class SACDB2(SAC):
                             self.soft_q_net2[i](o, demonstrator_actions)
                         )
 
-                        if self.mode == 1:
+                        if self.mode in [1, 3]:
                             q_demonstrator = q_demonstrator + (1+self.imitation_lr) * q_demonstrator
-                        elif self.mode == 2:
+                        if self.mode in [2, 3]:
                             log_pi = (1+self.imitation_lr) * log_pi  # increase probability of this action
 
                         policy_loss = (self.alpha[i] * log_pi - q_demonstrator).mean()
