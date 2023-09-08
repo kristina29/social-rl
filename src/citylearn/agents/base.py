@@ -186,8 +186,7 @@ class Agent(Environment):
                         eval_env = copy.deepcopy(self.env)
                         eval_observations = eval_env.reset()
 
-                        r = []
-                        for eval_step in range(168):
+                        while not eval_env.done:
                             actions = self.predict(eval_observations, deterministic=True)
                             eval_observations, eval_rewards, _, _ = eval_env.step(actions)
 
