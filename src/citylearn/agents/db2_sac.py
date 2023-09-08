@@ -13,7 +13,7 @@ except (ModuleNotFoundError, ImportError) as e:
 from citylearn.agents.sac import SAC
 
 class SACDB2(SAC):
-    def __init__(self, *args, imitation_lr: float = 0.01, **kwargs):
+    def __init__(self, *args, imitation_lr: float = 0.01, mode: int = 1, **kwargs):
         r"""Initialize :class:`SACDB2`.
 
         Parameters
@@ -22,6 +22,8 @@ class SACDB2(SAC):
             `SAC` positional arguments.
         imitation_lr: float
             Imitation learning rate
+        mode: int
+            Mode of social learning
 
         Other Parameters
         ----------------
@@ -31,6 +33,7 @@ class SACDB2(SAC):
         super().__init__(*args, **kwargs)
 
         self.imitation_lr = imitation_lr
+        self.mode = mode
         self.demonstrator_policy_net = [None for _ in range(self.env.demonstrator_count)]
 
         self.set_demonstrator_policies()
@@ -87,9 +90,6 @@ class SACDB2(SAC):
                 else:
                     pass
 
-                if self.env.buildings[i].demonstrator:
-                    print('Demonstrator True pred: ', self.policy_net[i].sample(torch.tensor([[0.25]]), True))
-
                 for _ in range(self.update_per_time_step):
                     o, q1_loss, q2_loss, policy_loss, alpha_loss = self.update_step(i)
                     current_losses['q1_losses'].append(q1_loss)
@@ -99,27 +99,21 @@ class SACDB2(SAC):
 
                     # Use demonstrator actions for updating policy
                     for demonstrator_policy in self.demonstrator_policy_net:
-                        print('Demonstrator Not True pred: ', demonstrator_policy.sample(torch.tensor([[0.25]]), True))
-                        action, log_pi, _ = demonstrator_policy.sample(torch.tensor([[0.25]]), True)
-                        q_demonstrator = torch.min(
-                            self.soft_q_net1[i](torch.tensor([[0.25]]), action),
-                            self.soft_q_net2[i](torch.tensor([[0.25]]), action)
-                        )
-                        q_demonstrator = q_demonstrator + self.imitation_lr * (1 - q_demonstrator)
-                        print(q_demonstrator)
-
                         demonstrator_actions, log_pi, _ = demonstrator_policy.sample(o)
                         q_demonstrator = torch.min(
                             self.soft_q_net1[i](o, demonstrator_actions),
                             self.soft_q_net2[i](o, demonstrator_actions)
                         )
-                        q_demonstrator = q_demonstrator + self.imitation_lr * (1-q_demonstrator)
+
+                        if self.mode == 1:
+                            q_demonstrator = q_demonstrator + (1+self.imitation_lr) * q_demonstrator
+                        elif self.mode == 2:
+                            log_pi = (1+self.imitation_lr) * log_pi  # increase probability of this action
 
                         policy_loss = (self.alpha[i] * log_pi - q_demonstrator).mean()
                         self.policy_optimizer[i].zero_grad()
                         policy_loss.backward()
                         self.policy_optimizer[i].step()
-                print('')
             else:
                 pass
 
