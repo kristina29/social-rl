@@ -11,7 +11,7 @@ from mpl_toolkits.basemap import Basemap
 
 from utils import save_multi_image
 
-save = True
+save = False
 challenge_data = False
 ny_data = True
 timestamp = datetime.now().strftime("%Y%m%dT%H%M%S")
@@ -424,6 +424,17 @@ pricing_new = pd.read_csv('citylearn/data/nydata/pricing.csv')['Electricity Pric
 fossil_share = 1 - fuel_mix['Renewable Share']
 alpha = 20
 pricing_new = pricing_new + alpha * fossil_share
+
+hours = []
+h = 1
+for i in range(len(pricing_new)):
+    hours.append(h)
+    h+=1
+    if h == 25:
+        h=1
+hours = np.array(hours)
+fig, ax = plt.subplots()
+create_scatter_plot(ax, hours, pricing_new)
 
 # normalize between 0 and 1
 pricing_new = (pricing_new - np.min(pricing_new)) / (np.max(pricing_new) - np.min(pricing_new))
