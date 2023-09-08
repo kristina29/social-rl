@@ -124,7 +124,7 @@ def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entr
 
     print('SAC model trained!')
 
-    return env, losses, rewards
+    return env, losses, rewards, eval_results
 
 
 if __name__ == '__main__':
