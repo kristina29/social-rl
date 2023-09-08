@@ -106,7 +106,6 @@ class SACDB2(SAC):
                         self.policy_optimizer[i].zero_grad()
                         policy_loss.backward()
                         self.policy_optimizer[i].step()
-
             else:
                 pass
 

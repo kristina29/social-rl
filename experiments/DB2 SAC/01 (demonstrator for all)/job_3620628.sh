@@ -2,7 +2,7 @@
 #SBATCH --ntasks=1                # Number of tasks (see below)
 #SBATCH --cpus-per-task=1         # Number of CPU cores per task
 #SBATCH --nodes=1                 # Ensure that all cores are on one machine
-#SBATCH --time=0-12:00            # Runtime in D-HH:MM
+#SBATCH --time=0-02:00            # Runtime in D-HH:MM
 #SBATCH --gres=gpu:1    # optionally type and number of gpus
 #SBATCH --mem=100G                # Memory pool for all cores (see also --mem-per-cpu)
 #SBATCH --output=logs/job_%j.out  # File to which STDOUT will be written - make sure this is not on $HOME
@@ -18,8 +18,6 @@ source $HOME/.bashrc
 # insert your commands here
 #eval "$(micromamba shell hook --shell=bash)"
 micromamba activate social-rl
-
-srun python3 src/socialrl.py -s nydata_new_buildings2 -b 6 -d 2 -e 2 --tql --autotune
-
+srun python3 src/socialrl.py -b 4 -d 1 -e 2 --tql
 micromamba deactivate
 
