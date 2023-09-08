@@ -107,7 +107,7 @@ if __name__ == '__main__':
     l2_loss = opts.l2_loss
     mode = opts.mode
 
-    if True:
+    if False:
         DATASET_NAME = 'nydata'
         exclude_rbc = 1
         exclude_tql = 1
