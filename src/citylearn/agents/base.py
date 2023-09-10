@@ -180,8 +180,9 @@ class Agent(Environment):
                 observations = [o for o in next_observations]
 
                 # evaluate once a month for a whole week
-                if self.env.time_step % (168*4) == 0 and hasattr(self, 'start_training_time_step') and \
-                        self.time_step >= self.start_training_time_step:
+                if self.env.time_step % (168 * 4) == 0 \
+                        and hasattr(self, 'start_training_time_step') \
+                        and self.start_training_time_step <= self.time_step <= self.end_exploration_time_step:
                     for eval_counter in range(1):#range(30):
                         eval_env = copy.deepcopy(self.env)
                         eval_observations = eval_env.reset()

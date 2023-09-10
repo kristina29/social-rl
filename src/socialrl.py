@@ -11,7 +11,7 @@ from nonsocialrl import train_tql, train_rbc, train_sac
 
 def train(dataset_name, random_seed, building_count, demonstrators_count, episodes, discount, active_observations,
           batch_size, autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc,
-          exclude_sac, mode):
+          exclude_sac, mode, imitation_lr):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
 
@@ -46,7 +46,8 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
     all_envs['SAC_DB2'], all_losses['SAC_DB2'], all_rewards['SAC_DB2'], all_eval_results['SAC_DB2'] = \
         train_sacdb2(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
                      discount=discount, autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
-                     kaiming_initialization= kaiming_initialization, l2_loss=l2_loss, mode=mode)
+                     kaiming_initialization= kaiming_initialization, l2_loss=l2_loss, mode=mode, 
+                     imitation_lr=imitation_lr)
 
     save_results(all_envs, all_losses, all_rewards, all_eval_results)
 
@@ -72,11 +73,11 @@ def preprocessing(schema, building_count, demonstrators_count, random_seed, acti
 
 
 def train_sacdb2(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
-                 kaiming_initialization, l2_loss, mode):
+                 kaiming_initialization, l2_loss, mode, imitation_lr):
     env = CityLearnEnv(schema)
     sacdb2_model = SACDB2(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
                           clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
-                          discount=discount, mode=mode)#,
+                          discount=discount, mode=mode, imitation_lr=imitation_lr)#,
                           #start_training_time_step=1, end_exploration_time_step=7000)
     losses, rewards, eval_results = sacdb2_model.learn(episodes=episodes, deterministic_finish=True)
 
@@ -106,6 +107,7 @@ if __name__ == '__main__':
     kaiming_initialization = opts.kaiming
     l2_loss = opts.l2_loss
     mode = opts.mode
+    imitation_lr = opts.ir
 
     if False:
         DATASET_NAME = 'nydata'
@@ -119,6 +121,7 @@ if __name__ == '__main__':
         seed = 2
         active_observations = ['renewable_energy_produced']
         batch_size = 256
+        imitation_lr = 0.01
         mode = 1
         autotune_entropy = True
         clip_gradient = False
@@ -129,7 +132,8 @@ if __name__ == '__main__':
           demonstrators_count=demonstrators_count, episodes=episodes, discount=discount,
           active_observations=active_observations, batch_size=batch_size, autotune_entropy=autotune_entropy,
           clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
-          exclude_tql=exclude_tql, exclude_rbc=exclude_rbc, exclude_sac=exclude_sac, mode=mode)
+          exclude_tql=exclude_tql, exclude_rbc=exclude_rbc, exclude_sac=exclude_sac, mode=mode, 
+          imitation_lr=imitation_lr)
 
     # get the end time
     et = time.time()
