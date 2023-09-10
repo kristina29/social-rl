@@ -13,7 +13,7 @@ except (ModuleNotFoundError, ImportError) as e:
 from citylearn.agents.sac import SAC
 
 class SACDB2(SAC):
-    def __init__(self, *args, imitation_lr: float = 0.01, **kwargs):
+    def __init__(self, *args, imitation_lr: float = 0.01, mode: int = 1, **kwargs):
         r"""Initialize :class:`SACDB2`.
 
         Parameters
@@ -22,6 +22,8 @@ class SACDB2(SAC):
             `SAC` positional arguments.
         imitation_lr: float
             Imitation learning rate
+        mode: int
+            Mode of social learning
 
         Other Parameters
         ----------------
@@ -31,6 +33,7 @@ class SACDB2(SAC):
         super().__init__(*args, **kwargs)
 
         self.imitation_lr = imitation_lr
+        self.mode = mode
         self.demonstrator_policy_net = [None for _ in range(self.env.demonstrator_count)]
 
         self.set_demonstrator_policies()
@@ -101,7 +104,12 @@ class SACDB2(SAC):
                             self.soft_q_net1[i](o, demonstrator_actions),
                             self.soft_q_net2[i](o, demonstrator_actions)
                         )
-                        q_demonstrator = q_demonstrator + self.imitation_lr * (1-q_demonstrator)
+
+                        if self.mode in [1, 3]:
+                            q_demonstrator = q_demonstrator + (1+self.imitation_lr) * q_demonstrator
+                        if self.mode in [2, 3]:
+                            log_pi = (1+self.imitation_lr) * log_pi  # increase probability of this action
+
                         policy_loss = (self.alpha[i] * log_pi - q_demonstrator).mean()
                         self.policy_optimizer[i].zero_grad()
                         policy_loss.backward()

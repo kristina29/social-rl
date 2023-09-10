@@ -34,6 +34,10 @@ def parseOptions_social():
                               'number of total buildings). If not defined, one building acts as demonstrator.')
     optParser.add_option('--sac', action='store_true', default=False, dest='exclude_sac',
                          help='Do not train a soft actor-critic (SAC) agent for comparison.')
+    optParser.add_option('--mode', action='store', type='int', dest='mode', default='1',
+                         help='Social-learning mode to use.')
+    optParser.add_option('--ir', action='store', type='float', dest='ir', default='0.01',
+                         help='Imitation rate for imitating actions/values of the demonstrators.')
 
     opts, args = optParser.parse_args()
 
