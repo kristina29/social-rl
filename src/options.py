@@ -36,6 +36,7 @@ def parseOptions_social():
                          help='Do not train a soft actor-critic (SAC) agent for comparison.')
     optParser.add_option('--mode', action='store', type='int', dest='mode', default='1',
                          help='Social-learning mode to use.')
+    optParser.add_option('--ir')
 
     opts, args = optParser.parse_args()
 
