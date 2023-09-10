@@ -189,7 +189,7 @@ class Agent(Environment):
                 #if hasattr(self, 'start_training_time_step') \
                 #        and self.start_training_time_step <= self.time_step <= self.end_exploration_time_step:
                     #print('self.env.time_step % 168', self.env.time_step % 168)
-                if self.env.time_step % 168 == 0 \
+                if self.time_step % 168 == 0 \
                         and hasattr(self, 'start_training_time_step') \
                         and self.start_training_time_step <= self.time_step <= self.end_exploration_time_step:
                     for eval_counter in range(1):  # range(30):
