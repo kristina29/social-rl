@@ -1,8 +1,10 @@
+import copy
 import inspect
 import logging
 import os
 from pathlib import Path
 import pickle
+from statistics import mean
 from typing import Any, List, Mapping, Union
 from gym import spaces
 from citylearn.base import Environment
@@ -11,6 +13,7 @@ from citylearn.citylearn import CityLearnEnv
 LOGGER = logging.getLogger()
 logging.getLogger('matplotlib.font_manager').disabled = True
 logging.getLogger('matplotlib.pyplot').disabled = True
+
 
 class Agent(Environment):
     def __init__(self, env: CityLearnEnv, **kwargs):
@@ -35,9 +38,9 @@ class Agent(Environment):
 
         arg_spec = inspect.getfullargspec(super().__init__)
         kwargs = {
-            key:value for (key, value) in kwargs.items()
+            key: value for (key, value) in kwargs.items()
             if (key in arg_spec.args or (arg_spec.varkw is not None))
-            
+
         }
         super().__init__(**kwargs)
 
@@ -98,9 +101,9 @@ class Agent(Environment):
             self.__actions[i][self.time_step] = actions[i]
 
     def learn(
-            self, episodes: int = None, keep_env_history: bool = None, env_history_directory: Union[str, Path] = None, 
+            self, episodes: int = None, keep_env_history: bool = None, env_history_directory: Union[str, Path] = None,
             deterministic: bool = None, deterministic_finish: bool = None, logging_level: int = None
-        ) -> (Mapping[int, Mapping[str, List[float]]], List[float]):
+    ) -> (Mapping[int, Mapping[str, List[float]]], List[float]):
         """Train agent.
 
         Parameters
@@ -125,7 +128,7 @@ class Agent(Environment):
         rewards: List[List[float]]
             Reward value per training step.
         """
-        
+
         episodes = 1 if episodes is None else episodes
         keep_env_history = False if keep_env_history is None else keep_env_history
         deterministic_finish = False if deterministic_finish is None else deterministic_finish
@@ -133,14 +136,18 @@ class Agent(Environment):
         self.__set_logger(logging_level)
 
         if keep_env_history:
-            env_history_directory = Path(f'citylearn_learning_{self.env.uid}') if env_history_directory is None else env_history_directory
+            env_history_directory = Path(
+                f'citylearn_learning_{self.env.uid}') if env_history_directory is None else env_history_directory
             os.makedirs(env_history_directory, exist_ok=True)
-            
+
         else:
             pass
 
         losses = None
         rewards = []
+        eval_results = {'1 - average_daily_renewable_share': [],
+                        '1 - average_daily_renewable_share_grid': [],
+                        '1 - used_pv_of_total_share': []}
         for episode in range(episodes):
             deterministic = deterministic or (deterministic_finish and episode >= episodes - 1)
             observations = self.env.reset()
@@ -172,11 +179,37 @@ class Agent(Environment):
 
                 observations = [o for o in next_observations]
 
+                # evaluate once a month for a whole week
+                if self.env.time_step % 168 == 0 \
+                        and hasattr(self, 'start_training_time_step') \
+                        and self.start_training_time_step <= self.time_step <= self.end_exploration_time_step:
+                    for eval_counter in range(1):#range(30):
+                        eval_env = copy.deepcopy(self.env)
+                        eval_observations = eval_env.reset()
+
+                        while not eval_env.done:
+                            actions = self.predict(eval_observations, deterministic=True)
+                            eval_observations, eval_rewards, _, _ = eval_env.step(actions)
+
+                        kpis = eval_env.evaluate()
+                        kpis = kpis[(kpis['cost_function'].isin(['1 - average_daily_renewable_share',
+                                                                 '1 - average_daily_renewable_share_grid',
+                                                                 '1 - used_pv_of_total_share']))].dropna()
+                        kpis['value'] = kpis['value'].round(3)
+                        kpis = kpis.rename(columns={'cost_function': 'kpi'})
+                        kpis = kpis[kpis['level'] == 'district'].copy()
+
+                        for kpi, value in zip(kpis['kpi'], kpis['value']):
+                            if isinstance(value, float):
+                                eval_results[kpi].append(value)
+                            else:
+                                eval_results[kpi].extend(value)
+
                 logging.debug(
-                    f'Time step: {self.env.time_step}/{self.env.time_steps - 1},'\
-                        f' Episode: {episode}/{episodes - 1},'\
-                            f' Actions: {actions},'\
-                                f' Rewards: {new_rewards}'
+                    f'Time step: {self.env.time_step}/{self.env.time_steps - 1},' \
+                    f' Episode: {episode}/{episodes - 1},' \
+                    f' Actions: {actions},' \
+                    f' Rewards: {new_rewards}'
                 )
 
             # store episode's env to disk
@@ -185,7 +218,7 @@ class Agent(Environment):
             else:
                 pass
 
-        return losses, rewards
+        return losses, rewards, eval_results
 
     def get_env_history(self, directory: Path, episodes: List[int] = None):
         env_history = ()
@@ -207,7 +240,6 @@ class Agent(Environment):
         with open(filepath, 'wb') as f:
             pickle.dump(self.env, f)
 
-
     def predict(self, observations: List[List[float]], deterministic: bool = None) -> List[List[float]]:
         """Provide actions for current time step.
 
@@ -225,12 +257,12 @@ class Agent(Environment):
         actions: List[float]
             Action values
         """
-        
+
         actions = [list(s.sample()) for s in self.action_space]
         self.actions = actions
         self.next_time_step()
         return actions
-    
+
     def __set_logger(self, logging_level: int = None):
         logging_level = 30 if logging_level is None else logging_level
         assert logging_level >= 0, 'logging_level must be >= 0'
