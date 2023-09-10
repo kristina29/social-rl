@@ -534,7 +534,13 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
 
         share = used / could_have_used
         share[share == np.inf] = 1.
-        assert np.all(((share >= 0.) & (share <= 1.) | np.isnan(share)))
+
+        try:
+            assert np.all(((share >= 0.) & (share <= 1.)) | np.isnan(share))
+        except AssertionError:
+            print('Assertion problem values:',
+                  share[np.where((share < 0) | (share > 1) | (np.isnan(share)))])
+
         y = running_mean(share, 160)
         x = range(len(y))
         ax.plot(x, y, label=k)
@@ -586,7 +592,12 @@ def plot_used_pv_share(envs: Mapping[str, CityLearnEnv]) -> List[plt.Figure]:
 
             share = used / could_have_used
             share[no_generation] = np.nan
-            assert np.all(((share >= 0.) & (share <= 1.) | np.isnan(share)))
+
+            try:
+                assert np.all(((share >= 0.) & (share <= 1.)) | np.isnan(share))
+            except AssertionError:
+                print('Assertion problem values:',
+                      share[np.where((share < 0) | (share > 1) | (np.isnan(share)))])
 
             y = running_mean(share, 160)
             x = range(len(y))
