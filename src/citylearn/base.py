@@ -42,6 +42,10 @@ class Environment:
         r"""Number of seconds in 1 time step."""
 
         return self.__seconds_per_time_step
+
+    @time_step.setter
+    def time_step(self, time_step: int):
+        self.__time_step = time_step
     
     @random_seed.setter
     def random_seed(self, random_seed: int):

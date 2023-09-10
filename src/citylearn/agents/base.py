@@ -150,9 +150,9 @@ class Agent(Environment):
                         '1 - used_pv_of_total_share': []}
 
         # evaluate once a month for a whole week
-        if hasattr(self, 'start_training_time_step'):
-            print('start_training_time_step', self.start_training_time_step)
-            print('end_exploration_time_step', self.end_exploration_time_step)
+        #if hasattr(self, 'start_training_time_step'):
+            #print('start_training_time_step', self.start_training_time_step)
+            #print('end_exploration_time_step', self.end_exploration_time_step)
 
         for episode in range(episodes):
             deterministic = deterministic or (deterministic_finish and episode >= episodes - 1)
@@ -186,12 +186,13 @@ class Agent(Environment):
                 observations = [o for o in next_observations]
 
                 # evaluate once a month for a whole week
-                if hasattr(self, 'start_training_time_step') \
-                        and self.start_training_time_step <= self.time_step <= self.end_exploration_time_step:
-                    print('self.env.time_step % 168', self.env.time_step % 168)
+                #if hasattr(self, 'start_training_time_step') \
+                #        and self.start_training_time_step <= self.time_step <= self.end_exploration_time_step:
+                    #print('self.env.time_step % 168', self.env.time_step % 168)
                 if self.time_step % 168 == 0 \
                         and hasattr(self, 'start_training_time_step') \
                         and self.start_training_time_step <= self.time_step <= self.end_exploration_time_step:
+                    old_time_step = self.time_step
                     for eval_counter in range(1):  # range(30):
                         eval_env = copy.deepcopy(self.env)
                         eval_observations = eval_env.reset()
@@ -207,15 +208,17 @@ class Agent(Environment):
                         kpis['value'] = kpis['value'].round(3)
                         kpis = kpis.rename(columns={'cost_function': 'kpi'})
                         kpis = kpis[kpis['level'] == 'district'].copy()
-                        print('KPIS', kpis)
+                        #print('KPIS', kpis)
 
                         for kpi, value in zip(kpis['kpi'], kpis['value']):
-                            print('KPI, value', kpi, value)
+                            #print('KPI, value', kpi, value)
                             if isinstance(value, float):
                                 eval_results[kpi].append(value)
                             else:
                                 eval_results[kpi].extend(value)
-                        print('')
+                        #print('')
+
+                    self.time_step = old_time_step
 
                 logging.debug(
                     f'Time step: {self.env.time_step}/{self.env.time_steps - 1},' \
@@ -224,8 +227,9 @@ class Agent(Environment):
                     f' Rewards: {new_rewards}'
                 )
 
-                print('self.env.time_step', self.env.time_step)
-                print('env.done', self.env.done)
+                #print('self.time_step', self.time_step)
+                #print('self.env.time_step', self.env.time_step)
+                #print('env.done', self.env.done)
 
             # store episode's env to disk
             if keep_env_history:
@@ -234,7 +238,7 @@ class Agent(Environment):
                 pass
 
 
-        print(eval_results)
+        #print(eval_results)
         return losses, rewards, eval_results
 
     def get_env_history(self, directory: Path, episodes: List[int] = None):
