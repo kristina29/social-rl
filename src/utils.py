@@ -482,7 +482,7 @@ def plot_district_load_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
 def get_possible_consumption(building: Building, excluded_used_pv: bool) -> np.ndarray:
     ec = np.array(building.electrical_storage.capacity_history)
     es = np.array(building.electrical_storage.soc)
-    battery_input = np.minimum(np.clip((ec - es), 0., None), np.array(building.electrical_storage.max_input_history))
+    battery_input = np.minimum(np.clip((ec - es), 0., None), np.array(building.electrical_storage.nominal_power))
 
     if excluded_used_pv:
         return battery_input + building.net_electricity_consumption_without_storage_and_pv
@@ -534,6 +534,7 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
 
         share = used / could_have_used
         share[share == np.inf] = 1.
+        assert np.all((share >= 0) & (share <= 1))
         y = running_mean(share, 160)
         x = range(len(y))
         ax.plot(x, y, label=k)
@@ -585,6 +586,7 @@ def plot_used_pv_share(envs: Mapping[str, CityLearnEnv]) -> List[plt.Figure]:
 
             share = used / could_have_used
             share[no_generation] = np.nan
+            assert np.all(((share >= 0) & (share <= 1) | np.isnan(share)))
 
             y = running_mean(share, 160)
             x = range(len(y))
