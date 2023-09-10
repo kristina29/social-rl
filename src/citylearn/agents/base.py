@@ -148,6 +148,12 @@ class Agent(Environment):
         eval_results = {'1 - average_daily_renewable_share': [],
                         '1 - average_daily_renewable_share_grid': [],
                         '1 - used_pv_of_total_share': []}
+
+        # evaluate once a month for a whole week
+        if hasattr(self, 'start_training_time_step'):
+            print('start_training_time_step', self.start_training_time_step)
+            print('end_exploration_time_step', self.end_exploration_time_step)
+
         for episode in range(episodes):
             deterministic = deterministic or (deterministic_finish and episode >= episodes - 1)
             observations = self.env.reset()
@@ -183,7 +189,7 @@ class Agent(Environment):
                 if self.env.time_step % 168 == 0 \
                         and hasattr(self, 'start_training_time_step') \
                         and self.start_training_time_step <= self.time_step <= self.end_exploration_time_step:
-                    for eval_counter in range(1):#range(30):
+                    for eval_counter in range(1):  # range(30):
                         eval_env = copy.deepcopy(self.env)
                         eval_observations = eval_env.reset()
 
@@ -218,6 +224,7 @@ class Agent(Environment):
             else:
                 pass
 
+        print(eval_results)
         return losses, rewards, eval_results
 
     def get_env_history(self, directory: Path, episodes: List[int] = None):
@@ -244,7 +251,7 @@ class Agent(Environment):
         """Provide actions for current time step.
 
         Return randomly sampled actions from `action_space`.
-        
+
         Parameters
         ----------
         observations: List[List[float]]
@@ -275,7 +282,7 @@ class Agent(Environment):
         ------
         losses: Mapping[str, List[float]]
             Mapping of neural-network name to loss values of training steps.
-        
+
         Notes
         -----
         This implementation does nothing but is kept to keep the API for all agents similar during simulation.
