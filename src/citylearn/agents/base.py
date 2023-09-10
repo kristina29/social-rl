@@ -186,6 +186,9 @@ class Agent(Environment):
                 observations = [o for o in next_observations]
 
                 # evaluate once a month for a whole week
+                if hasattr(self, 'start_training_time_step') \
+                        and self.start_training_time_step <= self.time_step <= self.end_exploration_time_step:
+                    print('self.env.time_step % 168', self.env.time_step % 168)
                 if self.env.time_step % 168 == 0 \
                         and hasattr(self, 'start_training_time_step') \
                         and self.start_training_time_step <= self.time_step <= self.end_exploration_time_step:
@@ -204,12 +207,15 @@ class Agent(Environment):
                         kpis['value'] = kpis['value'].round(3)
                         kpis = kpis.rename(columns={'cost_function': 'kpi'})
                         kpis = kpis[kpis['level'] == 'district'].copy()
+                        print('KPIS', kpis)
 
                         for kpi, value in zip(kpis['kpi'], kpis['value']):
+                            print('KPI, value', kpi, value)
                             if isinstance(value, float):
                                 eval_results[kpi].append(value)
                             else:
                                 eval_results[kpi].extend(value)
+                        print('')
 
                 logging.debug(
                     f'Time step: {self.env.time_step}/{self.env.time_steps - 1},' \
