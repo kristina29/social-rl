@@ -482,6 +482,7 @@ def plot_district_load_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
 def get_possible_consumption(building: Building, excluded_used_pv: bool) -> np.ndarray:
     ec = np.array(building.electrical_storage.capacity_history)
     es = np.array(building.electrical_storage.soc)
+    #TODO get_max_input_power uses last possible input!
     battery_input = np.minimum(np.clip((ec - es), 0., None), building.electrical_storage.get_max_input_power())
 
     if excluded_used_pv:
