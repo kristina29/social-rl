@@ -180,7 +180,7 @@ class Agent(Environment):
                 observations = [o for o in next_observations]
 
                 # evaluate once a month for a whole week
-                if self.env.time_step % (168 * 4) == 0 \
+                if self.env.time_step % 168 == 0 \
                         and hasattr(self, 'start_training_time_step') \
                         and self.start_training_time_step <= self.time_step <= self.end_exploration_time_step:
                     for eval_counter in range(1):#range(30):
