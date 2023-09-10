@@ -224,11 +224,15 @@ class Agent(Environment):
                     f' Rewards: {new_rewards}'
                 )
 
+                print('self.env.time_step', self.env.time_step)
+                print('env.done', self.env.done)
+
             # store episode's env to disk
             if keep_env_history:
                 self.__save_env(episode, env_history_directory)
             else:
                 pass
+
 
         print(eval_results)
         return losses, rewards, eval_results
