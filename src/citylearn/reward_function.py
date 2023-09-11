@@ -197,7 +197,7 @@ class OwnSolarPenaltyReward(RewardFunction):
             else:
                 used = max(min(b.net_electricity_consumption[-1] - b.solar_generation[-1], b.solar_generation[-1]*-1),
                            0)
-                reward = -(used - could_used)
+                reward = used - could_used
 
             reward_list.append(reward)
 
