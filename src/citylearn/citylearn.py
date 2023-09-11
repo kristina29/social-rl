@@ -701,6 +701,7 @@ class CityLearnEnv(Environment, Env):
             building.apply_actions(**building_actions)
 
         self.next_time_step()
+        print(self.reward_function)
         reward = self.reward_function.calculate()
         self.__rewards.append(reward)
         return self.observations, reward, self.done, self.get_info()
