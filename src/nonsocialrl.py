@@ -137,6 +137,7 @@ if __name__ == '__main__':
     seed = opts.seed
     building_count = opts.buildings
     episodes = opts.episodes
+    discount = opts.discount
     exclude_tql = opts.exclude_tql
     exclude_rbc = opts.exclude_rbc
     active_observations = opts.observations
