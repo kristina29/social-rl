@@ -191,7 +191,8 @@ class Agent(Environment):
                     #print('self.env.time_step % 168', self.env.time_step % 168)
                 if self.time_step % 168 == 0 \
                         and hasattr(self, 'start_training_time_step') \
-                        and self.start_training_time_step <= self.time_step <= self.end_exploration_time_step:
+                        and self.start_training_time_step <= self.time_step <= self.end_exploration_time_step \
+                        and self.time_step > self.replay_buffer_capacity:
                     old_time_step = self.time_step
                     for eval_counter in range(1):  # range(30):
                         eval_env = copy.deepcopy(self.env)
