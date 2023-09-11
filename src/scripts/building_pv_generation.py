@@ -9,7 +9,7 @@ from pvlib.pvarray import pvefficiency_adr
 ##### Based on https://pvlib-python.readthedocs.io/en/latest/gallery/adr-pvarray/plot_simulate_fast.html
 ########################################################################################################################
 
-df_raw = pd.read_csv('../datasets/building_data_test/weather_ny.csv')
+df_raw = pd.read_csv('../../datasets/building_data_test/weather_ny.csv')
 
 df = pd.DataFrame({'dhi': df_raw['Diffuse Solar Radiation [W/m2]'],
                    'dni': df_raw['Direct Solar Radiation [W/m2]'],

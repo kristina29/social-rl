@@ -151,9 +151,9 @@ def read_fuel_data(load_dir) -> pd.DataFrame:
 
 
 if __name__ == '__main__':
-    weather_dir = '../datasets/'
+    weather_dir = '../../datasets/'
     weather_filepath = f'{weather_dir}weather_ny_42.30_-74.37_2021.csv'
-    weather_save_filepath = 'citylearn/data/nydata/weather.csv'
+    weather_save_filepath = '../citylearn/data/nydata/weather.csv'
     preprocess_data(weather_filepath, weather_save_filepath, weather=True)
 
     weather_filenames = [f'{weather_dir}{filename}' for filename in os.listdir(weather_dir) if filename.startswith('weather_ny_')]
@@ -161,6 +161,6 @@ if __name__ == '__main__':
     preprocess_data(weather_filenames, weather_save_filepath, weather=True)
 
     fuel_mix_dirpath = '../datasets/fuel_mix_ny_2021'
-    fuel_mix_save_filepath = 'citylearn/data/nydata/fuelmix.csv'
+    fuel_mix_save_filepath = '../citylearn/data/nydata/fuelmix.csv'
     fuel_mix = preprocess_data(fuel_mix_dirpath, fuel_mix_save_filepath, weather=False)
 

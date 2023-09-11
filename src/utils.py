@@ -17,7 +17,8 @@ import seaborn as sns
 from citylearn.utilities import get_active_parts
 
 
-def set_schema_buildings(schema: dict, count: int, seed: int) -> Tuple[dict, List[str]]:
+def set_schema_buildings(schema: dict, count: int=1, seed: int=1, building_id: int=None) \
+        -> Tuple[dict, List[str]]:
     """Randomly select number of buildings to set as active in the schema.
 
     Parameters
@@ -28,6 +29,8 @@ def set_schema_buildings(schema: dict, count: int, seed: int) -> Tuple[dict, Lis
         Number of buildings to set as active in schema.
     seed: int
         Seed for pseudo-random number generator
+    building_id: int
+        Id of the only building that should be included.
 
     Returns
     -------
@@ -57,7 +60,10 @@ def set_schema_buildings(schema: dict, count: int, seed: int) -> Tuple[dict, Lis
             buildings.remove(b)
 
     # randomly select specified number of buildings
-    buildings = np.random.choice(buildings, size=count, replace=False).tolist()
+    if building_id is None:
+        buildings = np.random.choice(buildings, size=count, replace=False).tolist()
+    else:
+        buildings = [f'Building_{building_id}']
 
     # reorder buildings
     building_ids = [int(b.split('_')[-1]) for b in buildings]

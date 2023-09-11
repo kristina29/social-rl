@@ -12,7 +12,8 @@ from utils import set_schema_buildings, set_active_observations, save_results
 
 
 def train(dataset_name, random_seed, building_count, episodes, active_observations, batch_size, discount,
-          autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc):
+          autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc,
+          building_id):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
 
@@ -22,7 +23,7 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
     # TODO: DATA EXPLORATION
 
     # Data Preprocessing
-    schema = preprocessing(schema, building_count, random_seed, active_observations)
+    schema = preprocessing(schema, building_count, random_seed, active_observations, building_id=building_id)
 
     all_envs = {}
     all_losses = {}
@@ -49,9 +50,12 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
     save_results(all_envs, all_losses, all_rewards)
 
 
-def preprocessing(schema, building_count, random_seed, active_observations):
-    if building_count is not None:
-        schema, buildings = set_schema_buildings(schema, building_count, random_seed)
+def preprocessing(schema, building_count, random_seed, active_observations, building_id):
+    if building_id is not None:
+        schema, buildings = set_schema_buildings(schema, building_id=building_id)
+        print('Selected buildings:', buildings)
+    elif building_count is not None:
+        schema, buildings = set_schema_buildings(schema, count=building_count, seed=random_seed)
         print('Selected buildings:', buildings)
     if active_observations is not None:
         schema, active_observations = set_active_observations(schema, active_observations)
@@ -144,6 +148,7 @@ if __name__ == '__main__':
     clip_gradient = opts.clipgradient
     kaiming_initialization = opts.kaiming
     l2_loss = opts.l2_loss
+    building_id = opts.building_id
 
     if False:
         DATASET_NAME = 'nydata'
@@ -153,6 +158,8 @@ if __name__ == '__main__':
         episodes = 2
         seed = 2
         autotune_entropy = False
+        discount = 0.99
+        building_id = 6
         active_observations = ['hour']  # , 'electricity_pricing', 'electricity_pricing_predicted_6h',
         #                       'electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
         batch_size = 256
@@ -160,8 +167,10 @@ if __name__ == '__main__':
         kaiming_initialization = False
         l2_loss = False
 
-    train(DATASET_NAME, seed, building_count, episodes, active_observations, batch_size, discount, autotune_entropy,
-          clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc)
+    train(dataset_name=DATASET_NAME, random_seed=seed, building_count=building_count, episodes=episodes,
+          active_observations=active_observations, batch_size=batch_size, discount=discount,
+          autotune_entropy=autotune_entropy, clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization,
+          l2_loss=l2_loss, exclude_tql=exclude_tql, exclude_rbc=exclude_rbc, building_id=building_id)
 
     # get the end time
     et = time.time()
