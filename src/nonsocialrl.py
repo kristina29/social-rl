@@ -149,7 +149,7 @@ if __name__ == '__main__':
     building_id = opts.building_id
     store_agents = opts.store_agents
 
-    if True:
+    if False:
         DATASET_NAME = 'nydata'
         exclude_rbc = 0
         exclude_tql = 1
