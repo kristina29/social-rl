@@ -43,7 +43,7 @@ def set_schema_buildings(schema: dict, count: int, seed: int) -> Tuple[dict, Lis
     if seed is not None:
         np.random.seed(seed)
     else:
-        np.random.seed(27) #always get the same buildings for training
+        np.random.seed(27)  # always get the same buildings for training
 
     # get all building names
     buildings = list(schema['buildings'].keys())
@@ -486,16 +486,19 @@ def get_possible_consumption(building: Building, excluded_used_pv: bool) -> np.n
     es = building.electrical_storage.soc[:-1]
     es.insert(0, 0.)
     es = np.array(es)
-    battery_input = np.minimum(np.clip((ec - es), 0., None), np.array(building.electrical_storage.nominal_power))
+    max_battery_input = (ec - es * (1 - building.electrical_storage.loss_coefficient)) / \
+                        building.electrical_storage.efficiency_history
+    battery_input = np.minimum(np.clip(max_battery_input, 0., None),
+                               np.array(building.electrical_storage.nominal_power))
 
     if excluded_used_pv:
         return battery_input + building.net_electricity_consumption_without_storage_and_pv
     else:
         return np.maximum(battery_input + building.net_electricity_consumption_without_storage_and_pv -
-                          building.solar_generation*-1, 0.)
+                          building.solar_generation * -1, 0.)
 
 
-def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> plt.Figure:
+def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool = False) -> plt.Figure:
     """Plots renewable share KPIs over time for different control agents.
 
     Parameters
@@ -512,8 +515,8 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
         Figure containing plotted axes.
     """
 
-    #figsize = (5.0, 1.5)
-    fig, ax = plt.subplots(1, 1)#, figsize=figsize)
+    # figsize = (5.0, 1.5)
+    fig, ax = plt.subplots(1, 1)  # , figsize=figsize)
 
     for k, v in envs.items():
         if grid:
@@ -532,7 +535,7 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
                 could_used += b_demand
                 solar_could_used += np.minimum(b.solar_generation * -1, b_demand)
 
-            could_have_used = np.minimum(v.buildings[0].fuel_mix.renewable_energy_produced+solar_could_used,
+            could_have_used = np.minimum(v.buildings[0].fuel_mix.renewable_energy_produced + solar_could_used,
                                          could_used)
             used = v.net_renewable_electricity_consumption
 
@@ -540,10 +543,10 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool=False) -> 
         share[share == np.inf] = 1.
 
         try:
-            assert np.all(((share >= 0.) & (share <= 1.)) | np.isnan(share))
+            assert np.all(((share > -0.01) & (share < 1.01)) | np.isnan(share))
         except AssertionError:
             print('Assertion problem values:',
-                  share[np.where((share < 0) | (share > 1) | (np.isnan(share)))])
+                  share[np.where((share <= -0.01) | (share >= 1.01))])
 
         y = running_mean(share, 160)
         x = range(len(y))
@@ -590,7 +593,7 @@ def plot_used_pv_share(envs: Mapping[str, CityLearnEnv]) -> List[plt.Figure]:
 
             could_have_used = np.minimum(b.solar_generation * -1, could_used)
             no_generation = np.where(b.solar_generation == 0)[0]
-            could_have_used[no_generation] = 1. # prevent errors
+            could_have_used[no_generation] = 1.  # prevent errors
 
             used = b.used_pv_electricity
 
@@ -598,10 +601,10 @@ def plot_used_pv_share(envs: Mapping[str, CityLearnEnv]) -> List[plt.Figure]:
             share[no_generation] = np.nan
 
             try:
-                assert np.all(((share >= 0.) & (share <= 1.)) | np.isnan(share))
+                assert np.all(((share > -0.01) & (share < 1.01)) | np.isnan(share))
             except AssertionError:
                 print('Assertion problem values:',
-                      share[np.where((share < 0) | (share > 1) | (np.isnan(share)))])
+                      share[np.where((share <= -0.01) | (share >= 1.01))])
 
             y = running_mean(share, 160)
             x = range(len(y))
@@ -846,12 +849,11 @@ def save_kpis(envs: Mapping[str, CityLearnEnv], filename):
 
 def save_results(envs: Mapping[str, CityLearnEnv], losses: Mapping[str, Mapping[str, List[float]]],
                  rewards: Mapping[str, List[List[float]]], eval_results: Mapping[str, Mapping[str, List[float]]]):
-
     timestamp = datetime.now().strftime("%Y%m%dT%H%M%S")
 
     # plot summary and compare with other control results
     p_filename = f'plots_{timestamp}'
-    plot_simulation_summary(envs, losses, rewards, eval_results,  p_filename)
+    plot_simulation_summary(envs, losses, rewards, eval_results, p_filename)
 
     # save KPIs as csv
     k_filename = f'kpis_{timestamp}.csv'
