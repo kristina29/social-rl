@@ -43,7 +43,6 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
         train_sac(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size, discount=discount,
                   autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
                   kaiming_initialization=kaiming_initialization, l2_loss=l2_loss)
-    print('SAC model trained!')
 
     save_results(all_envs, all_losses, all_rewards, all_eval_results, agents=all_agents, store_agents=store_agents)
 
