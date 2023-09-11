@@ -111,9 +111,9 @@ if __name__ == '__main__':
 
     if False:
         DATASET_NAME = 'nydata'
-        exclude_rbc = 1
+        exclude_rbc = 0
         exclude_tql = 1
-        exclude_sac = 1
+        exclude_sac = 0
         demonstrators_count = 1
         building_count = 2
         episodes = 2

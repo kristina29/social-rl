@@ -696,6 +696,7 @@ class Battery(ElectricDevice, StorageDevice):
 
         self.__efficiency_history = []
         self.__capacity_history = []
+        self.__max_input_history = []
         super().__init__(capacity = capacity, nominal_power = nominal_power, **kwargs)
         self.capacity_loss_coefficient = capacity_loss_coefficient
         self.power_efficiency_curve = power_efficiency_curve
@@ -749,6 +750,12 @@ class Battery(ElectricDevice, StorageDevice):
 
         return self.__capacity_history
 
+    @property
+    def max_input_history(self) -> List[float]:
+        """Time series of maximum input power."""
+
+        return self.__max_input_history
+
     @capacity.setter
     def capacity(self, capacity: float):
         capacity = ZERO_DIVISION_CAPACITY if capacity is None or capacity == 0 else capacity
@@ -801,8 +808,8 @@ class Battery(ElectricDevice, StorageDevice):
         If charging, soc = min(`soc_init` + energy*`efficiency`, `max_input_power`, `capacity`)
         If discharging, soc = max(0, `soc_init` + energy/`efficiency`, `max_output_power`)
         """
-
-        energy = min(energy, self.get_max_input_power()) if energy >= 0 else max(-self.get_max_output_power(), energy)
+        self.__max_input_history.append(self.get_max_input_power())
+        energy = min(energy, self.__max_input_history[-1]) if energy >= 0 else max(-self.get_max_output_power(), energy)
         self.efficiency = self.get_current_efficiency(energy)
         super().charge(energy)
         self.capacity = self.capacity - self.degrade()
@@ -889,3 +896,4 @@ class Battery(ElectricDevice, StorageDevice):
         super().reset()
         self.__efficiency_history = self.__efficiency_history[0:1]
         self.__capacity_history = self.__capacity_history[0:1]
+        self.__max_input_history = self.__max_input_history[0:1]
