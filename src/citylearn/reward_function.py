@@ -180,11 +180,25 @@ class OwnSolarPenaltyReward(RewardFunction):
         reward_list = []
 
         for b in self.env.buildings:
-            e = b.net_electricity_consumption[-1]
             ec = b.electrical_storage.capacity_history[-1]
-            es = b.electrical_storage.soc[-1] / ec
 
-            reward = -(1.0 + np.sign(e) * es) * abs(e) if ec > ZERO_DIVISION_CAPACITY else 0.0
+            # insert 0 in the beginning of soc such that electricity consumption of battery is shifted one time step ahead
+            es = b.electrical_storage.soc[:-1]
+            es.insert(0, 0.)
+            es = es[-1]
+            max_battery_input = (ec - es * (1 - b.electrical_storage.loss_coefficient)) / \
+                                b.electrical_storage.efficiency_history[-1]
+            battery_input = min(max_battery_input, b.electrical_storage.nominal_power)
+            demand = b.net_electricity_consumption_without_storage_and_pv[-1]
+            could_have_used = battery_input + demand
+            could_used = min(could_have_used, b.solar_generation[-1]*-1)
+            if could_used == 0:
+                reward = 0
+            else:
+                used = max(min(b.net_electricity_consumption[-1] - b.solar_generation[-1], b.solar_generation[-1]*-1),
+                           0)
+                reward = -(used - could_used)
+
             reward_list.append(reward)
 
         if self.env.central_agent:
