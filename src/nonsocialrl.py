@@ -163,7 +163,7 @@ if __name__ == '__main__':
         #                       'electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
         batch_size = 256
         clip_gradient = False
-        store_agents = True
+        store_agents = False
         kaiming_initialization = False
         l2_loss = False
 
