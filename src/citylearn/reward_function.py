@@ -153,6 +153,46 @@ class SolarPenaltyReward(RewardFunction):
 
         return reward
 
+class OwnSolarPenaltyReward(RewardFunction):
+    def __init__(self, env: CityLearnEnv):
+        super().__init__(env)
+
+    def calculate(self) -> List[float]:
+        """The reward is designed to minimize electricity consumption and maximize
+        solar generation to charge energy storage systems.
+
+        The reward is calculated for each building, i and summed to provide the agent
+        with a reward that is representative of all the building or buildings (in centralized case)
+        it controls. It encourages net-zero energy use by penalizing grid load satisfaction
+        when there is energy in the enerygy storage systems as well as penalizing
+        net export when the energy storage systems are not fully charged through the penalty
+        term. There is neither penalty nor reward when the energy storage systems
+        are fully charged during net export to the grid. Whereas, when the
+        energy storage systems are charged to capacity and there is net import from the
+        grid the penalty is maximized.
+
+        Returns
+        -------
+        reward: List[float]
+            Reward for transition to current timestep.
+        """
+
+        reward_list = []
+
+        for b in self.env.buildings:
+            e = b.net_electricity_consumption[-1]
+            ec = b.electrical_storage.capacity_history[-1]
+            es = b.electrical_storage.soc[-1] / ec
+
+            reward = -(1.0 + np.sign(e) * es) * abs(e) if ec > ZERO_DIVISION_CAPACITY else 0.0
+            reward_list.append(reward)
+
+        if self.env.central_agent:
+            reward = [sum(reward_list)]
+        else:
+            reward = reward_list
+
+        return reward
 
 class PricePenaltyReward(RewardFunction):
     def __init__(self, env: CityLearnEnv):

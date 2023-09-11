@@ -1,3 +1,4 @@
+import copy
 import math
 import os
 import pickle
@@ -505,6 +506,25 @@ def get_possible_consumption(building: Building, excluded_used_pv: bool) -> np.n
                           building.solar_generation * -1, 0.)
 
 
+def plot_shares(envs: Mapping[str, CityLearnEnv], agents: Mapping[str, Agent]):
+    eval_envs = {}
+
+    for method, env in envs.items():
+        agent = agents[method]
+        eval_env = copy.deepcopy(env)
+        eval_observations = eval_env.reset()
+
+        while not eval_env.done:
+            actions = agent.predict(eval_observations, deterministic=True)
+            eval_observations, eval_rewards, _, _ = eval_env.step(actions)
+
+        eval_envs[method] = eval_env
+
+    plot_renewable_share(eval_envs)
+    plot_renewable_share(eval_envs, grid=True)
+    plot_used_pv_share(eval_envs)
+
+
 def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool = False) -> plt.Figure:
     """Plots renewable share KPIs over time for different control agents.
 
@@ -797,7 +817,7 @@ def save_multi_image(filename):
 
 
 def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], losses: Mapping[str, Mapping[str, List[float]]],
-                            rewards: Mapping[str, List[List[float]]],
+                            rewards: Mapping[str, List[List[float]]], agents: Mapping[str, Agent],
                             eval_results: Mapping[str, Mapping[str, List[float]]], filename: str):
     """Plots KPIs, load and battery SoC profiles for different control agents.
 
@@ -821,9 +841,13 @@ def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], losses: Mapping[st
     plot_battery_soc_profiles(envs)
     plot_district_kpis(envs)
     plot_district_load_profiles(envs)
+
+    plot_shares(envs, agents)
+
     plot_renewable_share(envs)
     plot_renewable_share(envs, grid=True)
     plot_used_pv_share(envs)
+
     plot_losses(losses, envs)
     plot_rewards(rewards, envs)
     plot_eval_results(eval_results)
@@ -861,7 +885,7 @@ def save_results(envs: Mapping[str, CityLearnEnv], losses: Mapping[str, Mapping[
 
     # plot summary and compare with other control results
     p_filename = f'plots_{timestamp}'
-    plot_simulation_summary(envs, losses, rewards, eval_results, p_filename)
+    plot_simulation_summary(envs, losses, rewards, agents, eval_results, p_filename)
 
     # save KPIs as csv
     k_filename = f'kpis_{timestamp}.csv'
