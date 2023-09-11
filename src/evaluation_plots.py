@@ -8,7 +8,8 @@ EXPERIMENT_BASE_DIR = '../experiments/'
 
 parser = ArgumentParser()
 parser.add_argument('--agentdir', help='Name of the directory of chosen agent', default='SAC_DB2')
-parser.add_argument('--agent', help='Name of the agent to compare KPIs of', default='SAC')
+parser.add_argument('--agent1', help='Name of the agent to compare KPIs of', default='SAC')
+parser.add_argument('--agent2', help='Name of the agent to compare KPIs of', default='SAC_DB2')
 parser.add_argument('--dirs', help='Names of the directories of the experiments to compare', nargs='+')
 opts = parser.parse_args()
 
@@ -20,17 +21,31 @@ if __name__ == '__main__':
         agent = parser.agent
 
     if True:
-        experiment_dirs = ['15_reward_price_pv/alpha05/new_buildings2',
-                           '30_renewable_prod/reward_05pvprice/0.5',
-                           '30_renewable_prod/reward_05pvprice/1.5',
+        experiment_dirs = ['31_ir0.01/socialMode1/',
+                           '32_ir0.2/socialMode1/',
+                           '31_ir0.01/socialMode2/',
+                           '32_ir0.2/socialMode2/',
+                           '31_ir0.01/socialMode3/',
+                           '32_ir0.2/socialMode3/',
                            ]
-        ref_dirs = ['15_reward_price_pv/alpha05/new_buildings2']
+        ref_dirs = ['SAC']
+        asocial_agent = 'SAC'
         n_refs = len(ref_dirs)
         length = 1/n_refs
         agentdir = 'SAC_DB2'
-        agent = 'SAC'
+        agent = 'SAC_DB2'
 
     kpis = {}
+    kpi_filenames = glob.glob(f'{EXPERIMENT_BASE_DIR}{agentdir}/{experiment_dirs[0]}/kpis_*.csv')
+
+    if len(kpi_filenames) > 1:
+        raise ValueError(f'More than one KPI csv file found in {experiment_dirs[0]}')
+
+    df = pd.read_csv(kpi_filenames[0])
+    df = df.set_index('kpi')
+    df = df[(df['env_id'] == asocial_agent) & (df['level'] == 'district')]
+    kpis[asocial_agent] = df
+
     for dir in experiment_dirs:
         print(dir)
         kpi_filenames = glob.glob(f'{EXPERIMENT_BASE_DIR}{agentdir}/{dir}/kpis_*.csv')
@@ -42,7 +57,6 @@ if __name__ == '__main__':
         df = df.set_index('kpi')
         df = df[(df['env_id'] == agent) & (df['level'] == 'district')]
         kpis[dir] = df
-
 
     # plot 1-avarage_daily_renewable share net_value/net_value_without_storage
     values = []
