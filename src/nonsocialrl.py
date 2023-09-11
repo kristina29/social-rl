@@ -13,7 +13,7 @@ from utils import set_schema_buildings, set_active_observations, save_results
 
 def train(dataset_name, random_seed, building_count, episodes, active_observations, batch_size, discount,
           autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc,
-          building_id):
+          building_id, store_agents):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
 
@@ -28,26 +28,24 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
     all_envs = {}
     all_losses = {}
     all_rewards = {}
+    all_agents = {}
+    all_eval_results = {}
     # Train rule-based control (RBC) agent for comparison
     if not exclude_rbc:
-        all_envs['RBC'] = train_rbc(schema, episodes)
+        all_envs['RBC'], all_agents['RBC'] = train_rbc(schema=schema, episodes=episodes)
 
     # Train tabular Q-Learning (TQL) agent for comparison
     if not exclude_tql:
-        all_envs['TQL'] = train_tql(schema, active_observations, episodes)
+        all_envs['TQL'], all_agents['TQL'] = train_tql(schema=schema, active_observations=active_observations, episodes=episodes)
 
     # Train soft actor-critic (SAC) agent
-    all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'] = train_sac(schema=schema, episodes=episodes,
-                                                                       random_seed=random_seed,
-                                                                       batch_size=batch_size,
-                                                                       discount=discount,
-                                                                       autotune_entropy=autotune_entropy,
-                                                                       clip_gradient=clip_gradient,
-                                                                       kaiming_initialization=kaiming_initialization,
-                                                                       l2_loss=l2_loss)
+    all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'], all_eval_results['SAC'], all_agents['SAC'] = \
+        train_sac(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size, discount=discount,
+                  autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
+                  kaiming_initialization=kaiming_initialization, l2_loss=l2_loss)
     print('SAC model trained!')
 
-    save_results(all_envs, all_losses, all_rewards)
+    save_results(all_envs, all_losses, all_rewards, all_eval_results, agents=all_agents, store_agents=store_agents)
 
 
 def preprocessing(schema, building_count, random_seed, active_observations, building_id):
@@ -86,7 +84,7 @@ def train_rbc(schema, episodes):
 
     print('RBC model trained!')
 
-    return env
+    return env, rbc_model
 
 
 def train_tql(schema, active_observations, episodes):
@@ -114,7 +112,7 @@ def train_tql(schema, active_observations, episodes):
 
     print('TQL model trained!')
 
-    return env
+    return env, tql_model
 
 
 def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
@@ -128,7 +126,7 @@ def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entr
 
     print('SAC model trained!')
 
-    return env, losses, rewards, eval_results
+    return env, losses, rewards, eval_results, sac_model
 
 
 if __name__ == '__main__':
@@ -149,6 +147,7 @@ if __name__ == '__main__':
     kaiming_initialization = opts.kaiming
     l2_loss = opts.l2_loss
     building_id = opts.building_id
+    store_agents = opts.store_agents
 
     if False:
         DATASET_NAME = 'nydata'
@@ -164,13 +163,15 @@ if __name__ == '__main__':
         #                       'electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
         batch_size = 256
         clip_gradient = False
+        store_agents = True
         kaiming_initialization = False
         l2_loss = False
 
     train(dataset_name=DATASET_NAME, random_seed=seed, building_count=building_count, episodes=episodes,
           active_observations=active_observations, batch_size=batch_size, discount=discount,
           autotune_entropy=autotune_entropy, clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization,
-          l2_loss=l2_loss, exclude_tql=exclude_tql, exclude_rbc=exclude_rbc, building_id=building_id)
+          l2_loss=l2_loss, exclude_tql=exclude_tql, exclude_rbc=exclude_rbc, building_id=building_id,
+          store_agents=store_agents)
 
     # get the end time
     et = time.time()

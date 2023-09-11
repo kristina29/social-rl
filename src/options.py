@@ -77,5 +77,7 @@ def add_nonsocial_options(optParser):
                               'If not defined, the full observation space (as defined in the schema file) is used.')
     optParser.add_option('--building_id', action='store', type='int', dest='building_id',
                          help='Id of the building that shpuld be trained. Overwrites the building_count.')
+    optParser.add_option('--store', action='store_true', default=False, dest='store_agents',
+                         help='Store trained agents.')
 
     return optParser

@@ -6,6 +6,7 @@ from datetime import datetime
 
 import numpy as np
 import pandas as pd
+from citylearn.agents.base import Agent
 
 from citylearn.building import Building
 from matplotlib.backends.backend_pdf import PdfPages
@@ -854,7 +855,8 @@ def save_kpis(envs: Mapping[str, CityLearnEnv], filename):
 
 
 def save_results(envs: Mapping[str, CityLearnEnv], losses: Mapping[str, Mapping[str, List[float]]],
-                 rewards: Mapping[str, List[List[float]]], eval_results: Mapping[str, Mapping[str, List[float]]]):
+                 rewards: Mapping[str, List[List[float]]], eval_results: Mapping[str, Mapping[str, List[float]]],
+                 agents: Mapping[str, Agent], store_agents: bool=False):
     timestamp = datetime.now().strftime("%Y%m%dT%H%M%S")
 
     # plot summary and compare with other control results
@@ -878,6 +880,16 @@ def save_results(envs: Mapping[str, CityLearnEnv], losses: Mapping[str, Mapping[
         pickle.dump(rewards, fp)
         print(f'Rewards dictionary saved to {r_filename}')
 
+    a_filenames = []
+    if store_agents:
+        # save each agent to agent_name.pkl file
+        for agent_name, agent_obj in agents.items():
+            a_filename = f'agents/{agent_name}_agent_{timestamp}.pkl'
+            a_filenames.append(a_filename)
+            with open(a_filename, 'wb') as fp:
+                pickle.dump(agent_obj, fp)
+                print(f'{agent_name} agent saved to {a_filename}')
+
     print('')
     print('---------------------------------')
     print('COPY COMMANDS')
@@ -890,3 +902,6 @@ def save_results(envs: Mapping[str, CityLearnEnv], losses: Mapping[str, Mapping[
           f'experiments/SAC_DB2/{l_filename}')
     print(f'scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/{r_filename} '
           f'experiments/SAC_DB2/{r_filename}')
+    for a_filename in a_filenames:
+        print(f'scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/{a_filename} '
+              f'experiments/SAC_DB2/{a_filename}')
