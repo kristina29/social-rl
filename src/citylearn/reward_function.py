@@ -197,6 +197,9 @@ class OwnSolarPenaltyReward(RewardFunction):
             elif b.electrical_storage_electricity_consumption[-1] < 0 and b.net_electricity_consumption[-1] < 0:
                 reward = -1000
                 print('Happened', self.env.time_step)
+                print('electrical_storage_electricity_consumption', b.electrical_storage_electricity_consumption[-1])
+                print('solar_generation', b.solar_generation[-1])
+                print('net_electricity_consumption_without_storage_and_pv', b.net_electricity_consumption_without_storage_and_pv[-1])
             else:
                 used = max(min(b.net_electricity_consumption[-1] - b.solar_generation[-1], b.solar_generation[-1]*-1),
                            0)
