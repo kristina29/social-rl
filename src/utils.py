@@ -1,3 +1,4 @@
+import copy
 import math
 import os
 import pickle
@@ -6,6 +7,7 @@ from datetime import datetime
 
 import numpy as np
 import pandas as pd
+from citylearn.agents.base import Agent
 
 from citylearn.building import Building
 from matplotlib.backends.backend_pdf import PdfPages
@@ -17,7 +19,8 @@ import seaborn as sns
 from citylearn.utilities import get_active_parts
 
 
-def set_schema_buildings(schema: dict, count: int, seed: int) -> Tuple[dict, List[str]]:
+def set_schema_buildings(schema: dict, count: int=1, seed: int=1, building_id: int=None) \
+        -> Tuple[dict, List[str]]:
     """Randomly select number of buildings to set as active in the schema.
 
     Parameters
@@ -28,6 +31,8 @@ def set_schema_buildings(schema: dict, count: int, seed: int) -> Tuple[dict, Lis
         Number of buildings to set as active in schema.
     seed: int
         Seed for pseudo-random number generator
+    building_id: int
+        Id of the only building that should be included.
 
     Returns
     -------
@@ -57,7 +62,10 @@ def set_schema_buildings(schema: dict, count: int, seed: int) -> Tuple[dict, Lis
             buildings.remove(b)
 
     # randomly select specified number of buildings
-    buildings = np.random.choice(buildings, size=count, replace=False).tolist()
+    if building_id is None:
+        buildings = np.random.choice(buildings, size=count, replace=False).tolist()
+    else:
+        buildings = [f'Building_{building_id}']
 
     # reorder buildings
     building_ids = [int(b.split('_')[-1]) for b in buildings]
@@ -498,6 +506,25 @@ def get_possible_consumption(building: Building, excluded_used_pv: bool) -> np.n
                           building.solar_generation * -1, 0.)
 
 
+def plot_shares(envs: Mapping[str, CityLearnEnv], agents: Mapping[str, Agent]):
+    eval_envs = {}
+
+    for method, env in envs.items():
+        agent = agents[method]
+        eval_env = copy.deepcopy(env)
+        eval_observations = eval_env.reset()
+
+        while not eval_env.done:
+            actions = agent.predict(eval_observations, deterministic=True)
+            eval_observations, eval_rewards, _, _ = eval_env.step(actions)
+
+        eval_envs[method] = eval_env
+
+    plot_renewable_share(eval_envs)
+    plot_renewable_share(eval_envs, grid=True)
+    plot_used_pv_share(eval_envs)
+
+
 def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool = False) -> plt.Figure:
     """Plots renewable share KPIs over time for different control agents.
 
@@ -541,6 +568,7 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool = False) -
 
         share = used / could_have_used
         share[share == np.inf] = 1.
+        share[could_have_used < 0.0001] = 1.
 
         try:
             assert np.all(((share > -0.01) & (share < 1.01)) | np.isnan(share))
@@ -598,7 +626,8 @@ def plot_used_pv_share(envs: Mapping[str, CityLearnEnv]) -> List[plt.Figure]:
             used = b.used_pv_electricity
 
             share = used / could_have_used
-            share[no_generation] = np.nan
+            share[no_generation] = 1
+            share[could_have_used < 0.0001] = 1
 
             try:
                 assert np.all(((share > -0.01) & (share < 1.01)) | np.isnan(share))
@@ -790,7 +819,7 @@ def save_multi_image(filename):
 
 
 def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], losses: Mapping[str, Mapping[str, List[float]]],
-                            rewards: Mapping[str, List[List[float]]],
+                            rewards: Mapping[str, List[List[float]]], agents: Mapping[str, Agent],
                             eval_results: Mapping[str, Mapping[str, List[float]]], filename: str):
     """Plots KPIs, load and battery SoC profiles for different control agents.
 
@@ -814,9 +843,13 @@ def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], losses: Mapping[st
     plot_battery_soc_profiles(envs)
     plot_district_kpis(envs)
     plot_district_load_profiles(envs)
-    plot_renewable_share(envs)
-    plot_renewable_share(envs, grid=True)
+
+    #plot_shares(envs, agents)
+
     plot_used_pv_share(envs)
+    plot_renewable_share(envs, grid=True)
+    plot_renewable_share(envs)
+
     plot_losses(losses, envs)
     plot_rewards(rewards, envs)
     plot_eval_results(eval_results)
@@ -848,12 +881,13 @@ def save_kpis(envs: Mapping[str, CityLearnEnv], filename):
 
 
 def save_results(envs: Mapping[str, CityLearnEnv], losses: Mapping[str, Mapping[str, List[float]]],
-                 rewards: Mapping[str, List[List[float]]], eval_results: Mapping[str, Mapping[str, List[float]]]):
+                 rewards: Mapping[str, List[List[float]]], eval_results: Mapping[str, Mapping[str, List[float]]],
+                 agents: Mapping[str, Agent], store_agents: bool=False):
     timestamp = datetime.now().strftime("%Y%m%dT%H%M%S")
 
     # plot summary and compare with other control results
     p_filename = f'plots_{timestamp}'
-    plot_simulation_summary(envs, losses, rewards, eval_results, p_filename)
+    plot_simulation_summary(envs, losses, rewards, agents, eval_results, p_filename)
 
     # save KPIs as csv
     k_filename = f'kpis_{timestamp}.csv'
@@ -872,6 +906,16 @@ def save_results(envs: Mapping[str, CityLearnEnv], losses: Mapping[str, Mapping[
         pickle.dump(rewards, fp)
         print(f'Rewards dictionary saved to {r_filename}')
 
+    a_filenames = []
+    if store_agents:
+        # save each agent to agent_name.pkl file
+        for agent_name, agent_obj in agents.items():
+            a_filename = f'agents/{agent_name}_agent_{timestamp}.pkl'
+            a_filenames.append(a_filename)
+            with open(a_filename, 'wb') as fp:
+                pickle.dump(agent_obj, fp)
+                print(f'{agent_name} agent saved to {a_filename}')
+
     print('')
     print('---------------------------------')
     print('COPY COMMANDS')
@@ -884,3 +928,6 @@ def save_results(envs: Mapping[str, CityLearnEnv], losses: Mapping[str, Mapping[
           f'experiments/SAC_DB2/{l_filename}')
     print(f'scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/{r_filename} '
           f'experiments/SAC_DB2/{r_filename}')
+    for a_filename in a_filenames:
+        print(f'scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/{a_filename} '
+              f'experiments/SAC_DB2/{a_filename}')
