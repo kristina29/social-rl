@@ -568,6 +568,7 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool = False) -
 
         share = used / could_have_used
         share[share == np.inf] = 1.
+        share[could_have_used < 0.0001] = np.nan
 
         try:
             assert np.all(((share > -0.01) & (share < 1.01)) | np.isnan(share))
@@ -626,6 +627,7 @@ def plot_used_pv_share(envs: Mapping[str, CityLearnEnv]) -> List[plt.Figure]:
 
             share = used / could_have_used
             share[no_generation] = np.nan
+            share[could_have_used < 0.0001] = np.nan
 
             try:
                 assert np.all(((share > -0.01) & (share < 1.01)) | np.isnan(share))
