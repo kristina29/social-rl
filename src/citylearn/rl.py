@@ -59,7 +59,7 @@ class PolicyNetwork(nn.Module):
         log_std = torch.clamp(log_std, min=self.log_std_min, max=self.log_std_max)
         return mean, log_std
 
-    def sample(self, state):
+    def sample(self, state, deterministic=False):
         mean, log_std = self.forward(state)
         std = log_std.exp()
         normal = Normal(mean, std)
@@ -71,6 +71,10 @@ class PolicyNetwork(nn.Module):
         log_prob -= torch.log(self.action_scale * (1 - y_t.pow(2)) + self.epsilon)
         log_prob = log_prob.sum(1, keepdim=True)
         mean = torch.tanh(mean) * self.action_scale + self.action_bias
+
+        if deterministic:
+            action = mean
+
         return action, log_prob, mean
 
     def to(self, device):

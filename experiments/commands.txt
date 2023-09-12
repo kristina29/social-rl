@@ -2,10 +2,11 @@ scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230802T
 
 scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/kpis_20230802T230752.csv experiments/SAC_DB2/20_e4/old_buildings/kpis_20230802T230752.csv
 
-scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/plots_20230704T135811.pdf experiments/plots_20230704T135811.pdf
 
-scp 'klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/x_inf_2023-09-06 11:21:25.546930.pkl' 'src/x_inf_2023-09-06 11:21:25.546930.pkl'
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/citylearn_learning_c13ee471923a4ae99d41f6b55a55c5ad/1.pkl experiments/
 
+
+4228569 solar penalty
 
 
 
@@ -27,3 +28,5 @@ scp src/citylearn/data/nydata_new_buildings2/schema.json klietz10@134.2.168.52:/
 scp src/citylearn/data/nydata_new_buildings/schema.json klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata_new_buildings/schema.json
 
 scp src/job.sh klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/
+
+
