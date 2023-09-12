@@ -568,7 +568,7 @@ def plot_renewable_share(envs: Mapping[str, CityLearnEnv], grid: bool = False) -
 
         share = used / could_have_used
         share[share == np.inf] = 1.
-        share[could_have_used < 0.0001] = np.nan
+        share[could_have_used < 0.0001] = 1.
 
         try:
             assert np.all(((share > -0.01) & (share < 1.01)) | np.isnan(share))
@@ -626,8 +626,8 @@ def plot_used_pv_share(envs: Mapping[str, CityLearnEnv]) -> List[plt.Figure]:
             used = b.used_pv_electricity
 
             share = used / could_have_used
-            share[no_generation] = np.nan
-            share[could_have_used < 0.0001] = np.nan
+            share[no_generation] = 1
+            share[could_have_used < 0.0001] = 1
 
             try:
                 assert np.all(((share > -0.01) & (share < 1.01)) | np.isnan(share))
@@ -846,9 +846,9 @@ def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], losses: Mapping[st
 
     #plot_shares(envs, agents)
 
-    plot_renewable_share(envs)
-    plot_renewable_share(envs, grid=True)
     plot_used_pv_share(envs)
+    plot_renewable_share(envs, grid=True)
+    plot_renewable_share(envs)
 
     plot_losses(losses, envs)
     plot_rewards(rewards, envs)
