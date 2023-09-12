@@ -153,6 +153,67 @@ class SolarPenaltyReward(RewardFunction):
 
         return reward
 
+class OwnSolarPenaltyReward(RewardFunction):
+    def __init__(self, env: CityLearnEnv):
+        super().__init__(env)
+
+    def calculate(self) -> List[float]:
+        """The reward is designed to minimize electricity consumption and maximize
+        solar generation to charge energy storage systems.
+
+        The reward is calculated for each building, i and summed to provide the agent
+        with a reward that is representative of all the building or buildings (in centralized case)
+        it controls. It encourages net-zero energy use by penalizing grid load satisfaction
+        when there is energy in the enerygy storage systems as well as penalizing
+        net export when the energy storage systems are not fully charged through the penalty
+        term. There is neither penalty nor reward when the energy storage systems
+        are fully charged during net export to the grid. Whereas, when the
+        energy storage systems are charged to capacity and there is net import from the
+        grid the penalty is maximized.
+
+        Returns
+        -------
+        reward: List[float]
+            Reward for transition to current timestep.
+        """
+
+        reward_list = []
+
+        for b in self.env.buildings:
+            ec = b.electrical_storage.capacity_history[-1]
+
+            # insert 0 in the beginning of soc such that electricity consumption of battery is shifted one time step ahead
+            es = b.electrical_storage.soc[:-1]
+            es.insert(0, 0.)
+            es = es[-1]
+            max_battery_input = (ec - es * (1 - b.electrical_storage.loss_coefficient)) / \
+                                b.electrical_storage.efficiency_history[-1]
+            battery_input = min(max_battery_input, b.electrical_storage.nominal_power)
+            demand = b.net_electricity_consumption_without_storage_and_pv[-1]
+            could_have_used = battery_input + demand
+            could_used = min(could_have_used, b.solar_generation[-1]*-1)
+            if could_used == 0:
+                reward = 0
+            elif b.electrical_storage_electricity_consumption[-1] < -0.001 and b.net_electricity_consumption[-1] < -0.001:
+                reward = -100
+                print('Happened', self.env.time_step)
+                print('electrical_storage_electricity_consumption', b.electrical_storage_electricity_consumption[-1])
+                print('solar_generation', b.solar_generation[-1])
+                print('net_electricity_consumption_without_storage_and_pv', b.net_electricity_consumption_without_storage_and_pv[-1])
+                print('')
+            else:
+                used = max(min(b.net_electricity_consumption[-1] - b.solar_generation[-1], b.solar_generation[-1]*-1),
+                           0)
+                reward = used - could_used
+
+            reward_list.append(reward)
+
+        if self.env.central_agent:
+            reward = [sum(reward_list)]
+        else:
+            reward = reward_list
+
+        return reward
 
 class PricePenaltyReward(RewardFunction):
     def __init__(self, env: CityLearnEnv):

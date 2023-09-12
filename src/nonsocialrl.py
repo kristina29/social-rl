@@ -1,3 +1,4 @@
+import pickle
 import time
 
 from citylearn.agents.q_learning import TabularQLearning
@@ -12,7 +13,8 @@ from utils import set_schema_buildings, set_active_observations, save_results
 
 
 def train(dataset_name, random_seed, building_count, episodes, active_observations, batch_size, discount,
-          autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc):
+          autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc,
+          building_id, store_agents):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
 
@@ -22,36 +24,36 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
     # TODO: DATA EXPLORATION
 
     # Data Preprocessing
-    schema = preprocessing(schema, building_count, random_seed, active_observations)
+    schema = preprocessing(schema, building_count, random_seed, active_observations, building_id=building_id)
 
     all_envs = {}
     all_losses = {}
     all_rewards = {}
+    all_agents = {}
+    all_eval_results = {}
     # Train rule-based control (RBC) agent for comparison
     if not exclude_rbc:
-        all_envs['RBC'] = train_rbc(schema, episodes)
+        all_envs['RBC'], all_agents['RBC'] = train_rbc(schema=schema, episodes=episodes)
 
     # Train tabular Q-Learning (TQL) agent for comparison
     if not exclude_tql:
-        all_envs['TQL'] = train_tql(schema, active_observations, episodes)
+        all_envs['TQL'], all_agents['TQL'] = train_tql(schema=schema, active_observations=active_observations, episodes=episodes)
 
     # Train soft actor-critic (SAC) agent
-    all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'] = train_sac(schema=schema, episodes=episodes,
-                                                                       random_seed=random_seed,
-                                                                       batch_size=batch_size,
-                                                                       discount=discount,
-                                                                       autotune_entropy=autotune_entropy,
-                                                                       clip_gradient=clip_gradient,
-                                                                       kaiming_initialization=kaiming_initialization,
-                                                                       l2_loss=l2_loss)
-    print('SAC model trained!')
+    all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'], all_eval_results['SAC'], all_agents['SAC'] = \
+        train_sac(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size, discount=discount,
+                  autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
+                  kaiming_initialization=kaiming_initialization, l2_loss=l2_loss)
 
-    save_results(all_envs, all_losses, all_rewards)
+    save_results(all_envs, all_losses, all_rewards, all_eval_results, agents=all_agents, store_agents=store_agents)
 
 
-def preprocessing(schema, building_count, random_seed, active_observations):
-    if building_count is not None:
-        schema, buildings = set_schema_buildings(schema, building_count, random_seed)
+def preprocessing(schema, building_count, random_seed, active_observations, building_id):
+    if building_id is not None:
+        schema, buildings = set_schema_buildings(schema, building_id=building_id)
+        print('Selected buildings:', buildings)
+    elif building_count is not None:
+        schema, buildings = set_schema_buildings(schema, count=building_count, seed=random_seed)
         print('Selected buildings:', buildings)
     if active_observations is not None:
         schema, active_observations = set_active_observations(schema, active_observations)
@@ -82,7 +84,7 @@ def train_rbc(schema, episodes):
 
     print('RBC model trained!')
 
-    return env
+    return env, rbc_model
 
 
 def train_tql(schema, active_observations, episodes):
@@ -110,7 +112,7 @@ def train_tql(schema, active_observations, episodes):
 
     print('TQL model trained!')
 
-    return env
+    return env, tql_model
 
 
 def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
@@ -119,12 +121,19 @@ def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entr
     sac_model = SAC(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
                     clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
                     discount=discount) #,
-                    #start_training_time_step=1, end_exploration_time_step=7000)
+                    #start_training_time_step=1, end_exploration_time_step=14000)
     losses, rewards, eval_results = sac_model.learn(episodes=episodes, deterministic_finish=True)
+
+    filename = f'sac_env.pkl'
+    with open(filename, 'wb') as fp:
+        pickle.dump(env, fp, protocol=pickle.HIGHEST_PROTOCOL)
+        print(f'SAC env saved to {filename}')
+    print(f'scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/{filename}'
+          f'experiments/SAC_DB2/{filename}')
 
     print('SAC model trained!')
 
-    return env, losses, rewards, eval_results
+    return env, losses, rewards, eval_results, sac_model
 
 
 if __name__ == '__main__':
@@ -136,6 +145,7 @@ if __name__ == '__main__':
     seed = opts.seed
     building_count = opts.buildings
     episodes = opts.episodes
+    discount = opts.discount
     exclude_tql = opts.exclude_tql
     exclude_rbc = opts.exclude_rbc
     active_observations = opts.observations
@@ -144,24 +154,32 @@ if __name__ == '__main__':
     clip_gradient = opts.clipgradient
     kaiming_initialization = opts.kaiming
     l2_loss = opts.l2_loss
+    building_id = opts.building_id
+    store_agents = opts.store_agents
 
     if False:
-        DATASET_NAME = 'nydata'
+        DATASET_NAME = 'nydata_new_buildings2'
         exclude_rbc = 0
         exclude_tql = 1
         building_count = 2
         episodes = 2
         seed = 2
-        autotune_entropy = False
-        active_observations = ['hour']  # , 'electricity_pricing', 'electricity_pricing_predicted_6h',
-        #                       'electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
+        autotune_entropy = True
+        discount = 0.99
+        building_id = 6
+        active_observations = None#['solar_generation', 'electrical_storage_soc', 'non_shiftable_load']  # , 'electricity_pricing', 'electricity_pricing_predicted_6h',
+                               #'#electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
         batch_size = 256
         clip_gradient = False
+        store_agents = False
         kaiming_initialization = False
         l2_loss = False
 
-    train(DATASET_NAME, seed, building_count, episodes, active_observations, batch_size, discount, autotune_entropy,
-          clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc)
+    train(dataset_name=DATASET_NAME, random_seed=seed, building_count=building_count, episodes=episodes,
+          active_observations=active_observations, batch_size=batch_size, discount=discount,
+          autotune_entropy=autotune_entropy, clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization,
+          l2_loss=l2_loss, exclude_tql=exclude_tql, exclude_rbc=exclude_rbc, building_id=building_id,
+          store_agents=store_agents)
 
     # get the end time
     et = time.time()
