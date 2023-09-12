@@ -6,6 +6,8 @@ scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/kpis_20230802T2
 scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/citylearn_learning_c13ee471923a4ae99d41f6b55a55c5ad/1.pkl experiments/
 
 
+4228569 solar penalty
+
 
 
 scp src/citylearn/data/nydata/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata/
