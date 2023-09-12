@@ -158,17 +158,17 @@ if __name__ == '__main__':
     store_agents = opts.store_agents
 
     if False:
-        DATASET_NAME = 'nydata'
+        DATASET_NAME = 'nydata_new_buildings2'
         exclude_rbc = 0
         exclude_tql = 1
         building_count = 2
         episodes = 2
         seed = 2
-        autotune_entropy = False
+        autotune_entropy = True
         discount = 0.99
         building_id = 6
-        active_observations = ['solar_generation', 'electrical_storage_soc', 'non_shiftable_load']  # , 'electricity_pricing', 'electricity_pricing_predicted_6h',
-        #                       'electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
+        active_observations = None#['solar_generation', 'electrical_storage_soc', 'non_shiftable_load']  # , 'electricity_pricing', 'electricity_pricing_predicted_6h',
+                               #'#electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
         batch_size = 256
         clip_gradient = False
         store_agents = False
