@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 import pandas as pd
 import matplotlib.pyplot as plt
 
-EXPERIMENT_BASE_DIR = '../../experiments/'
+EXPERIMENT_BASE_DIR = '../experiments/'
 
 parser = ArgumentParser()
 parser.add_argument('--agentdir', help='Name of the directory of chosen agent', default='SAC_DB2')
