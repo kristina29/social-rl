@@ -31,7 +31,7 @@ Next, since a large part of the renewable energy is wind energy, \todo[inline]{s
 \todo[inline]{(all units in kWh) ????!!!! Also in the following!!!!!!!!!!}
 \subsection{Building data}
 \label{sec:building-data}
-As building data, we used the one provided by CityLearn for the CityLearn Challenge 2021. These datasets contain the battery and PV specifications for 13 buildings. Each of them has a battery with attributes as specified in Table \ref{tab:battery-attributes} and a PV with a nominal power of 5 \textcolor{red}{kW} for building 4 and buildings 10-17. All other buildings have a PV with nominal power 4.
+As building data, we used the one provided by CityLearn for the CityLearn Challenge 2021 \cite{citylearn-challenge}. These datasets contain the battery and PV specifications for 13 buildings. Each of them has a battery with attributes as specified in Table \ref{tab:battery-attributes} and a PV with a nominal power of 5 \textcolor{red}{kW} for building 4 and buildings 10-17. All other buildings have a PV with nominal power 4.
 
 Moreover, for each building, the equioment electric power and the solar generation time series per hour is provided. The input variables are described in Appendix \ref{tab:buildings-vars}. Since we used different weather data than the one in the challenge, we also resimulated the solar generation time series of the buildings. For this, we used the python library pvlib \textcolor{red}{TODO source} and followed there simulation instructions on their website\footnote{See \url{https://pvlib-python.readthedocs.io/en/latest/gallery/adr-pvarray/plot_simulate_fast.html}}. For the weather data, we used the one described in Chapter \ref{sec:weather-data}. As location, we used \textcolor{red}{TODO}. Finally, for \textcolor{red}{TODO P\_STC} we used the maximum solar generation of the original data and added 500 W in order to meet approximately the same mean generation of all buildings as in the original dataset.
 
@@ -52,11 +52,33 @@ Nominal power & Maximum amount of electric power that the battery can use to cha
 
 \subsection{Fuelmix and Weather data}
 \label{sec:weather-data}
-The fuel mix data we used is obtained from the \textcolor{red}{NY-ISO}, retrieved on the 7th of June 2023. The original data provides the produced energy in MW for each of the energy sources dual fuel, natural gas, nuclear, \textcolor{red}{other fossil fuels}, wind, hydro, and \textcolor{red}{other renewables} for a time interval of 5 minutes for 2021 in the New York (NY) state. Since we are only interested in renewable (wind, hydro, other renewables) or non-renewable (all others) energy produced, we summed these values up and calculated the value in kWh. \todo[inline]{kW vs MW vs kWh????} To meed the hourly time steps of the building data, we calculated the hourly mean of the values, because \textcolor{red}{???}. The final fuelmix data contains the hourly amount of energy produced with renewable sources in kWh and the share of renewable energy produced calculated as the absolute amount of renewable energy produced devided by the total produced energy. The renewable share is calculated on the original time steps of five minutes, so for the final dataset here also the median per hour was calculated. Note, that this data does not include the solar generation of the buildings described in Chapter \ref{sec:building-data}, but only the renewable energy from the grid. 
+The fuel mix data we used is obtained from the \textcolor{red}{NY-ISO}, retrieved on the 7th of June 2023 \cite{fuelmix_nyiso}. The original data provides the produced energy in MW for each of the energy sources dual fuel, natural gas, nuclear, \textcolor{red}{other fossil fuels}, wind, hydro, and \textcolor{red}{other renewables} for a time interval of 5 minutes for 2021 in the New York (NY) state. Since we are only interested in renewable (wind, hydro, other renewables) or non-renewable (all others) energy produced, we summed these values up and calculated the value in kWh. \todo[inline]{kW vs MW vs kWh????} To meed the hourly time steps of the building data, we calculated the hourly mean of the values, because \textcolor{red}{???}. The final fuelmix data contains the hourly amount of energy produced with renewable sources in kWh and the share of renewable energy produced calculated as the absolute amount of renewable energy produced devided by the total produced energy. The renewable share is calculated on the original time steps of five minutes, so for the final dataset here also the median per hour was calculated. Note, that this data does not include the solar generation of the buildings described in Chapter \ref{sec:building-data}, but only the renewable energy from the grid. 
 
-As weather data, we used data from the New York state too, in order to encourage correlation between the weather and the produced amount of renewable energy. We obtained the data from the \textcolor{red}{NSRDB}. 
+As weather data, we used data from the New York state too, in order to encourage correlation between the weather and the produced amount of renewable energy. We obtained the data from the \textcolor{red}{NSRDB} \cite{weather_nsrdb}. 
+\todo[inline]{foecasts}
 
 \subsection{Energy prices}
+For the energy prices, we used the pricing data set provided with the CityLearn challenge 2022 \cite{citylearn-challenge} and weighted the price information by the share of fossil energy in the grid. The basic dataset follows a electricity rate, where the electricity is cheaper in the early morning, late at night and during the months october to may. The detailed electricity prices are shown in Table \ref{tab:basic-prices}.
+\begin{table}[htb]
+\center
+\begin{tabular}{l|l|l|l|l}
+            & \multicolumn{2}{l|}{June - September} & \multicolumn{2}{l}{Oktober - May} \\
+Time        & Weekday           & Weekend          & Weekday         & Weekend         \\ \hline
+8 AM - 4 PM & 0.21                  &  0.21                & 0.20                 & 0.20                 \\
+4 PM - 9 PM & 0.54                  &  0.40                 & 0.50                & 0.50                \\
+9 PM - 8 AM & 0.21                  & 0.21                 &  0.20               &  0.20              
+\end{tabular}
+\caption[Electricity price rate CityLearn Challenge 2022]{Electricity price rate of the electricity price data set provided with the CityLearn Challenge 2022.}
+\label{tab:basic-prices}
+\end{table}
+
+We weighted these base prices $p_{base,t}$ at time step $t$ by the share of fossil energy using a weighting factor $\beta$:
+\begin{equation}
+	p_t = p_{base,t} + \beta  \cdot (1-\frac{E_{r,grid}}{E_{grid}}),
+\end{equation}
+where  $E_{r,grid}$ is the renewable amount of energy produced in the grid and $E_{grid}$ is the total amount of energy produced in the grid. Finally, we normalized the prices to be in the range between zero and one.
+
+\todo[inline]{foecasts}
 
 \section{Key Performance Indicators}
 We used three KPIs for evaluating the performance of the models. We first present the cost functions used for calculating the KPIs and then explain the calculation and interpretation of the KPIs.
@@ -108,6 +130,7 @@ To calculate the KPIs we calculate the ratio between a cost function for the val
 
 \section{Implemented Agents}
 \subsection{SAC Baseline}
+\todo[inline]{Übergebene parameter prüfen! auch layergröße zb}
 As a baseline we implemented a SAC agent following the calculations as presented in Section \ref{sec:SAC}. We used the implementation provided by CityLearn and extended it to our needs, including the implementation of autotuning the temperature parameter $\alpha$. Moreover, we extended the implementation by the options to clip the gradient of both, critic and policy networks, and to use kaiming initialization and the mean squared error loss for the critic networks.
 \todo[inline]{explain kaiming initialization , ReLU somewhere, reparametrization trick}
 
@@ -122,7 +145,36 @@ The observation space of the SAC agent is listed in Appendix \ref{app:observatio
 
 \section{Training}
 \subsection{Hyperparameters}
-\todo[inline]{episodes, steps, hyperparameters, ReplayBuffer, for each building one agent, actions}
+\todo[inline]{episodes, steps, hyperparameters, ReplayBuffer, for each building one agent, actions
+
+MM oder results?!}
+\begin{itemize}
+	\item Rewards
+	\begin{itemize}
+	\item PricePv (alpha 0, 0.25, 0.5, 0.75, 1)
+	\item fossilpenalty
+	\item tolovski \cite{tolovski2020advancing}
+	\end{itemize}
+	\item Episodes
+	\begin{itemize}
+	\item 2, 3, 4
+	\end{itemize}
+	\item Hyperparameters
+	\begin{itemize}
+	\item Pricing factor (10,20) \textcolor{red}{lowe?}
+	\item Normalize/not normalize price
+	\item limit observations
+	\item increase batch size (1024)
+	\item autotune alpha
+	\item gradient clipping
+	\item kaiming initialization \cite{he2015delving}
+	\item L2 loss
+	\item Discount factor: 0.96,0.97,0.98,0.99
+	\item longer training (start earlier)
+	\item change renewable production in grid
+	\end{itemize}
+\end{itemize}
+
 \subsection{Reward function}
 The reward function we used is a linear combination of two other reward functions, where the parameter $\alpha$ determines the influence of them. The reward $r_t^b$ is calculated for each building $b$, as for each building one agent is trained, at time step $t$:
 \begin{equation}
