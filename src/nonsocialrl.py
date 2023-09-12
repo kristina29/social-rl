@@ -126,7 +126,7 @@ def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entr
 
     filename = f'sac_env.pkl'
     with open(filename, 'wb') as fp:
-        pickle.dump(rewards, fp)
+        pickle.dump(env, fp)
         print(f'SAC env saved to {filename}')
     print(f'scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/{filename}'
           f'experiments/SAC_DB2/{filename}')
