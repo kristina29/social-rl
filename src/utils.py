@@ -842,7 +842,7 @@ def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], losses: Mapping[st
     plot_district_kpis(envs)
     plot_district_load_profiles(envs)
 
-    plot_shares(envs, agents)
+    #plot_shares(envs, agents)
 
     plot_renewable_share(envs)
     plot_renewable_share(envs, grid=True)

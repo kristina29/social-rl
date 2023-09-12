@@ -1,3 +1,4 @@
+import pickle
 import time
 
 from citylearn.agents.q_learning import TabularQLearning
@@ -123,6 +124,13 @@ def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entr
                     #start_training_time_step=1, end_exploration_time_step=14000)
     losses, rewards, eval_results = sac_model.learn(episodes=episodes, deterministic_finish=True)
 
+    filename = f'sac_env.pkl'
+    with open(filename, 'wb') as fp:
+        pickle.dump(rewards, fp)
+        print(f'SAC env saved to {filename}')
+    print(f'scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/{filename}'
+          f'experiments/SAC_DB2/{filename}')
+
     print('SAC model trained!')
 
     return env, losses, rewards, eval_results, sac_model
@@ -159,7 +167,7 @@ if __name__ == '__main__':
         autotune_entropy = False
         discount = 0.99
         building_id = 6
-        active_observations = ['hour']  # , 'electricity_pricing', 'electricity_pricing_predicted_6h',
+        active_observations = ['solar_generation', 'electrical_storage_soc', 'non_shiftable_load']  # , 'electricity_pricing', 'electricity_pricing_predicted_6h',
         #                       'electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
         batch_size = 256
         clip_gradient = False
