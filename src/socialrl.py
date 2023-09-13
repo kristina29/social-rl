@@ -1,3 +1,4 @@
+import pickle
 import time
 
 from citylearn.agents.db2_sac import SACDB2
@@ -79,6 +80,11 @@ def preprocessing(schema, building_count, demonstrators_count, random_seed, acti
 
 def train_sacdb2(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
                  kaiming_initialization, l2_loss, mode, imitation_lr):
+
+    with open('/Users/kristina/Documents/Studium/Informatik M.Sc. - Tü/SoSe 2023/social-rl/experiments/SAC/09_b6_demonstrator/SAC_agent_20230913T105756.pkl', 'rb') as file:
+        demonstrator = pickle.load(file)
+        print('Done')
+
     env = CityLearnEnv(schema)
     sacdb2_model = SACDB2(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
                           clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
@@ -116,11 +122,11 @@ if __name__ == '__main__':
     building_id = opts.building_id
     store_agents = opts.store_agents
 
-    if False:
+    if True:
         DATASET_NAME = 'nydata'
-        exclude_rbc = 0
+        exclude_rbc = 1
         exclude_tql = 1
-        exclude_sac = 0
+        exclude_sac = 1
         demonstrators_count = 1
         building_count = 2
         episodes = 2

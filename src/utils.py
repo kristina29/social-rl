@@ -913,7 +913,7 @@ def save_results(envs: Mapping[str, CityLearnEnv], losses: Mapping[str, Mapping[
             a_filename = f'agents/{agent_name}_agent_{timestamp}.pkl'
             a_filenames.append(a_filename)
             with open(a_filename, 'wb') as fp:
-                pickle.dump(agent_obj, fp)
+                pickle.dump(agent_obj, fp, protocol=pickle.HIGHEST_PROTOCOL)
                 print(f'{agent_name} agent saved to {a_filename}')
 
     print('')
