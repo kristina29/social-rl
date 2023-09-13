@@ -318,10 +318,8 @@ class CityLearnEnv(Environment, Env):
                                                             / (`net_electricity_consumption_positive_without_storage` +
                                                             `used_pv_electricity_without_storage`)
         """
-        return list((self.net_renewable_electricity_consumption_without_storage /
-                     (
-                             self.net_electricity_consumption_positive_without_storage + self.used_pv_electricity_without_storage)).clip(
-            min=0))
+        return list(np.nan_to_num((self.net_renewable_electricity_consumption_without_storage /
+                     (self.net_electricity_consumption_positive_without_storage + self.used_pv_electricity_without_storage)).clip(min=0)))
 
     @property
     def net_renewable_electricity_grid_consumption_without_storage(self) -> np.ndarray:
