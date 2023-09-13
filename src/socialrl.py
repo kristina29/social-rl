@@ -81,7 +81,7 @@ def preprocessing(schema, building_count, demonstrators_count, random_seed, acti
 def train_sacdb2(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
                  kaiming_initialization, l2_loss, mode, imitation_lr):
 
-    with open('/Users/kristina/Documents/Studium/Informatik M.Sc. - Tü/SoSe 2023/social-rl/experiments/SAC_DB2/SAC_agent_20230913T111011.pkl', 'rb') as file:
+    with open('agents/SAC_agent_20230913T111011.pkl', 'rb') as file:
         demonstrator = pickle.load(file)
         print('Done')
 
