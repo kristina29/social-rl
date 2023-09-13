@@ -55,7 +55,7 @@ def set_schema_buildings(schema: dict, count: int=1, seed: int=1, building_id: i
 
     # remove buildins 12 and 15 as they have pecularities in their data
     # that are not relevant to this tutorial
-    buildings_to_exclude = ['Building_12', 'Building_15']
+    buildings_to_exclude = []#['Building_12', 'Building_15']
 
     for b in buildings_to_exclude:
         if b in buildings:
