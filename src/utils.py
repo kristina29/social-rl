@@ -42,7 +42,7 @@ def set_schema_buildings(schema: dict, count: int=1, seed: int=1, building_id: i
         List of selected buildings.
     """
 
-    # assert 1 <= count <= 15, 'Count must be between 1 and 15.'
+    assert 1 <= count <= 15, 'Count must be between 1 and 15.'
 
     # set random seed
     if seed is not None:
@@ -55,7 +55,7 @@ def set_schema_buildings(schema: dict, count: int=1, seed: int=1, building_id: i
 
     # remove buildins 12 and 15 as they have pecularities in their data
     # that are not relevant to this tutorial
-    buildings_to_exclude = []#['Building_12', 'Building_15']
+    buildings_to_exclude = ['Building_12', 'Building_15']
 
     for b in buildings_to_exclude:
         if b in buildings:

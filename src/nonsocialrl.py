@@ -166,7 +166,7 @@ if __name__ == '__main__':
         seed = 2
         autotune_entropy = True
         discount = 0.99
-        building_id = 6
+        building_id = 11
         active_observations = None#['solar_generation', 'electrical_storage_soc', 'non_shiftable_load']  # , 'electricity_pricing', 'electricity_pricing_predicted_6h',
                                #'#electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
         batch_size = 256

@@ -38,6 +38,10 @@ def parseOptions_social():
                          help='Social-learning mode to use.')
     optParser.add_option('--ir', action='store', type='float', dest='ir', default='0.01',
                          help='Imitation rate for imitating actions/values of the demonstrators.')
+    optParser.add_option('--pretrained_demonstrator', action='store', type='string', dest='pretrained_demonstrator',
+                         default=None,
+                         help='Path to pretained demonstrator agent to use. '
+                              'Overwrites the number of demonstrators to use.')
 
     opts, args = optParser.parse_args()
 
