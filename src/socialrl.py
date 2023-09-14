@@ -129,7 +129,7 @@ if __name__ == '__main__':
     else:
         demonstrators_count = opts.demonstrators
 
-    if True:
+    if False:
         DATASET_NAME = 'nydata'
         exclude_rbc = 1
         exclude_tql = 1
