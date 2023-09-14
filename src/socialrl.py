@@ -124,11 +124,6 @@ if __name__ == '__main__':
     store_agents = opts.store_agents
     pretrained_demonstrator = opts.pretrained_demonstrator
 
-    if pretrained_demonstrator is not None:
-        demonstrators_count = 0
-    else:
-        demonstrators_count = opts.demonstrators
-
     if False:
         DATASET_NAME = 'nydata'
         exclude_rbc = 1
@@ -139,7 +134,7 @@ if __name__ == '__main__':
         episodes = 2
         discount = 0.99
         seed = 2
-        active_observations = ['renewable_energy_produced']
+        active_observations = None #['renewable_energy_produced']
         batch_size = 256
         imitation_lr = 0.01
         mode = 1
@@ -149,7 +144,12 @@ if __name__ == '__main__':
         l2_loss = True
         building_id = None
         store_agents = False
-        pretrained_demonstrator = None
+        pretrained_demonstrator = 'agents/SAC_agent_20230914T135134.pkl'
+
+    if pretrained_demonstrator is not None:
+        demonstrators_count = 1
+    else:
+        demonstrators_count = opts.demonstrators
 
     train(dataset_name=DATASET_NAME, random_seed=seed, building_count=building_count,
           demonstrators_count=demonstrators_count, episodes=episodes, discount=discount,
