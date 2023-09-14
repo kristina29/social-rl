@@ -12,8 +12,9 @@ except (ModuleNotFoundError, ImportError) as e:
 
 from citylearn.agents.sac import SAC
 
+
 class SACDB2(SAC):
-    def __init__(self, *args, imitation_lr: float = 0.01, mode: int = 1, **kwargs):
+    def __init__(self, *args, imitation_lr: float = 0.01, mode: int = 1, pretrained_demonstrator: SAC = None, **kwargs):
         r"""Initialize :class:`SACDB2`.
 
         Parameters
@@ -24,6 +25,8 @@ class SACDB2(SAC):
             Imitation learning rate
         mode: int
             Mode of social learning
+        pretrained_demonstrator: SAC
+            Pretrained SAC agent to use as demonstrator
 
         Other Parameters
         ----------------
@@ -34,6 +37,11 @@ class SACDB2(SAC):
 
         self.imitation_lr = imitation_lr
         self.mode = mode
+        self.pretrained_demonstrator = pretrained_demonstrator
+
+        if pretrained_demonstrator is not None:
+            self.env.demonstrator_count = 1
+
         self.demonstrator_policy_net = [None for _ in range(self.env.demonstrator_count)]
 
         self.set_demonstrator_policies()
@@ -106,9 +114,9 @@ class SACDB2(SAC):
                         )
 
                         if self.mode in [1, 3]:
-                            q_demonstrator = q_demonstrator + (1+self.imitation_lr) * q_demonstrator
+                            q_demonstrator = q_demonstrator + (1 + self.imitation_lr) * q_demonstrator
                         if self.mode in [2, 3]:
-                            log_pi = (1+self.imitation_lr) * log_pi  # increase probability of this action
+                            log_pi = (1 + self.imitation_lr) * log_pi  # increase probability of this action
 
                         policy_loss = (self.alpha[i] * log_pi - q_demonstrator).mean()
                         self.policy_optimizer[i].zero_grad()
@@ -121,10 +129,12 @@ class SACDB2(SAC):
 
         return losses
 
-
     def set_demonstrator_policies(self):
         demonstrator_count = 0
-        for i in range(len(self.action_dimension)):
-            if self.env.buildings[i].demonstrator:
-                self.demonstrator_policy_net[demonstrator_count] = self.policy_net[i]
-                demonstrator_count += 1
+        if self.pretrained_demonstrator is not None:
+            self.demonstrator_policy_net[demonstrator_count] = self.pretrained_demonstrator.policy_net
+        else:
+            for i in range(len(self.action_dimension)):
+                if self.env.buildings[i].demonstrator:
+                    self.demonstrator_policy_net[demonstrator_count] = self.policy_net[i]
+                    demonstrator_count += 1

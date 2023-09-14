@@ -1,3 +1,4 @@
+import pickle
 import time
 
 from citylearn.agents.db2_sac import SACDB2
@@ -11,7 +12,7 @@ from nonsocialrl import train_tql, train_rbc, train_sac
 
 def train(dataset_name, random_seed, building_count, demonstrators_count, episodes, discount, active_observations,
           batch_size, autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc,
-          exclude_sac, mode, imitation_lr, building_id, store_agents):
+          exclude_sac, mode, imitation_lr, building_id, store_agents, pretrained_demonstrator):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
 
@@ -48,8 +49,8 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
         all_agents['SAC_DB2'] = \
         train_sacdb2(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
                      discount=discount, autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
-                     kaiming_initialization= kaiming_initialization, l2_loss=l2_loss, mode=mode, 
-                     imitation_lr=imitation_lr)
+                     kaiming_initialization=kaiming_initialization, l2_loss=l2_loss, mode=mode,
+                     imitation_lr=imitation_lr, pretrained_demonstrator=pretrained_demonstrator)
 
     save_results(all_envs, all_losses, all_rewards, all_eval_results, agents=all_agents, store_agents=store_agents)
 
@@ -78,11 +79,17 @@ def preprocessing(schema, building_count, demonstrators_count, random_seed, acti
 
 
 def train_sacdb2(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
-                 kaiming_initialization, l2_loss, mode, imitation_lr):
+                 kaiming_initialization, l2_loss, mode, imitation_lr, pretrained_demonstrator):
+
+    if pretrained_demonstrator is not None:
+        with open(pretrained_demonstrator, 'rb') as file:
+            pretrained_demonstrator = pickle.load(file)
+
     env = CityLearnEnv(schema)
     sacdb2_model = SACDB2(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
                           clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
-                          discount=discount, mode=mode, imitation_lr=imitation_lr)#,
+                          discount=discount, mode=mode, imitation_lr=imitation_lr,
+                          pretrained_demonstrator=pretrained_demonstrator)#,
                           #start_training_time_step=1, end_exploration_time_step=7000)
     losses, rewards, eval_results = sacdb2_model.learn(episodes=episodes, deterministic_finish=True)
 
@@ -115,12 +122,18 @@ if __name__ == '__main__':
     imitation_lr = opts.ir
     building_id = opts.building_id
     store_agents = opts.store_agents
+    pretrained_demonstrator = opts.pretrained_demonstrator
+
+    if pretrained_demonstrator is not None:
+        demonstrators_count = 0
+    else:
+        demonstrators_count = opts.demonstrators
 
     if False:
         DATASET_NAME = 'nydata'
-        exclude_rbc = 0
+        exclude_rbc = 1
         exclude_tql = 1
-        exclude_sac = 0
+        exclude_sac = 1
         demonstrators_count = 1
         building_count = 2
         episodes = 2
@@ -136,13 +149,15 @@ if __name__ == '__main__':
         l2_loss = True
         building_id = None
         store_agents = False
+        pretrained_demonstrator = None
 
     train(dataset_name=DATASET_NAME, random_seed=seed, building_count=building_count,
           demonstrators_count=demonstrators_count, episodes=episodes, discount=discount,
           active_observations=active_observations, batch_size=batch_size, autotune_entropy=autotune_entropy,
           clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
           exclude_tql=exclude_tql, exclude_rbc=exclude_rbc, exclude_sac=exclude_sac, mode=mode, 
-          imitation_lr=imitation_lr, building_id=building_id, store_agents=store_agents)
+          imitation_lr=imitation_lr, building_id=building_id, store_agents=store_agents,
+          pretrained_demonstrator=pretrained_demonstrator)
 
     # get the end time
     et = time.time()
