@@ -39,9 +39,6 @@ class SACDB2(SAC):
         self.mode = mode
         self.pretrained_demonstrator = pretrained_demonstrator
 
-        if pretrained_demonstrator is not None:
-            self.env.demonstrator_count = 1
-
         self.demonstrator_policy_net = [None for _ in range(self.env.demonstrator_count)]
 
         self.set_demonstrator_policies()
@@ -132,7 +129,7 @@ class SACDB2(SAC):
     def set_demonstrator_policies(self):
         demonstrator_count = 0
         if self.pretrained_demonstrator is not None:
-            self.demonstrator_policy_net[demonstrator_count] = self.pretrained_demonstrator.policy_net
+            self.demonstrator_policy_net[demonstrator_count] = self.pretrained_demonstrator.policy_net[0]
         else:
             for i in range(len(self.action_dimension)):
                 if self.env.buildings[i].demonstrator:
