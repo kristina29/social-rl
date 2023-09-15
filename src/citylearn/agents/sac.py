@@ -46,6 +46,7 @@ class SAC(RLC):
             self.soft_q_criterion = nn.SmoothL1Loss()
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.replay_buffer = [ReplayBuffer(int(self.replay_buffer_capacity)) for _ in self.action_space]
+        self.prioritized_replay_buffer = False
         self.soft_q_net1 = [None for _ in self.action_space]
         self.soft_q_net2 = [None for _ in self.action_space]
         self.target_soft_q_net1 = [None for _ in self.action_space]
@@ -149,7 +150,12 @@ class SAC(RLC):
         self.normalized[i] = True
 
     def update_step(self, i) -> (List[List[float]], float, float, float, float):
-        o, a, r, n, d = self.replay_buffer[i].sample(self.batch_size)
+        if self.prioritized_replay_buffer:
+            transitions, inds, weights = self.replay_buffer[i].sample(self.batch_size)
+            o, a, r, n, d = transitions
+            weights = torch.FloatTensor(weights).unsqueeze(1)
+        else:
+            o, a, r, n, d = self.replay_buffer[i].sample(self.batch_size)
         tensor = torch.cuda.FloatTensor if self.device.type == 'cuda' else torch.FloatTensor
         o = tensor(o).to(self.device)
         n = tensor(n).to(self.device)
@@ -171,8 +177,23 @@ class SAC(RLC):
         # Update Soft Q-Networks
         q1_pred = self.soft_q_net1[i](o, a)
         q2_pred = self.soft_q_net2[i](o, a)
-        q1_loss = self.soft_q_criterion(q1_pred, q_target)
-        q2_loss = self.soft_q_criterion(q2_pred, q_target)
+
+        def smoothl1_withweights(pred, target, weights, beta = 1.0):
+            td_error = target - pred
+            if abs(td_error < beta):
+                return (0.5 * (td_error ** 2 * weights) / beta).mean(), td_error
+            else:
+                return (td_error * weights - 0.5 * beta).mean(), td_error
+
+        if self.prioritized_replay_buffer:
+            # Smooth L1 loss using weighted error
+            q1_loss, td_error1 = smoothl1_withweights(q_target, q1_pred, weights)
+            q2_loss, td_error2 = smoothl1_withweights(q_target, q2_pred, weights)
+            priorities = abs(((td_error1 + td_error2) / 2 + 1e-5)).squeeze().detach().numpy()
+            self.replay_buffer[i].update_priorities(inds, priorities)
+        else:
+            q1_loss = self.critic_loss(q1_pred, q_target)
+            q2_loss = self.critic_loss(q2_pred, q_target)
 
         self.soft_q_optimizer1[i].zero_grad()
         q1_loss.backward()

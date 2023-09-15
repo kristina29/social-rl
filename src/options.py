@@ -34,6 +34,8 @@ def parseOptions_social():
                               'number of total buildings). If not defined, one building acts as demonstrator.')
     optParser.add_option('--sac', action='store_true', default=False, dest='exclude_sac',
                          help='Do not train a soft actor-critic (SAC) agent for comparison.')
+    optParser.add_option('--sacdb2', action='store_true', default=False, dest='exclude_sacdb2',
+                         help='Do not train a DB2 soft actor-critic (SAC) agent for comparison.')
     optParser.add_option('--mode', action='store', type='int', dest='mode', default='1',
                          help='Social-learning mode to use.')
     optParser.add_option('--ir', action='store', type='float', dest='ir', default='0.01',
@@ -42,6 +44,8 @@ def parseOptions_social():
                          default=None,
                          help='Path to pretained demonstrator agent to use. '
                               'Overwrites the number of demonstrators to use.')
+    optParser.add_option('--transitions', action='store', type='string', dest='demo_transitions', default=None,
+                         help='Path to transitions stored as csv from a demonstrator to put in the replay buffer.')
 
     opts, args = optParser.parse_args()
 
