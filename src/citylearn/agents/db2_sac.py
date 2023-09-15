@@ -111,7 +111,7 @@ class SACDB2(SAC):
                         )
 
                         if self.mode in [1, 3]:
-                            q_demonstrator = q_demonstrator + (1 + self.imitation_lr) * q_demonstrator
+                            q_demonstrator = q_demonstrator + self.imitation_lr * torch.abs(q_demonstrator)
                         if self.mode in [2, 3]:
                             log_pi = (1 + self.imitation_lr) * log_pi  # increase probability of this action
 
