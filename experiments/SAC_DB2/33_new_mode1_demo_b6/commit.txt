@@ -1,0 +1,4 @@
+scale_to_building: 0.5
+
+dbd4a9f
+https://github.com/kristina29/social-rl/commit/dbd4a9f1369faf24880923bd86752ef865e931d0
