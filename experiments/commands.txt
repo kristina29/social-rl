@@ -12,6 +12,10 @@ scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/citylearn_learn
 
 scp src/citylearn/data/nydata/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata/
 
+scp src/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/
+
+scp src/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/
+
 scp src/citylearn/data/nydata_new_buildings2/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata_new_buildings2/ 
 
 scp src/citylearn/data/testenv/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/testenv/ 

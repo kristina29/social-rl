@@ -223,12 +223,12 @@ class SAC(RLC):
 
         if self.prioritized_replay_buffer:
             # Smooth L1 loss using weighted error
-            q1_loss, td_error1 = smoothl1_withweights(q_target, q1_pred, weights)
-            q2_loss, td_error2 = smoothl1_withweights(q_target, q2_pred, weights)
-            #td_error1 = q_target - q1_pred
-            #td_error2 = q_target - q2_pred
-            #q1_loss = 0.5 * (td_error1 ** 2 * weights).mean()
-            #q2_loss = 0.5 * (td_error2 ** 2 * weights).mean()
+            #q1_loss, td_error1 = smoothl1_withweights(q_target, q1_pred, weights)
+            #q2_loss, td_error2 = smoothl1_withweights(q_target, q2_pred, weights)
+            td_error1 = q_target - q1_pred
+            td_error2 = q_target - q2_pred
+            q1_loss = 0.5 * (td_error1 ** 2 * weights).mean()
+            q2_loss = 0.5 * (td_error2 ** 2 * weights).mean()
 
             priorities = ((abs(td_error1) + abs(td_error2)) / 2 + 1e-5).squeeze().detach().numpy()
             self.replay_buffer[i].update_priorities(inds, priorities)
