@@ -15,7 +15,7 @@ from nonsocialrl import train_tql, train_rbc, train_sac
 
 def train(dataset_name, random_seed, building_count, demonstrators_count, episodes, discount, active_observations,
           batch_size, autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc,
-          exclude_sac, exclude_sacdb2, mode, imitation_lr, building_id, store_agents, pretrained_demonstrator,
+          exclude_sac, exclude_sacdb2, mode, imitation_lr, building_ids, store_agents, pretrained_demonstrator,
           demo_transitions):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
@@ -26,7 +26,7 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
     # TODO: DATA EXPLORATION
 
     # Data Preprocessing
-    schema = preprocessing(schema, building_count, demonstrators_count, random_seed, active_observations, building_id)
+    schema = preprocessing(schema, building_count, demonstrators_count, random_seed, active_observations, building_ids)
 
     all_envs = {}
     all_agents = {}
@@ -68,14 +68,14 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
     save_results(all_envs, all_losses, all_rewards, all_eval_results, agents=all_agents, store_agents=store_agents)
 
 
-def preprocessing(schema, building_count, demonstrators_count, random_seed, active_observations, building_id):
-    if building_id is not None:
-        schema, buildings = set_schema_buildings(schema, building_id=building_id)
+def preprocessing(schema, building_count, demonstrators_count, random_seed, active_observations, building_ids):
+    if building_ids is not None:
+        schema, buildings = set_schema_buildings(schema, building_ids_to_include=building_ids)
         print('Selected buildings:', buildings)
     elif building_count is not None:
         schema, buildings = set_schema_buildings(schema, count=building_count, seed=random_seed)
         print('Selected buildings:', buildings)
-    if demonstrators_count is not None and demonstrators_count <= building_count:
+    if demonstrators_count is not None and demonstrators_count <= len(buildings):
         schema, demonstrators = set_schema_demonstrators(schema, demonstrators_count, random_seed)
         print('Selected demonstrators:', demonstrators)
     elif demonstrators_count is not None:
@@ -150,7 +150,7 @@ if __name__ == '__main__':
     l2_loss = opts.l2_loss
     mode = opts.mode
     imitation_lr = opts.ir
-    building_id = opts.building_id
+    building_ids = opts.building_ids
     store_agents = opts.store_agents
     pretrained_demonstrator = opts.pretrained_demonstrator
     demo_transitions = opts.demo_transitions
@@ -174,7 +174,7 @@ if __name__ == '__main__':
         clip_gradient = False
         kaiming_initialization = False
         l2_loss = False
-        building_id = None
+        building_ids = None
         store_agents = False
         pretrained_demonstrator = None
         demo_transitions = 'sac_transitions_b6.pkl'
@@ -189,7 +189,7 @@ if __name__ == '__main__':
           active_observations=active_observations, batch_size=batch_size, autotune_entropy=autotune_entropy,
           clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
           exclude_tql=exclude_tql, exclude_rbc=exclude_rbc, exclude_sac=exclude_sac, exclude_sacdb2=exclude_sacdb2,
-          mode=mode, imitation_lr=imitation_lr, building_id=building_id, store_agents=store_agents,
+          mode=mode, imitation_lr=imitation_lr, building_ids=building_ids, store_agents=store_agents,
           pretrained_demonstrator=pretrained_demonstrator, demo_transitions=demo_transitions)
 
     # get the end time
