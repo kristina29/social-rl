@@ -1,6 +1,8 @@
 import pickle
 import time
 
+import pandas as pd
+
 from citylearn.agents.db2_sac import SACDB2
 from citylearn.agents.dpb_sac import PRBSAC
 from citylearn.citylearn import CityLearnEnv
@@ -111,6 +113,10 @@ def train_sacdb2(schema, episodes, random_seed, batch_size, discount, autotune_e
 def train_prbsac(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
                  kaiming_initialization, demo_transitions):
     env = CityLearnEnv(schema)
+
+    with open(demo_transitions, 'rb') as file:
+        demo_transitions = pickle.load(file)
+
     prbsac_model = PRBSAC(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
                           clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
                           discount=discount, demonstrator_transitions=demo_transitions)
@@ -149,8 +155,8 @@ if __name__ == '__main__':
     pretrained_demonstrator = opts.pretrained_demonstrator
     demo_transitions = opts.demo_transitions
 
-    if True:
-        DATASET_NAME = 'nydata'
+    if False:
+        DATASET_NAME = 'nydata_new_buildings2'
         exclude_rbc = 1
         exclude_tql = 1
         exclude_sac = 1
@@ -167,11 +173,11 @@ if __name__ == '__main__':
         autotune_entropy = True
         clip_gradient = False
         kaiming_initialization = False
-        l2_loss = True
+        l2_loss = False
         building_id = None
         store_agents = False
         pretrained_demonstrator = None
-        demo_transitions = 'bla'
+        demo_transitions = 'sac_transitions_b6.pkl'
 
     if pretrained_demonstrator is not None:
         demonstrators_count = 1

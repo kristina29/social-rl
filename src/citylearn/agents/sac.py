@@ -131,6 +131,30 @@ class SAC(RLC):
         return losses
 
     def normalize(self, i):
+        if self.prioritized_replay_buffer:
+            self.normalize_prioritized_buffer(i)
+
+        else:
+            # calculate normalized observations and rewards
+            X = np.array([j[0] for j in self.replay_buffer[i].buffer], dtype=float)
+            self.norm_mean[i] = np.nanmean(X, axis=0)
+            self.norm_std[i] = np.nanstd(X, axis=0) + 1e-5
+            R = np.array([j[2] for j in self.replay_buffer[i].buffer], dtype=float)
+            self.r_norm_mean[i] = np.nanmean(R, dtype=float)
+            self.r_norm_std[i] = np.nanstd(R, dtype=float) / self.reward_scaling + 1e-5
+
+            # update buffer with normalization
+            self.replay_buffer[i].buffer = [(
+                np.hstack(self.get_normalized_observations(i, o).reshape(1, -1)[0]),
+                a,
+                self.get_normalized_reward(i, r),
+                np.hstack(self.get_normalized_observations(i, n).reshape(1, -1)[0]),
+                d
+            ) for o, a, r, n, d in self.replay_buffer[i].buffer]
+
+        self.normalized[i] = True
+
+    def normalize_prioritized_buffer(self, i):
         # calculate normalized observations and rewards
         X = np.array([j[0] for j in self.replay_buffer[i].buffer], dtype=float)
         self.norm_mean[i] = np.nanmean(X, axis=0)
@@ -140,20 +164,29 @@ class SAC(RLC):
         self.r_norm_std[i] = np.nanstd(R, dtype=float) / self.reward_scaling + 1e-5
 
         # update buffer with normalization
-        self.replay_buffer[i].buffer = [(
-            np.hstack(self.get_normalized_observations(i, o).reshape(1, -1)[0]),
-            a,
-            self.get_normalized_reward(i, r),
-            np.hstack(self.get_normalized_observations(i, n).reshape(1, -1)[0]),
-            d
-        ) for o, a, r, n, d in self.replay_buffer[i].buffer]
-        self.normalized[i] = True
+        for j, transition in enumerate(self.replay_buffer[i].buffer):
+            o = transition[0]
+            a = transition[1]
+            r = transition[2]
+            n = transition[3]
+            d = transition[4]
+
+            self.replay_buffer[i].update_transition(j,
+                                                    np.hstack(self.get_normalized_observations(i, o).reshape(1, -1)[0]),
+                                                    a,
+                                                    self.get_normalized_reward(i, r),
+                                                    np.hstack(self.get_normalized_observations(i, n).reshape(1, -1)[0]),
+                                                    d)
 
     def update_step(self, i) -> (List[List[float]], float, float, float, float):
         if self.prioritized_replay_buffer:
             transitions, inds, weights = self.replay_buffer[i].sample(self.batch_size)
-            o, a, r, n, d = transitions
             weights = torch.FloatTensor(weights).unsqueeze(1)
+            o = torch.FloatTensor(np.stack(transitions[:, 0]))
+            a = torch.FloatTensor(np.stack(transitions[:, 1])[:, None]).squeeze(dim=1)
+            r = torch.FloatTensor(np.stack(transitions[:, 2]))
+            n = torch.FloatTensor(np.stack(transitions[:, 3]))
+            d = torch.FloatTensor(np.stack(transitions[:, 4]))
         else:
             o, a, r, n, d = self.replay_buffer[i].sample(self.batch_size)
         tensor = torch.cuda.FloatTensor if self.device.type == 'cuda' else torch.FloatTensor
@@ -179,21 +212,29 @@ class SAC(RLC):
         q2_pred = self.soft_q_net2[i](o, a)
 
         def smoothl1_withweights(pred, target, weights, beta = 1.0):
-            td_error = target - pred
-            if abs(td_error < beta):
-                return (0.5 * (td_error ** 2 * weights) / beta).mean(), td_error
-            else:
-                return (td_error * weights - 0.5 * beta).mean(), td_error
+            loss = 0
+
+            td_error = pred - target
+            mask = (td_error.abs() < beta)
+            loss += mask * (0.5 * (td_error ** 2 * weights) / beta)
+            loss += (~mask) * (td_error.abs() * weights - 0.5 * beta)
+
+            return loss.mean(), td_error
 
         if self.prioritized_replay_buffer:
             # Smooth L1 loss using weighted error
             q1_loss, td_error1 = smoothl1_withweights(q_target, q1_pred, weights)
             q2_loss, td_error2 = smoothl1_withweights(q_target, q2_pred, weights)
-            priorities = abs(((td_error1 + td_error2) / 2 + 1e-5)).squeeze().detach().numpy()
+            #td_error1 = q_target - q1_pred
+            #td_error2 = q_target - q2_pred
+            #q1_loss = 0.5 * (td_error1 ** 2 * weights).mean()
+            #q2_loss = 0.5 * (td_error2 ** 2 * weights).mean()
+
+            priorities = ((abs(td_error1) + abs(td_error2)) / 2 + 1e-5).squeeze().detach().numpy()
             self.replay_buffer[i].update_priorities(inds, priorities)
         else:
-            q1_loss = self.critic_loss(q1_pred, q_target)
-            q2_loss = self.critic_loss(q2_pred, q_target)
+            q1_loss = self.soft_q_criterion(q1_pred, q_target)
+            q2_loss = self.soft_q_criterion(q2_pred, q_target)
 
         self.soft_q_optimizer1[i].zero_grad()
         q1_loss.backward()
