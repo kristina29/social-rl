@@ -118,7 +118,8 @@ class SACDB2(SAC):
                         if self.mode in [2, 3, 5, 6]:
                             log_pi = log_pi + self.imitation_lr * torch.abs(log_pi)  # increase probability of this action
 
-                        policy_loss = (self.pretrained_demonstrator.alpha[0] * log_pi - q_demonstrator).mean()
+                        policy_loss = (self.alpha[i] * log_pi - q_demonstrator).mean()
+
                         self.policy_optimizer[i].zero_grad()
                         policy_loss.backward()
                         self.policy_optimizer[i].step()
