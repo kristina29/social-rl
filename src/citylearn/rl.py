@@ -1,4 +1,6 @@
 import random
+from typing import Tuple
+
 import numpy as np
 
 # conditional imports
@@ -102,7 +104,76 @@ class ReplayBuffer:
     
     def __len__(self):
         return len(self.buffer)
-        
+
+
+class PrioritizedReplayBuffer(ReplayBuffer):
+    def __init__(self, alpha=0.6, beta=0.4, beta_annealing=0.0001, **kwargs):
+        """ Initialize Prioritized Replay Buffer as described in
+            Schaul, Tom, et al. "Prioritized experience replay." arXiv preprint arXiv:1511.05952 (2015).
+
+        :param alpha: float
+            Prioritization of transitions degree
+        :param beta: float
+            Initial importance sampling correction degree
+        :param beta_annealing: float
+            Factor to anneal beta over time
+        """
+        super(PrioritizedReplayBuffer, self).__init__(**kwargs)
+
+        self.buffer = np.asarray([np.empty((5,))] * self.capacity)
+        self.priorities = np.zeros((self.capacity,), dtype=np.float32)
+        self.alpha = alpha
+        self.beta_0 = beta
+        self.beta_annealing = beta_annealing
+        self.size = 0
+
+    def push(self, state, action, reward, next_state, done):
+        if self.position == 0:
+            blank_buffer = [np.asarray((state, action, reward, next_state, done), dtype=object)] * self.capacity
+            self.buffer = np.asarray(blank_buffer)
+            max_prio = 1e-5  # not 0 to prevent numerical errors
+        else:
+            max_prio = self.priorities.max()
+
+        self.buffer[self.position, :] = np.asarray((state, action, reward, next_state, done), dtype=object)
+        self.priorities[self.position] = max_prio
+        self.size = min(self.size + 1, self.capacity)
+        self.position = (self.position + 1) % self.capacity
+
+    def sample(self, batch_size=1):
+        if batch_size > self.size:
+            batch_size = self.size
+
+        probabilities = np.array(self.priorities[:self.size]) ** self.alpha
+        P = probabilities / probabilities.sum()
+
+        inds = np.random.choice(range(self.size), batch_size, p=P)
+
+        # beta annealing
+        beta = min(1, self.beta_0 + (1. - self.beta_0) * self.beta_annealing)
+
+        weights = (self.size * P[inds]) ** (-beta)
+        weights = np.array(weights / weights.max())
+
+        return self.buffer[inds, :], inds, weights
+
+    def update_transition(self, position, state, action, reward, next_state, done):
+        self.buffer[position, :] = np.asarray((state, action, reward, next_state, done), dtype=object)
+
+    def update_priorities(self, indices, new_priorities):
+        """
+
+        :param indices: np.array
+            indices of the transitions whose priorities should be updated
+        :param new_priorities: np.array
+        :return:
+        """
+        self.priorities[indices] = new_priorities
+
+    def __len__(self):
+        return self.size
+
+
 class RegressionBuffer:
     def __init__(self, capacity):
         self.capacity = capacity
