@@ -110,10 +110,13 @@ class SACDB2(SAC):
                             self.soft_q_net2[i](o, demonstrator_actions)
                         )
 
-                        if self.mode in [1, 3]:
+                        if self.mode in [4, 5, 6]:
+                            log_pi = self.policy_net[i].get_log_prob(demonstrator_actions, o)
+
+                        if self.mode in [1, 3, 4, 6]:
                             q_demonstrator = q_demonstrator + self.imitation_lr * torch.abs(q_demonstrator)
-                        if self.mode in [2, 3]:
-                            log_pi = (1 + self.imitation_lr) * log_pi  # increase probability of this action
+                        if self.mode in [2, 3, 5, 6]:
+                            log_pi = log_pi + self.imitation_lr * torch.abs(log_pi)  # increase probability of this action
 
                         policy_loss = (self.pretrained_demonstrator.alpha[0] * log_pi - q_demonstrator).mean()
                         self.policy_optimizer[i].zero_grad()

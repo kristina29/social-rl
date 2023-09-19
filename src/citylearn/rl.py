@@ -79,6 +79,16 @@ class PolicyNetwork(nn.Module):
 
         return action, log_prob, mean
 
+    def get_log_prob(self, action, state):
+        y_t = (action - self.action_bias) / self.action_scale
+        x_t = torch.atanh(y_t)
+
+        mean, log_std = self.forward(state)
+        std = log_std.exp()
+        normal = Normal(mean, std)
+
+        return normal.log_prob(x_t)
+
     def to(self, device):
         self.action_scale = self.action_scale.to(device)
         self.action_bias = self.action_bias.to(device)
