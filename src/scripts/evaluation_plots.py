@@ -21,12 +21,18 @@ if __name__ == '__main__':
         agent = parser.agent
 
     if True:
-        experiment_dirs = ['33_b6/ir0.01/socialMode1',
-                           '33_b6/ir0.01/socialMode2',
-                           '33_b6/ir0.01/socialMode3',
-                           '33_b6/ir0.2/socialMode1',
-                           '33_b6/ir0.2/socialMode2',
-                           '33_b6/ir0.2/socialMode3',
+        experiment_dirs = ['32_demo_b6/ir0.01/socialMode1',
+                           '32_demo_b6/ir0.01/socialMode2',
+                           '32_demo_b6/ir0.01/socialMode3',
+                           '32_demo_b6/ir0.01/socialMode4',
+                           '32_demo_b6/ir0.01/socialMode5',
+                           '32_demo_b6/ir0.01/socialMode6',
+                           '32_demo_b6/ir0.2/socialMode1',
+                           '32_demo_b6/ir0.2/socialMode2',
+                           '32_demo_b6/ir0.2/socialMode3',
+                           '32_demo_b6/ir0.2/socialMode4',
+                           '32_demo_b6/ir0.2/socialMode5',
+                           '32_demo_b6/ir0.2/socialMode6',
                            ]
         ref_dirs = ['SAC']
         asocial_agent = 'SAC'

@@ -1,8 +1,6 @@
 import pickle
 import time
 
-import pandas as pd
-
 from citylearn.agents.db2_sac import SACDB2
 from citylearn.agents.dpb_sac import PRBSAC
 from citylearn.citylearn import CityLearnEnv
