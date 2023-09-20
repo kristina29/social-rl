@@ -140,6 +140,11 @@ The policy is implemented as a Gaussian distribution where the mean and the cova
 
 The observation space of the SAC agent is listed in Appendix \ref{app:observation-space-sac}.
 
+\subsection{SAC using demonstrator transitions}
+As mentioned in Section \ref{sec:background-social-learning}, a widely used method to improve learning is sampling demonstrator transitions and storing them in a Prioritized Replay Buffer. These kind of buffer add priorities based on the Temporal difference (TD) error to the transitions: Transistion with a higher TD error have an higher priority, assuming that these are more difficult to learn and hence should be seen more often during training. Thus, transitions with a higher priority are sampled with a higher probability. The priorities are updated during the training process \cite{schaul2015prioritized}.
+
+\todo[inline]{Present the buildings used in training and the demonstrator building (and why this)}
+For implementing the SAC agent using the demonstrator transitions, we first trained one building with 
 \subsection{\textcolor{red}{Social Agent I}}
 \subsection{\textcolor{red}{Social Agent II}}
 
