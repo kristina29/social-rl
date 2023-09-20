@@ -1,6 +1,4 @@
 from typing import List, Mapping
-import numpy as np
-import numpy.typing as npt
 
 try:
     import torch

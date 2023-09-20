@@ -4,7 +4,6 @@ import logging
 import os
 from pathlib import Path
 import pickle
-from statistics import mean
 from typing import Any, List, Mapping, Union
 from gym import spaces
 from citylearn.base import Environment
