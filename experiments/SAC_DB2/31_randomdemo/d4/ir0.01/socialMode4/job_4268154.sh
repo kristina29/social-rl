@@ -1,5 +1,3 @@
-
-
 #!/bin/bash
 #SBATCH --ntasks=1                # Number of tasks (see below)
 #SBATCH --cpus-per-task=1         # Number of CPU cores per task
@@ -21,8 +19,7 @@ source $HOME/.bashrc
 #eval "$(micromamba shell hook --shell=bash)"
 micromamba activate social-rl
 
-srun python3 src/socialrl.py -s nydata_new_buildings2 -b 6 --pretrained_demonstrator agents/SAC_agent_20230914T144400.pkl -e 2 --tql --autotune --mode 1 --ir 0.01
+srun python3 src/socialrl.py -s nydata_new_buildings2 -b 6 -d 4 -e 2 --tql --autotune --mode 4 --sac
 
 micromamba deactivate
 
-    
