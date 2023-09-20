@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-ir = 0.2
+ir = 1
 
 PREFIX = '''\
 #!/bin/bash
