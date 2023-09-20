@@ -13,6 +13,9 @@ try:
 except ImportError:
     raise Exception("This functionality requires you to install torch. You can install torch by : pip install torch torchvision, or for more detailed instructions please visit https://pytorch.org.")
 
+torch.autograd.set_detect_anomaly(True)
+np.seterr(all="raise")
+
 class PolicyNetwork(nn.Module):
     def __init__(self, 
                  num_inputs, 
@@ -64,6 +67,7 @@ class PolicyNetwork(nn.Module):
     def sample(self, state, deterministic=False):
         mean, log_std = self.forward(state)
         std = log_std.exp()
+
         normal = Normal(mean, std)
         x_t = normal.rsample()  # for reparameterization trick (mean + std * N(0,1))
         y_t = torch.tanh(x_t)
@@ -81,13 +85,41 @@ class PolicyNetwork(nn.Module):
 
     def get_log_prob(self, action, state):
         y_t = (action - self.action_bias) / self.action_scale
+
+        # prevent inf values
+        if any(y_t == 1):
+            idx = torch.where(y_t == 1)
+            y_t[idx] = 0.99999
+        if any(y_t == -1):
+            idx = torch.where(y_t == -1)
+            y_t[idx] = -0.99999
+
         x_t = torch.atanh(y_t)
+
+        # if any(torch.isinf(x_t)):
+        #     idx = torch.where(torch.isinf(x_t))
+        #     for id in idx:
+        #         if y_t[id] == 1:
+        #             x_t[id] = 10
+        #         elif y_t[id] == -1:
+        #             x_t[id] = -10
+        #         elif not torch.isnan(x_t[id]):
+        #             pass
+        #         else:
+        #             raise ValueError(f'x_t[{id}]={x_t[id]} but y_t[{id}]={y_t[id]}')
 
         mean, log_std = self.forward(state)
         std = log_std.exp()
-        normal = Normal(mean, std)
 
-        return normal.log_prob(x_t)
+        normal = Normal(mean, std)
+        log_prob = normal.log_prob(x_t)
+
+        # prevent infinity log probabilities (if actual probability is 0)
+        if any(torch.isinf(log_prob)):
+            idx = torch.where(torch.isinf(log_prob))
+            log_prob[idx] = 1e-100
+
+        return log_prob
 
     def to(self, device):
         self.action_scale = self.action_scale.to(device)
