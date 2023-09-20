@@ -10,7 +10,7 @@ scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/citylearn_learn
 
 
 
-scp src/citylearn/data/nydata/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata/
+scp src/citylearn/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/
 
 scp src/citylearn/data/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/
 
