@@ -21,25 +21,9 @@ if __name__ == '__main__':
         agent = parser.agent
 
     if True:
-        experiment_dirs = ['30_renewable_prod/reward_05pvprice/0.5',
-                           '32_demo_b6/ir0.01/socialMode1',
-                           '32_demo_b6/ir0.01/socialMode2',
-                           '32_demo_b6/ir0.01/socialMode3',
-                           '32_demo_b6/ir0.01/socialMode4',
-                           '32_demo_b6/ir0.01/socialMode5',
-                           '32_demo_b6/ir0.01/socialMode6',
-                           '32_demo_b6/ir0.2/socialMode1',
-                           '32_demo_b6/ir0.2/socialMode2',
-                           '32_demo_b6/ir0.2/socialMode3',
-                           '32_demo_b6/ir0.2/socialMode4',
-                           '32_demo_b6/ir0.2/socialMode5',
-                           '32_demo_b6/ir0.2/socialMode6',
-                           '32_demo_b6/ir1/socialMode1',
-                           '32_demo_b6/ir1/socialMode2',
-                           '32_demo_b6/ir1/socialMode3',
-                           '32_demo_b6/ir1/socialMode4',
-                           '32_demo_b6/ir1/socialMode5',
-                           '32_demo_b6/ir1/socialMode6',
+        experiment_dirs = ['15_reward_price_pv/alpha05/new_buildings2',
+                           '30_renewable_prod/reward_05pvprice/0.5',
+                           '30_renewable_prod/reward_05pvprice/1.5'
                            ]
         ref_dirs = ['15_reward_price_pv/alpha05/new_buildings2']
         asocial_agent = 'SAC'

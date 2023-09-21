@@ -33,6 +33,6 @@ for mode in range(1,7):
     with open(f'job{mode}.sh', 'w') as rsh:
         rsh.write(f'''\
 {PREFIX}
-srun python3 src/socialrl.py -s nydata_new_buildings2 -b 6 --pretrained_demonstrator agents/SAC_agent_20230914T144400.pkl -e 2 --tql --sac --autotune --mode {mode} --ir {ir}
+srun python3 src/socialrl.py -s nydata_new_buildings2 -b 6 --pretrained_demonstrator agents/SAC_agent_20230914T144400.pkl -e 2 --tql --sac --autotune --mode {mode} --ir {ir} --deterministic_demo
 {SUFFIX}
     ''')
