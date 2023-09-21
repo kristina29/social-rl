@@ -304,4 +304,4 @@ class FuelMix:
             sum_medians: float
                 Sum of the medians of net energy consumption of all included buildings.
         """
-        self.renewable_energy_produced = self.renewable_energy_share * sum_medians * 0.5
+        self.renewable_energy_produced = self.renewable_energy_share * sum_medians * 1.5
