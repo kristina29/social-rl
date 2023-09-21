@@ -1,6 +1,4 @@
 from typing import List, Mapping
-import numpy as np
-import numpy.typing as npt
 
 try:
     import torch
@@ -12,8 +10,9 @@ except (ModuleNotFoundError, ImportError) as e:
 
 from citylearn.agents.sac import SAC
 
+
 class SACDB2(SAC):
-    def __init__(self, *args, imitation_lr: float = 0.01, mode: int = 1, **kwargs):
+    def __init__(self, *args, imitation_lr: float = 0.01, mode: int = 1, pretrained_demonstrator: SAC = None, **kwargs):
         r"""Initialize :class:`SACDB2`.
 
         Parameters
@@ -24,6 +23,8 @@ class SACDB2(SAC):
             Imitation learning rate
         mode: int
             Mode of social learning
+        pretrained_demonstrator: SAC
+            Pretrained SAC agent to use as demonstrator
 
         Other Parameters
         ----------------
@@ -34,6 +35,8 @@ class SACDB2(SAC):
 
         self.imitation_lr = imitation_lr
         self.mode = mode
+        self.pretrained_demonstrator = pretrained_demonstrator
+
         self.demonstrator_policy_net = [None for _ in range(self.env.demonstrator_count)]
 
         self.set_demonstrator_policies()
@@ -105,12 +108,16 @@ class SACDB2(SAC):
                             self.soft_q_net2[i](o, demonstrator_actions)
                         )
 
-                        if self.mode in [1, 3]:
-                            q_demonstrator = q_demonstrator + (1+self.imitation_lr) * q_demonstrator
-                        if self.mode in [2, 3]:
-                            log_pi = (1+self.imitation_lr) * log_pi  # increase probability of this action
+                        if self.mode in [4, 5, 6]:
+                            log_pi = self.policy_net[i].get_log_prob(demonstrator_actions, o)
+
+                        if self.mode in [1, 3, 4, 6]:
+                            q_demonstrator = q_demonstrator + self.imitation_lr * torch.abs(q_demonstrator)
+                        if self.mode in [2, 3, 5, 6]:
+                            log_pi = log_pi + self.imitation_lr * torch.abs(log_pi)  # increase probability of this action
 
                         policy_loss = (self.alpha[i] * log_pi - q_demonstrator).mean()
+
                         self.policy_optimizer[i].zero_grad()
                         policy_loss.backward()
                         self.policy_optimizer[i].step()
@@ -121,10 +128,12 @@ class SACDB2(SAC):
 
         return losses
 
-
     def set_demonstrator_policies(self):
         demonstrator_count = 0
-        for i in range(len(self.action_dimension)):
-            if self.env.buildings[i].demonstrator:
-                self.demonstrator_policy_net[demonstrator_count] = self.policy_net[i]
-                demonstrator_count += 1
+        if self.pretrained_demonstrator is not None:
+            self.demonstrator_policy_net[demonstrator_count] = self.pretrained_demonstrator.policy_net[0]
+        else:
+            for i in range(len(self.action_dimension)):
+                if self.env.buildings[i].demonstrator:
+                    self.demonstrator_policy_net[demonstrator_count] = self.policy_net[i]
+                    demonstrator_count += 1

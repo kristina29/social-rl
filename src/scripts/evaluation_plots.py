@@ -21,14 +21,27 @@ if __name__ == '__main__':
         agent = parser.agent
 
     if True:
-        experiment_dirs = ['31_ir0.01/socialMode1/',
-                           '32_ir0.2/socialMode1/',
-                           '31_ir0.01/socialMode2/',
-                           '32_ir0.2/socialMode2/',
-                           '31_ir0.01/socialMode3/',
-                           '32_ir0.2/socialMode3/',
+        experiment_dirs = ['30_renewable_prod/reward_05pvprice/0.5',
+                           '32_demo_b6/ir0.01/socialMode1',
+                           '32_demo_b6/ir0.01/socialMode2',
+                           '32_demo_b6/ir0.01/socialMode3',
+                           '32_demo_b6/ir0.01/socialMode4',
+                           '32_demo_b6/ir0.01/socialMode5',
+                           '32_demo_b6/ir0.01/socialMode6',
+                           '32_demo_b6/ir0.2/socialMode1',
+                           '32_demo_b6/ir0.2/socialMode2',
+                           '32_demo_b6/ir0.2/socialMode3',
+                           '32_demo_b6/ir0.2/socialMode4',
+                           '32_demo_b6/ir0.2/socialMode5',
+                           '32_demo_b6/ir0.2/socialMode6',
+                           '32_demo_b6/ir1/socialMode1',
+                           '32_demo_b6/ir1/socialMode2',
+                           '32_demo_b6/ir1/socialMode3',
+                           '32_demo_b6/ir1/socialMode4',
+                           '32_demo_b6/ir1/socialMode5',
+                           '32_demo_b6/ir1/socialMode6',
                            ]
-        ref_dirs = ['SAC']
+        ref_dirs = ['15_reward_price_pv/alpha05/new_buildings2']
         asocial_agent = 'SAC'
         n_refs = len(ref_dirs)
         length = 1/n_refs
@@ -44,9 +57,9 @@ if __name__ == '__main__':
     df = pd.read_csv(kpi_filenames[0])
     df = df.set_index('kpi')
     df = df[(df['env_id'] == asocial_agent) & (df['level'] == 'district')]
-    kpis[asocial_agent] = df
+    kpis[ref_dirs[0]] = df
 
-    for dir in experiment_dirs:
+    for dir in experiment_dirs[1:]:
         print(dir)
         kpi_filenames = glob.glob(f'{EXPERIMENT_BASE_DIR}{agentdir}/{dir}/kpis_*.csv')
 
