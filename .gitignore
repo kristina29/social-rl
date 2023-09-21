@@ -1,4 +1,6 @@
-*.xlsx
+Book1.xlsx
+~$*.xlsx
+src/.xlsx
 literature/
 literature
 commands.txt
