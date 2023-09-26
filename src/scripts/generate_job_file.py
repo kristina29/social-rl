@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
-#irs = [0.01, 0.25, 0.5, 0.75, 1]
-ir = 0.2
+irs = [0.00001, 0.0001, 0.001, 0.01, 0.02, 0.03, 0.04, 0.05]
+#ir = 0.2
 
 PREFIX = '''\
 #!/bin/bash
@@ -30,12 +30,12 @@ SUFFIX = '''
 micromamba deactivate
 '''
 
-#for i, ir in enumerate(irs):
-for mode in range(4,7):
-    with open(f'job{mode}.sh', 'w') as rsh:
+for i, ir in enumerate(irs):
+#for mode in range(4,7):
+    with open(f'job{i}.sh', 'w') as rsh:
         rsh.write(f'''\
 {PREFIX}
-srun python3 src/socialrl.py -s nydata_new_buildings2 -b 6 -d 4 -e 2 --tql --sac --autotune --mode {mode} --ir {ir} --deterministic_demo
+srun python3 src/socialrl.py -s nydata_new_buildings2 -b 6 -d 4 -e 2 --tql --sac --sacdb2 --autotune --ir {ir}
 
 {SUFFIX}
     ''')

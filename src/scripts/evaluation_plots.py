@@ -21,16 +21,22 @@ if __name__ == '__main__':
         agent = parser.agent
 
     if True:
-        experiment_dirs = ['15_reward_price_pv/alpha05/new_buildings2',
-                           '30_renewable_prod/reward_05pvprice/0.5',
-                           '30_renewable_prod/reward_05pvprice/1.5'
+        experiment_dirs = ['30_renewable_prod/reward_05pvprice/0.5',
+                           '34_randomdemo_val/d2/ir0.0001',
+                           '34_randomdemo_val/d2/ir0.001',
+                           '34_randomdemo_val/d2/ir0.01',
+                           '34_randomdemo_val/d2/ir0.02',
+                           '34_randomdemo_val/d2/ir0.25',
+                           '34_randomdemo_val/d2/ir0.5',
+                           '34_randomdemo_val/d2/ir0.75',
+                           '34_randomdemo_val/d2/ir1',
                            ]
-        ref_dirs = ['15_reward_price_pv/alpha05/new_buildings2']
+        ref_dirs = ['30_renewable_prod/reward_05pvprice/0.5']
         asocial_agent = 'SAC'
         n_refs = len(ref_dirs)
         length = 1/n_refs
         agentdir = 'SAC_DB2'
-        agent = 'SAC_DB2'
+        agent = 'SAC_DB2Value'
 
     kpis = {}
     kpi_filenames = glob.glob(f'{EXPERIMENT_BASE_DIR}{agentdir}/{experiment_dirs[0]}/kpis_*.csv')
