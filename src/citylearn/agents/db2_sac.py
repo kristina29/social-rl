@@ -126,7 +126,7 @@ class SACDB2(SAC):
                         policy_loss = (self.alpha[i] * log_pi - q_demonstrator).mean()
 
                         # prevent numerical errors
-                        policy_loss = policy_loss.clip(-1e+10, 1e+10)
+                        policy_loss = policy_loss.clip(-1e+8, 1e+8)
 
                         self.policy_optimizer[i].zero_grad()
                         policy_loss.backward()
