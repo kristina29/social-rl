@@ -141,6 +141,7 @@ The policy is implemented as a Gaussian distribution where the mean and the cova
 The observation space of the SAC agent is listed in Appendix \ref{app:observation-space-sac}.
 
 \subsection{SAC using demonstrator transitions}
+\todo[inline]{Font in tabellen beschreibungen verkleinern}
 As mentioned in Section \ref{sec:background-social-learning}, a widely used method to improve learning is sampling demonstrator transitions and storing them in a Prioritized Replay Buffer. These kind of buffer add priorities based on the Temporal difference (TD) error to the transitions: Transistion with a higher TD error have an higher priority, assuming that these are more difficult to learn and hence should be seen more often during training. Thus, transitions with a higher priority are sampled with a higher probability. The priorities are updated during the training process \cite{schaul2015prioritized}.
 
 \todo[inline]{Present the buildings used in training and the demonstrator building (and why this)}
@@ -155,31 +156,46 @@ Then: policy update using demonstrator actions
 Classical loss $l$ to minimize is is 
 \begin{align*}
 	l &= \mathbb{E}_{s_t \sim \mathcal{D}, \epsilon_t \sim \mathcal{N}}[\alpha \log\pi_{\phi}(f_{\phi}(\epsilon_t;s_t)|s_t)-Q_{\theta}(s_t, f_{\phi}(\epsilon_t;s_t))] \\ 
-	&=  \mathbb{E}_{s_t \sim \mathcal{D}, \epsilon_t \sim \mathcal{N}}[\alpha \mathcal{H}_{SAC}-\mathcal{V}_{SAC}] \numberthis \label{eqn}
+	&=  \mathbb{E}_{s_t \sim \mathcal{D}, \epsilon_t \sim \mathcal{N}}[\alpha \mathcal{H}_{SAC}-\mathcal{V}_{SAC}] \numberthis \label{eqn:policy-loss}
 \end{align*}
-with the entropy term that aims to maximize randomess $\mathcal{H}_{SAC}$ and the value term that aims to maximize the estimated Q-Value of the action $\mathcal{V}_{SAC}$. 
+with the entropy term that aims to maximize randomness $\mathcal{H}_{SAC}$ and the value term that aims to maximize the estimated Q-Value of the action $\mathcal{V}_{SAC}$. For incorporating demonstrator actions similar to decision biasing described in chapter \ref{sec:decision-biasing}, so increase the probability of observed demonstrator actions or increase the estimated Q-Value of these, we modify the terms as follows: In mode 1, we use the actions sampled from the demonstrator $f^d_{\Phi}(\epsilon_t;s_t)$ in the value term and increase the estimated Q-Value by adding a fraction of the absolute value of it using the imitation learning rate $\alpha_i$:
+\begin{equation}
+	\mathcal{V}_{M1} =  Q_{\theta}(s_t, f_{\phi}^d(\epsilon_t;s_t)) + \alpha_i|Q_{\theta}(s_t, f_{\phi}^d(\epsilon_t;s_t))|
+\end{equation}
+Also, the probability of taking the demonstrator action for the demonstrator is used in the entropy term:
+\begin{equation}
+	\mathcal{H}_{M1} =  \log\pi_{\phi}^d(f_{\phi}^d(\epsilon_t;s_t)|s_t)
+\end{equation}
+In mode 2, the probability of taking the demonstrator action is increased by the learning rate:
+\begin{equation}
+	\mathcal{H}_{M2} = \log\pi_{\phi}^d(f_{\phi}^d(\epsilon_t;s_t)|s_t) + \alpha_i|\log\pi_{\phi}^d(f_{\phi}^d(\epsilon_t;s_t)|s_t)|
+\end{equation}
+Mode 3 combines mode 1 and mode 2. Mode 4-6 are similar to the modes 1-3, but the probability of taking the demonstrator action in the current trained policy is used:
+\begin{align*}
+	\mathcal{H}_{M4} &=  \log\pi_{\phi}(f_{\phi}^d(\epsilon_t;s_t)|s_t) \\
+	\mathcal{H}_{M5} &= \log\pi_{\phi}(f_{\phi}^d(\epsilon_t;s_t)|s_t) + \alpha_i|\log\pi_{\phi}(f_{\phi}^d(\epsilon_t;s_t)|s_t)|
+\end{align*}
+All modes calculate the loss as defined in Equation \ref{eqn:policy-loss} using the defined entropy and value term. Table \ref{tab:social-policy-update-modes} summarizes the different modes and their entropy and value terms.
+
 {
 \renewcommand{\baselinestretch}{0.9} 
 \normalsize
 \begin{table}[htb]
-\begin{tabular}{|p{2.7cm}||l|c|r|}
+\center
+\begin{tabular}{|l|l|l|}
 \hline
-    \textbf{Mode} & \textbf{Entropy term} & \textbf{Value term} 
-  & \textbf{Spalte 4} \\
+    \textbf{Mode} & \textbf{Entropy term} & \textbf{Value term} \\
   \hline\hline
-  xxx1111
-  & xxxxxxx2222222
-  & xxxxxx333333 
-  & xxxxxxxxxx444444 \\
-  \hline
-    ...
-  & ...
-  & ...
-  & ...\\
-  \hline
+  1 & $\mathcal{H}_{M1}$ &$\mathcal{V}_{M1}$
+  \\ \hline
+  2 & $\mathcal{H}_{M2}$& $\mathcal{V}_{SAC}$ \\ \hline
+  3 & $\mathcal{H}_{M2}$& $\mathcal{V}_{M1}$ \\ \hline 
+  4 & $\mathcal{H}_{M4}$ & $\mathcal{V}_{M1}$ \\ \hline
+  5 & $\mathcal{H}_{M5}$ & $\mathcal{V}_{SAC}$ \\ \hline
+  6 & $\mathcal{H}_{M5}$ &  $\mathcal{V}_{M1}$ \\ \hline 
 \end{tabular}
   \caption[Beispieltabelle mit einer langen Legende]{Beispieltabelle mit einer langen Legende, damit man sieht, dass in der Legende der Zeilenabstand verringert wurde. Ausserdem soll auch der Font etwas kleiner gew\"ahlt werden. So sieht die ganze Umgebung kompakter aus.}
-  \label{tabelle-1}
+  \label{tab:social-policy-update-modes}
 \end{table}
 }
 
