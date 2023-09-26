@@ -115,10 +115,7 @@ class SACDB2(SAC):
                         if self.mode in [4, 5, 6]:
                             log_pi = self.policy_net[i].get_log_prob(demonstrator_actions, o)
                         elif self.deterministic_demo:
-                            try:
-                                log_pi = demonstrator_policy.get_log_prob(demonstrator_actions, o)
-                            except:
-                                log_pi = demonstrator_policy.get_log_prob(demonstrator_actions, o)
+                            log_pi = demonstrator_policy.get_log_prob(demonstrator_actions, o)
 
                         if self.mode in [1, 3, 4, 6]:
                             q_demonstrator = q_demonstrator + self.imitation_lr * torch.abs(q_demonstrator)
@@ -127,11 +124,15 @@ class SACDB2(SAC):
 
                         policy_loss = (self.alpha[i] * log_pi - q_demonstrator).mean()
 
+                        # prevent numerical errors
+                        policy_loss = policy_loss.clip(-1000, 1000)
+
                         self.policy_optimizer[i].zero_grad()
-                        try:
-                            policy_loss.backward()
-                        except:
-                            print('ho')
+                        policy_loss.backward()
+
+                        #if self.policy_net[i].has_nan():
+                        #    self.policy_net[i].has_nan()
+
                         self.policy_optimizer[i].step()
             else:
                 pass

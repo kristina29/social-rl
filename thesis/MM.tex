@@ -194,7 +194,7 @@ All modes calculate the loss as defined in Equation \ref{eqn:policy-loss} using 
   5 & $\mathcal{H}_{M5}$ & $\mathcal{V}_{SAC}$ \\ \hline
   6 & $\mathcal{H}_{M5}$ &  $\mathcal{V}_{M1}$ \\ \hline 
 \end{tabular}
-  \caption[Beispieltabelle mit einer langen Legende]{Beispieltabelle mit einer langen Legende, damit man sieht, dass in der Legende der Zeilenabstand verringert wurde. Ausserdem soll auch der Font etwas kleiner gew\"ahlt werden. So sieht die ganze Umgebung kompakter aus.}
+  \caption[Modes for Social Agent focusing on the policy update]{Modes for Social Agent focusing on the policy update. Mode 1 increases the estimated Q-Value of the demonstrator action, mode 2 increases the probability of the demonstrator action and mode 3 combines both. Mode 4-6 are similar, but the probability of the demonstrator actions in the current trained policy is used instead of their probabilities in the demonstrator policy.}
   \label{tab:social-policy-update-modes}
 \end{table}
 }

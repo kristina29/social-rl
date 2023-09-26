@@ -12,8 +12,8 @@ try:
 except ImportError:
     raise Exception("This functionality requires you to install torch. You can install torch by : pip install torch torchvision, or for more detailed instructions please visit https://pytorch.org.")
 
-torch.autograd.set_detect_anomaly(True)
-np.seterr(all="raise")
+#torch.autograd.set_detect_anomaly(True)
+#np.seterr(all="raise")
 
 class PolicyNetwork(nn.Module):
     def __init__(self, 
@@ -82,6 +82,19 @@ class PolicyNetwork(nn.Module):
 
         return action, log_prob, mean
 
+    def has_nan(self):
+        result = False
+        if torch.isnan(self.linear1.weight).any():
+            result = True
+        if torch.isnan(self.linear2.weight).any():
+            result = True
+        if torch.isnan(self.mean_linear.weight).any():
+            result = True
+        if torch.isnan(self.log_std_linear.weight).any():
+            result = True
+
+        return result
+
     def get_log_prob(self, action, state):
         y_t = (action - self.action_bias) / self.action_scale
 
@@ -94,7 +107,7 @@ class PolicyNetwork(nn.Module):
             y_t[idx] = -0.99999
 
         x_t = torch.atanh(y_t)
- 
+
         # if any(torch.isinf(x_t)):
         #     idx = torch.where(torch.isinf(x_t))
         #     for id in idx:
