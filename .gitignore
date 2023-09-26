@@ -14,6 +14,7 @@ experiments/SAC_DB2/plots_*
 experiments/SAC_DB2/kpis_*
 formelles/
 thesis/*.bbl
+thesis/thesis.synctex(busy)
 thesis/*.blg
 thesis/*.aux
 thesis/*.log

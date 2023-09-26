@@ -82,6 +82,19 @@ class PolicyNetwork(nn.Module):
 
         return action, log_prob, mean
 
+    def has_nan(self):
+        result = False
+        if torch.isnan(self.linear1.weight).any():
+            result = True
+        if torch.isnan(self.linear2.weight).any():
+            result = True
+        if torch.isnan(self.mean_linear.weight).any():
+            result = True
+        if torch.isnan(self.log_std_linear.weight).any():
+            result = True
+
+        return result
+
     def get_log_prob(self, action, state):
         y_t = (action - self.action_bias) / self.action_scale
 
