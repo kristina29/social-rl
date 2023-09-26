@@ -150,17 +150,28 @@ def read_fuel_data(load_dir) -> pd.DataFrame:
     return fuel
 
 
+def generate_carbon_emission_data(fuel_mix, save_path):
+    carbon_intensity = pd.DataFrame({'kg_CO2/kWh': (1 - fuel_mix['Renewable Share']) * 0.7})
+    carbon_intensity.to_csv(save_path, index=False)
+    print(f'File saved under {save_path}')
+
+
 if __name__ == '__main__':
-    weather_dir = '../../datasets/'
+    weather_dir = '../datasets/'
     weather_filepath = f'{weather_dir}weather_ny_42.30_-74.37_2021.csv'
-    weather_save_filepath = '../citylearn/data/nydata/weather.csv'
+    weather_save_filepath = 'citylearn/data/nydata_new_buildings2/weather.csv'
     preprocess_data(weather_filepath, weather_save_filepath, weather=True)
 
     weather_filenames = [f'{weather_dir}{filename}' for filename in os.listdir(weather_dir) if filename.startswith('weather_ny_')]
-    weather_save_filepath = f'citylearn/data/nydata/weather_{len(weather_filenames)}locs_median.csv'
+    weather_save_filepath = f'citylearn/data/nydata_new_buildings2/weather_{len(weather_filenames)}locs_median.csv'
     preprocess_data(weather_filenames, weather_save_filepath, weather=True)
 
     fuel_mix_dirpath = '../datasets/fuel_mix_ny_2021'
-    fuel_mix_save_filepath = '../citylearn/data/nydata/fuelmix.csv'
+    fuel_mix_save_filepath = 'citylearn/data/nydata_new_buildings2/fuelmix.csv'
     fuel_mix = preprocess_data(fuel_mix_dirpath, fuel_mix_save_filepath, weather=False)
+
+    carbon_emission_savepath = 'citylearn/data/nydata_new_buildings2/carbon_intensity.csv'
+    generate_carbon_emission_data(fuel_mix, carbon_emission_savepath)
+
+
 

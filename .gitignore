@@ -1,4 +1,6 @@
-*.xlsx
+Book1.xlsx
+~$*.xlsx
+src/.xlsx
 literature/
 literature
 commands.txt
@@ -31,6 +33,7 @@ src/kpis_*
 src/losses_*
 src/rewards_*
 src/*.pkl
+src/agents/
 src/.idea/
 src/.ipynb_checkpoints/
 src/__pycache__/

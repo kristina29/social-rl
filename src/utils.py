@@ -19,7 +19,7 @@ import seaborn as sns
 from citylearn.utilities import get_active_parts
 
 
-def set_schema_buildings(schema: dict, count: int=1, seed: int=1, building_id: int=None) \
+def set_schema_buildings(schema: dict, count: int=1, seed: int=1, building_ids_to_include: List[int]=None) \
         -> Tuple[dict, List[str]]:
     """Randomly select number of buildings to set as active in the schema.
 
@@ -31,8 +31,8 @@ def set_schema_buildings(schema: dict, count: int=1, seed: int=1, building_id: i
         Number of buildings to set as active in schema.
     seed: int
         Seed for pseudo-random number generator
-    building_id: int
-        Id of the only building that should be included.
+    building_ids_to_include: List[int]
+        Ids of the only buildings that should be included.
 
     Returns
     -------
@@ -62,10 +62,10 @@ def set_schema_buildings(schema: dict, count: int=1, seed: int=1, building_id: i
             buildings.remove(b)
 
     # randomly select specified number of buildings
-    if building_id is None:
+    if building_ids_to_include is None:
         buildings = np.random.choice(buildings, size=count, replace=False).tolist()
     else:
-        buildings = [f'Building_{building_id}']
+        buildings = [f'Building_{id}' for id in building_ids_to_include]
 
     # reorder buildings
     building_ids = [int(b.split('_')[-1]) for b in buildings]
@@ -241,6 +241,7 @@ def get_kpis(env: CityLearnEnv) -> pd.DataFrame:
     kpi_names = [
         'electricity_consumption', 'cost',
         'average_daily_peak', 'ramping', '1 - load_factor',
+        'carbon_emissions',
         '1 - average_daily_renewable_share',
         '1 - average_daily_renewable_share_grid',
         '1 - used_pv_of_total_share'
@@ -913,7 +914,7 @@ def save_results(envs: Mapping[str, CityLearnEnv], losses: Mapping[str, Mapping[
             a_filename = f'agents/{agent_name}_agent_{timestamp}.pkl'
             a_filenames.append(a_filename)
             with open(a_filename, 'wb') as fp:
-                pickle.dump(agent_obj, fp)
+                pickle.dump(agent_obj, fp, protocol=pickle.HIGHEST_PROTOCOL)
                 print(f'{agent_name} agent saved to {a_filename}')
 
     print('')

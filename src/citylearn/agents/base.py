@@ -4,7 +4,6 @@ import logging
 import os
 from pathlib import Path
 import pickle
-from statistics import mean
 from typing import Any, List, Mapping, Union
 from gym import spaces
 from citylearn.base import Environment
@@ -149,11 +148,6 @@ class Agent(Environment):
                         '1 - average_daily_renewable_share_grid': [],
                         '1 - used_pv_of_total_share': []}
 
-        # evaluate once a month for a whole week
-        #if hasattr(self, 'start_training_time_step'):
-            #print('start_training_time_step', self.start_training_time_step)
-            #print('end_exploration_time_step', self.end_exploration_time_step)
-
         for episode in range(episodes):
             deterministic = deterministic or (deterministic_finish and episode >= episodes - 1)
             observations = self.env.reset()
@@ -186,9 +180,6 @@ class Agent(Environment):
                 observations = [o for o in next_observations]
 
                 # evaluate once a month for a whole week
-                #if hasattr(self, 'start_training_time_step') \
-                #        and self.start_training_time_step <= self.time_step <= self.end_exploration_time_step:
-                    #print('self.env.time_step % 168', self.env.time_step % 168)
                 if self.time_step % 168 == 0 \
                         and hasattr(self, 'start_training_time_step') \
                         and self.start_training_time_step <= self.time_step <= self.end_exploration_time_step \
@@ -209,15 +200,12 @@ class Agent(Environment):
                         kpis['value'] = kpis['value'].round(3)
                         kpis = kpis.rename(columns={'cost_function': 'kpi'})
                         kpis = kpis[kpis['level'] == 'district'].copy()
-                        #print('KPIS', kpis)
 
                         for kpi, value in zip(kpis['kpi'], kpis['value']):
-                            #print('KPI, value', kpi, value)
                             if isinstance(value, float):
                                 eval_results[kpi].append(value)
                             else:
                                 eval_results[kpi].extend(value)
-                        #print('')
 
                     self.time_step = old_time_step
 
@@ -228,18 +216,12 @@ class Agent(Environment):
                     f' Rewards: {new_rewards}'
                 )
 
-                #print('self.time_step', self.time_step)
-                #print('self.env.time_step', self.env.time_step)
-                #print('env.done', self.env.done)
-
             # store episode's env to disk
             if keep_env_history:
                 self.__save_env(episode, env_history_directory)
             else:
                 pass
 
-
-        #print(eval_results)
         return losses, rewards, eval_results
 
     def get_env_history(self, directory: Path, episodes: List[int] = None):
