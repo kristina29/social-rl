@@ -145,7 +145,45 @@ As mentioned in Section \ref{sec:background-social-learning}, a widely used meth
 
 \todo[inline]{Present the buildings used in training and the demonstrator building (and why this)}
 For implementing the SAC agent using the demonstrator transitions, we first trained one building with 
+
 \subsection{\textcolor{red}{Social Agent I}}
+\textcolor{red}{Policy update}
+First: normal policy update
+
+Then: policy update using demonstrator actions
+
+Classical loss $l$ to minimize is is 
+\begin{align*}
+	l &= \mathbb{E}_{s_t \sim \mathcal{D}, \epsilon_t \sim \mathcal{N}}[\alpha \log\pi_{\phi}(f_{\phi}(\epsilon_t;s_t)|s_t)-Q_{\theta}(s_t, f_{\phi}(\epsilon_t;s_t))] \\ 
+	&=  \mathbb{E}_{s_t \sim \mathcal{D}, \epsilon_t \sim \mathcal{N}}[\alpha \mathcal{H}_{SAC}-\mathcal{V}_{SAC}] \numberthis \label{eqn}
+\end{align*}
+with the entropy term that aims to maximize randomess $\mathcal{H}_{SAC}$ and the value term that aims to maximize the estimated Q-Value of the action $\mathcal{V}_{SAC}$. 
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
+\begin{table}[htb]
+\begin{tabular}{|p{2.7cm}||l|c|r|}
+\hline
+    \textbf{Mode} & \textbf{Entropy term} & \textbf{Value term} 
+  & \textbf{Spalte 4} \\
+  \hline\hline
+  xxx1111
+  & xxxxxxx2222222
+  & xxxxxx333333 
+  & xxxxxxxxxx444444 \\
+  \hline
+    ...
+  & ...
+  & ...
+  & ...\\
+  \hline
+\end{tabular}
+  \caption[Beispieltabelle mit einer langen Legende]{Beispieltabelle mit einer langen Legende, damit man sieht, dass in der Legende der Zeilenabstand verringert wurde. Ausserdem soll auch der Font etwas kleiner gew\"ahlt werden. So sieht die ganze Umgebung kompakter aus.}
+  \label{tabelle-1}
+\end{table}
+}
+
+
 \subsection{\textcolor{red}{Social Agent II}}
 
 \section{Training}

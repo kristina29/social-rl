@@ -125,6 +125,9 @@ class SACDB2(SAC):
     def set_demonstrator_policies(self):
         demonstrator_count = 0
         for i in range(len(self.action_dimension)):
-            if self.env.buildings[i].demonstrator:
-                self.demonstrator_policy_net[demonstrator_count] = self.policy_net[i]
-                demonstrator_count += 1
+            try:
+                if self.env.buildings[i].demonstrator:
+                    self.demonstrator_policy_net[demonstrator_count] = self.policy_net[i]
+                    demonstrator_count += 1
+            except:
+                print(self.env.buildings[i].demonstrator)
