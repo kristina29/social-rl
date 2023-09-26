@@ -21,25 +21,25 @@ if __name__ == '__main__':
         agent = parser.agent
 
     if True:
-        experiment_dirs = ['30_renewable_prod/reward_05pvprice/0.5',
-                           '34_randomdemo_val/d2/ir0.0001',
-                           '34_randomdemo_val/d2/ir0.001',
-                           '34_randomdemo_val/d2/ir0.01',
-                           '34_randomdemo_val/d2/ir0.02',
-                           '34_randomdemo_val/d2/ir0.25',
-                           '34_randomdemo_val/d2/ir0.5',
-                           '34_randomdemo_val/d2/ir0.75',
-                           '34_randomdemo_val/d2/ir1',
+        experiment_dirs = ['SAC_DB2/30_renewable_prod/reward_05pvprice/0.5',
+                           '1_randomdemo/d2/ir0.0001',
+                           '1_randomdemo/d2/ir0.001',
+                           '1_randomdemo/d2/ir0.01',
+                           '1_randomdemo/d2/ir0.02',
+                           '1_randomdemo/d2/ir0.25',
+                           '1_randomdemo/d2/ir0.5',
+                           '1_randomdemo/d2/ir0.75',
+                           '1_randomdemo/d2/ir1',
                            ]
-        ref_dirs = ['30_renewable_prod/reward_05pvprice/0.5']
+        ref_dirs = ['SAC_DB2/30_renewable_prod/reward_05pvprice/0.5']
         asocial_agent = 'SAC'
         n_refs = len(ref_dirs)
         length = 1/n_refs
-        agentdir = 'SAC_DB2'
+        agentdir = 'SAC_DB2Value'
         agent = 'SAC_DB2Value'
 
     kpis = {}
-    kpi_filenames = glob.glob(f'{EXPERIMENT_BASE_DIR}{agentdir}/{experiment_dirs[0]}/kpis_*.csv')
+    kpi_filenames = glob.glob(f'{EXPERIMENT_BASE_DIR}/{experiment_dirs[0]}/kpis_*.csv')
 
     if len(kpi_filenames) > 1:
         raise ValueError(f'More than one KPI csv file found in {experiment_dirs[0]}')
@@ -61,7 +61,7 @@ if __name__ == '__main__':
         df = df[(df['env_id'] == agent) & (df['level'] == 'district')]
         kpis[dir] = df
 
-    # plot 1-avarage_daily_renewable share net_value/net_value_without_storage
+    # plot 1-avarage_daily_renewable share netue/netue_without_storage
     values = []
     names = []
     for key, value in kpis.items():
@@ -86,7 +86,7 @@ if __name__ == '__main__':
     plt.savefig('1.png', bbox_inches="tight")
 
 
-    # plot 1-avarage_daily_renewable share net_value/net_value_without_storage
+    # plot 1-avarage_daily_renewable share netue/netue_without_storage
     values = []
     names = []
     for key, value in kpis.items():
@@ -109,7 +109,7 @@ if __name__ == '__main__':
 
     plt.savefig('2.png', bbox_inches="tight")
 
-    # plot 1-used_pv_of_total_share share net_value/net_value_without_storage
+    # plot 1-used_pv_of_total_share share netue/netue_without_storage
     values = []
     names = []
     for key, value in kpis.items():
@@ -130,7 +130,7 @@ if __name__ == '__main__':
             pass
     ax.bar_label(rects, padding=3)
     ax.set_ylim(0.75, 1.05)
-    ax.set_title('1 - used_pv_of_total_share [net_value/net_value_without_storage]')
+    ax.set_title('1 - used_pv_of_total_share [netue/netue_without_storage]')
     for tick in ax.get_xticklabels():
         tick.set_rotation(90)
 
