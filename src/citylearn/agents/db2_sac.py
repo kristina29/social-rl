@@ -106,11 +106,12 @@ class SACDB2(SAC):
 
                     # Use demonstrator actions for updating policy
                     for demonstrator_policy in self.demonstrator_policy_net:
-                        demonstrator_actions, log_pi, _ = demonstrator_policy.sample(o, self.deterministic_demo)
-                        q_demonstrator = torch.min(
-                            self.soft_q_net1[i](o, demonstrator_actions),
-                            self.soft_q_net2[i](o, demonstrator_actions)
-                        )
+                        with torch.no_grad():
+                            demonstrator_actions, log_pi, _ = demonstrator_policy.sample(o, self.deterministic_demo)
+                            q_demonstrator = torch.min(
+                                self.soft_q_net1[i](o, demonstrator_actions),
+                                self.soft_q_net2[i](o, demonstrator_actions)
+                            )
 
                         if self.mode in [4, 5, 6]:
                             log_pi = self.policy_net[i].get_log_prob(demonstrator_actions, o)
@@ -147,9 +148,6 @@ class SACDB2(SAC):
             self.demonstrator_policy_net[demonstrator_count] = self.pretrained_demonstrator.policy_net[0]
         else:
             for i in range(len(self.action_dimension)):
-                try:
-                    if self.env.buildings[i].demonstrator:
-                        self.demonstrator_policy_net[demonstrator_count] = self.policy_net[i]
-                        demonstrator_count += 1
-                except:
-                    print(self.env.buildings[i].demonstrator)
+                if self.env.buildings[i].demonstrator:
+                    self.demonstrator_policy_net[demonstrator_count] = self.policy_net[i]
+                    demonstrator_count += 1
