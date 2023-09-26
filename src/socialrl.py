@@ -2,6 +2,7 @@ import pickle
 import time
 
 from citylearn.agents.db2_sac import SACDB2
+from citylearn.agents.db2_value_sac import SACDB2VALUE
 from citylearn.agents.dpb_sac import PRBSAC
 from citylearn.citylearn import CityLearnEnv
 from citylearn.data import DataSet
@@ -13,8 +14,8 @@ from nonsocialrl import train_tql, train_rbc, train_sac
 
 def train(dataset_name, random_seed, building_count, demonstrators_count, episodes, discount, active_observations,
           batch_size, autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc,
-          exclude_sac, exclude_sacdb2, mode, imitation_lr, building_ids, store_agents, pretrained_demonstrator,
-          demo_transitions, deterministic_demo):
+          exclude_sac, exclude_sacdb2, exclude_sacdb2value, mode, imitation_lr, building_ids, store_agents,
+          pretrained_demonstrator, demo_transitions, deterministic_demo):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
 
@@ -55,6 +56,16 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
                          kaiming_initialization=kaiming_initialization, l2_loss=l2_loss, mode=mode,
                          imitation_lr=imitation_lr, pretrained_demonstrator=pretrained_demonstrator,
                          deterministic_demo=deterministic_demo)
+
+    # Train SAC agent with decision-biasing on the value function
+    if not exclude_sacdb2value:
+        all_envs['SAC_DB2Value'], all_losses['SAC_DB2Value'], all_rewards['SAC_DB2Value'], \
+        all_eval_results['SAC_DB2Value'], all_agents['SAC_DB2Value'] = \
+            train_sacdb2value(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
+                              discount=discount, autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
+                              kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
+                              imitation_lr=imitation_lr, pretrained_demonstrator=pretrained_demonstrator,
+                              deterministic_demo=deterministic_demo)
 
     # Train SAC agent with demonstrator transitions
     if demo_transitions is not None:
@@ -109,6 +120,26 @@ def train_sacdb2(schema, episodes, random_seed, batch_size, discount, autotune_e
     return env, losses, rewards, eval_results, sacdb2_model
 
 
+def train_sacdb2value(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
+                      kaiming_initialization, l2_loss, imitation_lr, pretrained_demonstrator, deterministic_demo):
+    if pretrained_demonstrator is not None:
+        with open(pretrained_demonstrator, 'rb') as file:
+            pretrained_demonstrator = pickle.load(file)
+
+    env = CityLearnEnv(schema)
+    sacdb2value_model = SACDB2VALUE(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
+                                    clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization,
+                                    l2_loss=l2_loss,
+                                    discount=discount, imitation_lr=imitation_lr,
+                                    pretrained_demonstrator=pretrained_demonstrator,
+                                    deterministic_demo=deterministic_demo)
+    losses, rewards, eval_results = sacdb2value_model.learn(episodes=episodes, deterministic_finish=True)
+
+    print('SAC DB2 Value model trained!')
+
+    return env, losses, rewards, eval_results, sacdb2value_model
+
+
 def train_prbsac(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
                  kaiming_initialization, demo_transitions):
     env = CityLearnEnv(schema)
@@ -141,6 +172,7 @@ if __name__ == '__main__':
     exclude_rbc = opts.exclude_rbc
     exclude_sac = opts.exclude_sac
     exclude_sacdb2 = opts.exclude_sacdb2
+    exclude_sacdb2value = opts.exclude_sacdb2value
     active_observations = opts.observations
     batch_size = opts.batch
     autotune_entropy = opts.autotune
@@ -161,6 +193,7 @@ if __name__ == '__main__':
         exclude_tql = 1
         exclude_sac = 1
         exclude_sacdb2 = 1
+        exclude_sacdb2value = 0
         demonstrators_count = 1
         building_count = 2
         episodes = 2
@@ -190,6 +223,7 @@ if __name__ == '__main__':
           active_observations=active_observations, batch_size=batch_size, autotune_entropy=autotune_entropy,
           clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
           exclude_tql=exclude_tql, exclude_rbc=exclude_rbc, exclude_sac=exclude_sac, exclude_sacdb2=exclude_sacdb2,
+          exclude_sacdb2value=exclude_sacdb2value,
           mode=mode, imitation_lr=imitation_lr, building_ids=building_ids, store_agents=store_agents,
           pretrained_demonstrator=pretrained_demonstrator, demo_transitions=demo_transitions,
           deterministic_demo=deterministic_demo)

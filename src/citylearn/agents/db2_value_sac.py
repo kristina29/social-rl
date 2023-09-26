@@ -1,6 +1,7 @@
 from typing import List, Mapping
 
 import torch
+from torch import tensor
 
 from citylearn.agents.sac import SAC
 
@@ -97,11 +98,38 @@ class SACDB2VALUE(SAC):
 
                     # Use demonstrator actions for updating Q-Value network
                     for demonstrator_policy in self.demonstrator_policy_net:
-                        demonstrator_actions, log_pi, _ = demonstrator_policy.sample(o, self.deterministic_demo)
-                        q_demonstrator = torch.min(
-                            self.soft_q_net1[i](o, demonstrator_actions),
-                            self.soft_q_net2[i](o, demonstrator_actions)
-                        )
+                        with torch.no_grad():
+                            demonstrator_actions, log_pi, _ = demonstrator_policy.sample(o, self.deterministic_demo)
+
+                            target_q_values = torch.min(
+                                self.target_soft_q_net1[i](o, demonstrator_actions),
+                                self.target_soft_q_net2[i](o, demonstrator_actions),
+                            )
+                            q_target = target_q_values + self.imitation_lr * torch.abs(target_q_values)
+
+                        # Update Soft Q-Networks
+                        q1_pred = self.soft_q_net1[i](o, demonstrator_actions)
+                        q2_pred = self.soft_q_net2[i](o, demonstrator_actions)
+
+                        q1_loss = self.soft_q_criterion(q1_pred, q_target)
+                        q2_loss = self.soft_q_criterion(q2_pred, q_target)
+
+                        self.soft_q_optimizer1[i].zero_grad()
+                        q1_loss.backward()
+                        self.soft_q_optimizer1[i].step()
+
+                        self.soft_q_optimizer2[i].zero_grad()
+                        q2_loss.backward()
+                        self.soft_q_optimizer2[i].step()
+
+                        # Soft Updates
+                        for target_param, param in zip(self.target_soft_q_net1[i].parameters(),
+                                                       self.soft_q_net1[i].parameters()):
+                            target_param.data.copy_(target_param.data * (1.0 - self.tau) + param.data * self.tau)
+
+                        for target_param, param in zip(self.target_soft_q_net2[i].parameters(),
+                                                       self.soft_q_net2[i].parameters()):
+                            target_param.data.copy_(target_param.data * (1.0 - self.tau) + param.data * self.tau)
 
             else:
                 pass
