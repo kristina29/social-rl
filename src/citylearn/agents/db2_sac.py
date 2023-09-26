@@ -12,7 +12,8 @@ from citylearn.agents.sac import SAC
 
 
 class SACDB2(SAC):
-    def __init__(self, *args, imitation_lr: float = 0.01, mode: int = 1, pretrained_demonstrator: SAC = None, **kwargs):
+    def __init__(self, *args, imitation_lr: float = 0.01, mode: int = 1, pretrained_demonstrator: SAC = None,
+                 deterministic_demo: bool = False, **kwargs):
         r"""Initialize :class:`SACDB2`.
 
         Parameters
@@ -25,6 +26,8 @@ class SACDB2(SAC):
             Mode of social learning
         pretrained_demonstrator: SAC
             Pretrained SAC agent to use as demonstrator
+        deterministic_demo: bool
+            Use deterministic or sampled actions of the demonstrator
 
         Other Parameters
         ----------------
@@ -36,6 +39,7 @@ class SACDB2(SAC):
         self.imitation_lr = imitation_lr
         self.mode = mode
         self.pretrained_demonstrator = pretrained_demonstrator
+        self.deterministic_demo = deterministic_demo
 
         self.demonstrator_policy_net = [None for _ in range(self.env.demonstrator_count)]
 
@@ -102,7 +106,7 @@ class SACDB2(SAC):
 
                     # Use demonstrator actions for updating policy
                     for demonstrator_policy in self.demonstrator_policy_net:
-                        demonstrator_actions, log_pi, _ = demonstrator_policy.sample(o)
+                        demonstrator_actions, log_pi, _ = demonstrator_policy.sample(o, self.deterministic_demo)
                         q_demonstrator = torch.min(
                             self.soft_q_net1[i](o, demonstrator_actions),
                             self.soft_q_net2[i](o, demonstrator_actions)
@@ -110,6 +114,8 @@ class SACDB2(SAC):
 
                         if self.mode in [4, 5, 6]:
                             log_pi = self.policy_net[i].get_log_prob(demonstrator_actions, o)
+                        elif self.deterministic_demo:
+                            log_pi = demonstrator_policy.get_log_prob(demonstrator_actions, o)
 
                         if self.mode in [1, 3, 4, 6]:
                             q_demonstrator = q_demonstrator + self.imitation_lr * torch.abs(q_demonstrator)

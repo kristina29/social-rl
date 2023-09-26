@@ -44,6 +44,8 @@ def parseOptions_social():
                          default=None,
                          help='Path to pretained demonstrator agent to use. '
                               'Overwrites the number of demonstrators to use.')
+    optParser.add_option('--deterministic_demo', action='store_true', default=False, dest='deterministic_demo',
+                         help='Use deterministic action if the demonstrator')
     optParser.add_option('--transitions', action='store', type='string', dest='demo_transitions', default=None,
                          help='Path to transitions stored as csv from a demonstrator to put in the replay buffer.')
 

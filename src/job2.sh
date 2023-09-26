@@ -1,8 +1,3 @@
-#! /usr/bin/env python
-
-ir = 0.2
-
-PREFIX = '''\
 #!/bin/bash
 #SBATCH --ntasks=1                # Number of tasks (see below)
 #SBATCH --cpus-per-task=1         # Number of CPU cores per task
@@ -23,16 +18,9 @@ source $HOME/.bashrc
 # insert your commands here
 #eval "$(micromamba shell hook --shell=bash)"
 micromamba activate social-rl
-'''
 
-SUFFIX = '''
+srun python3 src/socialrl.py -s nydata_new_buildings2 -b 6 -d 4 -e 2 --tql --sac --autotune --mode 2 --ir 0.2 --deterministic_demo
+
 micromamba deactivate
-'''
 
-for mode in range(1,7):
-    with open(f'job{mode}.sh', 'w') as rsh:
-        rsh.write(f'''\
-{PREFIX}
-srun python3 src/socialrl.py -s nydata_new_buildings2 -b 6 -d 4 -e 2 --tql --sac --autotune --mode {mode} --ir {ir} --deterministic_demo
-{SUFFIX}
-    ''')
+    
