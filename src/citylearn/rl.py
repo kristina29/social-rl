@@ -12,8 +12,8 @@ try:
 except ImportError:
     raise Exception("This functionality requires you to install torch. You can install torch by : pip install torch torchvision, or for more detailed instructions please visit https://pytorch.org.")
 
-torch.autograd.set_detect_anomaly(True)
-np.seterr(all="raise")
+#torch.autograd.set_detect_anomaly(True)
+#np.seterr(all="raise")
 
 class PolicyNetwork(nn.Module):
     def __init__(self, 
