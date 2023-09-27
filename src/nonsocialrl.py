@@ -1,5 +1,9 @@
+import copy
 import pickle
 import time
+
+import pandas as pd
+from citylearn.rl import ReplayBuffer
 
 from citylearn.agents.q_learning import TabularQLearning
 from citylearn.agents.rbc import OptimizedRBC
@@ -14,7 +18,7 @@ from utils import set_schema_buildings, set_active_observations, save_results
 
 def train(dataset_name, random_seed, building_count, episodes, active_observations, batch_size, discount,
           autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc,
-          building_id, store_agents):
+          building_ids, store_agents):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
 
@@ -24,7 +28,7 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
     # TODO: DATA EXPLORATION
 
     # Data Preprocessing
-    schema = preprocessing(schema, building_count, random_seed, active_observations, building_id=building_id)
+    schema = preprocessing(schema, building_count, random_seed, active_observations, building_ids=building_ids)
 
     all_envs = {}
     all_losses = {}
@@ -37,7 +41,8 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
 
     # Train tabular Q-Learning (TQL) agent for comparison
     if not exclude_tql:
-        all_envs['TQL'], all_agents['TQL'] = train_tql(schema=schema, active_observations=active_observations, episodes=episodes)
+        all_envs['TQL'], all_agents['TQL'] = train_tql(schema=schema, active_observations=active_observations,
+                                                       episodes=episodes)
 
     # Train soft actor-critic (SAC) agent
     all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'], all_eval_results['SAC'], all_agents['SAC'] = \
@@ -48,9 +53,9 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
     save_results(all_envs, all_losses, all_rewards, all_eval_results, agents=all_agents, store_agents=store_agents)
 
 
-def preprocessing(schema, building_count, random_seed, active_observations, building_id):
-    if building_id is not None:
-        schema, buildings = set_schema_buildings(schema, building_id=building_id)
+def preprocessing(schema, building_count, random_seed, active_observations, building_ids):
+    if building_ids is not None:
+        schema, buildings = set_schema_buildings(schema, building_ids_to_include=building_ids)
         print('Selected buildings:', buildings)
     elif building_count is not None:
         schema, buildings = set_schema_buildings(schema, count=building_count, seed=random_seed)
@@ -120,8 +125,8 @@ def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entr
     env = CityLearnEnv(schema)
     sac_model = SAC(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
                     clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
-                    discount=discount) #,
-                    #start_training_time_step=1, end_exploration_time_step=14000)
+                    discount=discount)  # ,
+    # start_training_time_step=1, end_exploration_time_step=14000)
     losses, rewards, eval_results = sac_model.learn(episodes=episodes, deterministic_finish=True)
 
     filename = f'sac_env.pkl'
@@ -132,6 +137,29 @@ def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entr
           f'experiments/SAC_DB2/{filename}')
 
     print('SAC model trained!')
+
+    save_transitions = False
+    if save_transitions:
+        buffer = ReplayBuffer(100000)
+        eval_env = copy.deepcopy(env)
+        o = eval_env.reset()
+
+        while not eval_env.done:
+            a = sac_model.predict(o, deterministic=True)
+            n, r, d, _ = eval_env.step(a)
+
+            buffer.push(sac_model.get_normalized_observations(0, sac_model.get_encoded_observations(0, o[0])),
+                        a[0],
+                        sac_model.get_normalized_reward(0, r[0]),
+                        sac_model.get_normalized_observations(0, sac_model.get_encoded_observations(0, n[0])),
+                        d)
+            o = n
+
+        transitions = buffer.buffer
+        t_filename = 'sac_transitions_b6.pkl'
+        with open(t_filename, 'wb') as fp:
+            pickle.dump(transitions, fp)
+            print('Saved transitions to', t_filename)
 
     return env, losses, rewards, eval_results, sac_model
 
@@ -154,7 +182,7 @@ if __name__ == '__main__':
     clip_gradient = opts.clipgradient
     kaiming_initialization = opts.kaiming
     l2_loss = opts.l2_loss
-    building_id = opts.building_id
+    building_ids = opts.building_ids
     store_agents = opts.store_agents
 
     if False:
@@ -166,9 +194,9 @@ if __name__ == '__main__':
         seed = 2
         autotune_entropy = True
         discount = 0.99
-        building_id = 6
-        active_observations = None#['solar_generation', 'electrical_storage_soc', 'non_shiftable_load']  # , 'electricity_pricing', 'electricity_pricing_predicted_6h',
-                               #'#electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
+        building_ids = None
+        active_observations = None  # ['solar_generation', 'electrical_storage_soc', 'non_shiftable_load']  # , 'electricity_pricing', 'electricity_pricing_predicted_6h',
+        # '#electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
         batch_size = 256
         clip_gradient = False
         store_agents = False
@@ -178,7 +206,7 @@ if __name__ == '__main__':
     train(dataset_name=DATASET_NAME, random_seed=seed, building_count=building_count, episodes=episodes,
           active_observations=active_observations, batch_size=batch_size, discount=discount,
           autotune_entropy=autotune_entropy, clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization,
-          l2_loss=l2_loss, exclude_tql=exclude_tql, exclude_rbc=exclude_rbc, building_id=building_id,
+          l2_loss=l2_loss, exclude_tql=exclude_tql, exclude_rbc=exclude_rbc, building_ids=building_ids,
           store_agents=store_agents)
 
     # get the end time
