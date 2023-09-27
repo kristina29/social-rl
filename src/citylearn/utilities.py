@@ -51,6 +51,17 @@ def write_json(filepath: str, dictionary: dict, **kwargs):
         json.dump(dictionary, f, **kwargs)
 
 
+def smoothl1_withweights(pred, target, weights, beta = 1.0):
+    loss = 0
+
+    td_error = pred - target
+    mask = (td_error.abs() < beta)
+    loss += mask * (0.5 * (td_error ** 2 * weights) / beta)
+    loss += (~mask) * (td_error.abs() * weights - 0.5 * beta)
+
+    return loss.mean(), td_error
+
+
 def get_active_parts(schema: dict, key: str) -> List[str]:
     """Get objects of the schema with specified key that are active.
 

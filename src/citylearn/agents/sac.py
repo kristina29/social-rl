@@ -3,6 +3,8 @@ from typing import List, Mapping
 import numpy as np
 import numpy.typing as npt
 
+from citylearn.utilities import smoothl1_withweights
+
 try:
     import torch
     import torch.nn as nn
@@ -189,6 +191,9 @@ class SAC(RLC):
             d = torch.FloatTensor(np.stack(transitions[:, 4]))
         else:
             o, a, r, n, d = self.replay_buffer[i].sample(self.batch_size)
+            inds = None
+            weights = None
+
         tensor = torch.cuda.FloatTensor if self.device.type == 'cuda' else torch.FloatTensor
         o = tensor(o).to(self.device)
         n = tensor(n).to(self.device)
@@ -196,39 +201,47 @@ class SAC(RLC):
         r = tensor(r).unsqueeze(1).to(self.device)
         d = tensor(d).unsqueeze(1).to(self.device)
 
-        with torch.no_grad():
-            # Update Q-values. First, sample an action from the Gaussian policy/distribution for the current (next) observation and its associated log probability of occurrence.
-            new_next_actions, new_log_pi, _ = self.policy_net[i].sample(n)
+        # Update Q-Value networks
+        q1_loss, q2_loss = self.q_value_update(i, o, a, r, d, n, inds, weights)
 
-            # The updated Q-value is found by subtracting the logprob of the sampled action (proportional to the entropy) to the Q-values estimated by the target networks.
+        # Update Policy
+        log_pi, policy_loss = self.policy_update(i, o)
+
+        # Update Entropy
+        alpha_loss = self.alpha_update(i, log_pi)
+
+        # Soft Updates
+        self.update_targets(i)
+
+        return o, q1_loss.item(), q2_loss.item(), policy_loss.item(), alpha_loss.item()
+
+    def q_value_update(self, i, state, action, reward, done, next_state, inds, weights):
+        with torch.no_grad():
+            # Update Q-values. First, sample an action from the Gaussian policy/distribution for the current (next)
+            # observation and its associated log probability of occurrence.
+            new_next_actions, new_log_pi, _ = self.policy_net[i].sample(next_state)
+
+            # The updated Q-value is found by subtracting the logprob of the sampled action (proportional to the
+            # entropy) to the Q-values estimated by the target networks.
             target_q_values = torch.min(
-                self.target_soft_q_net1[i](n, new_next_actions),
-                self.target_soft_q_net2[i](n, new_next_actions),
+                self.target_soft_q_net1[i](next_state, new_next_actions),
+                self.target_soft_q_net2[i](next_state, new_next_actions),
             ) - self.alpha[i] * new_log_pi
-            q_target = r + (1 - d) * self.discount * target_q_values
+            q_target = reward + (1 - done) * self.discount * target_q_values
 
         # Update Soft Q-Networks
-        q1_pred = self.soft_q_net1[i](o, a)
-        q2_pred = self.soft_q_net2[i](o, a)
-
-        def smoothl1_withweights(pred, target, weights, beta = 1.0):
-            loss = 0
-
-            td_error = pred - target
-            mask = (td_error.abs() < beta)
-            loss += mask * (0.5 * (td_error ** 2 * weights) / beta)
-            loss += (~mask) * (td_error.abs() * weights - 0.5 * beta)
-
-            return loss.mean(), td_error
+        q1_pred = self.soft_q_net1[i](state, action)
+        q2_pred = self.soft_q_net2[i](state, action)
 
         if self.prioritized_replay_buffer:
-            # Smooth L1 loss using weighted error
-            q1_loss, td_error1 = smoothl1_withweights(q_target, q1_pred, weights)
-            q2_loss, td_error2 = smoothl1_withweights(q_target, q2_pred, weights)
-            #td_error1 = q_target - q1_pred
-            #td_error2 = q_target - q2_pred
-            #q1_loss = 0.5 * (td_error1 ** 2 * weights).mean()
-            #q2_loss = 0.5 * (td_error2 ** 2 * weights).mean()
+            if self.l2_loss:
+                td_error1 = q_target - q1_pred
+                td_error2 = q_target - q2_pred
+                q1_loss = 0.5 * (td_error1 ** 2 * weights).mean()
+                q2_loss = 0.5 * (td_error2 ** 2 * weights).mean()
+            else:
+                q1_loss, td_error1 = smoothl1_withweights(q_target, q1_pred, weights)
+                q2_loss, td_error2 = smoothl1_withweights(q_target, q2_pred, weights)
 
             priorities = ((abs(td_error1) + abs(td_error2)) / 2 + 1e-5).squeeze().detach().numpy()
             self.replay_buffer[i].update_priorities(inds, priorities)
@@ -242,6 +255,7 @@ class SAC(RLC):
         # Gradient Value Clipping
         if self.clip_gradient:
             nn.utils.clip_grad_value_(self.soft_q_net1[i].parameters(), clip_value=1.0)
+
         self.soft_q_optimizer1[i].step()
 
         self.soft_q_optimizer2[i].zero_grad()
@@ -252,20 +266,27 @@ class SAC(RLC):
             nn.utils.clip_grad_value_(self.soft_q_net2[i].parameters(), clip_value=1.0)
         self.soft_q_optimizer2[i].step()
 
-        # Update Policy
-        new_actions, log_pi, _ = self.policy_net[i].sample(o)
+        return q1_loss, q2_loss
+
+    def policy_update(self, i, state):
+        new_actions, log_pi, _ = self.policy_net[i].sample(state)
         q_new_actions = torch.min(
-            self.soft_q_net1[i](o, new_actions),
-            self.soft_q_net2[i](o, new_actions)
+            self.soft_q_net1[i](state, new_actions),
+            self.soft_q_net2[i](state, new_actions)
         )
         policy_loss = (self.alpha[i] * log_pi - q_new_actions).mean()
         self.policy_optimizer[i].zero_grad()
         policy_loss.backward()
+
         # Gradient Value Clipping
         if self.clip_gradient:
             nn.utils.clip_grad_value_(self.policy_net[i].parameters(), clip_value=1.0)
+
         self.policy_optimizer[i].step()
 
+        return log_pi, policy_loss
+
+    def alpha_update(self, i, log_pi):
         if self.autotune_entropy:
             alpha_loss = (-self.log_alpha[i] * (log_pi + self.target_entropy[i]).detach()).mean()
 
@@ -276,7 +297,9 @@ class SAC(RLC):
         else:
             alpha_loss = torch.tensor(0.)
 
-        # Soft Updates
+        return alpha_loss
+
+    def update_targets(self, i):
         for target_param, param in zip(self.target_soft_q_net1[i].parameters(),
                                        self.soft_q_net1[i].parameters()):
             target_param.data.copy_(target_param.data * (1.0 - self.tau) + param.data * self.tau)
@@ -284,8 +307,6 @@ class SAC(RLC):
         for target_param, param in zip(self.target_soft_q_net2[i].parameters(),
                                        self.soft_q_net2[i].parameters()):
             target_param.data.copy_(target_param.data * (1.0 - self.tau) + param.data * self.tau)
-
-        return o, q1_loss.item(), q2_loss.item(), policy_loss.item(), alpha_loss.item()
 
     def predict(self, observations: List[List[float]], deterministic: bool = None):
         r"""Provide actions for current time step.

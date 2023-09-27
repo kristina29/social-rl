@@ -1,7 +1,7 @@
 from typing import List, Mapping
 
 import torch
-from torch import tensor
+from torch import tensor, nn
 
 from citylearn.agents.sac import SAC
 
@@ -131,6 +131,27 @@ class SACDB2VALUE(SAC):
                                                        self.soft_q_net2[i].parameters()):
                             target_param.data.copy_(target_param.data * (1.0 - self.tau) + param.data * self.tau)
 
+                        if self.extra_policy_update:
+                            # Update Policy
+                            new_actions, log_pi, _ = self.policy_net[i].sample(o)
+                            q_new_actions = torch.min(
+                                self.soft_q_net1[i](o, new_actions),
+                                self.soft_q_net2[i](o, new_actions)
+                            )
+                            policy_loss = (self.alpha[i] * log_pi - q_new_actions).mean()
+                            self.policy_optimizer[i].zero_grad()
+                            policy_loss.backward()
+                            self.policy_optimizer[i].step()
+
+                            if self.autotune_entropy:
+                                alpha_loss = (-self.log_alpha[i] * (log_pi + self.target_entropy[i]).detach()).mean()
+
+                                self.alpha_optimizer[i].zero_grad()
+                                alpha_loss.backward()
+                                self.alpha_optimizer[i].step()
+                                self.alpha[i] = self.log_alpha[i].exp().item()
+                            else:
+                                alpha_loss = torch.tensor(0.)
             else:
                 pass
 
