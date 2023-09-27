@@ -91,6 +91,8 @@ def add_nonsocial_options(optParser):
                          help='Ids of the buildings that should be trained. Overwrites the building_count.')
     optParser.add_option('--store', action='store_true', default=False, dest='store_agents',
                          help='Store trained agents.')
+    optParser.add_option('--extra_policy_update', action='store_true', default=False, dest='extra_policy_update',
+                         help='Perform an additional policy update after the social Q-Value update.')
 
     return optParser
 

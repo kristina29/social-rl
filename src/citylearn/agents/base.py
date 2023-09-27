@@ -146,7 +146,8 @@ class Agent(Environment):
         rewards = []
         eval_results = {'1 - average_daily_renewable_share': [],
                         '1 - average_daily_renewable_share_grid': [],
-                        '1 - used_pv_of_total_share': []}
+                        '1 - used_pv_of_total_share': [],
+                        'fossil_energy_consumption': []}
 
         for episode in range(episodes):
             deterministic = deterministic or (deterministic_finish and episode >= episodes - 1)
@@ -196,7 +197,8 @@ class Agent(Environment):
                         kpis = eval_env.evaluate()
                         kpis = kpis[(kpis['cost_function'].isin(['1 - average_daily_renewable_share',
                                                                  '1 - average_daily_renewable_share_grid',
-                                                                 '1 - used_pv_of_total_share']))].dropna()
+                                                                 '1 - used_pv_of_total_share',
+                                                                 'fossil_energy_consumption']))].dropna()
                         kpis['value'] = kpis['value'].round(3)
                         kpis = kpis.rename(columns={'cost_function': 'kpi'})
                         kpis = kpis[kpis['level'] == 'district'].copy()

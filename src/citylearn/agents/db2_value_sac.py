@@ -8,7 +8,7 @@ from citylearn.agents.sac import SAC
 
 class SACDB2VALUE(SAC):
     def __init__(self, *args, imitation_lr: float = 0.01, pretrained_demonstrator: SAC = None,
-                 deterministic_demo: bool = False, **kwargs):
+                 deterministic_demo: bool = False, extra_policy_update: bool = False, **kwargs):
         r"""Initialize :class:`SACDB2`.
 
         Parameters
@@ -21,6 +21,8 @@ class SACDB2VALUE(SAC):
             Pretrained SAC agent to use as demonstrator
         deterministic_demo: bool
             Use deterministic or sampled actions of the demonstrator
+        extra_policy_update: bool
+            Update the policy after the social Q-Value update
 
         Other Parameters
         ----------------
@@ -32,6 +34,7 @@ class SACDB2VALUE(SAC):
         self.imitation_lr = imitation_lr
         self.pretrained_demonstrator = pretrained_demonstrator
         self.deterministic_demo = deterministic_demo
+        self.extra_policy_update = extra_policy_update
 
         self.demonstrator_policy_net = [None for _ in range(self.env.demonstrator_count)]
 
@@ -98,66 +101,45 @@ class SACDB2VALUE(SAC):
 
                     # Use demonstrator actions for updating Q-Value network
                     for demonstrator_policy in self.demonstrator_policy_net:
-                        with torch.no_grad():
-                            demonstrator_actions, log_pi, _ = demonstrator_policy.sample(o, self.deterministic_demo)
-
-                            target_q_values = torch.min(
-                                self.target_soft_q_net1[i](o, demonstrator_actions),
-                                self.target_soft_q_net2[i](o, demonstrator_actions),
-                            )
-                            q_target = target_q_values + self.imitation_lr * torch.abs(target_q_values)
-
-                        # Update Soft Q-Networks
-                        q1_pred = self.soft_q_net1[i](o, demonstrator_actions)
-                        q2_pred = self.soft_q_net2[i](o, demonstrator_actions)
-
-                        q1_loss = self.soft_q_criterion(q1_pred, q_target)
-                        q2_loss = self.soft_q_criterion(q2_pred, q_target)
-
-                        self.soft_q_optimizer1[i].zero_grad()
-                        q1_loss.backward()
-                        self.soft_q_optimizer1[i].step()
-
-                        self.soft_q_optimizer2[i].zero_grad()
-                        q2_loss.backward()
-                        self.soft_q_optimizer2[i].step()
-
-                        # Soft Updates
-                        for target_param, param in zip(self.target_soft_q_net1[i].parameters(),
-                                                       self.soft_q_net1[i].parameters()):
-                            target_param.data.copy_(target_param.data * (1.0 - self.tau) + param.data * self.tau)
-
-                        for target_param, param in zip(self.target_soft_q_net2[i].parameters(),
-                                                       self.soft_q_net2[i].parameters()):
-                            target_param.data.copy_(target_param.data * (1.0 - self.tau) + param.data * self.tau)
-
-                        if self.extra_policy_update:
-                            # Update Policy
-                            new_actions, log_pi, _ = self.policy_net[i].sample(o)
-                            q_new_actions = torch.min(
-                                self.soft_q_net1[i](o, new_actions),
-                                self.soft_q_net2[i](o, new_actions)
-                            )
-                            policy_loss = (self.alpha[i] * log_pi - q_new_actions).mean()
-                            self.policy_optimizer[i].zero_grad()
-                            policy_loss.backward()
-                            self.policy_optimizer[i].step()
-
-                            if self.autotune_entropy:
-                                alpha_loss = (-self.log_alpha[i] * (log_pi + self.target_entropy[i]).detach()).mean()
-
-                                self.alpha_optimizer[i].zero_grad()
-                                alpha_loss.backward()
-                                self.alpha_optimizer[i].step()
-                                self.alpha[i] = self.log_alpha[i].exp().item()
-                            else:
-                                alpha_loss = torch.tensor(0.)
+                        self.social_q_value_update(i, o, demonstrator_policy)
             else:
                 pass
 
             losses[i] = current_losses
 
         return losses
+
+    def social_q_value_update(self, i, state, demonstrator_policy):
+        with torch.no_grad():
+            demonstrator_actions, log_pi, _ = demonstrator_policy.sample(state, self.deterministic_demo)
+
+            target_q_values = torch.min(
+                self.target_soft_q_net1[i](state, demonstrator_actions),
+                self.target_soft_q_net2[i](state, demonstrator_actions),
+            )
+            q_target = target_q_values + self.imitation_lr * torch.abs(target_q_values)
+
+        # Update Soft Q-Networks
+        q1_pred = self.soft_q_net1[i](state, demonstrator_actions)
+        q2_pred = self.soft_q_net2[i](state, demonstrator_actions)
+
+        q1_loss = self.soft_q_criterion(q1_pred, q_target)
+        q2_loss = self.soft_q_criterion(q2_pred, q_target)
+
+        self.soft_q_optimizer1[i].zero_grad()
+        q1_loss.backward()
+        self.soft_q_optimizer1[i].step()
+
+        self.soft_q_optimizer2[i].zero_grad()
+        q2_loss.backward()
+        self.soft_q_optimizer2[i].step()
+
+        # Soft Updates
+        self.update_targets(i)
+
+        if self.extra_policy_update:
+            # Update Policy
+            self.policy_update(i, state)
 
     def set_demonstrator_policies(self):
         demonstrator_count = 0
