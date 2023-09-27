@@ -31,11 +31,11 @@ micromamba deactivate
 '''
 
 #for i, ir in enumerate(irs):
-for mode in range(1,7):
+for mode in range(4,7):
     with open(f'job{mode}.sh', 'w') as rsh:
         rsh.write(f'''\
 {PREFIX}
-srun python3 src/socialrl.py -s nydata_new_buildings2 -b 6 -d 4 -e 2 --tql --sac --autotune --mode {mode} --ir {ir} --deterministic_demo
+srun python3 src/socialrl.py -s nydata_new_buildings2 -b 6 -d 2 -e 2 --tql --sac --sacdb2value --autotune --mode {mode} --ir {ir}
 
 {SUFFIX}
     ''')
