@@ -67,9 +67,6 @@ class PolicyNetwork(nn.Module):
         mean, log_std = self.forward(state)
         std = log_std.exp()
 
-        if any(torch.isnan(mean)) or any(torch.isnan(std)):
-            print(1)
-
         normal = Normal(mean, std)
         x_t = normal.rsample()  # for reparameterization trick (mean + std * N(0,1))
         y_t = torch.tanh(x_t)
@@ -111,23 +108,8 @@ class PolicyNetwork(nn.Module):
 
         x_t = torch.atanh(y_t)
 
-        # if any(torch.isinf(x_t)):
-        #     idx = torch.where(torch.isinf(x_t))
-        #     for id in idx:
-        #         if y_t[id] == 1:
-        #             x_t[id] = 10
-        #         elif y_t[id] == -1:
-        #             x_t[id] = -10
-        #         elif not torch.isnan(x_t[id]):
-        #             pass
-        #         else:
-        #             raise ValueError(f'x_t[{id}]={x_t[id]} but y_t[{id}]={y_t[id]}')
-
         mean, log_std = self.forward(state)
         std = log_std.exp()
-
-        if any(torch.isnan(mean)) or any(torch.isnan(std)):
-            print(1)
 
         normal = Normal(mean, std)
         log_prob = normal.log_prob(x_t)
