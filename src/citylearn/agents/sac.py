@@ -198,10 +198,7 @@ class SAC(RLC):
 
         with torch.no_grad():
             # Update Q-values. First, sample an action from the Gaussian policy/distribution for the current (next) observation and its associated log probability of occurrence.
-            try:
-                new_next_actions, new_log_pi, _ = self.policy_net[i].sample(n)
-            except:
-                new_next_actions, new_log_pi, _ = self.policy_net[i].sample(n)
+            new_next_actions, new_log_pi, _ = self.policy_net[i].sample(n)
 
             # The updated Q-value is found by subtracting the logprob of the sampled action (proportional to the entropy) to the Q-values estimated by the target networks.
             target_q_values = torch.min(
