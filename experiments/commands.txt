@@ -30,7 +30,7 @@ find '/Users/kristina/Documents/Studium/Informatik M.Sc. - Tü/SoSe 2023/social
 
 scp src/citylearn/data/nydata/schema.json klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata/schema.json
 
-scp src/citylearn/data/nnb_limitobs1/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nnb_limitobs1/
+scp src/citylearn/data/nnb_limitobs2/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nnb_limitobs2/
 
 
 
