@@ -935,16 +935,18 @@ class CityLearnEnv(Environment, Env):
         }])
 
         try:
-            assert np.all(self.net_renewable_electricity_grid_consumption + self.net_fossil_electricity_consumption == self.net_electricity_consumption_positive)
+            diff = np.round(self.net_electricity_consumption_positive - (self.net_renewable_electricity_grid_consumption +
+                         self.net_fossil_electricity_consumption), 2)
+            assert np.all(diff == 0)
         except AssertionError:
-            val = (self.net_renewable_electricity_grid_consumption + self.net_fossil_electricity_consumption == self.net_electricity_consumption_positive)
-            print(f'Not true: {val[np.where(val == False)]}')
+            print(f'Not true: {diff[np.where((diff == 0) == False)]}')
         try:
-            assert np.all(self.net_renewable_electricity_grid_consumption_without_storage + self.net_fossil_electricity_consumption_without_storage == self.net_electricity_consumption_positive_without_storage)
+            diff = np.round(self.net_electricity_consumption_positive_without_storage -
+                         (self.net_renewable_electricity_grid_consumption_without_storage +
+                         self.net_fossil_electricity_consumption_without_storage), 2)
+            assert np.all(diff == 0)
         except AssertionError:
-            val = (self.net_renewable_electricity_grid_consumption_without_storage + self.net_fossil_electricity_consumption_without_storage == self.net_electricity_consumption_positive_without_storage)
-            print(f'Not true: {val[np.where(val == False)]}')
-
+            print(f'Not true: {diff[np.where((diff == 0) == False)]}')
 
         district_level = pd.concat([district_level, building_level], ignore_index=True, sort=False)
         district_level = district_level.groupby(['cost_function'])[
