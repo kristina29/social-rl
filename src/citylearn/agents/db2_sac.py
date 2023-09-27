@@ -131,9 +131,6 @@ class SACDB2(SAC):
                         self.policy_optimizer[i].zero_grad()
                         policy_loss.backward()
 
-                        #if self.policy_net[i].has_nan():
-                        #    self.policy_net[i].has_nan()
-
                         self.policy_optimizer[i].step()
             else:
                 pass
