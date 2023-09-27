@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 #irs = [0.01, 0.25, 0.5, 0.75, 1]
-ir = 0.2
+ir = 1
 
 PREFIX = '''\
 #!/bin/bash
