@@ -22,14 +22,18 @@ if __name__ == '__main__':
 
     if True:
         experiment_dirs = ['SAC_DB2/30_renewable_prod/reward_05pvprice/0.5',
-                           '1_randomdemo/d2/ir0.0001',
-                           '1_randomdemo/d2/ir0.001',
-                           '1_randomdemo/d2/ir0.01',
-                           '1_randomdemo/d2/ir0.02',
-                           '1_randomdemo/d2/ir0.25',
-                           '1_randomdemo/d2/ir0.5',
-                           '1_randomdemo/d2/ir0.75',
-                           '1_randomdemo/d2/ir1',
+                           '4_demo_b6_policyupdate/ir0.00001',
+                           '4_demo_b6_policyupdate/ir0.0001',
+                           '4_demo_b6_policyupdate/ir0.001',
+                           '4_demo_b6_policyupdate/ir0.01',
+                           '4_demo_b6_policyupdate/ir0.02',
+                           '4_demo_b6_policyupdate/ir0.03',
+                           '4_demo_b6_policyupdate/ir0.04',
+                           '4_demo_b6_policyupdate/ir0.05',
+                           #'1_randomdemo/d4/ir0.0001',
+                           #'1_randomdemo/d4/ir0.001',
+                           #'1_randomdemo/d4/ir0.01',
+                           #'1_randomdemo/d4/ir0.02',
                            ]
         ref_dirs = ['30_renewable_prod/reward_05pvprice/0.5']
         asocial_agent = 'SAC'
