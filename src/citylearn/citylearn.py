@@ -350,6 +350,20 @@ class CityLearnEnv(Environment, Env):
                      self.net_electricity_consumption_positive_without_storage, 1).clip(min=0))
 
     @property
+    def net_fossil_electricity_consumption_without_storage(self) -> List[float]:
+        """net fossil electricity consumption in the absence of flexibility provided by storage devices
+        time series, in [kWh].
+
+        Notes
+        -----
+        net_fossil_electricity_consumption_without_storage = net_electricity_consumption_positive_without_storage -
+                                                            net_renewable_electricity_grid_consumption_without_storage
+        """
+
+        return list(self.net_electricity_consumption_positive_without_storage -
+                    self.net_renewable_electricity_grid_consumption_without_storage)
+
+    @property
     def net_renewable_electricity_consumption(self) -> np.ndarray:
         """net renewable electricity consumption time series, in [kWh].
 
@@ -397,6 +411,17 @@ class CityLearnEnv(Environment, Env):
 
         return list(np.nan_to_num(self.net_renewable_electricity_grid_consumption /
                                   self.net_electricity_consumption_positive, 1.).clip(min=0))
+
+    @property
+    def net_fossil_electricity_consumption(self) -> List[float]:
+        """net fossil electricity consumption time series, in [kWh].
+
+        Notes
+        -----
+        net_fossil_electricity_consumption = net_electricity_consumption_positive - net_renewable_electricity_grid_consumption
+        """
+
+        return list(self.net_electricity_consumption_positive - self.net_renewable_electricity_grid_consumption)
 
     @property
     def used_pv_electricity(self) -> np.ndarray:
@@ -900,7 +925,28 @@ class CityLearnEnv(Environment, Env):
             'net_value_without_storage':
                 CostFunction.average_daily_renewable_share(self.net_renewable_electricity_grid_share_without_storage)[
                     -1]
+        }, {
+            'cost_function': 'fossil_energy_consumption',
+            'value': CostFunction.electricity_consumption(self.net_fossil_electricity_consumption)[-1] / \
+                     CostFunction.electricity_consumption(self.net_fossil_electricity_consumption_without_storage)[-1],
+            'net_value': CostFunction.electricity_consumption(self.net_fossil_electricity_consumption)[-1],
+            'net_value_without_storage':
+                CostFunction.electricity_consumption(self.net_fossil_electricity_consumption_without_storage)[-1]
         }])
+
+        try:
+            diff = np.round(self.net_electricity_consumption_positive - (self.net_renewable_electricity_grid_consumption +
+                         self.net_fossil_electricity_consumption), 2)
+            assert np.all(diff == 0)
+        except AssertionError:
+            print(f'Not true: {diff[np.where((diff == 0) == False)]}')
+        try:
+            diff = np.round(self.net_electricity_consumption_positive_without_storage -
+                         (self.net_renewable_electricity_grid_consumption_without_storage +
+                         self.net_fossil_electricity_consumption_without_storage), 2)
+            assert np.all(diff == 0)
+        except AssertionError:
+            print(f'Not true: {diff[np.where((diff == 0) == False)]}')
 
         district_level = pd.concat([district_level, building_level], ignore_index=True, sort=False)
         district_level = district_level.groupby(['cost_function'])[
