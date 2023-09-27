@@ -244,7 +244,8 @@ def get_kpis(env: CityLearnEnv) -> pd.DataFrame:
         'carbon_emissions',
         '1 - average_daily_renewable_share',
         '1 - average_daily_renewable_share_grid',
-        '1 - used_pv_of_total_share'
+        '1 - used_pv_of_total_share',
+        'fossil_energy_consumption'
     ]
     kpis = kpis[
         (kpis['cost_function'].isin(kpi_names))
@@ -652,6 +653,40 @@ def plot_used_pv_share(envs: Mapping[str, CityLearnEnv]) -> List[plt.Figure]:
     return figs
 
 
+def plot_fossil_consumption(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
+    """Plots fossil consumption KPIs over time for different control agents.
+
+    Parameters
+    ----------
+    envs: Mapping[str, CityLearnEnv]
+        Mapping of user-defined control agent names to environments
+        the agents have been used to control.
+
+    Returns
+    -------
+    fig: plt.Figure
+        Figure containing plotted axes.
+    """
+
+    # figsize = (5.0, 1.5)
+    fig, ax = plt.subplots(1, 1)  # , figsize=figsize)
+
+    for k, v in envs.items():
+        y = running_mean(v.net_fossil_electricity_consumption, 160)
+        x = range(len(y))
+        ax.plot(x, y, label=k)
+
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Fossil consumption [kWh]')
+    ax.xaxis.set_tick_params(length=0)
+    ax.legend(loc='upper left', bbox_to_anchor=(1.0, 1.0), framealpha=0.0)
+
+    title = 'District-level fossil energy consumption'
+    fig.suptitle(title, fontsize=14)
+    plt.tight_layout()
+    return fig
+
+
 def plot_battery_soc_profiles(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
     """Plots building-level battery SoC profiles from different control agents.
 
@@ -845,11 +880,10 @@ def plot_simulation_summary(envs: Mapping[str, CityLearnEnv], losses: Mapping[st
     plot_district_kpis(envs)
     plot_district_load_profiles(envs)
 
-    #plot_shares(envs, agents)
-
     plot_used_pv_share(envs)
     plot_renewable_share(envs, grid=True)
     plot_renewable_share(envs)
+    plot_fossil_consumption(envs)
 
     plot_losses(losses, envs)
     plot_rewards(rewards, envs)
