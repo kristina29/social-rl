@@ -22,12 +22,12 @@ if __name__ == '__main__':
 
     if True:
         experiment_dirs = ['30_renewable_prod/reward_05pvprice/0.5',
-                           '31_randomdemo/d2/det_ir0.2/socialMode1',
-                           '31_randomdemo/d2/det_ir0.2/socialMode2',
-                           '31_randomdemo/d2/det_ir0.2/socialMode3',
-                           '31_randomdemo/d2/det_ir0.2/socialMode4',
-                           '31_randomdemo/d2/det_ir0.2/socialMode5',
-                           '31_randomdemo/d2/det_ir0.2/socialMode6',
+                           '32_demo_b6/ir1/socialMode1',
+                           '32_demo_b6/ir1/socialMode2',
+                           '32_demo_b6/ir1/socialMode3',
+                           '32_demo_b6/ir1/socialMode4',
+                           '32_demo_b6/ir1/socialMode5',
+                           '32_demo_b6/ir1/socialMode6',
                            ]
         ref_dirs = ['30_renewable_prod/reward_05pvprice/0.5']
         asocial_agent = 'SAC'
@@ -128,11 +128,41 @@ if __name__ == '__main__':
             pass
     ax.bar_label(rects, padding=3)
     ax.set_ylim(0.75, 1.05)
-    ax.set_title('1 - used_pv_of_total_share [netue/netue_without_storage]')
+    ax.set_title('1 - used_pv_of_total_share [net_value/net_value_without_storage]')
     for tick in ax.get_xticklabels():
         tick.set_rotation(90)
 
     plt.savefig('3.png', bbox_inches="tight")
+
+    try:
+        # plot fossil_energy_consumption
+        values = []
+        names = []
+        for key, value in kpis.items():
+            if 'fossil_energy_consumption' in value.index:
+                values.append(round(value.loc['fossil_energy_consumption', 'net_value'] /
+                                    value.loc['fossil_energy_consumption', 'net_value_without_storage'], 3))
+                names.append(key)
+
+        fig, ax = plt.subplots()
+        ax.grid(which='major', axis='y', linestyle='--')
+        ax.set_axisbelow(True)
+        rects = ax.bar(names, values, label=names)
+        for i in range(n_refs):
+            try:
+                ax.axhline(values[names.index(ref_dirs[i])], xmin=0 + i * length, xmax=1 - length * (n_refs - i - 1),
+                           c='red', linewidth=0.7, linestyle="-")
+            except:
+                pass
+        ax.bar_label(rects, padding=3)
+        ax.set_ylim(0.75, 1.05)
+        ax.set_title('fossil_energy_consumption [netue/netue_without_storage]')
+        for tick in ax.get_xticklabels():
+            tick.set_rotation(90)
+
+        plt.savefig('4.png', bbox_inches="tight")
+    except:
+        pass
 
 
 
