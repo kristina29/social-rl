@@ -23,7 +23,15 @@ if __name__ == '__main__':
     if True:
         experiment_dirs = ['SAC_DB2/30_renewable_prod/reward_05pvprice/0.5',
                            '11_limit_obs/1',
+                           '11_limit_obs/1b',
+                           '11_limit_obs/1c',
+                           '11_limit_obs/1d',
+                           '11_limit_obs/1e',
                            '11_limit_obs/2',
+                           '11_limit_obs/2b',
+                           '11_limit_obs/2c',
+                           '11_limit_obs/2d',
+                           '11_limit_obs/2e',
                            ]
         ref_dirs = ['30_renewable_prod/reward_05pvprice/0.5']
         asocial_agent = 'SAC'

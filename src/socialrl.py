@@ -1,3 +1,4 @@
+import copy
 import pickle
 import time
 
@@ -8,7 +9,8 @@ from citylearn.citylearn import CityLearnEnv
 from citylearn.data import DataSet
 from citylearn.utilities import get_active_parts
 from options import parseOptions_social
-from utils import set_schema_buildings, set_active_observations, set_schema_demonstrators, save_results
+from utils import set_schema_buildings, set_active_observations, set_schema_demonstrators, save_results, \
+    plot_district_kpis
 from nonsocialrl import train_tql, train_rbc, train_sac
 
 
@@ -135,6 +137,15 @@ def train_sacdb2value(schema, episodes, random_seed, batch_size, discount, autot
                                     pretrained_demonstrator=pretrained_demonstrator,
                                     deterministic_demo=deterministic_demo, extra_policy_update=extra_policy_update)
     losses, rewards, eval_results = sacdb2value_model.learn(episodes=episodes, deterministic_finish=True)
+
+    eval_env = copy.deepcopy(sacdb2value_model.env)
+    eval_observations = eval_env.reset()
+
+    while not eval_env.done:
+        actions = sacdb2value_model.predict(eval_observations, deterministic=True)
+        eval_observations, eval_rewards, _, _ = eval_env.step(actions)
+
+    plot_district_kpis({'test': eval_env})
 
     print('SAC DB2 Value model trained!')
 
