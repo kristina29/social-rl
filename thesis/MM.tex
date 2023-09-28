@@ -171,10 +171,12 @@ In mode 2, the probability of taking the demonstrator action is increased by the
 	\mathcal{H}_{M2} = \log\pi_{\phi}^d(f_{\phi}^d(\epsilon_t;s_t)|s_t) + \alpha_i|\log\pi_{\phi}^d(f_{\phi}^d(\epsilon_t;s_t)|s_t)|
 \end{equation}
 Mode 3 combines mode 1 and mode 2. Mode 4-6 are similar to the modes 1-3, but the probability of taking the demonstrator action in the current trained policy is used:
-\begin{align*}
-	\mathcal{H}_{M4} &=  \log\pi_{\phi}(f_{\phi}^d(\epsilon_t;s_t)|s_t) \\
-	\mathcal{H}_{M5} &= \log\pi_{\phi}(f_{\phi}^d(\epsilon_t;s_t)|s_t) + \alpha_i|\log\pi_{\phi}(f_{\phi}^d(\epsilon_t;s_t)|s_t)|
-\end{align*}
+\begin{equation}
+	\mathcal{H}_{M4} =  \log\pi_{\phi}(f_{\phi}^d(\epsilon_t;s_t)|s_t)
+\end{equation}
+\begin{equation}
+	\mathcal{H}_{M5} = \log\pi_{\phi}(f_{\phi}^d(\epsilon_t;s_t)|s_t) + \alpha_i|\log\pi_{\phi}(f_{\phi}^d(\epsilon_t;s_t)|s_t)|
+\end{equation}
 All modes calculate the loss as defined in Equation \ref{eqn:policy-loss} using the defined entropy and value term. Table \ref{tab:social-policy-update-modes} summarizes the different modes and their entropy and value terms.
 
 {
@@ -201,6 +203,11 @@ All modes calculate the loss as defined in Equation \ref{eqn:policy-loss} using 
 
 
 \subsection{\textcolor{red}{Social Agent II}}
+Since the social policy update did not improve the performance of the models, we decided to focus on the Q-Value update in the next step. For this, we also first conducted classical Q-Value and policy updates as defined in Algorithm \ref{alg:sac-update}. Next, we performed a social Q-Value update on both Q-Value networks where we defined the target values as follows:
+\begin{equation}
+	Q_{\bar{\theta}}(a_t^d,s_t) + \alpha_i|Q_{\bar{\theta}}(a_t^d,s_t)| 
+\end{equation}
+This follows the assumption of decision biasing, that actions taken by the demonstrator $a_t^d$ are good and should thus have a higher Q-Value as proposed by \cite{najar2020actions}. Afterwards, a soft update of the target networks parameters is performed, and, optionally, a standard policy update.
 
 \section{Training}
 \subsection{Hyperparameters}

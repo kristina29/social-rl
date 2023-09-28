@@ -183,10 +183,11 @@ class Agent(Environment):
 
                 observations = [o for o in next_observations]
 
+                # and self.start_training_time_step <= self.time_step \ #<= self.end_exploration_time_step \
                 # evaluate once a month for a whole week
                 if self.time_step % 168 == 0 \
                         and hasattr(self, 'start_training_time_step') \
-                        and self.start_training_time_step <= self.time_step <= self.end_exploration_time_step \
+                        and self.start_training_time_step <= self.time_step \
                         and self.time_step > self.batch_size:
                     old_time_step = self.time_step
 
@@ -232,7 +233,7 @@ class Agent(Environment):
 
             eval_env = copy.deepcopy(self.env)
             eval_observations = eval_env.reset()
-    
+
             while not eval_env.done:
                 actions = self.predict(eval_observations, deterministic=True)
                 eval_observations, eval_rewards, _, _ = eval_env.step(actions)
