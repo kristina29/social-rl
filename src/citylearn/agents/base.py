@@ -207,6 +207,9 @@ class Agent(Environment):
                     kpis = kpis[kpis['level'] == 'district'].copy()
 
                     for kpi, value in zip(kpis['kpi'], kpis['value']):
+                        if kpi == '1 - used_pv_of_total_share' and value < 0.9:
+                            print(3)
+
                         if isinstance(value, float):
                             eval_results[kpi].append(value)
                         else:
