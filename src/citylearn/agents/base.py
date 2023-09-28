@@ -230,30 +230,30 @@ class Agent(Environment):
             else:
                 pass
 
-        eval_env = copy.deepcopy(self.env)
-        eval_observations = eval_env.reset()
+            eval_env = copy.deepcopy(self.env)
+            eval_observations = eval_env.reset()
+    
+            while not eval_env.done:
+                actions = self.predict(eval_observations, deterministic=True)
+                eval_observations, eval_rewards, _, _ = eval_env.step(actions)
 
-        while not eval_env.done:
-            actions = self.predict(eval_observations, deterministic=True)
-            eval_observations, eval_rewards, _, _ = eval_env.step(actions)
+            kpis = eval_env.evaluate()
+            kpis = kpis[(kpis['cost_function'].isin(['1 - average_daily_renewable_share',
+                                                     '1 - average_daily_renewable_share_grid',
+                                                     '1 - used_pv_of_total_share',
+                                                     'fossil_energy_consumption']))].dropna()
+            kpis['value'] = kpis['value'].round(3)
+            kpis = kpis.rename(columns={'cost_function': 'kpi'})
+            kpis = kpis[kpis['level'] == 'district'].copy()
 
-        kpis = eval_env.evaluate()
-        kpis = kpis[(kpis['cost_function'].isin(['1 - average_daily_renewable_share',
-                                                 '1 - average_daily_renewable_share_grid',
-                                                 '1 - used_pv_of_total_share',
-                                                 'fossil_energy_consumption']))].dropna()
-        kpis['value'] = kpis['value'].round(3)
-        kpis = kpis.rename(columns={'cost_function': 'kpi'})
-        kpis = kpis[kpis['level'] == 'district'].copy()
+            for kpi, value in zip(kpis['kpi'], kpis['value']):
+                if kpi == '1 - used_pv_of_total_share' and value < 0.9:
+                    print(3)
 
-        for kpi, value in zip(kpis['kpi'], kpis['value']):
-            if kpi == '1 - used_pv_of_total_share' and value < 0.9:
-                print(3)
-
-            if isinstance(value, float):
-                eval_results[kpi].append(value)
-            else:
-                eval_results[kpi].extend(value)
+                if isinstance(value, float):
+                    eval_results[kpi].append(value)
+                else:
+                    eval_results[kpi].extend(value)
 
         return losses, rewards, eval_results
 
