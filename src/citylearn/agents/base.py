@@ -5,10 +5,15 @@ import os
 from pathlib import Path
 import pickle
 from typing import Any, List, Mapping, Union
+
+import pandas as pd
 from gym import spaces
+from matplotlib import pyplot as plt
+
 from citylearn.base import Environment
 from citylearn.citylearn import CityLearnEnv
-from utils import plot_district_kpis
+import seaborn as sns
+
 
 LOGGER = logging.getLogger()
 logging.getLogger('matplotlib.font_manager').disabled = True
@@ -195,6 +200,66 @@ class Agent(Environment):
                             actions = self.predict(eval_observations, deterministic=True)
                             eval_observations, eval_rewards, _, _ = eval_env.step(actions)
 
+                        def plot_district_kpis(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
+                            kpis_list = []
+
+                            for k, v in envs.items():
+                                kpis = v.evaluate()
+
+                                # names of KPIs to retrieve from evaluate function
+                                kpi_names = [
+                                    'electricity_consumption', 'cost',
+                                    'average_daily_peak', 'ramping', '1 - load_factor',
+                                    'carbon_emissions',
+                                    '1 - average_daily_renewable_share',
+                                    '1 - average_daily_renewable_share_grid',
+                                    '1 - used_pv_of_total_share',
+                                    'fossil_energy_consumption'
+                                ]
+                                kpis = kpis[
+                                    (kpis['cost_function'].isin(kpi_names))
+                                ].dropna()
+
+                                # round up the values to 3 decimal places for readability
+                                kpis['value'] = kpis['value'].round(3)
+                                kpis['net_value'] = kpis['net_value'].round(3)
+                                kpis['net_value_without_storage'] = kpis['net_value_without_storage'].round(3)
+
+                                # rename the column that defines the KPIs
+                                kpis = kpis.rename(columns={'cost_function': 'kpi'})
+                                kpis = kpis[kpis['level'] == 'district'].copy()
+                                kpis['env_id'] = k
+                                kpis = kpis.drop(columns=['net_value', 'net_value_without_storage'])
+                                kpis_list.append(kpis)
+
+                            kpis = pd.concat(kpis_list, ignore_index=True, sort=False)
+                            row_count = 1
+                            column_count = 1
+                            env_count = len(envs)
+                            kpi_count = len(kpis['kpi'].unique())
+                            figsize = (6.0 * column_count, 0.225 * env_count * kpi_count * row_count)
+                            fig, ax = plt.subplots(row_count, column_count, figsize=figsize)
+                            sns.barplot(x='value', y='kpi', data=kpis, hue='env_id', ax=ax)
+                            ax.axvline(1.0, color='black', linestyle='--', label='Baseline')
+                            ax.set_xlabel(None)
+                            ax.set_ylabel(None)
+
+                            for s in ['right', 'top']:
+                                ax.spines[s].set_visible(False)
+
+                            for p in ax.patches:
+                                ax.text(
+                                    p.get_x() + p.get_width(),
+                                    p.get_y() + p.get_height() / 2.0,
+                                    p.get_width(), ha='left', va='center'
+                                )
+
+                            ax.legend(loc='upper left', bbox_to_anchor=(1.1, 1.0), framealpha=0.0)
+                            fig.suptitle('KPIs at district-level', fontsize=16)
+                            plt.tight_layout()
+
+                            return fig
+                        
                         plot_district_kpis({'test': eval_env})
 
                         kpis = eval_env.evaluate()
