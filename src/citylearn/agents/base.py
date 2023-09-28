@@ -8,6 +8,7 @@ from typing import Any, List, Mapping, Union
 from gym import spaces
 from citylearn.base import Environment
 from citylearn.citylearn import CityLearnEnv
+from utils import plot_district_kpis
 
 LOGGER = logging.getLogger()
 logging.getLogger('matplotlib.font_manager').disabled = True
@@ -193,6 +194,8 @@ class Agent(Environment):
                         while not eval_env.done:
                             actions = self.predict(eval_observations, deterministic=True)
                             eval_observations, eval_rewards, _, _ = eval_env.step(actions)
+
+                        plot_district_kpis({'test': eval_env})
 
                         kpis = eval_env.evaluate()
                         kpis = kpis[(kpis['cost_function'].isin(['1 - average_daily_renewable_share',
