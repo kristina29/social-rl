@@ -136,7 +136,7 @@ def train_sacdb2value(schema, episodes, random_seed, batch_size, discount, autot
                                     discount=discount, imitation_lr=imitation_lr,
                                     pretrained_demonstrator=pretrained_demonstrator,
                                     deterministic_demo=deterministic_demo, extra_policy_update=extra_policy_update)
-    losses, rewards, eval_results = sacdb2value_model.learn(episodes=episodes, deterministic_finish=True)
+    losses, rewards, eval_results = sacdb2value_model.learn(episodes=episodes, deterministic_finish=False)
 
     eval_env = copy.deepcopy(sacdb2value_model.env)
     eval_observations = eval_env.reset()
