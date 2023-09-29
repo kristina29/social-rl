@@ -20,17 +20,17 @@ git
 
 scp src/citylearn/data/testenv/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/testenv/ 
 
-find '/Users/kristina/Documents/Studium/Informatik M.Sc. - Tü/SoSe 2023/social-rl/experiments/SAC_DB2Value/2_demo_b6' -name '*.sh' -delete
+find '/Users/kristina/Documents/Studium/Informatik M.Sc. - Tü/SoSe 2023/social-rl/experiments/SAC_DB2Value/8_earlystopping_b6_polup' -name '*.sh' -delete
 
-find '/Users/kristina/Documents/Studium/Informatik M.Sc. - Tü/SoSe 2023/social-rl/experiments/SAC_DB2Value/2_demo_b6' -name '*.pdf' -delete
+find '/Users/kristina/Documents/Studium/Informatik M.Sc. - Tü/SoSe 2023/social-rl/experiments/SAC_DB2Value/8_earlystopping_b6_polup' -name '*.pdf' -delete
 
-find '/Users/kristina/Documents/Studium/Informatik M.Sc. - Tü/SoSe 2023/social-rl/experiments/SAC_DB2Value/2_demo_b6' -name '*.csv' -delete
+find '/Users/kristina/Documents/Studium/Informatik M.Sc. - Tü/SoSe 2023/social-rl/experiments/SAC_DB2Value/8_earlystopping_b6_polup' -name '*.csv' -delete
 
 
 
 scp src/citylearn/data/nydata/schema.json klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata/schema.json
 
-scp src/citylearn/data/nydata_new_buildings2/schema.json klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata_new_buildings2/schema.json
+scp src/citylearn/data/nnb_limitobs2/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nnb_limitobs2/
 
 
 

@@ -5,9 +5,12 @@ import os
 from pathlib import Path
 import pickle
 from typing import Any, List, Mapping, Union
+
 from gym import spaces
+
 from citylearn.base import Environment
 from citylearn.citylearn import CityLearnEnv
+
 
 LOGGER = logging.getLogger()
 logging.getLogger('matplotlib.font_manager').disabled = True
@@ -146,7 +149,10 @@ class Agent(Environment):
         rewards = []
         eval_results = {'1 - average_daily_renewable_share': [],
                         '1 - average_daily_renewable_share_grid': [],
-                        '1 - used_pv_of_total_share': []}
+                        '1 - used_pv_of_total_share': [],
+                        'fossil_energy_consumption': []}
+        kpi_min = 100
+        best_state = None
 
         for episode in range(episodes):
             deterministic = deterministic or (deterministic_finish and episode >= episodes - 1)
@@ -179,33 +185,39 @@ class Agent(Environment):
 
                 observations = [o for o in next_observations]
 
+                # and self.start_training_time_step <= self.time_step \ #<= self.end_exploration_time_step \
                 # evaluate once a month for a whole week
                 if self.time_step % 168 == 0 \
                         and hasattr(self, 'start_training_time_step') \
                         and self.start_training_time_step <= self.time_step <= self.end_exploration_time_step \
                         and self.time_step > self.batch_size:
                     old_time_step = self.time_step
-                    for eval_counter in range(1):  # range(30):
-                        eval_env = copy.deepcopy(self.env)
-                        eval_observations = eval_env.reset()
 
-                        while not eval_env.done:
-                            actions = self.predict(eval_observations, deterministic=True)
-                            eval_observations, eval_rewards, _, _ = eval_env.step(actions)
+                    eval_env = copy.deepcopy(self.env)
+                    eval_observations = eval_env.reset()
 
-                        kpis = eval_env.evaluate()
-                        kpis = kpis[(kpis['cost_function'].isin(['1 - average_daily_renewable_share',
-                                                                 '1 - average_daily_renewable_share_grid',
-                                                                 '1 - used_pv_of_total_share']))].dropna()
-                        kpis['value'] = kpis['value'].round(3)
-                        kpis = kpis.rename(columns={'cost_function': 'kpi'})
-                        kpis = kpis[kpis['level'] == 'district'].copy()
+                    while not eval_env.done:
+                        actions = self.predict(eval_observations, deterministic=True)
+                        eval_observations, eval_rewards, _, _ = eval_env.step(actions)
 
-                        for kpi, value in zip(kpis['kpi'], kpis['value']):
-                            if isinstance(value, float):
-                                eval_results[kpi].append(value)
-                            else:
-                                eval_results[kpi].extend(value)
+                    kpis = eval_env.evaluate()
+                    kpis = kpis[(kpis['cost_function'].isin(['1 - average_daily_renewable_share',
+                                                             '1 - average_daily_renewable_share_grid',
+                                                             '1 - used_pv_of_total_share',
+                                                             'fossil_energy_consumption']))].dropna()
+                    kpis['value'] = kpis['value'].round(3)
+                    kpis = kpis.rename(columns={'cost_function': 'kpi'})
+                    kpis = kpis[kpis['level'] == 'district'].copy()
+
+                    for kpi, value in zip(kpis['kpi'], kpis['value']):
+                        if not isinstance(value, float):
+                            value = value[0]
+
+                        eval_results[kpi].append(value)
+
+                        if kpi == 'fossil_energy_consumption' and value < kpi_min:
+                            best_state = copy.deepcopy(self)
+                            kpi_min = value
 
                     self.time_step = old_time_step
 
@@ -222,7 +234,7 @@ class Agent(Environment):
             else:
                 pass
 
-        return losses, rewards, eval_results
+        return losses, rewards, eval_results, best_state
 
     def get_env_history(self, directory: Path, episodes: List[int] = None):
         env_history = ()

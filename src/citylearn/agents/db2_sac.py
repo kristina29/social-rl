@@ -106,38 +106,41 @@ class SACDB2(SAC):
 
                     # Use demonstrator actions for updating policy
                     for demonstrator_policy in self.demonstrator_policy_net:
-                        with torch.no_grad():
-                            demonstrator_actions, log_pi, _ = demonstrator_policy.sample(o, self.deterministic_demo)
-                            q_demonstrator = torch.min(
-                                self.soft_q_net1[i](o, demonstrator_actions),
-                                self.soft_q_net2[i](o, demonstrator_actions)
-                            )
-
-                        if self.mode in [4, 5, 6]:
-                            log_pi = self.policy_net[i].get_log_prob(demonstrator_actions, o)
-                        elif self.deterministic_demo:
-                            log_pi = demonstrator_policy.get_log_prob(demonstrator_actions, o)
-
-                        if self.mode in [1, 3, 4, 6]:
-                            q_demonstrator = q_demonstrator + self.imitation_lr * torch.abs(q_demonstrator)
-                        if self.mode in [2, 3, 5, 6]:
-                            log_pi = log_pi + self.imitation_lr * torch.abs(log_pi)  # increase probability of this action
-
-                        policy_loss = (self.alpha[i] * log_pi - q_demonstrator).mean()
-
-                        # prevent numerical errors
-                        policy_loss = policy_loss.clip(-1e+2, 1e+2)
-
-                        self.policy_optimizer[i].zero_grad()
-                        policy_loss.backward()
-
-                        self.policy_optimizer[i].step()
+                        self.social_policy_update(i, o, demonstrator_policy)
             else:
                 pass
 
             losses[i] = current_losses
 
         return losses
+
+    def social_policy_update(self, i, state, demonstrator_policy):
+        with torch.no_grad():
+            demonstrator_actions, log_pi, _ = demonstrator_policy.sample(state, self.deterministic_demo)
+            q_demonstrator = torch.min(
+                self.soft_q_net1[i](state, demonstrator_actions),
+                self.soft_q_net2[i](state, demonstrator_actions)
+            )
+
+        if self.mode in [4, 5, 6]:
+            log_pi = self.policy_net[i].get_log_prob(demonstrator_actions, state)
+        elif self.deterministic_demo:
+            log_pi = demonstrator_policy.get_log_prob(demonstrator_actions, state)
+
+        if self.mode in [1, 3, 4, 6]:
+            q_demonstrator = q_demonstrator + self.imitation_lr * torch.abs(q_demonstrator)
+        if self.mode in [2, 3, 5, 6]:
+            log_pi = log_pi + self.imitation_lr * torch.abs(log_pi)  # increase probability of this action
+
+        policy_loss = (self.alpha[i] * log_pi - q_demonstrator).mean()
+
+        # prevent numerical errors
+        policy_loss = policy_loss.clip(-1e+2, 1e+2)
+
+        self.policy_optimizer[i].zero_grad()
+        policy_loss.backward()
+
+        self.policy_optimizer[i].step()
 
     def set_demonstrator_policies(self):
         demonstrator_count = 0

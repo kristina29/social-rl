@@ -1,3 +1,4 @@
+import copy
 import pickle
 import time
 
@@ -15,7 +16,7 @@ from nonsocialrl import train_tql, train_rbc, train_sac
 def train(dataset_name, random_seed, building_count, demonstrators_count, episodes, discount, active_observations,
           batch_size, autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc,
           exclude_sac, exclude_sacdb2, exclude_sacdb2value, mode, imitation_lr, building_ids, store_agents,
-          pretrained_demonstrator, demo_transitions, deterministic_demo):
+          pretrained_demonstrator, demo_transitions, deterministic_demo, extra_policy_update, end_exploration_t):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
 
@@ -45,7 +46,8 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
         all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'], all_eval_results['SAC'], all_agents['SAC'] = \
             train_sac(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
                       discount=discount, autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
-                      kaiming_initialization=kaiming_initialization, l2_loss=l2_loss)
+                      kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
+                      end_exploration_t=end_exploration_t)
 
     # Train SAC agent with decision-biasing
     if not exclude_sacdb2:
@@ -55,17 +57,18 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
                          discount=discount, autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
                          kaiming_initialization=kaiming_initialization, l2_loss=l2_loss, mode=mode,
                          imitation_lr=imitation_lr, pretrained_demonstrator=pretrained_demonstrator,
-                         deterministic_demo=deterministic_demo)
+                         deterministic_demo=deterministic_demo, end_exploration_t=end_exploration_t)
 
     # Train SAC agent with decision-biasing on the value function
     if not exclude_sacdb2value:
         all_envs['SAC_DB2Value'], all_losses['SAC_DB2Value'], all_rewards['SAC_DB2Value'], \
-        all_eval_results['SAC_DB2Value'], all_agents['SAC_DB2Value'] = \
+        all_eval_results['SAC_DB2Value'], all_agents['SAC_DB2Value'], all_envs['SAC_DB2Value Best'] = \
             train_sacdb2value(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
                               discount=discount, autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
                               kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
                               imitation_lr=imitation_lr, pretrained_demonstrator=pretrained_demonstrator,
-                              deterministic_demo=deterministic_demo)
+                              deterministic_demo=deterministic_demo, extra_policy_update=extra_policy_update,
+                              end_exploration_t=end_exploration_t)
 
     # Train SAC agent with demonstrator transitions
     if demo_transitions is not None:
@@ -73,7 +76,8 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
         all_agents['PRB_SAC'] = \
             train_prbsac(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
                          discount=discount, autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
-                         kaiming_initialization=kaiming_initialization, demo_transitions=demo_transitions)
+                         kaiming_initialization=kaiming_initialization, demo_transitions=demo_transitions,
+                         end_exploration_t=end_exploration_t)
 
     save_results(all_envs, all_losses, all_rewards, all_eval_results, agents=all_agents, store_agents=store_agents)
 
@@ -102,7 +106,8 @@ def preprocessing(schema, building_count, demonstrators_count, random_seed, acti
 
 
 def train_sacdb2(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
-                 kaiming_initialization, l2_loss, mode, imitation_lr, pretrained_demonstrator, deterministic_demo):
+                 kaiming_initialization, l2_loss, mode, imitation_lr, pretrained_demonstrator, deterministic_demo,
+                 end_exploration_t):
     if pretrained_demonstrator is not None:
         with open(pretrained_demonstrator, 'rb') as file:
             pretrained_demonstrator = pickle.load(file)
@@ -111,9 +116,9 @@ def train_sacdb2(schema, episodes, random_seed, batch_size, discount, autotune_e
     sacdb2_model = SACDB2(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
                           clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
                           discount=discount, mode=mode, imitation_lr=imitation_lr,
-                          pretrained_demonstrator=pretrained_demonstrator, deterministic_demo=deterministic_demo)  # ,
-    # start_training_time_step=1, end_exploration_time_step=7000)
-    losses, rewards, eval_results = sacdb2_model.learn(episodes=episodes, deterministic_finish=True)
+                          pretrained_demonstrator=pretrained_demonstrator, deterministic_demo=deterministic_demo,
+                          end_exploration_time_step=end_exploration_t)
+    losses, rewards, eval_results, best_state = sacdb2_model.learn(episodes=episodes, deterministic_finish=True)
 
     print('SAC DB2 model trained!')
 
@@ -121,7 +126,8 @@ def train_sacdb2(schema, episodes, random_seed, batch_size, discount, autotune_e
 
 
 def train_sacdb2value(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
-                      kaiming_initialization, l2_loss, imitation_lr, pretrained_demonstrator, deterministic_demo):
+                      kaiming_initialization, l2_loss, imitation_lr, pretrained_demonstrator, deterministic_demo,
+                      extra_policy_update, end_exploration_t):
     if pretrained_demonstrator is not None:
         with open(pretrained_demonstrator, 'rb') as file:
             pretrained_demonstrator = pickle.load(file)
@@ -132,16 +138,24 @@ def train_sacdb2value(schema, episodes, random_seed, batch_size, discount, autot
                                     l2_loss=l2_loss,
                                     discount=discount, imitation_lr=imitation_lr,
                                     pretrained_demonstrator=pretrained_demonstrator,
-                                    deterministic_demo=deterministic_demo)
-    losses, rewards, eval_results = sacdb2value_model.learn(episodes=episodes, deterministic_finish=True)
+                                    deterministic_demo=deterministic_demo, extra_policy_update=extra_policy_update,
+                                    end_exploration_time_step=end_exploration_t)
+    losses, rewards, eval_results, best_state = sacdb2value_model.learn(episodes=episodes, deterministic_finish=True)
+
+    best_state_env = copy.deepcopy(sacdb2value_model.env)
+    eval_observations = best_state_env.reset()
+
+    while not best_state_env.done:
+        actions = best_state.predict(eval_observations, deterministic=True)
+        eval_observations, eval_rewards, _, _ = best_state_env.step(actions)
 
     print('SAC DB2 Value model trained!')
 
-    return env, losses, rewards, eval_results, sacdb2value_model
+    return env, losses, rewards, eval_results, sacdb2value_model, best_state_env
 
 
 def train_prbsac(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
-                 kaiming_initialization, demo_transitions):
+                 kaiming_initialization, demo_transitions, end_exploration_t):
     env = CityLearnEnv(schema)
 
     with open(demo_transitions, 'rb') as file:
@@ -149,8 +163,9 @@ def train_prbsac(schema, episodes, random_seed, batch_size, discount, autotune_e
 
     prbsac_model = PRBSAC(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
                           clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
-                          discount=discount, demonstrator_transitions=demo_transitions)
-    losses, rewards, eval_results = prbsac_model.learn(episodes=episodes, deterministic_finish=True)
+                          discount=discount, demonstrator_transitions=demo_transitions,
+                          end_exploration_time_step=end_exploration_t)
+    losses, rewards, eval_results, best_state = prbsac_model.learn(episodes=episodes, deterministic_finish=True)
 
     print('PRB SAC model trained!')
 
@@ -186,6 +201,8 @@ if __name__ == '__main__':
     pretrained_demonstrator = opts.pretrained_demonstrator
     demo_transitions = opts.demo_transitions
     deterministic_demo = opts.deterministic_demo
+    extra_policy_update = opts.extra_policy_update
+    end_exploration_t = opts.end_exploration_t
 
     if False:
         DATASET_NAME = 'nydata_new_buildings2'
@@ -212,6 +229,8 @@ if __name__ == '__main__':
         pretrained_demonstrator = None
         demo_transitions = 'sac_transitions_b6.pkl'
         deterministic_demo = False
+        extra_policy_update = False
+        end_exploration_t = 7000
 
     if pretrained_demonstrator is not None:
         demonstrators_count = 1
@@ -226,7 +245,8 @@ if __name__ == '__main__':
           exclude_sacdb2value=exclude_sacdb2value,
           mode=mode, imitation_lr=imitation_lr, building_ids=building_ids, store_agents=store_agents,
           pretrained_demonstrator=pretrained_demonstrator, demo_transitions=demo_transitions,
-          deterministic_demo=deterministic_demo)
+          deterministic_demo=deterministic_demo, extra_policy_update=extra_policy_update,
+          end_exploration_t=end_exploration_t)
 
     # get the end time
     et = time.time()

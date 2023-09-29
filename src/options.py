@@ -50,6 +50,8 @@ def parseOptions_social():
                          help='Use deterministic action if the demonstrator')
     optParser.add_option('--transitions', action='store', type='string', dest='demo_transitions', default=None,
                          help='Path to transitions stored as csv from a demonstrator to put in the replay buffer.')
+    optParser.add_option('--extra_policy_update', action='store_true', default=False, dest='extra_policy_update',
+                         help='Perform an additional policy update after the social Q-Value update.')
 
     opts, args = optParser.parse_args()
 
@@ -91,6 +93,8 @@ def add_nonsocial_options(optParser):
                          help='Ids of the buildings that should be trained. Overwrites the building_count.')
     optParser.add_option('--store', action='store_true', default=False, dest='store_agents',
                          help='Store trained agents.')
+    optParser.add_option('--end_exploration', action='store', type='int', default=7000, dest='end_exploration_t',
+                         help='End exploration time step.')
 
     return optParser
 
