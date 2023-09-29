@@ -361,7 +361,7 @@ def plot_district_kpis(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
     column_count = 1
     env_count = len(envs)
     kpi_count = len(kpis['kpi'].unique())
-    figsize = (6.0 * column_count, 0.225 * env_count * kpi_count * row_count)
+    figsize = (8.0 * column_count, 0.225 * env_count * kpi_count * row_count)
     fig, ax = plt.subplots(row_count, column_count, figsize=figsize)
     sns.barplot(x='value', y='kpi', data=kpis, hue='env_id', ax=ax)
     ax.axvline(1.0, color='black', linestyle='--', label='Baseline')
