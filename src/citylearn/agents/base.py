@@ -250,13 +250,14 @@ class Agent(Environment):
             kpis = kpis[kpis['level'] == 'district'].copy()
 
             for kpi, value in zip(kpis['kpi'], kpis['value']):
+                if not isinstance(value, float):
+                    value = value[0]
+
+                eval_results[kpi].append(value)
+                
                 if kpi == 'fossil_energy_consumption' and value < kpi_min:
                     best_state = copy.deepcopy(self)
                     kpi_min = kpis['value']
-                if isinstance(value, float):
-                    eval_results[kpi].append(value)
-                else:
-                    eval_results[kpi].extend(value)
 
         return losses, rewards, eval_results, best_state
 
