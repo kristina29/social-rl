@@ -79,8 +79,6 @@ class RLC(Agent):
         self.update_per_time_step = update_per_time_step
         self.encoders = self.set_encoders()
 
-        self.deterministic_start_time_step = self.end_exploration_time_step
-
     @property
     def observation_dimension(self) -> int:
         """Number of observations after applying `encoders`."""

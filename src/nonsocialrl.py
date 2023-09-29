@@ -18,7 +18,7 @@ from utils import set_schema_buildings, set_active_observations, save_results
 
 def train(dataset_name, random_seed, building_count, episodes, active_observations, batch_size, discount,
           autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc,
-          building_ids, store_agents):
+          building_ids, store_agents, end_exploration_t):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
 
@@ -48,7 +48,7 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
     all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'], all_eval_results['SAC'], all_agents['SAC'] = \
         train_sac(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size, discount=discount,
                   autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
-                  kaiming_initialization=kaiming_initialization, l2_loss=l2_loss)
+                  kaiming_initialization=kaiming_initialization, l2_loss=l2_loss, end_exploration_t=end_exploration_t)
 
     save_results(all_envs, all_losses, all_rewards, all_eval_results, agents=all_agents, store_agents=store_agents)
 
@@ -121,12 +121,11 @@ def train_tql(schema, active_observations, episodes):
 
 
 def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
-              kaiming_initialization, l2_loss):
+              kaiming_initialization, l2_loss, end_exploration_t):
     env = CityLearnEnv(schema)
     sac_model = SAC(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
                     clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
-                    discount=discount)  # ,
-    # start_training_time_step=1, end_exploration_time_step=14000)
+                    discount=discount, end_exploration_time_step=end_exploration_t)
     losses, rewards, eval_results, best_state = sac_model.learn(episodes=episodes, deterministic_finish=True)
 
     filename = f'sac_env.pkl'
@@ -184,6 +183,7 @@ if __name__ == '__main__':
     l2_loss = opts.l2_loss
     building_ids = opts.building_ids
     store_agents = opts.store_agents
+    end_exploration_t = opts.end_exploration_t
 
     if False:
         DATASET_NAME = 'nydata_new_buildings2'
@@ -202,12 +202,13 @@ if __name__ == '__main__':
         store_agents = False
         kaiming_initialization = False
         l2_loss = False
+        end_exploration_t = 7000
 
     train(dataset_name=DATASET_NAME, random_seed=seed, building_count=building_count, episodes=episodes,
           active_observations=active_observations, batch_size=batch_size, discount=discount,
           autotune_entropy=autotune_entropy, clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization,
           l2_loss=l2_loss, exclude_tql=exclude_tql, exclude_rbc=exclude_rbc, building_ids=building_ids,
-          store_agents=store_agents)
+          store_agents=store_agents, end_exploration_t=end_exploration_t)
 
     # get the end time
     et = time.time()
