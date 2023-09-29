@@ -127,7 +127,7 @@ def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entr
                     clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
                     discount=discount)  # ,
     # start_training_time_step=1, end_exploration_time_step=14000)
-    losses, rewards, eval_results = sac_model.learn(episodes=episodes, deterministic_finish=True)
+    losses, rewards, eval_results, best_state = sac_model.learn(episodes=episodes, deterministic_finish=True)
 
     filename = f'sac_env.pkl'
     with open(filename, 'wb') as fp:

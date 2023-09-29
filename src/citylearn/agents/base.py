@@ -151,6 +151,8 @@ class Agent(Environment):
                         '1 - average_daily_renewable_share_grid': [],
                         '1 - used_pv_of_total_share': [],
                         'fossil_energy_consumption': []}
+        kpi_min = 100
+        best_state = None
 
         for episode in range(episodes):
             deterministic = deterministic or (deterministic_finish and episode >= episodes - 1)
@@ -187,7 +189,7 @@ class Agent(Environment):
                 # evaluate once a month for a whole week
                 if self.time_step % 168 == 0 \
                         and hasattr(self, 'start_training_time_step') \
-                        and self.start_training_time_step <= self.time_step \
+                        and self.start_training_time_step <= self.time_step <= self.end_exploration_time_step \
                         and self.time_step > self.batch_size:
                     old_time_step = self.time_step
 
@@ -248,15 +250,15 @@ class Agent(Environment):
             kpis = kpis[kpis['level'] == 'district'].copy()
 
             for kpi, value in zip(kpis['kpi'], kpis['value']):
-                if kpi == '1 - used_pv_of_total_share' and value < 0.9:
-                    print(3)
-
+                if kpi == 'fossil_energy_consumption' and kpis['value'] < kpi_min:
+                    best_state = copy.deepcopy(self)
+                    kpi_min = kpis['value']
                 if isinstance(value, float):
                     eval_results[kpi].append(value)
                 else:
                     eval_results[kpi].extend(value)
 
-        return losses, rewards, eval_results
+        return losses, rewards, eval_results, best_state
 
     def get_env_history(self, directory: Path, episodes: List[int] = None):
         env_history = ()

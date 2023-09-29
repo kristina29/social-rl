@@ -115,7 +115,7 @@ def train_sacdb2(schema, episodes, random_seed, batch_size, discount, autotune_e
                           discount=discount, mode=mode, imitation_lr=imitation_lr,
                           pretrained_demonstrator=pretrained_demonstrator, deterministic_demo=deterministic_demo)  # ,
     # start_training_time_step=1, end_exploration_time_step=7000)
-    losses, rewards, eval_results = sacdb2_model.learn(episodes=episodes, deterministic_finish=True)
+    losses, rewards, eval_results, best_state = sacdb2_model.learn(episodes=episodes, deterministic_finish=True)
 
     print('SAC DB2 model trained!')
 
@@ -136,13 +136,13 @@ def train_sacdb2value(schema, episodes, random_seed, batch_size, discount, autot
                                     discount=discount, imitation_lr=imitation_lr,
                                     pretrained_demonstrator=pretrained_demonstrator,
                                     deterministic_demo=deterministic_demo, extra_policy_update=extra_policy_update)
-    losses, rewards, eval_results = sacdb2value_model.learn(episodes=episodes, deterministic_finish=True)
+    losses, rewards, eval_results, best_state = sacdb2value_model.learn(episodes=episodes, deterministic_finish=True)
 
     eval_env = copy.deepcopy(sacdb2value_model.env)
     eval_observations = eval_env.reset()
 
     while not eval_env.done:
-        actions = sacdb2value_model.predict(eval_observations, deterministic=True)
+        actions = best_state.predict(eval_observations, deterministic=True)
         eval_observations, eval_rewards, _, _ = eval_env.step(actions)
 
     plot_district_kpis({'test': eval_env})
@@ -162,7 +162,7 @@ def train_prbsac(schema, episodes, random_seed, batch_size, discount, autotune_e
     prbsac_model = PRBSAC(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
                           clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
                           discount=discount, demonstrator_transitions=demo_transitions)
-    losses, rewards, eval_results = prbsac_model.learn(episodes=episodes, deterministic_finish=True)
+    losses, rewards, eval_results, best_state = prbsac_model.learn(episodes=episodes, deterministic_finish=True)
 
     print('PRB SAC model trained!')
 
