@@ -234,7 +234,6 @@ class Agent(Environment):
             else:
                 pass
 
-
         return losses, rewards, eval_results, best_state
 
     def get_env_history(self, directory: Path, episodes: List[int] = None):
