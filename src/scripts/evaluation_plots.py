@@ -22,21 +22,21 @@ if __name__ == '__main__':
 
     if True:
         experiment_dirs = ['SAC_DB2/30_renewable_prod/reward_05pvprice/0.5',
-                           '7_earlystopping_b5_polup/ir0.00001',
-                           '7_earlystopping_b5_polup/ir0.0001',
-                           '7_earlystopping_b5_polup/ir0.001',
-                           '7_earlystopping_b5_polup/ir0.01',
-                           '7_earlystopping_b5_polup/ir0.02',
-                           '7_earlystopping_b5_polup/ir0.03',
-                           '7_earlystopping_b5_polup/ir0.04',
-                           '7_earlystopping_b5_polup/ir0.05',
+                           '8_earlystopping_b6_polup/ir0.00001',
+                           '8_earlystopping_b6_polup/ir0.0001',
+                           '8_earlystopping_b6_polup/ir0.001',
+                           '8_earlystopping_b6_polup/ir0.01',
+                           '8_earlystopping_b6_polup/ir0.02',
+                           '8_earlystopping_b6_polup/ir0.03',
+                           '8_earlystopping_b6_polup/ir0.04',
+                           '8_earlystopping_b6_polup/ir0.05',
                            ]
         ref_dirs = ['30_renewable_prod/reward_05pvprice/0.5']
         asocial_agent = 'SAC'
         n_refs = len(ref_dirs)
         length = 1/n_refs
         agentdir = 'SAC_DB2Value'#_DB2Value'
-        agent = 'SAC_DB2Value Best'
+        agents = ['SAC_DB2Value', 'SAC_DB2Value Best']
 
     kpis = {}
     kpi_filenames = glob.glob(f'{EXPERIMENT_BASE_DIR}/{experiment_dirs[0]}/kpis_*.csv')

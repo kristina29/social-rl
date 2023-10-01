@@ -115,12 +115,11 @@ class SACDB2(SAC):
         return losses
 
     def social_policy_update(self, i, state, demonstrator_policy):
-        with torch.no_grad():
-            demonstrator_actions, log_pi, _ = demonstrator_policy.sample(state, self.deterministic_demo)
-            q_demonstrator = torch.min(
-                self.soft_q_net1[i](state, demonstrator_actions),
-                self.soft_q_net2[i](state, demonstrator_actions)
-            )
+        demonstrator_actions, log_pi, _ = demonstrator_policy.sample(state, self.deterministic_demo)
+        q_demonstrator = torch.min(
+            self.soft_q_net1[i](state, demonstrator_actions),
+            self.soft_q_net2[i](state, demonstrator_actions)
+        )
 
         if self.mode in [4, 5, 6]:
             log_pi = self.policy_net[i].get_log_prob(demonstrator_actions, state)

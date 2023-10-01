@@ -52,7 +52,7 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
     # Train SAC agent with decision-biasing
     if not exclude_sacdb2:
         all_envs['SAC_DB2'], all_losses['SAC_DB2'], all_rewards['SAC_DB2'], all_eval_results['SAC_DB2'], \
-        all_agents['SAC_DB2'] = \
+        all_agents['SAC_DB2'], all_envs['SAC_DB2 Best'] = \
             train_sacdb2(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
                          discount=discount, autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
                          kaiming_initialization=kaiming_initialization, l2_loss=l2_loss, mode=mode,
@@ -120,9 +120,16 @@ def train_sacdb2(schema, episodes, random_seed, batch_size, discount, autotune_e
                           end_exploration_time_step=end_exploration_t)
     losses, rewards, eval_results, best_state = sacdb2_model.learn(episodes=episodes, deterministic_finish=True)
 
+    best_state_env = copy.deepcopy(sacdb2_model.env)
+    eval_observations = best_state_env.reset()
+
+    while not best_state_env.done:
+        actions = best_state.predict(eval_observations, deterministic=True)
+        eval_observations, eval_rewards, _, _ = best_state_env.step(actions)
+
     print('SAC DB2 model trained!')
 
-    return env, losses, rewards, eval_results, sacdb2_model
+    return env, losses, rewards, eval_results, sacdb2_model, best_state_env
 
 
 def train_sacdb2value(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
