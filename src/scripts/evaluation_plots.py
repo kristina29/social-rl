@@ -36,7 +36,7 @@ if __name__ == '__main__':
         n_refs = len(ref_dirs)
         length = 1/n_refs
         agentdir = 'SAC_DB2Value'#_DB2Value'
-        agent = 'SAC_DB2Value'
+        agents = ['SAC_DB2Value', 'SAC_DB2Value Best']
 
     kpis = {}
     kpi_filenames = glob.glob(f'{EXPERIMENT_BASE_DIR}/{experiment_dirs[0]}/kpis_*.csv')

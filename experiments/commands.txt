@@ -20,11 +20,11 @@ git
 
 scp src/citylearn/data/testenv/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/testenv/ 
 
-find '/Users/kristina/Documents/Studium/Informatik M.Sc. - Tü/SoSe 2023/social-rl/experiments/SAC_DB2Value/bla' -name '*.sh' -delete
+find '/Users/kristina/Documents/Studium/Informatik M.Sc. - Tü/SoSe 2023/social-rl/experiments/SAC_DB2/99_bla' -name '*.sh' -delete
 
-find '/Users/kristina/Documents/Studium/Informatik M.Sc. - Tü/SoSe 2023/social-rl/experiments/SAC_DB2Value/bla' -name '*.pdf' -delete
+find '/Users/kristina/Documents/Studium/Informatik M.Sc. - Tü/SoSe 2023/social-rl/experiments/SAC_DB2/99_bla' -name '*.pdf' -delete
 
-find '/Users/kristina/Documents/Studium/Informatik M.Sc. - Tü/SoSe 2023/social-rl/experiments/SAC_DB2Value/bla' -name '*.csv' -delete
+find '/Users/kristina/Documents/Studium/Informatik M.Sc. - Tü/SoSe 2023/social-rl/experiments/SAC_DB2/99_bla' -name '*.csv' -delete
 
 
 
