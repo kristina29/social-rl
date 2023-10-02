@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 #irs = [0.00001, 0.0001, 0.001, 0.01, 0.02, 0.03, 0.04, 0.05]
-ir = 0.2
+ir = 0.01
 
 PREFIX = '''\
 #!/bin/bash
@@ -35,6 +35,6 @@ for mode in range(1,7):
     with open(f'job{mode}.sh', 'w') as rsh:
         rsh.write(f'''\
 {PREFIX}
-srun python3 src/socialrl.py -s nnb_limitobs1 -b 6 -d 4 -e 2 --tql --sac --sacdb2value --autotune --mode {mode} --ir {ir}
+srun python3 src/socialrl.py -s nnb_limitobs1 -b 6 --pretrained_demonstrator agents/SAC_agent_Building5.pkl -e 2 --tql --sac --sacdb2value --autotune --mode {mode} --ir {ir}
 {SUFFIX}
     ''')
