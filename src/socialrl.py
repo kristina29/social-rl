@@ -43,7 +43,8 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
 
     # Train soft actor-critic (SAC) agent for comparison
     if not exclude_sac:
-        all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'], all_eval_results['SAC'], all_agents['SAC'] = \
+        all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'], all_eval_results['SAC'], all_agents['SAC'],\
+            all_envs['SAC Best'] = \
             train_sac(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
                       discount=discount, autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
                       kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
