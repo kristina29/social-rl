@@ -5,11 +5,8 @@
   "simulation_end_time_step": 8759,
   "episodes": 1,
   "seconds_per_time_step": 3600,
-  "fuel_mix": {
-    "time_series": "fuelmix.csv",
-    "attribute": "energy_consumption_median",
-    "scale": 0.5
-  },
+  "fuel_mix": "fuelmix.csv",
+  "fuel_mix_attribute": "energy_consumption_median",
   "observations": {
     "month": {
       "active": true,
@@ -37,12 +34,12 @@
       "bins": 8
     },
     "outdoor_dry_bulb_temperature_predicted_6h": {
-      "active": false,
+      "active": true,
       "shared_in_central_agent": true,
       "bins": 8
     },
     "outdoor_dry_bulb_temperature_predicted_12h": {
-      "active": false,
+      "active": true,
       "shared_in_central_agent": true,
       "bins": 8
     },
@@ -57,12 +54,12 @@
       "bins": 8
     },
     "outdoor_relative_humidity_predicted_6h": {
-      "active": false,
+      "active": true,
       "shared_in_central_agent": true,
       "bins": 8
     },
     "outdoor_relative_humidity_predicted_12h": {
-      "active": false,
+      "active": true,
       "shared_in_central_agent": true,
       "bins": 8
     },
@@ -77,12 +74,12 @@
       "bins": 8
     },
     "diffuse_solar_irradiance_predicted_6h": {
-      "active": false,
+      "active": true,
       "shared_in_central_agent": true,
       "bins": 8
     },
     "diffuse_solar_irradiance_predicted_12h": {
-      "active": false,
+      "active": true,
       "shared_in_central_agent": true,
       "bins": 8
     },
@@ -97,12 +94,12 @@
       "bins": 8
     },
     "direct_solar_irradiance_predicted_6h": {
-      "active": false,
+      "active": true,
       "shared_in_central_agent": true,
       "bins": 8
     },
     "direct_solar_irradiance_predicted_12h": {
-      "active": false,
+      "active": true,
       "shared_in_central_agent": true,
       "bins": 8
     },
@@ -117,12 +114,12 @@
       "bins": 8
     },
     "wind_speed_predicted_6h": {
-      "active": false,
+      "active": true,
       "shared_in_central_agent": true,
       "bins": 8
     },
     "wind_speed_predicted_12h": {
-      "active": false,
+      "active": true,
       "shared_in_central_agent": true,
       "bins": 8
     },
@@ -192,12 +189,12 @@
       "bins": 10
     },
     "electricity_pricing_predicted_6h": {
-      "active": false,
+      "active": true,
       "shared_in_central_agent": false,
       "bins": 10
     },
     "electricity_pricing_predicted_12h": {
-      "active": false,
+      "active": true,
       "shared_in_central_agent": false,
       "bins": 10
     },
