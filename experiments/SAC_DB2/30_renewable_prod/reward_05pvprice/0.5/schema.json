@@ -8,7 +8,7 @@
   "fuel_mix": {
     "time_series": "fuelmix.csv",
     "attribute": "energy_consumption_median",
-    "scale": 1.5
+    "scale": 0.5
   },
   "observations": {
     "month": {
