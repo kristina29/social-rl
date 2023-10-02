@@ -45,7 +45,8 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
                                                        episodes=episodes)
 
     # Train soft actor-critic (SAC) agent
-    all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'], all_eval_results['SAC'], all_agents['SAC'] = \
+    all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'], all_eval_results['SAC'], all_agents['SAC'],\
+        all_envs['SAC Best'] = \
         train_sac(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size, discount=discount,
                   autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
                   kaiming_initialization=kaiming_initialization, l2_loss=l2_loss, end_exploration_t=end_exploration_t)
@@ -128,12 +129,12 @@ def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entr
                     discount=discount, end_exploration_time_step=end_exploration_t)
     losses, rewards, eval_results, best_state = sac_model.learn(episodes=episodes, deterministic_finish=True)
 
-    filename = f'sac_env.pkl'
-    with open(filename, 'wb') as fp:
-        pickle.dump(env, fp, protocol=pickle.HIGHEST_PROTOCOL)
-        print(f'SAC env saved to {filename}')
-    print(f'scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/{filename}'
-          f'experiments/SAC_DB2/{filename}')
+    best_state_env = copy.deepcopy(sac_model.env)
+    eval_observations = best_state_env.reset()
+
+    while not best_state_env.done:
+        actions = best_state.predict(eval_observations, deterministic=True)
+        eval_observations, eval_rewards, _, _ = best_state_env.step(actions)
 
     print('SAC model trained!')
 
@@ -160,7 +161,7 @@ def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entr
             pickle.dump(transitions, fp)
             print('Saved transitions to', t_filename)
 
-    return env, losses, rewards, eval_results, sac_model
+    return env, losses, rewards, eval_results, sac_model, best_state_env
 
 
 if __name__ == '__main__':
