@@ -1089,17 +1089,18 @@ class CityLearnEnv(Environment, Env):
         else:
             buildings = ()
 
-            if self.schema['fuel_mix'] is not None:
-                fuel_mix = pd.read_csv(os.path.join(root_directory, self.schema['fuel_mix'])).iloc[
+            if self.schema['fuel_mix']['time_series'] is not None:
+                fuel_mix = pd.read_csv(os.path.join(root_directory, self.schema['fuel_mix']['time_series'])).iloc[
                            simulation_start_time_step:simulation_end_time_step + 1].copy()
                 fuel_mix = FuelMix(*fuel_mix.values.T)
 
-                fuel_mix_attribute = self.schema['fuel_mix_attribute']
+                fuel_mix_attribute = self.schema['fuel_mix']['attribute']
                 sum_medians = 0
                 for b in get_active_parts(self.schema, 'buildings'):
                     sum_medians += self.schema['buildings'][b][fuel_mix_attribute]
+                fuelmix_scale = self.schema['fuel_mix']['scale']
 
-                fuel_mix.scale_to_buildings(sum_medians)
+                fuel_mix.scale_to_buildings(sum_medians, fuelmix_scale)
             else:
                 fuel_mix = None
 

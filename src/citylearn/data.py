@@ -295,7 +295,7 @@ class FuelMix:
         self.renewable_energy_produced = np.array(renewable_energy_produced, dtype=float)
         self.renewable_energy_share = np.array(renewable_energy_share, dtype=float)
 
-    def scale_to_buildings(self, sum_medians: float) -> None:
+    def scale_to_buildings(self, sum_medians: float, scale: float) -> None:
         """Scale the renewable and non-renewable energy production to
             the sum of the median consumed energy of all included buildings.
 
@@ -303,5 +303,7 @@ class FuelMix:
             ----------
             sum_medians: float
                 Sum of the medians of net energy consumption of all included buildings.
+            scale: float
+                Factor by which the sum of the medians should be scaled.
         """
-        self.renewable_energy_produced = self.renewable_energy_share * sum_medians * 0.5
+        self.renewable_energy_produced = self.renewable_energy_share * sum_medians * scale
