@@ -21,18 +21,20 @@ if __name__ == '__main__':
         agent = parser.agent
 
     if True:
-        experiment_dirs = ['23_autotune/new_buildings2/old',
-                           '15_reward_price_pv/alpha075/new_buildings2/old',
-                           '15_reward_price_pv/alpha05/new_buildings2/repeats',
-                           '15_reward_price_pv/alpha025/new_buildings2/old',
-                           '15_reward_price_pv/alpha0/new_buildings2/old',
+        experiment_dirs = ['30_renewable_prod/reward_05pvprice/0.5',
+                           '32_demo_b6/ir1/socialMode1',
+                           '32_demo_b6/ir1/socialMode2',
+                           '32_demo_b6/ir1/socialMode3',
+                           '32_demo_b6/ir1/socialMode4',
+                           '32_demo_b6/ir1/socialMode5',
+                           '32_demo_b6/ir1/socialMode6',
                            ]
-        ref_dirs = ['23_autotune/new_buildings2',]
-        base_agent = 'SAC'
+        ref_dirs = ['30_renewable_prod/reward_05pvprice/0.5',]
+        base_agent = ['SAC', 'SAC Best']
         n_refs = len(ref_dirs)
         length = 1/n_refs
         agentdir = 'SAC_DB2'#_DB2Value'
-        agents = ['SAC']#, #'SAC Best']
+        agents = ['SAC_DB2', 'SAC_DB2 Best']
 
     kpis = {}
     kpi_filenames = glob.glob(f'{EXPERIMENT_BASE_DIR}{agentdir}/{experiment_dirs[0]}/kpis_*.csv')
@@ -42,14 +44,13 @@ if __name__ == '__main__':
 
     df = pd.read_csv(kpi_filenames[0])
     df = df.set_index('kpi')
-    df = df[(df['env_id'] == base_agent) & (df['level'] == 'district')]
-    kpis[f'{ref_dirs[0]} {base_agent}'] = df
+    df = df[(df['env_id'] == base_agent[0]) & (df['level'] == 'district')]
+    kpis[f'{ref_dirs[0]} {base_agent[0]}'] = df
 
-    #df = pd.read_csv(kpi_filenames[0])
-    #df = df.set_index('kpi')
-    #df = df[(df['env_id'] == agents[1]) & (df['level'] == 'district')]
-    #kpis[f'{ref_dirs[0]} {agents[1]}'] = df
-
+    df = pd.read_csv(kpi_filenames[0])
+    df = df.set_index('kpi')
+    df = df[(df['env_id'] == base_agent[1]) & (df['level'] == 'district')]
+    kpis[f'{ref_dirs[0]} {base_agent[1]}'] = df
 
     for dir in experiment_dirs[1:]:
         print(dir)
@@ -81,10 +82,10 @@ if __name__ == '__main__':
     rects = ax.bar(names, values, label=names)
 
     for i in range(n_refs):
-        ax.axhline(values[names.index(f'{ref_dirs[i]} {base_agent}')], xmin=0+i*length, xmax=1-length*(n_refs-i-1), c='red',
+        ax.axhline(values[names.index(f'{ref_dirs[i]} {base_agent[1]}')], xmin=0+i*length, xmax=1-length*(n_refs-i-1), c='red',
                    linewidth=0.7, linestyle="-")
     ax.bar_label(rects, padding=3)
-    ax.set_ylim(0.95,1.05)
+    ax.set_ylim(0.95, 1.05)
     ax.set_title('1 - average_daily_renewable_share [net_value/net_value_without_storage]')
     for tick in ax.get_xticklabels():
         tick.set_rotation(90)
@@ -105,7 +106,7 @@ if __name__ == '__main__':
     ax.set_axisbelow(True)
     rects = ax.bar(names, values, label=names)
     for i in range(n_refs):
-        ax.axhline(values[names.index(f'{ref_dirs[i]} {base_agent}')], xmin=0 + i * length, xmax=1 - length * (n_refs - i - 1), c='red',
+        ax.axhline(values[names.index(f'{ref_dirs[i]} {base_agent[1]}')], xmin=0 + i * length, xmax=1 - length * (n_refs - i - 1), c='red',
                    linewidth=0.7, linestyle="-")
     ax.bar_label(rects, padding=3)
     ax.set_ylim(0.95, 1.05)
@@ -130,7 +131,7 @@ if __name__ == '__main__':
     rects = ax.bar(names, values, label=names)
     for i in range(n_refs):
         try:
-            ax.axhline(values[names.index(f'{ref_dirs[i]} {base_agent}')], xmin=0 + i * length, xmax=1 - length * (n_refs - i - 1),
+            ax.axhline(values[names.index(f'{ref_dirs[i]} {base_agent[1]}')], xmin=0 + i * length, xmax=1 - length * (n_refs - i - 1),
                        c='red', linewidth=0.7, linestyle="-")
         except:
             pass
@@ -158,7 +159,7 @@ if __name__ == '__main__':
         rects = ax.bar(names, values, label=names)
         for i in range(n_refs):
             try:
-                ax.axhline(values[names.index(f'{ref_dirs[i]} {base_agent}')], xmin=0 + i * length, xmax=1 - length * (n_refs - i - 1),
+                ax.axhline(values[names.index(f'{ref_dirs[i]} {base_agent[1]}')], xmin=0 + i * length, xmax=1 - length * (n_refs - i - 1),
                            c='red', linewidth=0.7, linestyle="-")
             except:
                 pass
