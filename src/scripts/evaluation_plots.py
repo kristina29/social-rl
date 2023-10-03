@@ -21,23 +21,23 @@ if __name__ == '__main__':
         agent = parser.agent
 
     if True:
-        experiment_dirs = ['30_renewable_prod/reward_05pvprice/0.5',
-                           '32_demo_b6/ir1/socialMode1',
-                           '32_demo_b6/ir1/socialMode2',
-                           '32_demo_b6/ir1/socialMode3',
-                           '32_demo_b6/ir1/socialMode4',
-                           '32_demo_b6/ir1/socialMode5',
-                           '32_demo_b6/ir1/socialMode6',
+        experiment_dirs = ['SAC_DB2/30_renewable_prod/reward_05pvprice/0.5',
+                           '2_demo_b6/ir0.0001',
+                           '2_demo_b6/ir0.001',
+                           '2_demo_b6/ir0.01',
+                           '2_demo_b6/ir0.03',
+                           '2_demo_b6/ir0.05',
+                           '2_demo_b6/ir0.1',
                            ]
-        ref_dirs = ['30_renewable_prod/reward_05pvprice/0.5',]
+        ref_dirs = ['SAC_DB2/30_renewable_prod/reward_05pvprice/0.5',]
         base_agent = ['SAC', 'SAC Best']
         n_refs = len(ref_dirs)
         length = 1/n_refs
-        agentdir = 'SAC_DB2'#_DB2Value'
-        agents = ['SAC_DB2', 'SAC_DB2 Best']
+        agentdir = 'SAC_DB2Value'#_DB2Value'
+        agents = ['SAC_DB2Value', 'SAC_DB2Value Best']
 
     kpis = {}
-    kpi_filenames = glob.glob(f'{EXPERIMENT_BASE_DIR}{agentdir}/{experiment_dirs[0]}/kpis_*.csv')
+    kpi_filenames = glob.glob(f'{EXPERIMENT_BASE_DIR}/{experiment_dirs[0]}/kpis_*.csv')
 
     if len(kpi_filenames) > 1:
         raise ValueError(f'More than one KPI csv file found in {experiment_dirs[0]}')
