@@ -57,6 +57,8 @@ The fuel mix data we used is obtained from the \textcolor{red}{NY-ISO}, retrieve
 As weather data, we used data from the New York state too, in order to encourage correlation between the weather and the produced amount of renewable energy. We obtained the data from the \textcolor{red}{NSRDB} \cite{weather_nsrdb}. 
 \todo[inline]{foecasts}
 
+\todo[inline]{fuel mix scaled to 0.5 (somtetimes buildings use full available from grid -> capture this behaviour)}
+
 \subsection{Energy prices}
 For the energy prices, we used the pricing data set provided with the CityLearn challenge 2022 \cite{citylearn-challenge} and weighted the price information by the share of fossil energy in the grid. The basic dataset follows a electricity rate, where the electricity is cheaper in the early morning, late at night and during the months october to may. The detailed electricity prices are shown in Table \ref{tab:basic-prices}.
 \begin{table}[htb]

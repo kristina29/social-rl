@@ -22,17 +22,15 @@ if __name__ == '__main__':
 
     if True:
         experiment_dirs = ['SAC_DB2/30_renewable_prod/reward_05pvprice/0.5',
-                           '8_earlystopping_b6_polup/ir0.00001',
-                           '8_earlystopping_b6_polup/ir0.0001',
-                           '8_earlystopping_b6_polup/ir0.001',
-                           '8_earlystopping_b6_polup/ir0.01',
-                           '8_earlystopping_b6_polup/ir0.02',
-                           '8_earlystopping_b6_polup/ir0.03',
-                           '8_earlystopping_b6_polup/ir0.04',
-                           '8_earlystopping_b6_polup/ir0.05',
+                           '2_demo_b6/ir0.0001',
+                           '2_demo_b6/ir0.001',
+                           '2_demo_b6/ir0.01',
+                           '2_demo_b6/ir0.03',
+                           '2_demo_b6/ir0.05',
+                           '2_demo_b6/ir0.1',
                            ]
-        ref_dirs = ['30_renewable_prod/reward_05pvprice/0.5']
-        asocial_agent = 'SAC'
+        ref_dirs = ['SAC_DB2/30_renewable_prod/reward_05pvprice/0.5',]
+        base_agent = ['SAC', 'SAC Best']
         n_refs = len(ref_dirs)
         length = 1/n_refs
         agentdir = 'SAC_DB2Value'#_DB2Value'
@@ -46,8 +44,13 @@ if __name__ == '__main__':
 
     df = pd.read_csv(kpi_filenames[0])
     df = df.set_index('kpi')
-    df = df[(df['env_id'] == asocial_agent) & (df['level'] == 'district')]
-    kpis[ref_dirs[0]] = df
+    df = df[(df['env_id'] == base_agent[0]) & (df['level'] == 'district')]
+    kpis[f'{ref_dirs[0]} {base_agent[0]}'] = df
+
+    df = pd.read_csv(kpi_filenames[0])
+    df = df.set_index('kpi')
+    df = df[(df['env_id'] == base_agent[1]) & (df['level'] == 'district')]
+    kpis[f'{ref_dirs[0]} {base_agent[1]}'] = df
 
     for dir in experiment_dirs[1:]:
         print(dir)
@@ -56,18 +59,22 @@ if __name__ == '__main__':
         if len(kpi_filenames) > 1:
             raise ValueError(f'More than one KPI csv file found in {dir}')
 
-        df = pd.read_csv(kpi_filenames[0])
-        df = df.set_index('kpi')
-        df = df[(df['env_id'] == agent) & (df['level'] == 'district')]
-        kpis[dir] = df
+        for a in agents:
+            df = pd.read_csv(kpi_filenames[0])
+            df = df.set_index('kpi')
+            df = df[(df['env_id'] == a) & (df['level'] == 'district')]
+            kpis[f'{dir} {a}'] = df
 
     # plot 1-avarage_daily_renewable share netue/netue_without_storage
     values = []
     names = []
     for key, value in kpis.items():
-        values.append(round(value.loc['1 - average_daily_renewable_share', 'net_value']/
-                      value.loc['1 - average_daily_renewable_share', 'net_value_without_storage'], 3))
-        names.append(key)
+        try:
+            values.append(round(value.loc['1 - average_daily_renewable_share', 'net_value']/
+                          value.loc['1 - average_daily_renewable_share', 'net_value_without_storage'], 3))
+            names.append(key)
+        except:
+            pass
 
     fig, ax = plt.subplots()
     ax.grid(which='major', axis='y', linestyle='--')
@@ -75,10 +82,10 @@ if __name__ == '__main__':
     rects = ax.bar(names, values, label=names)
 
     for i in range(n_refs):
-        ax.axhline(values[names.index(ref_dirs[i])], xmin=0+i*length, xmax=1-length*(n_refs-i-1), c='red',
+        ax.axhline(values[names.index(f'{ref_dirs[i]} {base_agent[1]}')], xmin=0+i*length, xmax=1-length*(n_refs-i-1), c='red',
                    linewidth=0.7, linestyle="-")
     ax.bar_label(rects, padding=3)
-    ax.set_ylim(0.95,1.05)
+    ax.set_ylim(0.95, 1.05)
     ax.set_title('1 - average_daily_renewable_share [net_value/net_value_without_storage]')
     for tick in ax.get_xticklabels():
         tick.set_rotation(90)
@@ -99,7 +106,7 @@ if __name__ == '__main__':
     ax.set_axisbelow(True)
     rects = ax.bar(names, values, label=names)
     for i in range(n_refs):
-        ax.axhline(values[names.index(ref_dirs[i])], xmin=0 + i * length, xmax=1 - length * (n_refs - i - 1), c='red',
+        ax.axhline(values[names.index(f'{ref_dirs[i]} {base_agent[1]}')], xmin=0 + i * length, xmax=1 - length * (n_refs - i - 1), c='red',
                    linewidth=0.7, linestyle="-")
     ax.bar_label(rects, padding=3)
     ax.set_ylim(0.95, 1.05)
@@ -124,12 +131,12 @@ if __name__ == '__main__':
     rects = ax.bar(names, values, label=names)
     for i in range(n_refs):
         try:
-            ax.axhline(values[names.index(ref_dirs[i])], xmin=0 + i * length, xmax=1 - length * (n_refs - i - 1),
+            ax.axhline(values[names.index(f'{ref_dirs[i]} {base_agent[1]}')], xmin=0 + i * length, xmax=1 - length * (n_refs - i - 1),
                        c='red', linewidth=0.7, linestyle="-")
         except:
             pass
     ax.bar_label(rects, padding=3)
-    ax.set_ylim(0.75, 1.05)
+    ax.set_ylim(0.7, 1.05)
     ax.set_title('1 - used_pv_of_total_share [net_value/net_value_without_storage]')
     for tick in ax.get_xticklabels():
         tick.set_rotation(90)
@@ -152,7 +159,7 @@ if __name__ == '__main__':
         rects = ax.bar(names, values, label=names)
         for i in range(n_refs):
             try:
-                ax.axhline(values[names.index(ref_dirs[i])], xmin=0 + i * length, xmax=1 - length * (n_refs - i - 1),
+                ax.axhline(values[names.index(f'{ref_dirs[i]} {base_agent[1]}')], xmin=0 + i * length, xmax=1 - length * (n_refs - i - 1),
                            c='red', linewidth=0.7, linestyle="-")
             except:
                 pass
