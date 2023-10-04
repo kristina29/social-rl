@@ -6,11 +6,11 @@ import re
 
 optParser = OptionParser(option_class=Option)
 optParser.add_option('--building', action='store', dest='building_path',
-                     default='citylearn/data/nnblo2_onlyb6shifted/Building_6.csv')
-optParser.add_option('--median', action='store', type='int', dest='median', default=0.5)
+                     default='citylearn/data/nnblo1_onlyb5shifted/Building_5.csv')
+optParser.add_option('--median', action='store', type='int', dest='median', default=0.29)
 optParser.add_option('-n', action='store', type='int', dest='n', default=5)
 optParser.add_option('--r', action='store', type='int', dest='r', default=1)
-optParser.add_option('--output', action='store', dest='output_path', default='citylearn/data/nnblo2_onlyb6shifted/')
+optParser.add_option('--output', action='store', dest='output_path', default='citylearn/data/nnblo1_onlyb5shifted/')
 
 opts, args = optParser.parse_args()
 
@@ -42,7 +42,7 @@ if __name__ == '__main__':
             id += 1
 
         path = f'{output_path}Building_{id}.csv'
-        #new_df.to_csv(path, index=False)
-        #print(f'Written to {path} --- Shifted by: {shift_by}, Median: {new_median}')
+        new_df.to_csv(path, index=False)
+        print(f'Written to {path} --- Shifted by: {shift_by}, Median: {new_median}')
         id += 1
 

@@ -45,7 +45,7 @@ scp src/citylearn/data/nydata_new_buildings2/schema.json klietz10@134.2.168.52:/
 scp src/citylearn/data/nnb_limitobs1/schema.json klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nnb_limitobs1/
 
 
-scp src/citylearn/data/nnblo1_onlyb6shifted/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nnblo1_onlyb6shifted/
+scp src/citylearn/data/nnblo1_onlyb5shifted/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nnblo1_onlyb5shifted/
 
 
 scp src/citylearn/data/nnb_limitobs2/schema.json klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nnb_limitobs2/
