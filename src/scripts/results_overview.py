@@ -28,10 +28,15 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['1_randomdemo/d2',
                                            '2_demo_b6',
                                            '4_demo_b6_policyupdate',
                                            '3_demo_b5',
-                                           '5_demo_b5_policyupdate'
+                                           '5_demo_b5_policyupdate',
+                                           '7_shifted_demos/demo_b5/non_extra_pol',
+                                           '7_shifted_demos/demo_b5/extra_pol',
+                                           '7_shifted_demos/demo_b6/non_extra_pol',
+                                           '7_shifted_demos/demo_b6/extra_pol',
                                            ],
-                                 'demos': [2, 2, 4, 4, 'B6', 'B6', 'B5', 'B5'],
-                                 'extra_pols': [0, 1, 0, 1, 0, 1, 0, 1]})
+                                 'demos': [2, 2, 4, 4, 'B6', 'B6', 'B5', 'B5', 'B5 (only B5s)',
+                                           'B5 (only B5s)', 'B6 (only B5s)', 'B6 (only B5s)'],
+                                 'extra_pols': [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]})
 
 mode = 'sacdb2s'
 var = 2
@@ -162,7 +167,9 @@ def generate_sacdb2value():
     demo_pos = {2: 1,
                 4: 2,
                 'B5': 3,
-                'B6': 4}
+                'B6': 4,
+                'B5 (only B5s)': 5,
+                'B6 (only B5s)': 6}
 
     final_df = pd.DataFrame({'irs': irs,
                              'demos': demos,
