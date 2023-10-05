@@ -8,7 +8,8 @@ from citylearn.agents.sac import SAC
 
 class SACDB2VALUE(SAC):
     def __init__(self, *args, imitation_lr: float = 0.01, pretrained_demonstrator: SAC = None,
-                 deterministic_demo: bool = False, extra_policy_update: bool = False, **kwargs):
+                 deterministic_demo: bool = False, extra_policy_update: bool = False,
+                 only_demo_action: bool = False, **kwargs):
         r"""Initialize :class:`SACDB2`.
 
         Parameters
@@ -23,6 +24,8 @@ class SACDB2VALUE(SAC):
             Use deterministic or sampled actions of the demonstrator
         extra_policy_update: bool
             Update the policy after the social Q-Value update
+        only_demo_action: bool
+            Train only on demonstrator actions
 
         Other Parameters
         ----------------
@@ -35,6 +38,7 @@ class SACDB2VALUE(SAC):
         self.pretrained_demonstrator = pretrained_demonstrator
         self.deterministic_demo = deterministic_demo
         self.extra_policy_update = extra_policy_update
+        self.only_demo_action = only_demo_action
 
         self.demonstrator_policy_net = [None for _ in range(self.env.demonstrator_count)]
 
@@ -93,7 +97,7 @@ class SACDB2VALUE(SAC):
                     pass
 
                 for _ in range(self.update_per_time_step):
-                    o, q1_loss, q2_loss, policy_loss, alpha_loss = self.update_step(i)
+                    o, q1_loss, q2_loss, policy_loss, alpha_loss = self.update_step(i, update=not self.only_demo_action)
                     current_losses['q1_losses'].append(q1_loss)
                     current_losses['q2_losses'].append(q2_loss)
                     current_losses['policy_losses'].append(policy_loss)

@@ -13,7 +13,7 @@ from citylearn.agents.sac import SAC
 
 class SACDB2(SAC):
     def __init__(self, *args, imitation_lr: float = 0.01, mode: int = 1, pretrained_demonstrator: SAC = None,
-                 deterministic_demo: bool = False, **kwargs):
+                 deterministic_demo: bool = False, only_demo_action: bool = False, **kwargs):
         r"""Initialize :class:`SACDB2`.
 
         Parameters
@@ -28,6 +28,8 @@ class SACDB2(SAC):
             Pretrained SAC agent to use as demonstrator
         deterministic_demo: bool
             Use deterministic or sampled actions of the demonstrator
+        only_demo_action: bool
+            Train only on the demonstrator actions
 
         Other Parameters
         ----------------
@@ -40,6 +42,7 @@ class SACDB2(SAC):
         self.mode = mode
         self.pretrained_demonstrator = pretrained_demonstrator
         self.deterministic_demo = deterministic_demo
+        self.only_demo_action = only_demo_action
 
         self.demonstrator_policy_net = [None for _ in range(self.env.demonstrator_count)]
 
@@ -98,7 +101,7 @@ class SACDB2(SAC):
                     pass
 
                 for _ in range(self.update_per_time_step):
-                    o, q1_loss, q2_loss, policy_loss, alpha_loss = self.update_step(i)
+                    o, q1_loss, q2_loss, policy_loss, alpha_loss = self.update_step(i, update=not self.only_demo_action)
                     current_losses['q1_losses'].append(q1_loss)
                     current_losses['q2_losses'].append(q2_loss)
                     current_losses['policy_losses'].append(policy_loss)

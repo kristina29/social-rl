@@ -52,6 +52,8 @@ def parseOptions_social():
                          help='Path to transitions stored as csv from a demonstrator to put in the replay buffer.')
     optParser.add_option('--extra_policy_update', action='store_true', default=False, dest='extra_policy_update',
                          help='Perform an additional policy update after the social Q-Value update.')
+    optParser.add_option('--only_demo_action', action='store_true', default=False, dest='only_demo_action',
+                         help='Train only on demonstrator action.')
 
     opts, args = optParser.parse_args()
 

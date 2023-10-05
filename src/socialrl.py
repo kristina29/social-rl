@@ -16,7 +16,8 @@ from nonsocialrl import train_tql, train_rbc, train_sac
 def train(dataset_name, random_seed, building_count, demonstrators_count, episodes, discount, active_observations,
           batch_size, autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc,
           exclude_sac, exclude_sacdb2, exclude_sacdb2value, mode, imitation_lr, building_ids, store_agents,
-          pretrained_demonstrator, demo_transitions, deterministic_demo, extra_policy_update, end_exploration_t):
+          pretrained_demonstrator, demo_transitions, deterministic_demo, extra_policy_update, end_exploration_t,
+          only_demo_action):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
 
@@ -58,7 +59,8 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
                          discount=discount, autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
                          kaiming_initialization=kaiming_initialization, l2_loss=l2_loss, mode=mode,
                          imitation_lr=imitation_lr, pretrained_demonstrator=pretrained_demonstrator,
-                         deterministic_demo=deterministic_demo, end_exploration_t=end_exploration_t)
+                         deterministic_demo=deterministic_demo, end_exploration_t=end_exploration_t,
+                         only_demo_action=only_demo_action)
 
     # Train SAC agent with decision-biasing on the value function
     if not exclude_sacdb2value:
@@ -69,7 +71,7 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
                               kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
                               imitation_lr=imitation_lr, pretrained_demonstrator=pretrained_demonstrator,
                               deterministic_demo=deterministic_demo, extra_policy_update=extra_policy_update,
-                              end_exploration_t=end_exploration_t)
+                              end_exploration_t=end_exploration_t, only_demo_action=only_demo_action)
 
     # Train SAC agent with demonstrator transitions
     if demo_transitions is not None:
@@ -108,7 +110,7 @@ def preprocessing(schema, building_count, demonstrators_count, random_seed, acti
 
 def train_sacdb2(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
                  kaiming_initialization, l2_loss, mode, imitation_lr, pretrained_demonstrator, deterministic_demo,
-                 end_exploration_t):
+                 end_exploration_t, only_demo_action):
     if pretrained_demonstrator is not None:
         with open(pretrained_demonstrator, 'rb') as file:
             pretrained_demonstrator = pickle.load(file)
@@ -118,7 +120,7 @@ def train_sacdb2(schema, episodes, random_seed, batch_size, discount, autotune_e
                           clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
                           discount=discount, mode=mode, imitation_lr=imitation_lr,
                           pretrained_demonstrator=pretrained_demonstrator, deterministic_demo=deterministic_demo,
-                          end_exploration_time_step=end_exploration_t)
+                          end_exploration_time_step=end_exploration_t, only_demo_action=only_demo_action)
     losses, rewards, eval_results, best_state = sacdb2_model.learn(episodes=episodes, deterministic_finish=True)
 
     best_state_env = copy.deepcopy(sacdb2_model.env)
@@ -135,7 +137,7 @@ def train_sacdb2(schema, episodes, random_seed, batch_size, discount, autotune_e
 
 def train_sacdb2value(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
                       kaiming_initialization, l2_loss, imitation_lr, pretrained_demonstrator, deterministic_demo,
-                      extra_policy_update, end_exploration_t):
+                      extra_policy_update, end_exploration_t, only_demo_action):
     if pretrained_demonstrator is not None:
         with open(pretrained_demonstrator, 'rb') as file:
             pretrained_demonstrator = pickle.load(file)
@@ -147,7 +149,7 @@ def train_sacdb2value(schema, episodes, random_seed, batch_size, discount, autot
                                     discount=discount, imitation_lr=imitation_lr,
                                     pretrained_demonstrator=pretrained_demonstrator,
                                     deterministic_demo=deterministic_demo, extra_policy_update=extra_policy_update,
-                                    end_exploration_time_step=end_exploration_t)
+                                    end_exploration_time_step=end_exploration_t, only_demo_action=only_demo_action)
     losses, rewards, eval_results, best_state = sacdb2value_model.learn(episodes=episodes, deterministic_finish=True)
 
     best_state_env = copy.deepcopy(sacdb2value_model.env)
@@ -211,6 +213,7 @@ if __name__ == '__main__':
     deterministic_demo = opts.deterministic_demo
     extra_policy_update = opts.extra_policy_update
     end_exploration_t = opts.end_exploration_t
+    only_demo_action = opts.only_demo_action
 
     if False:
         DATASET_NAME = 'nydata_new_buildings2'
@@ -239,6 +242,7 @@ if __name__ == '__main__':
         deterministic_demo = False
         extra_policy_update = False
         end_exploration_t = 7000
+        only_demo_action = False
 
     if pretrained_demonstrator is not None:
         demonstrators_count = 1
@@ -254,7 +258,7 @@ if __name__ == '__main__':
           mode=mode, imitation_lr=imitation_lr, building_ids=building_ids, store_agents=store_agents,
           pretrained_demonstrator=pretrained_demonstrator, demo_transitions=demo_transitions,
           deterministic_demo=deterministic_demo, extra_policy_update=extra_policy_update,
-          end_exploration_t=end_exploration_t)
+          end_exploration_t=end_exploration_t, only_demo_action=only_demo_action)
 
     # get the end time
     et = time.time()

@@ -180,7 +180,7 @@ class SAC(RLC):
                                                     np.hstack(self.get_normalized_observations(i, n).reshape(1, -1)[0]),
                                                     d)
 
-    def update_step(self, i) -> (List[List[float]], float, float, float, float):
+    def update_step(self, i, update=True) -> (List[List[float]], float, float, float, float):
         if self.prioritized_replay_buffer:
             transitions, inds, weights = self.replay_buffer[i].sample(self.batch_size)
             weights = torch.FloatTensor(weights).unsqueeze(1)
@@ -201,17 +201,20 @@ class SAC(RLC):
         r = tensor(r).unsqueeze(1).to(self.device)
         d = tensor(d).unsqueeze(1).to(self.device)
 
-        # Update Q-Value networks
-        q1_loss, q2_loss = self.q_value_update(i, o, a, r, d, n, inds, weights)
+        q1_loss, q2_loss, policy_loss, alpha_loss = \
+            torch.tensor(0.), torch.tensor(0.), torch.tensor(0.), torch.tensor(0.)
+        if update:
+            # Update Q-Value networks
+            q1_loss, q2_loss = self.q_value_update(i, o, a, r, d, n, inds, weights)
 
-        # Update Policy
-        log_pi, policy_loss = self.policy_update(i, o)
+            # Update Policy
+            log_pi, policy_loss = self.policy_update(i, o)
 
-        # Update Entropy
-        alpha_loss = self.alpha_update(i, log_pi)
+            # Update Entropy
+            alpha_loss = self.alpha_update(i, log_pi)
 
-        # Soft Updates
-        self.update_targets(i)
+            # Soft Updates
+            self.update_targets(i)
 
         return o, q1_loss.item(), q2_loss.item(), policy_loss.item(), alpha_loss.item()
 
