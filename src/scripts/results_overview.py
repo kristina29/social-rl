@@ -33,7 +33,7 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['1_randomdemo/d2',
                                  'demos': [2, 2, 4, 4, 'B6', 'B6', 'B5', 'B5'],
                                  'extra_pols': [0, 1, 0, 1, 0, 1, 0, 1]})
 
-mode = 'sacdb2'
+mode = 'sacdb2s'
 var = 2
 
 
@@ -135,25 +135,29 @@ def generate_sacdb2value():
         demo = dir[1]['demos']
         extra_pol = dir[1]['extra_pols']
 
-        for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1]:
-            file = glob.glob(f'../experiments/SAC_DB2Value/{dir[1]["paths"]}/ir{ir}/kpis_*.csv')[0]
-            kpis = pd.read_csv(file)
-            kpis = kpis.set_index('kpi')
-            kpis = kpis[(kpis['env_id'] == 'SAC_DB2Value Best') & (kpis['level'] == 'district')]
-            v = round(kpis.loc['fossil_energy_consumption', 'net_value'] /
-                      kpis.loc['fossil_energy_consumption', 'net_value_without_storage'], 3)
+        for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1, 0.15]:
+            try:
+                file = glob.glob(f'../experiments/SAC_DB2Value/{dir[1]["paths"]}/ir{ir}/kpis_*.csv')[0]
+                kpis = pd.read_csv(file)
+                kpis = kpis.set_index('kpi')
+                kpis = kpis[(kpis['env_id'] == 'SAC_DB2Value Best') & (kpis['level'] == 'district')]
+                v = round(kpis.loc['fossil_energy_consumption', 'net_value'] /
+                          kpis.loc['fossil_energy_consumption', 'net_value_without_storage'], 3)
 
-            irs.append(ir)
-            extra_pols.append(extra_pol)
-            demos.append(demo)
-            fossil_energy_consumptions.append(v)
+                irs.append(ir)
+                extra_pols.append(extra_pol)
+                demos.append(demo)
+                fossil_energy_consumptions.append(v)
+            except:
+                pass
 
     colors = {0.0001: 'tab:blue',
               0.001: 'tab:orange',
               0.01: 'tab:green',
               0.03: 'tab:red',
               0.05: 'tab:purple',
-              0.1: 'tab:brown'}
+              0.1: 'tab:brown',
+              0.15: 'tab:pink'}
     markers = {0: 'o', 1: 'X'}
     demo_pos = {2: 1,
                 4: 2,
