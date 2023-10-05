@@ -26,7 +26,7 @@ sacdb2_dirs = pd.DataFrame({'paths': ['31_randomdemo/d2/ir0.01',
                                       ],
                             'demos': [2, 2, 2, 2, '2 (determ.)',
                                       4, 4, 4, 4,
-                                      'B5', 'B5', 'B5', 'B5,',
+                                      'B5', 'B5', 'B5', 'B5',
                                       'B6', 'B6', 'B6', 'B6'],
                             'ir': [0.01, 0.2, 1, 1.5, 0.2,
                                    0.01, 0.2, 1, 1.5,
@@ -40,6 +40,8 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['1_randomdemo/d2',
                                            '1_randomdemo/d4_extrapol',
                                            '2_demo_b6',
                                            '4_demo_b6_policyupdate',
+                                           '8_determ_actions/demo_b6/non_extra_pol_update',
+                                           '8_determ_actions/demo_b6/extra_pol_update',
                                            '3_demo_b5',
                                            '5_demo_b5_policyupdate',
                                            '7_shifted_demos/demo_b5/non_extra_pol',
@@ -47,9 +49,14 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['1_randomdemo/d2',
                                            '7_shifted_demos/demo_b6/non_extra_pol',
                                            '7_shifted_demos/demo_b6/extra_pol',
                                            ],
-                                 'demos': [2, 2, 4, 4, 'B6', 'B6', 'B5', 'B5', 'B5 (only B5s)',
-                                           'B5 (only B5s)', 'B6 (only B5s)', 'B6 (only B5s)'],
-                                 'extra_pols': [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]})
+                                 'demos': [2, 2,
+                                           4, 4,
+                                           'B6', 'B6',
+                                           'B6 (determ.)', 'B6 (determ.)',
+                                           'B5', 'B5',
+                                           'B5 (only B5s)', 'B5 (only B5s)',
+                                           'B6 (only B5s)', 'B6 (only B5s)'],
+                                 'extra_pols': [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]})
 
 mode = 'sacdb2v'
 var = 2
@@ -187,15 +194,16 @@ def generate_sacdb2value():
                 4: 2,
                 'B5': 3,
                 'B6': 4,
-                'B5 (only B5s)': 5,
-                'B6 (only B5s)': 6}
+                'B6 (determ.)': 5,
+                'B5 (only B5s)': 6,
+                'B6 (only B5s)': 7}
 
     final_df = pd.DataFrame({'irs': irs,
                              'demos': demos,
                              'fossil_energy_consumptions': fossil_energy_consumptions,
                              'extra_pols': extra_pols})
 
-    fig, ax = plt.subplots(figsize=(11, 7))
+    fig, ax = plt.subplots(figsize=(12, 7))
 
     if var == 1:
         for i, v in enumerate(final_df['fossil_energy_consumptions']):
