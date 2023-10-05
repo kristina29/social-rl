@@ -8,17 +8,30 @@ import seaborn as sns
 BEST_SAC_VALUE = 0.929
 sacdb2_dirs = pd.DataFrame({'paths': ['31_randomdemo/d2/ir0.01',
                                       '31_randomdemo/d2/ir0.2',
+                                      '31_randomdemo/d2/ir1',
+                                      '31_randomdemo/d2/ir1.5',
+                                      '31_randomdemo/d2/det_ir0.2',
                                       '31_randomdemo/d4/ir0.01',
                                       '31_randomdemo/d4/ir0.2',
+                                      '31_randomdemo/d4/ir1',
+                                      '31_randomdemo/d4/ir1.5',
                                       '32_demo_b5/ir0.01',
                                       '32_demo_b5/ir0.2',
                                       '32_demo_b5/ir1',
+                                      '32_demo_b5/ir1.5',
                                       '32_demo_b6/ir0.01',
                                       '32_demo_b6/ir0.2',
                                       '32_demo_b6/ir1',
+                                      '32_demo_b6/ir1.5',
                                       ],
-                            'demos': [2, 2, 4, 4, 'B5', 'B5', 'B5', 'B6', 'B6', 'B6'],
-                            'ir': [0.01, 0.2, 0.01, 0.2, 0.01, 0.2, 1, 0.01, 0.2, 1],
+                            'demos': [2, 2, 2, 2, '2 (determ.)',
+                                      4, 4, 4, 4,
+                                      'B5', 'B5', 'B5', 'B5',
+                                      'B6', 'B6', 'B6', 'B6'],
+                            'ir': [0.01, 0.2, 1, 1.5, 0.2,
+                                   0.01, 0.2, 1, 1.5,
+                                   0.01, 0.2, 1, 1.5,
+                                   0.01, 0.2, 1, 1.5],
                             })
 
 sacdb2value_dirs = pd.DataFrame({'paths': ['1_randomdemo/d2',
@@ -27,13 +40,25 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['1_randomdemo/d2',
                                            '1_randomdemo/d4_extrapol',
                                            '2_demo_b6',
                                            '4_demo_b6_policyupdate',
+                                           '8_determ_actions/demo_b6/non_extra_pol_update',
+                                           '8_determ_actions/demo_b6/extra_pol_update',
                                            '3_demo_b5',
-                                           '5_demo_b5_policyupdate'
+                                           '5_demo_b5_policyupdate',
+                                           '7_shifted_demos/demo_b5/non_extra_pol',
+                                           '7_shifted_demos/demo_b5/extra_pol',
+                                           '7_shifted_demos/demo_b6/non_extra_pol',
+                                           '7_shifted_demos/demo_b6/extra_pol',
                                            ],
-                                 'demos': [2, 2, 4, 4, 'B6', 'B6', 'B5', 'B5'],
-                                 'extra_pols': [0, 1, 0, 1, 0, 1, 0, 1]})
+                                 'demos': [2, 2,
+                                           4, 4,
+                                           'B6', 'B6',
+                                           'B6 (determ.)', 'B6 (determ.)',
+                                           'B5', 'B5',
+                                           'B5 (only B5s)', 'B5 (only B5s)',
+                                           'B6 (only B5s)', 'B6 (only B5s)'],
+                                 'extra_pols': [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]})
 
-mode = 'sacdb2'
+mode = 'sacdb2v'
 var = 2
 
 
@@ -43,17 +68,20 @@ def get_data_sacdb2(dirs):
         demo = dir[1]['demos']
 
         for m in range(1, 7):
-            file = glob.glob(f'../experiments/SAC_DB2/{dir[1]["paths"]}/socialMode{m}/kpis_*.csv')[0]
-            kpis = pd.read_csv(file)
-            kpis = kpis.set_index('kpi')
-            kpis = kpis[(kpis['env_id'] == 'SAC_DB2 Best') & (kpis['level'] == 'district')]
-            v = round(kpis.loc['fossil_energy_consumption', 'net_value'] /
-                      kpis.loc['fossil_energy_consumption', 'net_value_without_storage'], 3)
+            try:
+                file = glob.glob(f'../experiments/SAC_DB2/{dir[1]["paths"]}/socialMode{m}/kpis_*.csv')[0]
+                kpis = pd.read_csv(file)
+                kpis = kpis.set_index('kpi')
+                kpis = kpis[(kpis['env_id'] == 'SAC_DB2 Best') & (kpis['level'] == 'district')]
+                v = round(kpis.loc['fossil_energy_consumption', 'net_value'] /
+                          kpis.loc['fossil_energy_consumption', 'net_value_without_storage'], 3)
 
-            irs.append(ir)
-            demos.append(demo)
-            modes.append(m)
-            fossil_energy_consumptions.append(v)
+                irs.append(ir)
+                demos.append(demo)
+                modes.append(m)
+                fossil_energy_consumptions.append(v)
+            except:
+                pass
 
     return irs, demos, modes, fossil_energy_consumptions
 
@@ -71,11 +99,13 @@ def generate_sacdb2():
               6: 'tab:brown'}
     markers = {0.01: 'o',
                0.2: 'X',
-               1.0: 's'}
-    demo_pos = {2: 1,
-                4: 2,
-                'B5': 3,
-                'B6': 4}
+               1.0: 's',
+               1.5: '+'}
+    demo_pos = {'2 (determ.)': 1,
+                2: 2,
+                4: 3,
+                'B5': 4,
+                'B6': 5}
 
     final_df = pd.DataFrame({'irs': irs,
                              'demos': demos,
@@ -122,7 +152,7 @@ def generate_sacdb2():
     handles = [f("s", colors[i]) for i in colors.keys()]
     handles += [f(markers[i], "k") for i in markers.keys()]
 
-    labels = [f'Mode {i}' for i in colors.keys()] + ["ir0.01", "ir0.2", "ir1"]
+    labels = [f'Mode {i}' for i in colors.keys()] + ["ir0.01", "ir0.2", "ir1", "ir1.5"]
 
     plt.legend(handles, labels, bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.title('SACDB2')
@@ -135,37 +165,45 @@ def generate_sacdb2value():
         demo = dir[1]['demos']
         extra_pol = dir[1]['extra_pols']
 
-        for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1]:
-            file = glob.glob(f'../experiments/SAC_DB2Value/{dir[1]["paths"]}/ir{ir}/kpis_*.csv')[0]
-            kpis = pd.read_csv(file)
-            kpis = kpis.set_index('kpi')
-            kpis = kpis[(kpis['env_id'] == 'SAC_DB2Value Best') & (kpis['level'] == 'district')]
-            v = round(kpis.loc['fossil_energy_consumption', 'net_value'] /
-                      kpis.loc['fossil_energy_consumption', 'net_value_without_storage'], 3)
+        for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2]:
+            try:
+                file = glob.glob(f'../experiments/SAC_DB2Value/{dir[1]["paths"]}/ir{ir}/kpis_*.csv')[0]
+                kpis = pd.read_csv(file)
+                kpis = kpis.set_index('kpi')
+                kpis = kpis[(kpis['env_id'] == 'SAC_DB2Value Best') & (kpis['level'] == 'district')]
+                v = round(kpis.loc['fossil_energy_consumption', 'net_value'] /
+                          kpis.loc['fossil_energy_consumption', 'net_value_without_storage'], 3)
 
-            irs.append(ir)
-            extra_pols.append(extra_pol)
-            demos.append(demo)
-            fossil_energy_consumptions.append(v)
+                irs.append(ir)
+                extra_pols.append(extra_pol)
+                demos.append(demo)
+                fossil_energy_consumptions.append(v)
+            except:
+                pass
 
     colors = {0.0001: 'tab:blue',
               0.001: 'tab:orange',
               0.01: 'tab:green',
               0.03: 'tab:red',
               0.05: 'tab:purple',
-              0.1: 'tab:brown'}
+              0.1: 'tab:brown',
+              0.15: 'tab:pink',
+              0.2: 'tab:grey'}
     markers = {0: 'o', 1: 'X'}
     demo_pos = {2: 1,
                 4: 2,
                 'B5': 3,
-                'B6': 4}
+                'B6': 4,
+                'B6 (determ.)': 5,
+                'B5 (only B5s)': 6,
+                'B6 (only B5s)': 7}
 
     final_df = pd.DataFrame({'irs': irs,
                              'demos': demos,
                              'fossil_energy_consumptions': fossil_energy_consumptions,
                              'extra_pols': extra_pols})
 
-    fig, ax = plt.subplots(figsize=(10, 7))
+    fig, ax = plt.subplots(figsize=(12, 7))
 
     if var == 1:
         for i, v in enumerate(final_df['fossil_energy_consumptions']):

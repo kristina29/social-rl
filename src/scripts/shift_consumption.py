@@ -42,7 +42,7 @@ if __name__ == '__main__':
             id += 1
 
         path = f'{output_path}Building_{id}.csv'
-        new_df.to_csv(path, index=False)
-        print(f'Written to {path} --- Shifted by: {shift_by}, Median: {new_median}')
+        #new_df.to_csv(path, index=False)
+        #print(f'Written to {path} --- Shifted by: {shift_by}, Median: {new_median}')
         id += 1
 
