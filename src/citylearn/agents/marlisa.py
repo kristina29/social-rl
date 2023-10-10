@@ -238,7 +238,7 @@ class MARLISA(SAC):
                         target_q_values = torch.min(
                             self.target_soft_q_net1[i](n, new_next_actions),
                             self.target_soft_q_net2[i](n, new_next_actions),
-                        ) - self.alpha * new_log_pi
+                        ) - self.alpha[i] * new_log_pi
                         q_target = r + (1 - d) * self.discount * target_q_values
 
                     # Update Soft Q-Networks
@@ -259,7 +259,7 @@ class MARLISA(SAC):
                         self.soft_q_net1[i](o, new_actions),
                         self.soft_q_net2[i](o, new_actions)
                     )
-                    policy_loss = (self.alpha * log_pi - q_new_actions).mean()
+                    policy_loss = (self.alpha[i] * log_pi - q_new_actions).mean()
                     self.policy_optimizer[i].zero_grad()
                     policy_loss.backward()
                     self.policy_optimizer[i].step()

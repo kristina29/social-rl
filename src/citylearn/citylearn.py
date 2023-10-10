@@ -1089,7 +1089,7 @@ class CityLearnEnv(Environment, Env):
         else:
             buildings = ()
 
-            if self.schema['fuel_mix']['time_series'] is not None:
+            if self.schema['fuel_mix'] is not None:
                 fuel_mix = pd.read_csv(os.path.join(root_directory, self.schema['fuel_mix']['time_series'])).iloc[
                            simulation_start_time_step:simulation_end_time_step + 1].copy()
                 fuel_mix = FuelMix(*fuel_mix.values.T)
