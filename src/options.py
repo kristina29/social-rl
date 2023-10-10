@@ -58,6 +58,17 @@ def parseOptions_social():
     return opts
 
 
+def parseOptions_marlisa():
+    optParser = OptionParser(option_class=ExtendedOption)
+    optParser = add_nonsocial_options(optParser)
+    optParser.add_option('--information_sharing', action='store_true', default=False, dest='information_sharing',
+                         help='Share information between the agents.')
+
+    opts, args = optParser.parse_args()
+
+    return opts
+
+
 def add_nonsocial_options(optParser):
     optParser.add_option('-s', '--schema', action='store', type='string', dest='schema',
                          default='nydata',
