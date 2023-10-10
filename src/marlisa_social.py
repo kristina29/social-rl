@@ -105,7 +105,7 @@ if __name__ == '__main__':
     store_agents = opts.store_agents
     end_exploration_t = opts.end_exploration_t
 
-    if False:
+    if True:
         DATASET_NAME = 'nnb_limitobs1_marlisa'
         exclude_rbc = 0
         exclude_tql = 1
@@ -115,7 +115,7 @@ if __name__ == '__main__':
         autotune_entropy = True
         discount = 0.99
         building_ids = None
-        active_observations = None  # ['solar_generation', 'electrical_storage_soc', 'non_shiftable_load']  # , 'electricity_pricing', 'electricity_pricing_predicted_6h',
+        active_observations = ['hour']  # ['solar_generation', 'electrical_storage_soc', 'non_shiftable_load']  # , 'electricity_pricing', 'electricity_pricing_predicted_6h',
         # '#electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
         batch_size = 256
         clip_gradient = False
