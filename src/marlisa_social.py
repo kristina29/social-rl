@@ -105,7 +105,7 @@ if __name__ == '__main__':
     store_agents = opts.store_agents
     end_exploration_t = opts.end_exploration_t
 
-    if True:
+    if False:
         DATASET_NAME = 'nnb_limitobs1_marlisa'
         exclude_rbc = 0
         exclude_tql = 1
