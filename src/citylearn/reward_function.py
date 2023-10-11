@@ -80,6 +80,31 @@ class MARL(RewardFunction):
         return reward.tolist()
 
 
+class OwnMARL(RewardFunction):
+    def __init__(self, env: CityLearnEnv):
+        super().__init__(env)
+        self.price_solar_penalty = PriceAndSolarPenaltyReward(env, alpha=0.5)
+
+    def calculate(self) -> List[float]:
+        r"""Calculates MARL reward.
+
+        Returns
+        -------
+        reward: List[float]
+            Reward for transition to current timestep.
+
+        Notes
+        -----
+        Reward value is calculated as :math:`\textrm{sign}(-e) \times 0.01(e^2) \times \textrm{max}(0, E)`
+        where :math:`e` is the building `electricity_consumption` and :math:`E` is the district `electricity_consumption`.
+        """
+
+        district_fossil_electricity_consumption = self.env.net_fossil_electricity_consumption[self.env.time_step]
+        reward = self.price_solar_penalty.calculate() - district_fossil_electricity_consumption
+
+        return reward.tolist()
+
+
 class IndependentSACReward(RewardFunction):
     def __init__(self, env: CityLearnEnv):
         super().__init__(env)
@@ -153,6 +178,7 @@ class SolarPenaltyReward(RewardFunction):
 
         return reward
 
+
 class OwnSolarPenaltyReward(RewardFunction):
     def __init__(self, env: CityLearnEnv):
         super().__init__(env)
@@ -214,6 +240,7 @@ class OwnSolarPenaltyReward(RewardFunction):
             reward = reward_list
 
         return reward
+
 
 class PricePenaltyReward(RewardFunction):
     def __init__(self, env: CityLearnEnv):
