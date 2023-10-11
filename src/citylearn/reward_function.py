@@ -100,7 +100,7 @@ class OwnMARL(RewardFunction):
         """
 
         district_fossil_electricity_consumption = self.env.net_fossil_electricity_consumption[self.env.time_step]
-        reward = self.price_solar_penalty.calculate() - district_fossil_electricity_consumption
+        reward = np.array(self.price_solar_penalty.calculate()) - district_fossil_electricity_consumption
 
         return reward.tolist()
 
@@ -125,7 +125,7 @@ class OwnMARL2(RewardFunction):
         """
 
         district_electricity_consumption = self.env.net_electricity_consumption_positive[self.env.time_step]
-        reward = self.price_solar_penalty.calculate() - district_electricity_consumption
+        reward = np.array(self.price_solar_penalty.calculate()) - district_electricity_consumption
 
         return reward.tolist()
 
@@ -150,7 +150,7 @@ class OwnMARL3(RewardFunction):
         """
 
         district_electricity_consumption = self.env.net_electricity_consumption_positive[self.env.time_step]
-        reward = self.price_solar_penalty.calculate() * district_electricity_consumption
+        reward = np.array(self.price_solar_penalty.calculate()) * district_electricity_consumption
 
         return reward.tolist()
 
