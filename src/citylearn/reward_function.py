@@ -124,8 +124,8 @@ class OwnMARL2(RewardFunction):
         where :math:`e` is the building `electricity_consumption` and :math:`E` is the district `electricity_consumption`.
         """
 
-        district_electricity_consumption = self.env.net_electricity_consumption[self.env.time_step]
-        reward = self.price_solar_penalty.calculate() - np.nanmax(district_electricity_consumption)
+        district_electricity_consumption = self.env.net_electricity_consumption_positive[self.env.time_step]
+        reward = self.price_solar_penalty.calculate() - district_electricity_consumption
 
         return reward.tolist()
 
@@ -149,8 +149,8 @@ class OwnMARL3(RewardFunction):
         where :math:`e` is the building `electricity_consumption` and :math:`E` is the district `electricity_consumption`.
         """
 
-        district_electricity_consumption = self.env.net_electricity_consumption[self.env.time_step]
-        reward = self.price_solar_penalty.calculate() * np.nanmax(district_electricity_consumption)
+        district_electricity_consumption = self.env.net_electricity_consumption_positive[self.env.time_step]
+        reward = self.price_solar_penalty.calculate() * district_electricity_consumption
 
         return reward.tolist()
 
