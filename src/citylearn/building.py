@@ -82,7 +82,7 @@ class Building(Environment):
         self.__observation_epsilon = 0.0 # to avoid out of bound observations
         self.unnormalized_observation_space_limits = None
         self.normalized_observation_space_limits = None
-        self.observation_space = self.estimate_observation_space()
+        self.observation_space = self.estimate_observation_space()[0]
         self.action_space = self.estimate_action_space()
 
         arg_spec = inspect.getfullargspec(super().__init__)
@@ -809,7 +809,7 @@ class Building(Environment):
         energy = action*self.electrical_storage.capacity
         self.electrical_storage.charge(energy)
 
-    def estimate_observation_space(self, normalize: bool = None) -> spaces.Box:
+    def estimate_observation_space(self, normalize: bool = None) -> (spaces.Box, Mapping, Mapping):
         r"""Get estimate of observation spaces.
 
         Parameters
@@ -837,8 +837,14 @@ class Building(Environment):
             low_limit = list(low_limit.values())
             high_limit = list(high_limit.values())
         
-        return spaces.Box(low=np.array(low_limit, dtype='float32'), high=np.array(high_limit, dtype='float32'))
-    
+        return spaces.Box(low=np.array(low_limit, dtype='float32'), high=np.array(high_limit, dtype='float32')), \
+               low_limit, high_limit
+
+
+    def update_observation_space(self):
+        _, low_limit, high_limit = self.estimate_observation_space(normalize = None)
+
+
     def estimate_observation_space_limits(self, normalize: bool = None) -> Tuple[Mapping[str, float], Mapping[str, float]]:
         r"""Get estimate of observation space limits.
 

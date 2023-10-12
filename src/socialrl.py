@@ -245,6 +245,7 @@ if __name__ == '__main__':
     else:
         demonstrators_count = opts.demonstrators
 
+    print(DATASET_NAME)
     train(dataset_name=DATASET_NAME, random_seed=seed, building_count=building_count,
           demonstrators_count=demonstrators_count, episodes=episodes, discount=discount,
           active_observations=active_observations, batch_size=batch_size, autotune_entropy=autotune_entropy,

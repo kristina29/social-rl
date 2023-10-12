@@ -57,7 +57,7 @@ class CityLearnEnv(Environment, Env):
         self.schema = schema
         self.__rewards = None
         self.root_directory, self.buildings, self.simulation_start_time_step, self.simulation_end_time_step, self.seconds_per_time_step, \
-        self.reward_function, self.central_agent, self.shared_observations = self.__load(
+        self.reward_function, self.central_agent, self.shared_observations, self.interchanged_observations = self.__load(
             root_directory=root_directory,
             buildings=buildings,
             simulation_start_time_step=simulation_start_time_step,
@@ -129,6 +129,12 @@ class CityLearnEnv(Environment, Env):
         return self.__shared_observations
 
     @property
+    def interchanged_observations(self) -> List[str]:
+        """Names of observtions that are individual between each building but shared for the other ones."""
+
+        return self.__interchanged_observations
+
+    @property
     def done(self) -> bool:
         """Check if simulation has reached completion."""
         return self.time_step == self.time_steps - 1
@@ -160,7 +166,8 @@ class CityLearnEnv(Environment, Env):
             ]
             observation_space = [spaces.Box(low=np.array(low_limit), high=np.array(high_limit), dtype=np.float32)]
         else:
-            observation_space = [b.observation_space for b in self.buildings]
+            observation_space = [b.observation_space + len(self.interchanged_observations) * (len(self.buildings) - 1)
+                                 for b in self.buildings]
 
         return observation_space
 
@@ -198,11 +205,21 @@ class CityLearnEnv(Environment, Env):
         The `shared_observations` values are only included in the first building's observation values. If `central_agent` is False, a list of sublists 
         is returned where each sublist is a list of 1 building's observation values and the sublist in the same order as `buildings`.
         """
-
+        self.add_shared_observations(None)
         return [[
             v for i, b in enumerate(self.buildings) for k, v in b.observations().items() if
             i == 0 or k not in self.shared_observations
         ]] if self.central_agent else [list(b.observations().values()) for b in self.buildings]
+
+    def add_shared_observations(self, observations):
+        shared_obs = ['non_shiftable_load', 'solar_generation', 'electrical_storage_soc', 'net_electricity_consumption']
+
+        for current_b in self.buildings:
+            b_observations = list(current_b.observations().values())
+            for other_b in self.buildings:
+                if not current_b == other_b:
+                    for obs in shared_obs:
+                        b_observations.append(other_b.observations()[obs])
 
     @property
     def observation_names(self) -> List[List[str]]:
@@ -668,6 +685,10 @@ class CityLearnEnv(Environment, Env):
     def shared_observations(self, shared_observations: List[str]):
         self.__shared_observations = self.get_default_shared_observations() if shared_observations is None else shared_observations
 
+    @interchanged_observations.setter
+    def interchanged_observations(self, interchanged_observations: List[str]):
+        self.__interchanged_observations = [] if interchanged_observations is None else interchanged_observations
+
     @staticmethod
     def get_default_shared_observations() -> List[str]:
         """Names of default common observations across all buildings i.e. observations that have the same value irrespective of the building.
@@ -1032,7 +1053,7 @@ class CityLearnEnv(Environment, Env):
         return agent
 
     def __load(self, **kwargs) -> Tuple[
-        List[Building], int, float, 'citylearn.reward_function.RewardFunction', bool, List[str]]:
+        List[Building], int, float, 'citylearn.reward_function.RewardFunction', bool, List[str], List[str]]:
         """Return `CityLearnEnv` and `Controller` objects as defined by the `schema`.
         
         Returns
@@ -1049,6 +1070,8 @@ class CityLearnEnv(Environment, Env):
             Expect 1 central agent to control all building storage device.
         shared_observations : List[str], optional
             Names of common observations across all buildings i.e. observations that have the same value irrespective of the building.
+        interchanged_observations: List[str], optional
+            Names of observtions that are individual between each building but shared for the other ones.
         """
 
         if isinstance(self.schema, (str, Path)) and os.path.isfile(self.schema):
@@ -1075,6 +1098,8 @@ class CityLearnEnv(Environment, Env):
         actions = {a: v for a, v in self.schema['actions'].items() if v['active']}
         shared_observations = kwargs['shared_observations'] if kwargs.get('shared_observations') is not None else \
             [k for k, v in observations.items() if v['shared_in_central_agent']]
+        interchanged_observations = kwargs['interchanged_observations'] if kwargs.get('interchanged_observations') \
+            is not None else [k for k, v in observations.items() if v['interchanged_between_agents']]
         simulation_start_time_step = kwargs['simulation_start_time_step'] if kwargs.get(
             'simulation_start_time_step') is not None else \
             self.schema['simulation_start_time_step']
@@ -1209,14 +1234,23 @@ class CityLearnEnv(Environment, Env):
                             else:
                                 pass
 
-                    building.observation_space = building.estimate_observation_space()
+                    building.observation_space = building.estimate_observation_spacexc()
                     building.action_space = building.estimate_action_space()
                     buildings += (building,)
 
                 else:
                     continue
 
+        for building_name, building_schema in self.schema['buildings'].items():
+            if building_schema['include']:
+                for obs in interchanged_observations:
+                    observation_metadata[f'{obs}_{other_building_name}'] = True
+
         buildings = list(buildings)
+
+        if len(interchanged_observations) > 0:
+            for b in buildings:
+                b.observation_space = building.update_observation_space(buildings, interchanged_observations)
 
         if kwargs.get('reward_function') is not None:
             reward_function = kwargs['reward_function']
@@ -1229,7 +1263,7 @@ class CityLearnEnv(Environment, Env):
             reward_function_constructor = getattr(importlib.import_module(reward_function_module), reward_function_name)
             reward_function = reward_function_constructor(self, **reward_function_attributes)
 
-        return root_directory, buildings, simulation_start_time_step, simulation_end_time_step, seconds_per_time_step, reward_function, central_agent, shared_observations
+        return root_directory, buildings, simulation_start_time_step, simulation_end_time_step, seconds_per_time_step, reward_function, central_agent, shared_observations, interchanged_observations
 
 
 class Error(Exception):
