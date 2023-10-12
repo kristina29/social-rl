@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import List, Tuple
+from typing import List, Tuple, Mapping
 import numpy as np
 
 try:
@@ -116,7 +116,7 @@ class MARLISA(SAC):
         self.__iterations = 2 if iterations is None else iterations
 
     def update(self, observations: List[List[float]], actions: List[List[float]], reward: List[float],
-               next_observations: List[List[float]], done: bool):
+               next_observations: List[List[float]], done: bool) -> Mapping[int, Mapping[str, List[float]]]:
         r"""Update replay buffer.
 
         Parameters
@@ -135,10 +135,16 @@ class MARLISA(SAC):
 
         # Run once the regression model has been fitted
         # Normalize all the observations using periodical normalization, one-hot encoding, or -1, 1 scaling. It also removes observations that are not necessary (solar irradiance if there are no solar PV panels).
+        losses = {}
 
         for i, (o, a, r, n, c0, c1) in enumerate(
                 zip(observations, actions, reward, next_observations, self.coordination_variables_history[0],
                     self.coordination_variables_history[1])):
+            current_losses = {'q1_losses': [],
+                              'q2_losses': [],
+                              'policy_losses': [],
+                              'alpha_losses': []}
+
             if self.information_sharing:
                 # update regression buffer
                 variables = np.hstack(np.concatenate((self.get_encoded_regression_variables(i, o), a)))
@@ -222,59 +228,18 @@ class MARLISA(SAC):
                     pass
 
                 for _ in range(self.update_per_time_step):
-                    o, a, r, n, d = self.replay_buffer[i].sample(self.batch_size)
-                    tensor = torch.cuda.FloatTensor if self.device.type == 'cuda' else torch.FloatTensor
-                    o = tensor(o).to(self.device)
-                    n = tensor(n).to(self.device)
-                    a = tensor(a).to(self.device)
-                    r = tensor(r).unsqueeze(1).to(self.device)
-                    d = tensor(d).unsqueeze(1).to(self.device)
-
-                    with torch.no_grad():
-                        # Update Q-values. First, sample an action from the Gaussian policy/distribution for the current (next) observation and its associated log probability of occurrence.
-                        new_next_actions, new_log_pi, _ = self.policy_net[i].sample(n)
-
-                        # The updated Q-value is found by subtracting the logprob of the sampled action (proportional to the entropy) to the Q-values estimated by the target networks.
-                        target_q_values = torch.min(
-                            self.target_soft_q_net1[i](n, new_next_actions),
-                            self.target_soft_q_net2[i](n, new_next_actions),
-                        ) - self.alpha * new_log_pi
-                        q_target = r + (1 - d) * self.discount * target_q_values
-
-                    # Update Soft Q-Networks
-                    q1_pred = self.soft_q_net1[i](o, a)
-                    q2_pred = self.soft_q_net2[i](o, a)
-                    q1_loss = self.soft_q_criterion(q1_pred, q_target)
-                    q2_loss = self.soft_q_criterion(q2_pred, q_target)
-                    self.soft_q_optimizer1[i].zero_grad()
-                    q1_loss.backward()
-                    self.soft_q_optimizer1[i].step()
-                    self.soft_q_optimizer2[i].zero_grad()
-                    q2_loss.backward()
-                    self.soft_q_optimizer2[i].step()
-
-                    # Update Policy
-                    new_actions, log_pi, _ = self.policy_net[i].sample(o)
-                    q_new_actions = torch.min(
-                        self.soft_q_net1[i](o, new_actions),
-                        self.soft_q_net2[i](o, new_actions)
-                    )
-                    policy_loss = (self.alpha * log_pi - q_new_actions).mean()
-                    self.policy_optimizer[i].zero_grad()
-                    policy_loss.backward()
-                    self.policy_optimizer[i].step()
-
-                    # Soft Updates
-                    for target_param, param in zip(self.target_soft_q_net1[i].parameters(),
-                                                   self.soft_q_net1[i].parameters()):
-                        target_param.data.copy_(target_param.data * (1.0 - self.tau) + param.data * self.tau)
-
-                    for target_param, param in zip(self.target_soft_q_net2[i].parameters(),
-                                                   self.soft_q_net2[i].parameters()):
-                        target_param.data.copy_(target_param.data * (1.0 - self.tau) + param.data * self.tau)
+                    _, q1_loss, q2_loss, policy_loss, alpha_loss = self.update_step(i)
+                    current_losses['q1_losses'].append(q1_loss)
+                    current_losses['q2_losses'].append(q2_loss)
+                    current_losses['policy_losses'].append(policy_loss)
+                    current_losses['alpha_losses'].append(alpha_loss)
 
             else:
                 pass
+
+            losses[i] = current_losses
+
+        return losses
 
     def get_post_exploration_prediction(self, observations: List[List[float]], deterministic: bool) -> List[
         List[float]]:

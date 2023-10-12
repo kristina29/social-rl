@@ -32,17 +32,13 @@ scp src/citylearn/data/nydata/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz
 
 scp src/citylearn/data/nnb_limitobs2/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nnb_limitobs2/
 
-mv agents/SAC_agent_20231002T132420.pkl agents/SAC_agent_Building5.pkl
-
-mv agents/SAC_agent_20231002T132428.pkl agents/SAC_agent_Building6.pkl
-
-
-
 
 
 scp src/citylearn/data/nydata_new_buildings2/schema.json klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nydata_new_buildings2/
 
 scp src/citylearn/data/nnb_limitobs1/schema.json klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nnb_limitobs1/
+
+scp src/citylearn/data/nnb_limitobs1_marlisa/schema.json klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nnb_limitobs1_marlisa/
 
 
 scp src/citylearn/data/nnblo1_onlyb5shifted/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nnblo1_onlyb5shifted/

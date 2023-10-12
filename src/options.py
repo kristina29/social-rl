@@ -58,9 +58,20 @@ def parseOptions_social():
     return opts
 
 
+def parseOptions_marlisa():
+    optParser = OptionParser(option_class=ExtendedOption)
+    optParser = add_nonsocial_options(optParser)
+    optParser.add_option('--information_sharing', action='store_true', default=False, dest='information_sharing',
+                         help='Share information between the agents.')
+
+    opts, args = optParser.parse_args()
+
+    return opts
+
+
 def add_nonsocial_options(optParser):
     optParser.add_option('-s', '--schema', action='store', type='string', dest='schema',
-                         default='nydata',
+                         default='nnb_limitobs1',
                          help='Name of the directory including the schema and data files')
     optParser.add_option('-r', '--randomseed', action='store', type='int', dest='seed',
                          help='Random seed to create reproducible results. If not defined, no fixed seed is used.')
