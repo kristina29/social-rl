@@ -165,7 +165,7 @@ def generate_sacdb2value():
         demo = dir[1]['demos']
         extra_pol = dir[1]['extra_pols']
 
-        for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2]:
+        for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.4, 0.6, 0.8]:
             try:
                 file = glob.glob(f'../experiments/SAC_DB2Value/{dir[1]["paths"]}/ir{ir}/kpis_*.csv')[0]
                 kpis = pd.read_csv(file)
@@ -179,7 +179,7 @@ def generate_sacdb2value():
                 demos.append(demo)
                 fossil_energy_consumptions.append(v)
             except:
-                pass
+                print('Missing')
 
     colors = {0.0001: 'tab:blue',
               0.001: 'tab:orange',
@@ -188,7 +188,10 @@ def generate_sacdb2value():
               0.05: 'tab:purple',
               0.1: 'tab:brown',
               0.15: 'tab:pink',
-              0.2: 'tab:grey'}
+              0.2: 'tab:grey',
+              0.4: 'yellow',
+              0.6: 'black',
+              0.8: 'magenta'}
     markers = {0: 'o', 1: 'X'}
     demo_pos = {2: 1,
                 4: 2,
@@ -204,6 +207,7 @@ def generate_sacdb2value():
                              'extra_pols': extra_pols})
 
     fig, ax = plt.subplots(figsize=(12, 7))
+    final_df['irs'] = final_df['irs'].astype(str)
 
     if var == 1:
         for i, v in enumerate(final_df['fossil_energy_consumptions']):
@@ -211,7 +215,7 @@ def generate_sacdb2value():
     else:
         ax = sns.scatterplot(x=final_df['demos'].map(demo_pos),
                              y='fossil_energy_consumptions',
-                             hue=final_df['irs'].map(colors),
+                             hue=final_df['irs'].values,#.map(colors),
                              data=final_df,
                              style='extra_pols',
                              zorder=4)
@@ -244,7 +248,7 @@ def generate_sacdb2value():
 
     labels = [f'ir {i}' for i in colors.keys()] + ["No extra policy update", "Extra policy update"]
 
-    plt.legend(handles, labels, bbox_to_anchor=(1.05, 1), loc='upper left')
+    #plt.legend(handles, labels, bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.title('SACDB2 Value')
 
 
