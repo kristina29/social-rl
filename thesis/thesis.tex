@@ -24,6 +24,7 @@
 \usepackage{tabularx}
 \usepackage{url}
 \usepackage{amsmath}
+\usepackage[permil]{overpic}
 
 \newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
 \DeclareMathOperator*{\argmax}{arg\,max}
@@ -242,41 +243,41 @@ As defined by Sutton and Barto \cite{sutton2018reinforcement}, RL is a machine l
 
 \begin{figure}[htb]
      \center
-     \includegraphics[width=\textwidth]{figures/rl_overview.pdf}
+     \begin{overpic}[width=\textwidth, trim={0 1.7cm 0 0.3cm},clip]{figures/rl_overview_blank.pdf}%
+	\put(455,415){Agent}%
+	\put(450,351){Policy $\pi$}%
+	\put(503,290){\small Policy update}%
+	\put(409,223){RL Algorithm}%
+	\put(780,332){Action $a_t$}%
+	\put(120,332){State $s_t$}%
+	\put(503,122){\small Reward $r_t$}%
+	\put(417,60){Environment}%
+    \end{overpic}
   \caption[Reinforcement Learning Overview]{In RL, the agent observes the state of the environment $s_t$ at timestep $t$ via the observation $o_t$. The policy $\pi$ determines the agent's action $a_t$, which in turn determines the next state $s_{t+1}$ of the environment and the environment sends an reward $r_t$ to the agent. The policy of the agent is trained using the observation, the action, and the reward,}
   \label{fig:rl_overview}
 \end{figure}
 
 \noindent
-Figure \ref{fig:rl_overview} shows the general RL approach. RL problems are often formulated as finite MDPs, where the agent interacts with the environment over a series of time steps. At each time step $t$, the agent observes the current state of the environment, denoted as $s_t \in \mathcal{S}$. The agent selects an action $a_t \in \mathcal{A}$ using its, in this case stochastic, policy $\pi(a_t|s_t)$, which maps from the state to the probability of selecting the action. As a consequence of the chosen action, the agent receives at the next time step a numerical reward $r_{t+1}\in\mathcal{R} \subset \mathbb{R}$ and a new state $s_{t+1}\in \mathcal{S}$. Both are used in the RL algorithm to optimize the policy to maximize the expected sum of long-term rewards.
+Figure \ref{fig:rl_overview} shows the general RL approach. RL problems are often formulated as finite MDPs, where the agent interacts with the environment over a series of time steps. At each time step $t$, the agent observes the current state of the environment, denoted as $s_t \in \mathcal{S}$. The agent selects an action $a_t \in \mathcal{A}$ using its, in this case stochastic, policy $\pi(a_t|s_t)$, which maps from the state to the probability of selecting the action. As a consequence of the chosen action, the agent receives at the next time step a numerical reward $r_{t+1}\in\mathcal{R} \subset \mathbb{R}$ and a new state $s_{t+1}\in \mathcal{S}$. Both are used in the RL algorithm to optimize the policy to maximize the expected sum of discounted rewards.
 
-\todo[inline]{discrete spaces, markov property}
+The dynamics of the MDP are captured by a function $p': \mathcal{S}\times\mathcal{R}\times\mathcal{S}\times\mathcal{A} \rightarrow [0,1]$. This function represents the probability of transitioning from state $s_t\in\mathcal{S}$ to state $s_{t+1}\in\mathcal{S}$ and receiving reward $r_{t+1}\in\mathcal{R}$ when the action $a_t\in\mathcal{A}$ is taken.
+%\begin{equation}
+%p(s', r \mid s,a)=P(s_t=s', r_t=r \mid s_{t-1}=s, a_{t-1}=a)
+%\end{equation}
+Using this function, we can calculate additional quantities of interest. The state transition probability defined as function $p: \mathcal{S}\times\mathcal{S}\times\mathcal{A} \rightarrow [0,1]$ is the probability of transitioning to state $s_{t+1}$ when action $a_t$ is taken, given the current state is $s_t$.
+%\begin{equation}
+%p(s'\mid s,a)=P(s_t=s'\mid s_{t-1}=s, a_{t-1}=a) = \sum_{r\in\mathcal{R}}p(s',r \mid s,a)
+%\end{equation}
+Furthermore, we can calculate the expected reward for a given state-action pair $(s_t,a_t)$ as a function $r: \mathcal{S}\times\mathcal{A}\rightarrow \mathbb{R}$.
+%\begin{equation}
+%r(s_t,a_t)=\mathbb{E}[r_t\mid s_{t-1}=s,a_{t-1}=a]=\sum_{r\in\mathcal{R}}r\sum_{s'\in\mathcal{S}}p(s',r\mid s,a)
+%\end{equation}
 
-The dynamics of the MDP are captured by a function $p: \mathcal{S}\times\mathcal{R}\times\mathcal{S}\times\mathcal{A} \rightarrow [0,1]$. This function represents the probability of transitioning from state $s\in\mathcal{S}$ to state $s'\in\mathcal{S}$ and receiving reward $r\in\mathcal{R}$ when the action $a\in\mathcal{A}$ is taken:
-\begin{equation}
-p(s', r \mid s,a)=P(s_t=s', r_t=r \mid s_{t-1}=s, a_{t-1}=a)
-\end{equation}
-Using the dynamics function $p$, we can calculate additional quantities of interest. The state-transition probability defined as function $p: \mathcal{S}\times\mathcal{S}\times\mathcal{A} \rightarrow [0,1]$ is the probability of transitioning to state $s'$ when action $a$ is taken, given the current state is $s$: 
-\begin{equation}
-p(s'\mid s,a)=P(s_t=s'\mid s_{t-1}=s, a_{t-1}=a) = \sum_{r\in\mathcal{R}}p(s',r \mid s,a)
-\end{equation}
-Furthermore, we can calculate the expected reward for a given state-action pair $(s,a)$ as function $r: \mathcal{S}\times\mathcal{A}\rightarrow \mathbb{R}$: 
-\begin{equation}
-r(s,a)=\mathbb{E}[r_t\mid s_{t-1}=s,a_{t-1}=a]=\sum_{r\in\mathcal{R}}r\sum_{s'\in\mathcal{S}}p(s',r\mid s,a)
-\end{equation}
-
-\begin{itemize}
-\item Goal: maximize expected discounted return $G_t = R_{t+1}+\gamma R_{t+2}+\gamma^2R_{t+3}+... = \sum_{k=0}^{\infty}\gamma^kR_{t+k+1}$ with discount rate $0 \leq \gamma \leq 1$
-\end{itemize} 
-
-
-The policy $\pi: \mathcal{S}=p(a_t|s_t)$ determines the action, which may also be deterministic. Also, reacting to the received action, the environment sends the agent a reward signal $r_t$. The agent's policy is trained to maximize the discounted total reward. 
-
-
+The state-value function, denoted by $V_{\pi}(s_t)$, represents the expected total discounted reward obtained when starting from state $s_t$ and following policy $\pi$. Similarly, the action-value function, denoted by $Q_{\pi}(s_t, a_t)$ is defined as the expected total discounted reward when starting in state $s_t$, taking action $a_t$ and then following the policy $\pi$. In this context, we refer to the action-value function as value function or Q-function.
 
 \subsection{Soft Actor-Critic}
 \label{sec:SAC}
-Handling continuous state and action spaces with tabular RL algorithms can be computationally intensive and requires a significant amount of memory. We opted for the SAC algorithm to address this issue. This algorithm is widely used in RL and is designed to efficiently handle continuous state and action spaces. In actor-critic methods, the 'actor' models the policy $\pi(a_t|s_t)$, while the 'critic' models the value function $Q(s_t,a_t)$. SAC is a model-free RL algorithm that maximizes the maximum entropy objective, which aims to increase the policy's entropy while keeping the expected return constant:
+Handling continuous state and action spaces with tabular RL algorithms can be computationally intensive and requires a significant amount of memory. We opted for the SAC algorithm to address this issue. This algorithm is widely used in RL and is designed to efficiently handle continuous state and action spaces. In actor-critic methods, the 'actor' models the policy $\pi(a_t|s_t)$, while the 'critic' models the value function $Q_\pi(s_t,a_t)$. SAC is a model-free RL algorithm that maximizes the maximum entropy objective, which aims to increase the policy's entropy while keeping the expected return constant:
 \begin{equation}
 	\pi^*=\argmax_{\pi}\sum_t \mathbb{E}_{(s_t,a_t)\sim\rho_{\pi}} \left [r(s_t,a_t)+\alpha \mathcal{H}(\pi(\cdot | s_t) \right ],
 \end{equation}
@@ -291,11 +292,12 @@ However, for continuous space and action dimensions, functional approximators ar
 \begin{equation}
 	J_Q(\theta)=\mathbb{E}_{(s_t,a_t)\sim\mathcal{D}}\left[\frac{1}{2}(Q_\theta(s_t,a_t)-(r(s_t,a_t)+\gamma\mathbb{E}_{s_{t+1}\sim p}\left[V_{\bar{\theta}}(s_{t+1}) \right ]))^2 \right],
 \end{equation}
-using replay buffer data $\mathcal{D}$. The update rule given by stochastic gradient decent is denoted as $\hat{\triangledown}_{\theta}J_Q(\theta)$. \todo[inline]{gamma, V, state transition probability p}
+using replay buffer data $\mathcal{D}$ and discount factor $\gamma$. The update rule given by stochastic gradient decent is denoted as $\hat{\triangledown}_{\theta}J_Q(\theta)$.
 %The update rule given by stochastic gradient decent is given by 
 %\begin{equation} \small
 %	\hat{\triangledown}_{\theta}J_Q(\theta)=\triangledown_{\theta} Q_{\theta}(a_t,s_t)(Q_{\theta}(s_t,a_t)-(r(s_t,a_t)+\gamma(Q_{\bar{\theta}}(s_{t+1},a_{t+1})-\alpha \log (\pi_\phi(a_{t+1}|s_{t+1})))).
 %\end{equation}
+
 The objective function for updating the policy is obtained by minimizing the expected KL divergence: 
 \begin{equation}
 	J_{\pi}(\phi)=\mathbb{E}_{s_t\sim\mathcal{D},\epsilon_t\sim\mathcal{N}}\left [\alpha \log \pi_{\phi}(f_{\phi}(\epsilon_t;s_t)|s_t)-Q_{\theta}(s_t, f_{\phi}(\epsilon_t;s_t)) \right ],
@@ -309,7 +311,6 @@ The temperature parameter $\alpha$ is important for the success of SAC and needs
 \begin{equation}
 	\max_{\pi_{0:T}}\mathbb{E}_{\rho_{\pi}}\left[\sum_{t=0}^Tr(s_t,a_t) \right ] \textbf{ s.t. } \mathbb{E}_{(s_t,a_t)\sim \rho_{\pi}}\left [-\log(\pi_t(a_t|s_t)) \right ] \geq \mathcal{H}~\forall t
 \end{equation}
-\todo[inline]{rho}
 After solving for the optimal soft Q-value function $Q^*_t$ and the optimal policy $\pi^*_t$, the optimal temperature parameter at time step $t$ is given by
 \begin{equation}\label{eq:obj-alpha}
 	\alpha^*_t = \argmin_{\alpha_t} \mathbb{E}_{a_t \sim \pi^*_t}\left [-\alpha_t \log \pi^*_t(a_t|s_t; \alpha_t)-\alpha_t \bar{\mathcal{H}} \right ].
