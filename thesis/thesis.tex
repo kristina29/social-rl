@@ -253,7 +253,7 @@ As defined by Sutton and Barto \cite{sutton2018reinforcement}, RL is a machine l
 	\put(503,122){\small Reward $r_t$}%
 	\put(417,60){Environment}%
     \end{overpic}
-  \caption[Reinforcement Learning Overview]{In RL, the agent observes the state of the environment $s_t$ at timestep $t$ via the observation $o_t$. The policy $\pi$ determines the agent's action $a_t$, which in turn determines the next state $s_{t+1}$ of the environment and the environment sends an reward $r_t$ to the agent. The policy of the agent is trained using the observation, the action, and the reward,}
+  \caption[Reinforcement Learning Overview]{In RL, the agent observes the state of the environment $s_t$ at timestep $t$. The agent takes an action $a_t$ based on the policy $\pi$. This action determines the next state of the environment $s_{t+1}$, and the environment sends a reward $r_{t+1}$ to the agent..}
   \label{fig:rl_overview}
 \end{figure}
 
@@ -284,15 +284,15 @@ Handling continuous state and action spaces with tabular RL algorithms can be co
 with state-action marginal induced by the policy $\rho_{\pi}(s_t,a_t)$, temperature parameter $\alpha$ and entropy $ \mathcal{H}$.
 The first part of this objective is equivalent to the classic maximizing total expected reward approach of RL algorithms, and the second term adds the maximum entropy of the policy. The temperature parameter controls the trade-off between these two. As $\alpha \rightarrow 0$, this objective is the same as in standard RL. The entropy term introduces stochasticity to the policy and thus favors exploration. 
 
-SAC can be derived form the Soft Policy Iteration, an algorithm that alternates between the policy evaluation step, where the soft Q-function of the current policy $\pi$ is calculated, and the policy iteration step, where the policy is improved in terms of its soft Q-value. 
-To ensure the tractability of the obtained policy, it is restricted to a set of possible policies $\Pi$ using the information projection in terms of the Kullback-Leibler (KL) divergence. 
-For tabular setting the convergence of the Soft Policy Iteration towards the optimal policy $\pi^* \in \Pi$ in terms of the maximum entropy RL is guaranteed.
+SAC can be derived from the Soft Policy Iteration, an algorithm that alternates between the policy evaluation step, where the soft Q-function of the current policy $\pi$ is calculated, and the policy iteration step, where the policy is improved in terms of its soft Q-value. 
+The set of possible policies $\Pi$ is constrained using the Kullback-Leibler (KL) divergence to ensure the tractability of the obtained policy.
+For the tabular setting, the convergence of the Soft Policy Iteration towards the optimal policy $\pi^* \in \Pi$ in terms of the maximum entropy RL is guaranteed.
 
-However, for continuous space and action dimensions, functional approximators are needed for the Q-value function $Q_{\theta}(s_t,a_t)$ and the policy $\pi_{\phi}(a_t|s_t)$ with parameters $\theta$ and $\phi$. For these, iterating the Soft Policy Iteration algorithm until convergence is computationally intractable. Hence the authors introduced SAC, alternating between optimizing these networks with stochastic gradient descent. The parameters of the soft Q-value functions are minimized using the soft Bellman residual using a target network with parameters $\bar{\theta}$ to stabilize training:
+However, for continuous space and action dimensions, functional approximators are needed for the Q-value function $Q_{\theta}(s_t,a_t)$ and the policy $\pi_{\phi}(a_t|s_t)$ with parameters $\theta$ and $\phi$. For these, iterating the Soft Policy Iteration algorithm until convergence is computationally intractable. Hence, the authors introduced SAC, alternating between optimizing these networks with stochastic gradient descent. The parameters of the soft Q-value functions are minimized using the soft Bellman residual using a target network with parameters $\bar{\theta}$ to stabilize training:
 \begin{equation}
 	J_Q(\theta)=\mathbb{E}_{(s_t,a_t)\sim\mathcal{D}}\left[\frac{1}{2}(Q_\theta(s_t,a_t)-(r(s_t,a_t)+\gamma\mathbb{E}_{s_{t+1}\sim p}\left[V_{\bar{\theta}}(s_{t+1}) \right ]))^2 \right],
 \end{equation}
-using replay buffer data $\mathcal{D}$ and discount factor $\gamma$. The update rule given by stochastic gradient decent is denoted as $\hat{\triangledown}_{\theta}J_Q(\theta)$.
+using replay buffer data $\mathcal{D}$ and discount factor $\gamma$. The update rule given by stochastic gradient descent is denoted as $\hat{\triangledown}_{\theta}J_Q(\theta)$.
 %The update rule given by stochastic gradient decent is given by 
 %\begin{equation} \small
 %	\hat{\triangledown}_{\theta}J_Q(\theta)=\triangledown_{\theta} Q_{\theta}(a_t,s_t)(Q_{\theta}(s_t,a_t)-(r(s_t,a_t)+\gamma(Q_{\bar{\theta}}(s_{t+1},a_{t+1})-\alpha \log (\pi_\phi(a_{t+1}|s_{t+1})))).
@@ -307,7 +307,7 @@ where the policy is reparametrizied by a neural network $a_t=f_{\phi}(\epsilon_t
 %	\hat{\triangledown}_{\phi}J_{\pi}(\phi)=\triangledown_{\phi}\alpha\log (\pi_{\phi}(a_t|s_t))+(\triangledown_{a_t}\alpha \log (\pi_{\phi}(a_t|s_t))-\triangledown_{a_t}Q(s_t,a_t))\triangledown_{\phi}f_{\phi}(\epsilon_t;s_t).
 %\end{equation}
 
-The temperature parameter $\alpha$ is important for the success of SAC and needs to be tuned for each task individually. Even during training of one single task it would be advantageous if $\alpha$ would be adjustable: In regions, where the policy is very sure about the best action, the entropy should be rather small and thus the policy deterministic. In regions, where the policy is unsure, exploration should be enhanced. Thus the authors presented a solution for adjusting the temperature parameter automatically and proved is theoretical optimalicy in the tabular setting. For this, the new objective considers the target minimum entropy $\mathcal{H}$ in a constraint to the classical maximum reward approach:
+The temperature parameter $\alpha$ is essential for the success of SAC and needs to be tuned for each task individually. Even during training of one single task, it would be advantageous if $\alpha$ would be adjustable: In regions where the policy is very sure about the best action, the entropy should be rather small and thus the policy deterministic. In regions where the policy is unsure, exploration should be enhanced. Thus, the authors presented a solution for adjusting the temperature parameter automatically and proved its theoretical optimality in the tabular setting. For this, the new objective considers the target minimum entropy $\mathcal{H}$ in a constraint to the classical maximum reward approach:
 \begin{equation}
 	\max_{\pi_{0:T}}\mathbb{E}_{\rho_{\pi}}\left[\sum_{t=0}^Tr(s_t,a_t) \right ] \textbf{ s.t. } \mathbb{E}_{(s_t,a_t)\sim \rho_{\pi}}\left [-\log(\pi_t(a_t|s_t)) \right ] \geq \mathcal{H}~\forall t
 \end{equation}
