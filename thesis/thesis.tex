@@ -245,7 +245,7 @@ Referenzen: \cite{SaaSchTue97,TueConSaa96ismis,SchTueSaa98preprint}
 \label{sec:city-learn-presentation}
 CityLearn \cite{vazquez2020citylearn} is a framework that utilizes RL applications to simulate and optimize building energy management. The framework requires the energy simulation of buildings as input data, which can include equipment electric power (i.e., non-shiftable load) and required energy for heating or cooling. For this work, only the non-shiftable load is taken into account. The buildings in the simulation are equipped with batteries that can be charged either with energy from the grid or their photovoltaic system. The amount of energy produced by the solar system at a point in time is also provided as an input time series. However, the buildings can only use their solar and battery energy themselves, so passing on surplus solar energy or discharging the battery to other buildings is not possible. The non-shiftable load must be covered by energy from the grid, produced solar energy, or discharging the battery at any time. An RL agent is trained for each building on charging or discharging its battery. By default, the framework operates hourly, expecting input data and actions to be performed hourly.
 
-In addition, CityLearn offers the possibility to upload data sets on the weather (temperature, humidity, solar irradiance), weather forecasts (6h, 12h and 24h ahead), energy prices (and forecasts) and carbon emissions. These data sets can be combined with time-specific data (month, day type, hour) and building-specific data (load, solar generation, battery state of charge, energy consumption from the grid) to create a comprehensive state of the environment that is passed to the RL agents. However, the buildings can only observe their own building-specific data by default. Detailed information about the predefined state and action variables can be found on the CityLearn website \footnote{\url{https://www.citylearn.net}}.
+In addition, CityLearn offers the possibility to upload data sets on the weather (temperature, humidity, solar irradiance), weather forecasts (6h, 12h and 24h ahead), energy prices (and forecasts) and carbon emissions. These data sets can be combined with time-specific data (month, day type, hour) and building-specific data (load, solar generation, battery state of charge, energy consumption from the grid) to create a comprehensive state of the environment that is passed to the RL agents. However, the buildings can only observe their own building-specific data by default. Detailed information about the predefined state and action variables can be found on the CityLearn website\footnote{\url{https://www.citylearn.net}}.
 
 The framework offers a range of key performance indicators (KPIs) based on the actions performed by the agents. These KPIs are available at both the building level and the district level (for all buildings combined). The framework is highly adaptable and can be customized to meet various objectives: Individual reward functions can be defined, custom data can be used, and custom algorithms can be used to train the agents.
 
@@ -260,6 +260,25 @@ First, we added the hourly fuel mix data from the grid as input. This dataset in
 and thus scaled to a value corresponding to the median energy consumption of the buildings. Here, $k$ is an optional scaling factor. If more energy is consumed from the grid than the renewable energy generated, we assume that this excess energy comes from fossil sources.
 
 Since a significant part of the renewable energy produced is wind energy, we further added the current wind speed in $m/s$ as well as the forecasts with a forecast horizon of 6h, 12h and 24h corresponding to the other forecasts in the framework to the state of the environment.
+
+\section{Datasets}
+\todo[inline]{(all units in kWh) ????!!!! Also in the following!!!!!!!!!!}
+\subsection{Building data}
+\label{sec:building-data}
+We utilized the data provided by CityLearn for the 2021 CityLearn Challenge \cite{citylearn-challenge} to build our building datasets. These datasets consist of the specifications for the battery and PV of 13 buildings, along with the non-shiftable load time series for one year. Each building has a battery with attributes specified in Appendix \ref{app:battery-attributes}. Also, Building 4 and Buildings 10-17 have a 5 kW nominal power PV, while all other buildings have a PV with a nominal power of 4 kW.
+
+We conducted a new simulation for the time series of solar power generation for the buildings, as we used different weather data than in the challenge. To carry out the simulation, we used the Python library pvlib \cite{holmgren2018pvlib} and followed the instructions provided on their website\footnote{see \url{https://pvlib-python.readthedocs.io/en/latest/gallery/adr-pvarray/plot_simulate_fast.html}}. The weather data we used is described in Section \ref{sec:weather-data}, and for the location, we used 42°17.98'N, -74°22.2'E. Furthermore, we set the default test condition power output of the PV for each building to be the maximum solar generation of the original data and added 500 W to attain a nearly equivalent median generation of all buildings as in the original dataset.
+
+To obtain the median values for energy consumption per hour, we trained the SAC agent with the default hyperparameters from CityLearn for three episodes using the default reward function and the weather data described in Section \ref{sec:weather-data}. The medians obtained are listed in the Appendix \ref{tab:building-medians}.
+
+\subsection{Fuelmix and Weather data}
+\label{sec:weather-data}
+The fuel mix data we used is obtained from the \textcolor{red}{NY-ISO}, retrieved on the 7th of June 2023 \cite{fuelmix_nyiso}. The original data provides the produced energy in MW for each of the energy sources dual fuel, natural gas, nuclear, \textcolor{red}{other fossil fuels}, wind, hydro, and \textcolor{red}{other renewables} for a time interval of 5 minutes for 2021 in the New York (NY) state. Since we are only interested in renewable (wind, hydro, other renewables) or non-renewable (all others) energy produced, we summed these values up and calculated the value in kWh. \todo[inline]{kW vs MW vs kWh????} To meed the hourly time steps of the building data, we calculated the hourly mean of the values, because \textcolor{red}{???}. The final fuelmix data contains the hourly amount of energy produced with renewable sources in kWh and the share of renewable energy produced calculated as the absolute amount of renewable energy produced devided by the total produced energy. The renewable share is calculated on the original time steps of five minutes, so for the final dataset here also the median per hour was calculated. Note, that this data does not include the solar generation of the buildings described in Chapter \ref{sec:building-data}, but only the renewable energy from the grid. 
+
+As weather data, we used data from the New York state too, in order to encourage correlation between the weather and the produced amount of renewable energy. We obtained the data from the \textcolor{red}{NSRDB} \cite{weather_nsrdb}. 
+\todo[inline]{foecasts}
+
+\todo[inline]{fuel mix scaled to 0.5 (somtetimes buildings use full available from grid -> capture this behaviour)}
 
 %% 
 \input{MM}
@@ -308,119 +327,61 @@ $total\_used\_of\_available_{t} = total\_used_{t} / total\_could\_have\_used_{t}
 %\setcounter{secnumdepth}{-1}
 %\section{Tables}\label{chap:App}
 \chapter{Appendix}\label{chap:App}
-\todo[inline]{only relevant ones?}
 \begin{table}[htb]
-\begin{tabularx}{\linewidth}{lX}
-name & description \\ \hline
-month & 1 (January) through 12 (December)\\
- day & type of day as provided by EnergyPlus (from 1 to 8). 1 (Sunday), 2 (Monday), ..., 7 (Saturday), 8 (Holiday)\\
- hour & hour of day (from 1 to 24)\\
- daylight\_savings\_status & indicates if the building is under daylight savings period (0 to 1). 0 indicates that the building has not changed its electricity consumption profiles due to daylight savings, while 1 indicates the period in which the building may have been affected.\\
- t\_out & outdoor temperature in Celcius degrees.\\
- t\_out\_pred\_6h & outdoor temperature predicted 6h ahead \\
- t\_out\_pred\_12h & outdoor temperature predicted 12h ahead \\
- t\_out\_pred\_24h & outdoor temperature predicted 24h ahead \\
- rh\_out & outdoor relative humidity in \%.\\
- rh\_out\_pred\_6h & outdoor relative humidity predicted 6h ahead \_\\
- rh\_out\_pred\_12h & outdoor relative humidity predicted 12h ahead \_\\
- rh\_out\_pred\_24h & outdoor relative humidity predicted 24h ahead \_\\
- diffuse\_solar\_rad & diffuse solar radiation in $W/m^2$.\\
- diffuse\_solar\_rad\_pred\_6h & diffuse solar radiation predicted 6h ahead \_\\
- diffuse\_solar\_rad\_pred\_12h & diffuse solar radiation predicted 12h ahead \_\\
- diffuse\_solar\_rad\_pred\_24h & diffuse solar radiation predicted 24h ahead \_\\
- direct\_solar\_rad & direct solar radiation in $W/m^2$. \\
- direct\_solar\_rad\_pred\_6h & direct solar radiation predicted 6h ahead \_\\ 
- direct\_solar\_rad\_pred\_12h & direct solar radiation predicted 12h ahead \_\\ 
- direct\_solar\_rad\_pred\_24h & direct solar radiation predicted 24h ahead \_\\ 
- t\_in & indoor temperature in Celcius degrees.\\ 
- avg\_unmet\_setpoint & average difference between the indoor temperatures and the cooling temperature setpoints in the different zones of the building in Celcius degrees. $sum((t\_in, t\_setpoint).clip(min=0) * zone\_volumes)/total\_volume$\\ 
- rh\_in & indoor relative humidity in \%.\\ 
- non\_shiftable\_load & electricity currently consumed by electrical appliances in kWh.\\ 
- solar\_gen & electricity currently being generated by photovoltaic panels in kWh.\\ 
- cooling\_storage\_soc & state of the charge (SOC) of the cooling storage device. From 0 (no energy stored) to 1 (at full capacity).\\ 
- dhw\_storage\_soc & state of the charge (SOC) of the domestic hot water (DHW) storage device. From 0 (no energy stored) to 1 (at full capacity).\\ 
- net\_electricity\_consumption & net electricity consumption of the building (including all energy systems) in the current time step.
+\begin{tabularx}{\linewidth}{lXc}
+Attribute name & Description & Value \\ \hline
+Capacity & Maximum amount of energy the storage device can store & 6.4 kWh \\
+Efficiency & Technical efficiency & 90 \% \\
+Capacity loss coefficient & Storage capacity lost in each charge and discharge cycle (as a fraction of the total capacity) & $1e^{-5}$ \\
+Loss coefficient & Standby hourly losses & 0 \\
+Nominal power & Maximum amount of electric power that the battery can use to charge or discharge & 5 \textcolor{red}{kW}
 \end{tabularx}
-\caption[States of the CityLearn Framework]{States of the CityLearn Framework \textcolor{red}{unvollständig} \cite{vazquez2020citylearn}}\label{tab:citylearn-states}
-\end{table}
-
-\begin{table}[htb]
-\begin{tabularx}{\linewidth}{lX}
-name & description \\ \hline
-month & 1 (January) through 12 (December)\\
-day\_type & type of day as provided by EnergyPlus (from 1 to 8). 1 (Sunday), 2 (Monday), ..., 7 (Saturday), 8 (Holiday)\\
-hour & hour of day (from 1 to 24)\\
- t\_out & outdoor temperature in Celcius degrees.\\
- t\_out\_pred\_6h & outdoor temperature predicted 6h ahead \textcolor{red}{(\nolinebreak accuracy: +-0.3C)}\\
- t\_out\_pred\_12h & outdoor temperature predicted 12h ahead \textcolor{red}{(\nolinebreak accuracy: +-0.65C)}\\
- t\_out\_pred\_24h & outdoor temperature predicted 24h ahead \textcolor{red}{(\nolinebreak accuracy: +-1.35C)}\\
- rh\_out & outdoor relative humidity in \%.\\
- rh\_out\_pred\_6h & outdoor relative humidity predicted 6h ahead \\
- rh\_out\_pred\_12h & outdoor relative humidity predicted 12h ahead \\
- rh\_out\_pred\_24h & outdoor relative humidity predicted 24h ahead \\
- diffuse\_solar\_rad & diffuse solar radiation in $W/m^2$.\\
- diffuse\_solar\_rad\_pred\_6h & diffuse solar radiation predicted 6h ahead \\
- diffuse\_solar\_rad\_pred\_12h & diffuse solar radiation predicted 12h ahead \\
- diffuse\_solar\_rad\_pred\_24h & diffuse solar radiation predicted 24h ahead \\
- direct\_solar\_rad & direct solar radiation in $W/m^2$. \\
- direct\_solar\_rad\_pred\_6h & direct solar radiation predicted 6h ahead \\ 
- direct\_solar\_rad\_pred\_12h & direct solar radiation predicted 12h ahead \\ 
- direct\_solar\_rad\_pred\_24h & direct solar radiation predicted 24h ahead \\ 
- wind\_speed & wind speed in $m/s$ \\
- wind\_speed\_pred\_6h & wind speed predicted 6h ahead \\
- wind\_speed\_pred\_12h & wind speed predicted 12h ahead \\
- wind\_speed\_pred\_24h & wind speed predicted 24h ahead \\
- non\_shiftable\_load & electricity currently consumed by electrical appliances in kWh.\\ 
- solar\_gen & electricity currently being generated by photovoltaic panels in kWh.\\ 
- electrical\_storage\_soc & SOC of the electrical storage from 0 (no energy stored) to 1 (at full capacity). \\
- net\_electricity\_consumption & net electricity consumption of the building (including all energy systems) in the current time step. \\
- electricity\_pricing & Electricity rate in $\$/kWh$ \\
- electricity\_pricing\_pred\_6h & Electricity rate predicted 6 hours ahead. \\
- electricity\_pricing\_pred\_12h & Electricity rate predicted 12 hours ahead. \\
- electricity\_pricing\_pred\_24h & Electricity rate predicted 24 hours ahead. \\
- renewable\_energy\_share & Share of renewable energy in the fuel mix of the grid.
-\end{tabularx}
-\caption[Observation space of the baseline SAC Agent]{Observation space of the baseline SAC Agent}\label{tab:citylearn-states}
-\label{app:observation-space-sac}
+\caption[Attributes of the batteries of each building]{Attributes of the batteries of each building. Description of the attributes obtained from \textcolor{red}{TODO source}}
+\label{app:battery-attributes}
 \end{table}
 
 %\chapter{Figures}\label{chap:App2}
 
 \begin{table}[htb]
-\begin{tabularx}{\linewidth}{lX}
-Attribute Name & Description \\  \hline
-Month & 1\\
-Hour & 2\\ 
-Day Type & 3\\
-Daylight Saving Status & 4\\
-Equipment Electric Power in kWh& 5\\
-Solar Generation in W/kW
-\end{tabularx}
-\caption{\textcolor{red}{Zweite Appendix-Tabelle}}
-\label{tab:buildings-vars}
-\end{table}
-
-\begin{table}[htb]
-\begin{tabularx}{\linewidth}{lXXXXXXX}
-Id & Demonstrator & Energy Consumption Median & Energy Consumption without storage Median & Energy Consumption without storage and PV Median \\  \hline
-1 & 0  & 0.54 & 0.58 & 0.81 \\
-2 & 0  & 0.45 & 0.49 & 0.74 \\
-3 & 0  & 0.25 & 0.28 & 0.56 \\
-4 & 0  & 0.52 & 0.54 & 0.94  \\
-5 & 0  & 0.29 & 0.29 & 0.74 \\
-6 & 0  & 0.5 & 0.56 & 1.08 \\
-7 & 0  & 0.21 & 0.21 & 0.33 \\
-8 & 0  & 0.31 & 0.32 & 0.68 \\
-9 & 0  & 0.36 & 0.38 & 0.46 \\
-10 & 0  & 0.56 & 0.65 & 0.98 \\
-11 & 0  & 0.66 & 0.71 & 1.19 \\
-12 & 0  & 0.0 & 0.0 & 0.0 \\
-13 & 0  & 0.43 & 0.48 & 0.97 \\
-14 & 0  & 0.49 & 0.48 & 0.59 \\
-15 & 0  & 0.12 & 0.0 & 0.0 \\
-16 & 0  & 0.55 & 0.72 & 1.2 \\
-17 & 0  & 0.75 & 0.82 & 1.24 \\
-\end{tabularx}
+\center
+\begin{tabular}{c|c}
+Building Id & Energy Consumption Median 
+%& Energy Consumption without storage Median & Energy Consumption without storage and PV Median 
+\\  \hline
+1  & 0.54 %& 0.58 & 0.81 
+\\
+2  & 0.45 %& 0.49 & 0.74 
+\\
+3  & 0.25 %& 0.28 & 0.56 
+\\
+4 & 0.52 %& 0.54 & 0.94  
+\\
+5 & 0.29 %& 0.29 & 0.74 
+\\
+6 & 0.5 % & 0.56 & 1.08 
+\\
+7 & 0.21 %& 0.21 & 0.33 
+\\
+8 & 0.31 %& 0.32 & 0.68 
+\\
+9  & 0.36 %& 0.38 & 0.46 
+\\
+10 & 0.56 %& 0.65 & 0.98
+\\
+11 & 0.66 %& 0.71 & 1.19 
+\\
+12 & 0.0 %& 0.0 & 0.0 
+\\
+13 & 0.43 %& 0.48 & 0.97 
+\\
+14 & 0.49 %& 0.48 & 0.59 
+\\
+15 & 0.12 %& 0.0 & 0.0 
+\\
+16 & 0.55 %& 0.72 & 1.2 
+\\
+17 & 0.75% & 0.82 & 1.24 \\
+\end{tabular}
 \caption{\textcolor{red}{Zweite Appendix-Tabelle}}
 \label{tab:building-medians}
 \end{table}
