@@ -2,29 +2,6 @@
 % Grundlagen
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Methods and Material}
-  \label{MetMat}
-
-\noindent
-\todo[inline]{Ziel dieses Kapitels ist eine Einf\"uhrung in die Thematik BlaBlaBla ...}
-
-\section{CityLearn Framework}
-\subsection{Presentation}
-\label{sec:city-learn-presentation}
-The CityLearn framework \cite{vazquez2020citylearn} aims to provide a standardized environment for multi-agent RL applications in the demand-side energy management. For this, hourly input datasets of building energy consumptions, weather and weather forecasts, and optional solar generation of buildings should be provided. The framework passes these information as state values to the agents (see Chapter \ref{sec:reinforcement-learning}) and calculates a number of key performance indicators (KPIs) based on the actions taken by the agents. The framework assumes that defined indoor temperatures of the buildings always have to be met. Thus, if the action of the agents do not reach this goal, the actions would be overwritten. Thereby, the framework provides flexibility for different goals: Individual reward functions can be defined, own data can be used and also own agents can be defined. These agents can either be multi-agent, so each building is defined as one agent, or central-agent, where all buildings are controlled by a single agent. The building data defines the electricity needed for non-shiftable devices, water heating, and space cooling and heating at each time step. Via storage devices for electricity, heating, or cooling, the buildings can load und unload these in their actions and thus optimize their energy consumption. Addtionally, each building can have a photovoltaic (PV) as additional energy source to the energy provided by the grid. If more energy is produced by the PV then used from the building, the overflow is wasted: No energy sharing between buildings is possible. 
-
-Detailed information about the pre-defined state and action variables are described in Appendix \ref{tab:citylearn-states}. \todo[inline]{electritcity consumption calculation of building}
-
-\subsection{Adaptions}
-Since our goal was to maximize the use of renewable energy and this was not possible with the current state of the CityLearn framework, we had to introduce some adaptions regarding the state space of the environment and the KPIs.
-
-First of all, we added the hourly fuel mix of the energy provided by the grid as input data. This includes the produced renewable energy in kilowatt hour (kWh) $E_{renewable}^t$ at time step $t$ and the share of available renewable energy of the total produced amount of energy. However, the former may not be in an appropriate scale for the energy consumed by the buildings in the simulations. Hence, the median electricity consumption per hour $\bar{E}_b$ in kWh is expected as input for each building $b \in B$. Then, the absolute produced renewable energy of the grid is calculated as 
-\begin{equation}
-	\hat{E}_{renewable}^t = E_{renewable}^t \cdot \sum_{b\in B} \bar{E}_b,
-\end{equation}
-and thus scaled to an value that, in the median, meets the energy consumption of the buildings. \todo[inline]{Lower?} If more energy from the grid is used than renewable calculated, we assume that this energy is produced by fossil sources.
-
-Next, since a large part of the renewable energy is wind energy, \todo[inline]{source or reference to introduction} we added the current wind speed in $m/s$ as well as the forecasts with a forecast horizon of 6h, 12h and 24h accordingly to the other weather data to the environment state. 
 
 
 \section{Datasets}
