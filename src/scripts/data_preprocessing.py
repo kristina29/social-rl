@@ -54,6 +54,7 @@ def preprocess_data(load_path, save_path, weather) -> pd.DataFrame:
         df = median_by_hour(df)
     else:
         df = read_fuel_data(load_path)
+        df = kwh_by_hour(df)
 
     df = add_daytype(df)
     df = correct_time_series_start(df)
@@ -90,6 +91,18 @@ def median_by_hour(df) -> pd.DataFrame:
     return df
 
 
+def kwh_by_hour(df) -> pd.DataFrame:
+    df['Renewable Sources [kWh]'] = 1/12 * df['Renewable Sources [kW]']
+    df['Other [kWh]'] = 1 / 12 * df['Other [kW]']
+    df = df.groupby(by=['Year', 'Month', 'Day', 'Hour']).sum().reset_index()
+    df['Hour'] = df['Hour'] + 1
+
+    df['Renewable Share'] = df['Renewable Sources [kWh]'] / (df['Renewable Sources [kWh]'] + df['Other [kWh]'])
+    df = df.drop(columns=['Renewable Sources [kW]', 'Other [kW]', 'Other [kWh]'])
+
+    return df
+
+
 def add_daytype(df) -> pd.DataFrame:
     # Add day type column equivalent to citylearn
     # Mo 2 Di 3 Mi 4 Do 5 Fr 6 Sa 7 So 1
@@ -109,7 +122,7 @@ def correct_time_series_start(df) -> pd.DataFrame:
     # hence drop columns from the begnning of the year until the last hour on last saturday in july
     # and append them to the end
     first_row_idx = df.index[(df['Month'] == 7) &
-                             (df['Hour'] == 0) &
+                             (df['Hour'] == 24) &
                              (df['Day Type'] == 7)].tolist()[-1]
     idx = df.index.tolist()
     del idx[:first_row_idx]
@@ -141,11 +154,11 @@ def read_fuel_data(load_dir) -> pd.DataFrame:
     fuel['Minute'] = pd.DatetimeIndex(fuel['Time Stamp']).minute
 
     # group by renewable and not renewable and convert given MW into kWh
-    fuel['Renewable Sources [kWh]'] = fuel[['Hydro', 'Wind', 'Other Renewables']].sum(axis=1) * 1000
-    fuel['Other [kWh]'] = fuel[['Dual Fuel', 'Natural Gas', 'Nuclear', 'Other Fossil Fuels']].sum(axis=1) * 1000
-    fuel['Renewable Share'] = fuel['Renewable Sources [kWh]'] / (fuel['Renewable Sources [kWh]'] + fuel['Other [kWh]'])
+    fuel['Renewable Sources [kW]'] = fuel[['Hydro', 'Wind', 'Other Renewables']].sum(axis=1) * 1000
+    fuel['Other [kW]'] = fuel[['Dual Fuel', 'Natural Gas', 'Nuclear', 'Other Fossil Fuels']].sum(axis=1) * 1000
+
     fuel = fuel.drop(columns=['Hydro', 'Wind', 'Other Renewables', 'Dual Fuel', 'Natural Gas', 'Nuclear',
-                              'Other Fossil Fuels', 'Other [kWh]'])
+                              'Other Fossil Fuels'])
 
     return fuel
 
