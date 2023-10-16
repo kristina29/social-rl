@@ -2,31 +2,6 @@
 % Grundlagen
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
-\subsection{Energy prices}
-For the energy prices, we used the pricing data set provided with the CityLearn challenge 2022 \cite{citylearn-challenge} and weighted the price information by the share of fossil energy in the grid. The basic dataset follows a electricity rate, where the electricity is cheaper in the early morning, late at night and during the months october to may. The detailed electricity prices are shown in Table \ref{tab:basic-prices}.
-\begin{table}[htb]
-\center
-\begin{tabular}{l|l|l|l|l}
-            & \multicolumn{2}{l|}{June - September} & \multicolumn{2}{l}{Oktober - May} \\
-Time        & Weekday           & Weekend          & Weekday         & Weekend         \\ \hline
-8 AM - 4 PM & 0.21                  &  0.21                & 0.20                 & 0.20                 \\
-4 PM - 9 PM & 0.54                  &  0.40                 & 0.50                & 0.50                \\
-9 PM - 8 AM & 0.21                  & 0.21                 &  0.20               &  0.20              
-\end{tabular}
-\caption[Electricity price rate CityLearn Challenge 2022]{Electricity price rate of the electricity price data set provided with the CityLearn Challenge 2022.}
-\label{tab:basic-prices}
-\end{table}
-
-We weighted these base prices $p_{base,t}$ at time step $t$ by the share of fossil energy using a weighting factor $\beta$:
-\begin{equation}
-	p_t = p_{base,t} + \beta  \cdot (1-\frac{E_{r,grid}}{E_{grid}}),
-\end{equation}
-where  $E_{r,grid}$ is the renewable amount of energy produced in the grid and $E_{grid}$ is the total amount of energy produced in the grid. Finally, we normalized the prices to be in the range between zero and one.
-
-\todo[inline]{foecasts}
-
 \section{Key Performance Indicators}
 We used three KPIs for evaluating the performance of the models. We first present the cost functions used for calculating the KPIs and then explain the calculation and interpretation of the KPIs.
 

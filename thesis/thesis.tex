@@ -167,11 +167,16 @@ Thesis period: 01.06.2023~-~01.12.2023
 \todo[inline]{TODO}
 \begin{tabbing}
 \textbf{FACTOTUM}\hspace{1cm}\=Schrott\kill
+\textbf{DHI}\>Diffuse Horizontal Irradiance \\
+\textbf{DNI}\>Direct Normal Irradiation \\
+\textbf{GHI}\>Global Horizontal Irradiance \\
 \textbf{KL divergence}\>Kullback-Leibler divergence \\
 \textbf{KPI}\>Key performance indicator \\
 \textbf{kWh}\>Kilowatt hour \\
 \textbf{MDP}\>Markov decision process \\
+\textbf{NSRDB}\>National Solar Radiation Database \\
 \textbf{NY}\> New York \\
+\textbf{NYISO}\>New York Independent System Operator \\
 \textbf{PV}\> Photovoltaic \\
 \textbf{RL}\>Reinforcement learning \\
 \textbf{SAC}\>Soft actor-critic \\
@@ -265,20 +270,47 @@ Since a significant part of the renewable energy produced is wind energy, we fur
 \todo[inline]{(all units in kWh) ????!!!! Also in the following!!!!!!!!!!}
 \subsection{Building data}
 \label{sec:building-data}
-We utilized the data provided by CityLearn for the 2021 CityLearn Challenge \cite{citylearn-challenge} to build our building datasets. These datasets consist of the specifications for the battery and PV of 13 buildings, along with the non-shiftable load time series for one year. Each building has a battery with attributes specified in Appendix \ref{app:battery-attributes}. Also, Building 4 and Buildings 10-17 have a 5 kW nominal power PV, while all other buildings have a PV with a nominal power of 4 kW.
+We utilized the data provided by CityLearn for the 2022 CityLearn Challenge \cite{citylearn-challenge} to build our building datasets. These datasets consist of the specifications for the battery and PV of 13 buildings, along with the non-shiftable load time series for one year. Each building has a battery with attributes specified in Appendix \ref{app:battery-attributes}. Also, Building 4 and Buildings 10-17 have a 5 kW nominal power PV, while all other buildings have a PV with a nominal power of 4 kW.
 
-We conducted a new simulation for the time series of solar power generation for the buildings, as we used different weather data than in the challenge. To carry out the simulation, we used the Python library pvlib \cite{holmgren2018pvlib} and followed the instructions provided on their website\footnote{see \url{https://pvlib-python.readthedocs.io/en/latest/gallery/adr-pvarray/plot_simulate_fast.html}}. The weather data we used is described in Section \ref{sec:weather-data}, and for the location, we used 42°17.98'N, -74°22.2'E. Furthermore, we set the default test condition power output of the PV for each building to be the maximum solar generation of the original data and added 500 W to attain a nearly equivalent median generation of all buildings as in the original dataset.
+We conducted a new simulation for the time series of solar power generation for the buildings, as we used different weather data than in the challenge. To carry out the simulation, we used the Python library pvlib \cite{holmgren2018pvlib} and followed the instructions provided on their website\footnote{see \url{https://pvlib-python.readthedocs.io/en/latest/gallery/adr-pvarray/plot_simulate_fast.html}}. The weather data we used is described in Section \ref{sec:weather-data}, and for the location, we used $42$°$17.98$N, $-74$°$22.2'$E. Furthermore, we set the default test condition power output of the PV for each building to be the maximum solar generation of the original data and added 500 W to attain a nearly equivalent median generation of all buildings as in the original dataset.
 
 To obtain the median values for energy consumption per hour, we trained the SAC agent with the default hyperparameters from CityLearn for three episodes using the default reward function and the weather data described in Section \ref{sec:weather-data}. The medians obtained are listed in the Appendix \ref{tab:building-medians}.
 
 \subsection{Fuelmix and Weather data}
-\label{sec:weather-data}
-The fuel mix data we used is obtained from the \textcolor{red}{NY-ISO}, retrieved on the 7th of June 2023 \cite{fuelmix_nyiso}. The original data provides the produced energy in MW for each of the energy sources dual fuel, natural gas, nuclear, \textcolor{red}{other fossil fuels}, wind, hydro, and \textcolor{red}{other renewables} for a time interval of 5 minutes for 2021 in the New York (NY) state. Since we are only interested in renewable (wind, hydro, other renewables) or non-renewable (all others) energy produced, we summed these values up and calculated the value in kWh. \todo[inline]{kW vs MW vs kWh????} To meed the hourly time steps of the building data, we calculated the hourly mean of the values, because \textcolor{red}{???}. The final fuelmix data contains the hourly amount of energy produced with renewable sources in kWh and the share of renewable energy produced calculated as the absolute amount of renewable energy produced devided by the total produced energy. The renewable share is calculated on the original time steps of five minutes, so for the final dataset here also the median per hour was calculated. Note, that this data does not include the solar generation of the buildings described in Chapter \ref{sec:building-data}, but only the renewable energy from the grid. 
-
-As weather data, we used data from the New York state too, in order to encourage correlation between the weather and the produced amount of renewable energy. We obtained the data from the \textcolor{red}{NSRDB} \cite{weather_nsrdb}. 
-\todo[inline]{forecasts}
-
 \todo[inline]{fuel mix scaled to 0.5 (somtetimes buildings use full available from grid -> capture this behaviour)}
+\label{sec:weather-data}
+For our analysis, we used fuel mix data from the New York Independent System Operator (NYISO), retrieved on June 7, 2023 \cite{fuelmix_nyiso}. The dataset provides the generated energy in MW for each of the energy sources dual fuel, natural gas, nuclear, other fossil fuel, wind, hydro, and other renewables for a 5-minute time interval for the year 2021 in New York State (NY). Since we are only interested in renewable (wind, hydro, other renewables) or fossil (all others) energy generated, we added up the values of the corresponding energy sources and converted the resulting values to kWh for hourly intervals. The preprocessed fuel mix data includes the hourly amount of energy generated by renewable energy sources in kWh and the share of renewable energy generated, which is calculated as the absolute amount of renewable energy generated divided by the total energy generated. Note that this data only includes renewable energy from the grid and does not include the building solar generation described in \ref{sec:building-data}.
+
+We utilized weather data from NY State to establish a correlation between weather and the amount of renewable energy generated. We obtained the data from the USA Continental \& Mexico dataset from the National Solar Radiation Database (NSRDB) on July 04, 2023. As attributes, we retrieved Global Horizontal Irradiance (GHI), Diffuse Horizontal Irradiance (DHI), Direct Normal Irradiation (DNI), Relative Humidity, Temperature, and Wind Speed at 5-minute intervals. Except for GHI, which we used to generate the solar production time series of the buildings, all values are part of the state of the environment. To better cover geographic differences, we collected these attributes from eight locations across New York State (see Figure \ref{fig:weather-locations}). We calculated the median across these locations and per hour to obtain a single hourly value for each attribute. The predictions for 6h, 12h, and 24h were based on the correct values, which means our predictions were perfect.
+
+\begin{figure}[htb]
+\center
+     \includegraphics[width=0.6\textwidth]{figures/locations.pdf}
+  \caption{Locations in NY State from which weather data was used.}
+  \label{fig:weather-locations}
+\end{figure}
+
+\subsection{Energy prices}
+We used the CityLearn Challenge 2022 price dataset to determine the energy prices. Then, we weighted the price information by the proportion of fossil fuel energy in the grid. The baseline dataset follows an electricity rate that offers lower prices during early morning, late evening, and from October to May. Table \ref{tab:basic-prices} shows the detailed electricity prices.
+\begin{table}[htb]
+\center
+\begin{tabular}{l|l|l|l|l}
+            & \multicolumn{2}{l|}{June - September} & \multicolumn{2}{l}{Oktober - May} \\
+Time        & Weekday           & Weekend          & Weekday         & Weekend         \\ \hline
+8 AM - 4 PM & 0.21                  &  0.21                & 0.20                 & 0.20                 \\
+4 PM - 9 PM & 0.54                  &  0.40                 & 0.50                & 0.50                \\
+9 PM - 8 AM & 0.21                  & 0.21                 &  0.20               &  0.20              
+\end{tabular}
+\caption[Electricity price rate CityLearn Challenge 2022]{Electricity price rate of the electricity price data set provided with the CityLearn Challenge 2022.}
+\label{tab:basic-prices}
+\end{table}
+
+To calculate the prices at a given time step, we first consider the basic prices $p_{base,t}$ at that time step as described above. Then, we factor in the share of fossil energy by using a weighting factor $\beta$:
+\begin{equation}
+	p_t = p_{base,t} + \beta \cdot (1-\frac{E_{r,grid}}{E_{grid}}).
+\end{equation}
+Here, $E_{r,grid}$ is the amount of renewable energy generated in the grid, and $E_{grid}$ is the total energy generated. Finally, we normalized the prices to be within a range of zero and one. We used the actual prices for the 6-hour, 12-hour, and 24-hour price predictions, just as we did for the weather data.
+
 
 %% 
 \input{MM}
