@@ -131,7 +131,7 @@ Decision Biasing is a method for modeling social learning. It observes which act
 
 Our approach is based on the 'DB2' method presented by Najar et al. \cite{najar2020actions}. In their experiment, the action space is binary. A 'decision value function' $Q'$ is used, which is a copy of the current value function used to derive the policy $\pi$. $Q'$ is biased towards the observed demonstrator actions as follows: 
 \begin{equation} 
-Q'(d) \leftarrow Q'(d) + \alpha_i \times [1-Q'(d)],
+Q'(d) \leftarrow Q'(d) + \alpha_i \cdot [1-Q'(d)],
 \end{equation}
 where $d$ is the observed demonstrator action and $\alpha_i $ is an imitation decision bias rate parameter. 
 
