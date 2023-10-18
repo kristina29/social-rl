@@ -24,8 +24,12 @@
 \usepackage{tabularx}
 \usepackage{url}
 \usepackage{amsmath}
+\usepackage[permil]{overpic}
+\usepackage{multirow}
 
 \newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
 
 \textwidth 14cm
 \textheight 22cm
@@ -164,11 +168,16 @@ Thesis period: 01.06.2023~-~01.12.2023
 \todo[inline]{TODO}
 \begin{tabbing}
 \textbf{FACTOTUM}\hspace{1cm}\=Schrott\kill
+\textbf{DHI}\>Diffuse Horizontal Irradiance \\
+\textbf{DNI}\>Direct Normal Irradiation \\
+\textbf{GHI}\>Global Horizontal Irradiance \\
 \textbf{KL divergence}\>Kullback-Leibler divergence \\
 \textbf{KPI}\>Key performance indicator \\
 \textbf{kWh}\>Kilowatt hour \\
 \textbf{MDP}\>Markov decision process \\
+\textbf{NSRDB}\>National Solar Radiation Database \\
 \textbf{NY}\> New York \\
+\textbf{NYISO}\>New York Independent System Operator \\
 \textbf{PV}\> Photovoltaic \\
 \textbf{RL}\>Reinforcement learning \\
 \textbf{SAC}\>Soft actor-critic \\
@@ -228,14 +237,286 @@ Referenzen: \cite{SaaSchTue97,TueConSaa96ismis,SchTueSaa98preprint}
 \cleardoublepage
 
 %% 
-\chapter{Background}
-\label{Background}
-\todo[inline]{Begriffserklärung: renewable energy (wind, solar, bla)}
-This chapter provides the necessary background knowledge to comprehend our approach to the presented problem. First, we introduce the fundamental concepts of reinforcement learning (RL), often modeled as finite Markov decision processes (MDP). However, considering the limitations of this traditional framework in handling continuous state and action spaces, we also delve into the soft actor-critic method as a promising solution.
-\todo[inline]{TODO}
-
 \input{Background}
 \cleardoublepage
+
+\chapter{Methods and Material}
+  \label{sec:met-mat}
+
+\noindent
+\todo[inline]{Ziel dieses Kapitels ist eine Einf\"uhrung in die Thematik BlaBlaBla ...}
+
+\section{CityLearn Framework}
+\subsection{Presentation}
+\label{sec:city-learn-presentation}
+CityLearn \cite{vazquez2020citylearn} is a framework that utilizes RL applications to simulate and optimize building energy management. The framework requires the energy simulation of buildings as input data, which can include equipment electric power (i.e., non-shiftable load) and required energy for heating or cooling. For this work, only the non-shiftable load is taken into account. The buildings in the simulation are equipped with batteries that can be charged either with energy from the grid or their photovoltaic system. The amount of energy produced by the solar system at a point in time is also provided as an input time series. However, the buildings can only use their solar and battery energy themselves, so passing on surplus solar energy or discharging the battery to other buildings is not possible. The non-shiftable load must be covered by energy from the grid, produced solar energy, or discharging the battery at any time. An RL agent is trained for each building on charging or discharging its battery. By default, the framework operates hourly, expecting input data and actions to be performed hourly.
+
+In addition, CityLearn offers the possibility to upload data sets on the weather (temperature, humidity, solar irradiance), weather forecasts (6h, 12h and 24h ahead), energy prices (and forecasts) and carbon emissions. These data sets can be combined with time-specific data (month, day type, hour) and building-specific data (load, solar generation, battery state of charge, energy consumption from the grid) to create a comprehensive state of the environment that is passed to the RL agents. However, the buildings can only observe their own building-specific data by default. Detailed information about the predefined state and action variables can be found on the CityLearn website\footnote{\url{https://www.citylearn.net}}.
+
+The framework offers a range of key performance indicators (KPIs) based on the actions performed by the agents. These KPIs are available at both the building level and the district level (for all buildings combined). The framework is highly adaptable and can be customized to meet various objectives: Individual reward functions can be defined, custom data can be used, and custom algorithms can be used to train the agents.
+
+\subsection{Adaptions}
+Our goal was to minimize fossil energy use, which was not possible with the current state of the CityLearn framework. Therefore, we had to make some extensions regarding the state space of the environment and the KPIs, which are explained below.
+
+First, we added the hourly fuel mix data from the grid as input. This dataset includes the renewable energy produced in kilowatt-hours (kWh) $E_{renewable}^t$ at time step $t$, as well as the percentage of renewable of the total energy produced. However, the former does not always correspond to the energy consumed by the buildings in the simulations. There would be too much or too little renewable energy available to compare the performance of the agents. Therefore, the median electricity consumption per hour $\bar{E}_b$ in kWh is expected as input for each building. Then, the absolute renewable energy generated by the grid is calculated as 
+\begin{equation}
+	\hat{E}_{renewable}^t = E_{renewable}^t \cdot k\sum_{b\in B} \bar{E}_b,
+\end{equation}
+and thus scaled to a value corresponding to the median energy consumption of the buildings. Here, $k$ is an optional scaling factor. If more energy is consumed from the grid than the renewable energy generated, we assume that this excess energy comes from fossil sources.
+
+Since a significant part of the renewable energy produced is wind energy, we further added the current wind speed in $m/s$ as well as the forecasts with a forecast horizon of 6h, 12h and 24h corresponding to the other forecasts in the framework to the state of the environment.
+
+\section{Datasets}
+\todo[inline]{(all units in kWh) ????!!!! Also in the following!!!!!!!!!!}
+\subsection{Building data}
+\label{sec:building-data}
+We utilized the data provided by CityLearn for the 2022 CityLearn Challenge \cite{citylearn-challenge} to build our building datasets. These datasets consist of the specifications for the battery and PV of 13 buildings, along with the non-shiftable load time series for one year. Each building has a battery with attributes specified in Appendix \ref{app:battery-attributes}. Also, Building 4 and Buildings 10-17 have a 5 kW nominal power PV, while all other buildings have a PV with a nominal power of 4 kW.
+
+We conducted a new simulation for the time series of solar power generation for the buildings, as we used different weather data than in the challenge. To carry out the simulation, we used the Python library pvlib \cite{holmgren2018pvlib} and followed the instructions provided on their website\footnote{see \url{https://pvlib-python.readthedocs.io/en/latest/gallery/adr-pvarray/plot_simulate_fast.html}}. The weather data we used is described in Section \ref{sec:weather-data}, and for the location, we used $42$°$17.98$N, $-74$°$22.2'$E. Furthermore, we set the default test condition power output of the PV for each building to be the maximum solar generation of the original data and added 500 W to attain a nearly equivalent median generation of all buildings as in the original dataset.
+
+To obtain the median values for energy consumption per hour, we trained the SAC agent with the default hyperparameters from CityLearn for three episodes using the default reward function and the weather data described in Section \ref{sec:weather-data}. The medians obtained are listed in the Appendix \ref{tab:building-medians}.
+
+\subsection{Fuelmix and Weather data}
+\todo[inline]{fuel mix scaled to 0.5 (somtetimes buildings use full available from grid -> capture this behaviour)}
+\label{sec:weather-data}
+For our analysis, we used fuel mix data from the New York Independent System Operator (NYISO), retrieved on June 7, 2023 \cite{fuelmix_nyiso}. The dataset provides the generated energy in MW for each of the energy sources dual fuel, natural gas, nuclear, other fossil fuel, wind, hydro, and other renewables for a 5-minute time interval for the year 2021 in New York State (NY). Since we are only interested in renewable (wind, hydro, other renewables) or fossil (all others) energy generated, we added up the values of the corresponding energy sources and converted the resulting values to kWh for hourly intervals. The preprocessed fuel mix data includes the hourly amount of energy generated by renewable energy sources in kWh and the share of renewable energy generated, which is calculated as the absolute amount of renewable energy generated divided by the total energy generated. Note that this data only includes renewable energy from the grid and does not include the building solar generation described in \ref{sec:building-data}.
+
+We utilized weather data from NY State to establish a correlation between weather and the amount of renewable energy generated. We obtained the data from the USA Continental \& Mexico dataset from the National Solar Radiation Database (NSRDB) on July 04, 2023. As attributes, we retrieved Global Horizontal Irradiance (GHI), Diffuse Horizontal Irradiance (DHI), Direct Normal Irradiation (DNI), Relative Humidity, Temperature, and Wind Speed at 5-minute intervals. Except for GHI, which we used to generate the solar production time series of the buildings, all values are part of the state of the environment. To better cover geographic differences, we collected these attributes from eight locations across New York State (see Figure \ref{fig:weather-locations}). We calculated the median across these locations and per hour to obtain a single hourly value for each attribute. The predictions for 6h, 12h, and 24h were based on the correct values, which means our predictions were perfect.
+
+\begin{figure}[htb]
+\center
+     \includegraphics[width=0.6\textwidth]{figures/locations.pdf}
+  \caption{Locations in NY State from which weather data was used.}
+  \label{fig:weather-locations}
+\end{figure}
+
+\subsection{Energy prices}
+We used the CityLearn Challenge 2022 price dataset to determine the energy prices. Then, we weighted the price information by the proportion of fossil fuel energy in the grid. The baseline dataset follows an electricity rate that offers lower prices during early morning, late evening, and from October to May. Table \ref{tab:basic-prices} shows the detailed electricity prices.
+\begin{table}[htb]
+\center
+\begin{tabular}{l|l|l|l|l}
+            & \multicolumn{2}{l|}{June - September} & \multicolumn{2}{l}{Oktober - May} \\
+Time        & Weekday           & Weekend          & Weekday         & Weekend         \\ \hline
+8 AM - 4 PM & 0.21                  &  0.21                & 0.20                 & 0.20                 \\
+4 PM - 9 PM & 0.54                  &  0.40                 & 0.50                & 0.50                \\
+9 PM - 8 AM & 0.21                  & 0.21                 &  0.20               &  0.20              
+\end{tabular}
+\caption[Electricity price rate CityLearn Challenge 2022]{Electricity price rate of the electricity price data set provided with the CityLearn Challenge 2022.}
+\label{tab:basic-prices}
+\end{table}
+
+To calculate the prices at a given time step, we first consider the basic prices $p_{base,t}$ at that time step as described above. Then, we factor in the share of fossil energy by using a weighting factor $\beta$:
+\begin{equation}
+	p_t = p_{base,t} + \beta \cdot (1-\frac{E_{r,grid}}{E_{grid}}).
+\end{equation}
+Here, $E_{r,grid}$ is the amount of renewable energy generated in the grid, and $E_{grid}$ is the total energy generated. Finally, we normalized the prices to be within a range of zero and one. We used the actual prices for the 6-hour, 12-hour, and 24-hour price predictions, just as we did for the weather data.
+
+\section{Key Performance Indicators}
+\label{sec:kpis}
+To evaluate the performance of the models, we utilized four additional KPIs in conjunction with the ones provided by CityLearn. Initially, we present the cost functions used for calculating the KPIs, followed by an explanation of how the KPIs were calculated and interpreted. Note that we have omitted the time index $h$ in the following equations for readability, but all of these equations correspond to the calculation for one time step. Since the data is provided in hourly time steps, this corresponds to one hour. For all cost functions, low values indicate better performance than higher values.
+
+\begin{table}[htb]
+\center
+\begin{tabular}{l | lll || l | l}
+\multicolumn{3}{c}{Input values}                                  &  & \multicolumn{2}{c}{Calculated Values} \\ \hline \hline
+           & $e\_net^b$ & $e\_pv^b$ &  & $E_{net_{pos}}$             & 20          \\ 
+Building 1 & -10                       & -20                      &  & $E_{used_{r,grid}}$         & 10          \\
+Building 2 & 20                        & -30                      &  & $E_{used_f}$              & 10          \\
+$E_{r,grid}$  & \multicolumn{2}{l}{10}                               &  & $E_{used_{pv}}$             & 40          \\
+           &                           &                          &  & $E_{used_r}$              & 50          \\
+           &                           &                          &  & $R_{share}$                & 5/6         \\
+           &                           &                          &  & $R_{share,grid}$           & 1/2         \\
+           &                           &                          &  & $E_{pv}$                   & -50        
+\end{tabular}
+\caption{Examples of the calculated values.}
+\label{tab:basic-prices}
+\end{table}
+
+
+\subsubsection*{Fossil Energy Consumption}
+Our most important cost function calculates the absolute fossil energy consumption for all buildings combined. Since fossil energy is only produced in the grid, and it is not possible to determine which energy mix each building consumes, this cost function cannot be calculated for individual buildings. 
+
+To determine the amount of fossil energy consumed, we first need to calculate the positive net electricity consumption of all buildings $E_{net_{pos}}$, which is the sum of the non-negative net electricity consumption $e_{net}^b$ of all buildings $b \in B$:
+\begin{equation}
+  E_{net_{pos}} = \sum_{b\in B} \max(e_{net}^b, 0).
+\end{equation}
+The CityLearn Framework provides the calculation of a single building's energy consumption. In certain cases, such as when the PV of a building generates more solar energy than the building consumes, the consumption value can become negative. However, as buildings cannot share the surplus energy, a positive consumption value is used to prevent this from happening.
+
+In the next step, we calculate the consumed renewable energy from the grid $E_{used_{r,grid}}$ as the minimum of the net positive energy consumption of all buildings, which is equal to the required energy from the grid, and the available renewable energy in the grid $E_{r,grid}$: 
+\begin{equation}
+E_{used_{r,grid}} = \min(E_{net_{pos}}, E_{r, grid}).
+\end{equation}
+Finally, the fossil energy consumed $E_{used_{f}}$ is calculated as the sum over all time steps $h$ of the difference of these two values:
+\begin{equation}
+fossil\_energy\_consumption = E_{used_{f}} = \sum_h E_{net_{pos}}^h - E_{used_{r,grid}}^h.
+\end{equation}
+
+\subsubsection*{1 - Average Daily Renewable Energy Share}
+The next cost function calculates the average daily renewable energy fraction of the total energy consumed. To do this, we first determine the amount of solar energy consumed per building $b$ by finding the minimum value between the net energy consumption excluding solar energy $e_{pv}^b$ and negative solar energy. We use the negative solar energy since this is specified as a negative time series in the CityLearn framework. Note, that the term solar energy only refers to the energy produced by the PVs of the building and does not include the solar energy in the grid.
+
+To obtain the total neighborhood solar consumption $E_{consumed_{pv}}$, we sum these values up:
+\begin{equation}
+  E_{used_{pv}} = \sum_{b\in Buildings} \max(\min(e_{net}^b - e_{pv}^b, - e_{pv}^b), 0).
+\end{equation}
+Non-negative values prevent negative values from occurring when energy storage is discharged excessively.
+
+In order to compute the total renewable energy consumption denoted as $E_{used_{r}}$, we add the amount of solar energy consumed to the amount of renewable energy consumed from the grid:
+\begin{equation}
+  E_{used_{r}} = E_{used_{r,grid}}  + E_{used_{pv}}.
+\end{equation}
+
+To calculate the share of renewable energy consumed in the total energy consumed $R_{share}$, we divide it by the sum of the net positive energy consumption (i.e., energy consumed from the grid) and the solar energy used:
+\begin{equation}
+ R_{share} = \frac{E_{used_{r}}}{E_{net_{pos}} + E_{used_{pv}}}.
+\end{equation}
+Using this, we calculate the cost function $1-average\_day\_renewable\_share$ as the average renewable share consumed in a day:
+\begin{equation}
+ 1 - average\_daily\_renewable\_share = \sum_{h=1}^{24}\frac{R_{share}^h}{24}.
+\end{equation}
+
+\subsubsection*{1 - Average Daily Renewable Energy Share from the Grid}
+However, the next cost function considers only the share of renewable energy in the energy consumed from the grid $R_{share,grid}$, which is calculated as follows:
+\begin{equation}
+ R_{share,grid} = \frac{E_{used_{r,grid}}}{E_{net_{pos}}}.
+\end{equation}
+The cost function is then given as
+\begin{equation}
+ 1 - average\_daily\_renewable\_share\_grid = \sum_{h=1}^{24}\frac{R_{share, grid}^h}{24}
+\end{equation}
+calculated.
+
+\subsubsection*{1 - Used PV of total generated}
+The final cost function calculates how much of the produced solar energy of a building is used. This cost function is the only newly defined cost function that can also be calculated individually for each building. The function calculates the proportion of solar energy consumed to the PV energy generated $E_{pv}^h$ of all buildings:
+\begin{equation}
+ 1 - used\_pv\_of\_total = \sum_{h=1}^{24}\frac{\frac{E_{used_{pv}}^h}{-E_{pv}^h}}{24}.
+\end{equation}\vspace{5px}
+
+\noindent
+Finally, to calculate the KPIs, we calculate the ratio between a cost function for the values when storage is used and when storage is not used. When no storage is used, the values are determined similarly to the formulas above but using the net (positive) electricity consumption without storage, which is already implemented as part of CityLearn. In addition, the values without storage correspond to the energy demand of the buildings that is not met by PV production at a particular time step. KPI values below 1 indicate better performance compared to not using storage, while values above 1 indicate worse performance.
+
+\section{SAC Baseline}
+\todo[inline]{Number of buildings and which one, observation space}
+\subsection{Architecture}
+We implemented an SAC agent following the calculations presented in section \ref{sec:SAC} as a basis for comparison. We used the implementation provided by CityLearn and customized it according to our requirements, including the autotuning of the temperature parameter $\alpha$. In addition, we extended the implementation with options to clip the gradient of both the critic and policy networks, to use kaiming initialization, and to use the mean squared error loss for the critic networks.
+
+The critic networks are implemented as 3-layer feedforward networks with 256 neurons in each hidden layer using layer normalization and ReLU activation. When kaiming initialization is not used, initial weights and biases are drawn from the uniform distribution $\mathcal{U}(-0.003, 0.003)$. The output is the estimated soft Q-value.
+
+The policy is implemented as a Gaussian distribution, with the mean and covariance approximated by neural networks. These have the same backbone, a three-layer feedforward network similar to the critical networks, but without layer normalization. The network has two output layers, one for computing the mean and one for the log standard deviation. The latter must be in a certain range between -20 and 2. When sampling an action from the policy, the neural network first performs a forward pass to calculate the mean and standard deviation. Next, the reparameterization trick is applied to sample actions from the resulting Gaussian distribution. These actions are then transformed to fit within the defined action space. Additionally, the log-likelihood of the generated actions is computed.
+
+%The observation space of the SAC agent is given in the appendix \ref{app:observation-space-sac}.
+
+\subsection{Reward function}
+\label{sec:reward}
+As part of the training process for the baseline SAC agent, we experimented with various reward functions. Initially, we implemented the price penalty reward $r_{price_t}^b$. This reward function is determined by taking the minimum value between zero and the negative price paid for energy purchased from the grid:
+\begin{equation}
+r_{price_t}^b = \min(-p_{net_t}^b, 0).
+\end{equation}
+Here, $p_{net}^b$ are the cost of net electricity consumption of building $b$, which is the product of net electricity consumption and the price of electricity at time step $t$. The minimum term prevents any non-negative costs that may arise when net electricity consumption is negative. 
+
+Next, we used the solar penalty reward $r_{solar_t}^b$, which is included in the CityLearn framework. It aims to maximize the solar energy used by penalizing the purchase of energy from the grid when the batteries are charged and penalizing the non-use of solar energy to charge the batteries when they are not fully charged:
+\begin{equation}
+r_{solar_t}^{b} = \left\{%
+\begin{array}{ll}
+    -\left(1+sign(e_{net_t}^{b}) \cdot \frac{SOC^b_t}{C^b_t} \right) \cdot |e_{net_t}^{b}|, & \hbox{if } C^b_t > 0.00001  \\
+    0, & \hbox{else}
+\end{array}%
+\right..
+\end{equation}
+At any given time step $t$, $C^b_t$ represents the capacity of the battery for building $b$, while $SOC^b_t$ represents the state of charge of the same battery. The ratio of $SOC^b_t$ to $C^b_t$ calculates the percentage state of charge. Table \ref{tab:solar-penalty-reward} indicates that the solar penalty reward is zero if the building's energy consumption is balanced or if the net energy consumption is negative and the battery is fully charged. For all other cases, the reward is negative. If the building draws energy from the grid even though the battery is fully charged, then the penalty is maximized.
+
+Furthermore, we tested a linear combination $r_t^b$ between these two reward functions, where the parameter $\alpha$ determines the influence of the two functions:
+\begin{equation}
+r_t^b = \alpha r_{price_t}^b + (1-\alpha)r_{solar_t}^b.
+\end{equation}
+
+In addition, we tested the fossil penalty reward $r_{fossil_t}^b$. This reward aims to minimize the fossil energy fraction of the total energy consumed. Therefore, the reward value is equal to the renewable energy fraction as defined in Section \ref{sec:kpis}:
+\begin{equation}
+r_{fossil_t}^b=R_{share}.
+\end{equation}
+Note that this value is the same for all buildings since it cannot be determined which building obtains which fuel mix from the grid.
+
+Finally, we tested a reward function given by Tolovski et al. \ref{TODO}:
+\begin{equation}
+r_{tolovski_t}^b= -(E_{pv}+E_{r,grid}-E_{net_{pos}})^2
+\end{equation}
+
+BKAAAAAAAAAA
+
+The reward function we used is a linear combination of two other reward functions, where the parameter $\alpha$ determines the influence of them. The reward $r_t^b$ is calculated for each building $b$, as for each building one agent is trained, at time step $t$:
+\begin{equation}
+r_t^b = \alpha r_{price_t}^b + (1-\alpha)r_{solar_t}^b.
+\end{equation}
+The individual reward functions used are the price penalty rewad $r_{price_t}^b$ and the solar penalty reward $r_{solar_t}^b$. The former is calculated as the minimum between the negative price payed for the energy obtained from the grid and zero:
+\begin{equation}
+r_{price_t}^b = \min(-p_{net_t}^b, 0)
+\end{equation}
+where $p_{net}^b$ are the costs of the net electricity consumption of building $b$ calculated as the product of the net electricity consumption and the electricity price at time step $t$. The minimum term prevents positive costs that can occur when the net electricity consumption is negative. 
+
+The solar penalty reward is already provided by CityLearn and aims to maximize the used solar energy by penalizing obtaining energy from the grid when the batteries are loaded and penalizing not using solar energy for loading the batteries if they are not fully loaded:
+
+Here, $C^b_t$ is the capacity of the battery of building $b$ at time step $t$ and $SOC^b_t$ is the state of charge of this battery, so the ration calculates the percent of load status. Table \ref{tab:solar-penalty-reward} shows, that the solar penalty reward is zero if the building has a balanced energy consumption or if the net energy consumption is negative and the battery is fully charged. In all other cases the reward is negative. If the battery is fully charged but the building obtains energy from the grid, the penalty is maximized.
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
+\begin{table}[htb]
+\center
+\begin{tabular}{|c|c||c|}
+\hline
+   \textbf{$e_{net_t}^b$}  & \textbf{$\frac{SOC^b_t}{C^b_t}$} & \textbf{$r_{solar_t}^b$} \\
+  \hline\hline
+  $<0$ & $0$ & $<0$ \\
+  $<0$ & $>0$ and $<1$ & $<0$ \\
+  $<0$ & $1$ &  0\\
+  $0$ & $0$ &  0\\
+  $0$ & $>0$ and $<1$ &  0\\
+  $0$ & $1$ &  0\\
+  $>0$ & $0$ & $<0$ \\
+  $>0$ & $>0$ and $<1$ & $<0$  \\
+  $>0$ & $1$ & $<0$ \\
+  \hline
+\end{tabular}
+  \caption[Beispieltabelle mit einer langen Legende]{Beispieltabelle mit einer langen Legende, damit man sieht, dass in der Legende der Zeilenabstand verringert wurde. Ausserdem soll auch der Font etwas kleiner gew\"ahlt werden. So sieht die ganze Umgebung kompakter aus.}
+  \label{tab:solar-penalty-reward}
+\end{table}
+}
+
+\subsection{Hyperparameters}
+In order to improve the baseline SAC agent, we experimented with various hyperparameter values, reward functions, and observation spaces. We followed a step-by-step approach where we optimized one parameter at a time and assumed that the optimal value would work for the following changes as well. Thus, we did not perform grid search optimization, which might have resulted in better final results but would have been much more time-consuming. However, since our goal was not to achieve an optimally trained agent, this approach was sufficient.
+
+\begin{table}[htb]
+\center
+\begin{tabularx}{\linewidth}{l|l|X}
+\textbf{Hyperprameter}                    & \textbf{Initial Value}                  & \textbf{Tested Values}                                                                        \\ \hline
+\rule{0pt}{3ex}%  EXTRA vertical height  
+Training Episodes                & 2                              & \textbf{2}, 3, 4                                                                                \\
+\rule{0pt}{3ex}%  EXTRA vertical height  
+Pricing Factor                   & 1                              & 1, 10, \textbf{20}                                                                              \\
+\rule{0pt}{3ex}%  EXTRA vertical height  
+Normalize Price                  & No                             & \textbf{Yes}, No                                                                              \\
+\rule{0pt}{3ex}%  EXTRA vertical height  
+Weather (number of locations)    & 1                              & 1, \textbf{8}                                                                                 \\
+\rule{0pt}{3ex}%  EXTRA vertical height  
+Autotune alpha                   & No                             & \textbf{Yes}, No                                                                              \\
+\rule{0pt}{3ex}%  EXTRA vertical height  
+Reward Function & Price Penalty &  See Section \ref{sec:reward} \\
+\rule{0pt}{3ex}%  EXTRA vertical height  
+\multirow{3}{*}{State Space}                      & \multirow{3}{*}{Complete}                       & a) Complete  \\ 
+& & \textbf{b) No 6h, 12h predictions} \\
+& & c) No 6h, 12 predictions, no wind, no renewable share \\
+\rule{0pt}{3ex}%  EXTRA vertical height  
+Batch Size                       & 256                            & \textbf{256}, 1024                                                                            \\
+\rule{0pt}{3ex}%  EXTRA vertical height  
+Gradient Clipping                & No                             & Yes, \textbf{No}                                                                              \\
+\rule{0pt}{3ex}%  EXTRA vertical height  
+Kaiming Initialization           & No                             & Yes, \textbf{No}                                                                              \\
+\rule{0pt}{3ex}%  EXTRA vertical height  
+Discount Factor                  & 0.99                           & 0.96, 0.97, 0.98, \textbf{0.99}                                                               \\
+\rule{0pt}{3ex}%  EXTRA vertical height  
+Loss function                    & L1                             & \textbf{L1}, L2                                                                              
+\end{tabularx}
+\caption{Examples of the calculated values.}
+\label{tab:basic-prices}
+\end{table}
 
 %% 
 \input{MM}
@@ -284,119 +565,61 @@ $total\_used\_of\_available_{t} = total\_used_{t} / total\_could\_have\_used_{t}
 %\setcounter{secnumdepth}{-1}
 %\section{Tables}\label{chap:App}
 \chapter{Appendix}\label{chap:App}
-\todo[inline]{only relevant ones?}
 \begin{table}[htb]
-\begin{tabularx}{\linewidth}{lX}
-name & description \\ \hline
-month & 1 (January) through 12 (December)\\
- day & type of day as provided by EnergyPlus (from 1 to 8). 1 (Sunday), 2 (Monday), ..., 7 (Saturday), 8 (Holiday)\\
- hour & hour of day (from 1 to 24)\\
- daylight\_savings\_status & indicates if the building is under daylight savings period (0 to 1). 0 indicates that the building has not changed its electricity consumption profiles due to daylight savings, while 1 indicates the period in which the building may have been affected.\\
- t\_out & outdoor temperature in Celcius degrees.\\
- t\_out\_pred\_6h & outdoor temperature predicted 6h ahead \\
- t\_out\_pred\_12h & outdoor temperature predicted 12h ahead \\
- t\_out\_pred\_24h & outdoor temperature predicted 24h ahead \\
- rh\_out & outdoor relative humidity in \%.\\
- rh\_out\_pred\_6h & outdoor relative humidity predicted 6h ahead \_\\
- rh\_out\_pred\_12h & outdoor relative humidity predicted 12h ahead \_\\
- rh\_out\_pred\_24h & outdoor relative humidity predicted 24h ahead \_\\
- diffuse\_solar\_rad & diffuse solar radiation in $W/m^2$.\\
- diffuse\_solar\_rad\_pred\_6h & diffuse solar radiation predicted 6h ahead \_\\
- diffuse\_solar\_rad\_pred\_12h & diffuse solar radiation predicted 12h ahead \_\\
- diffuse\_solar\_rad\_pred\_24h & diffuse solar radiation predicted 24h ahead \_\\
- direct\_solar\_rad & direct solar radiation in $W/m^2$. \\
- direct\_solar\_rad\_pred\_6h & direct solar radiation predicted 6h ahead \_\\ 
- direct\_solar\_rad\_pred\_12h & direct solar radiation predicted 12h ahead \_\\ 
- direct\_solar\_rad\_pred\_24h & direct solar radiation predicted 24h ahead \_\\ 
- t\_in & indoor temperature in Celcius degrees.\\ 
- avg\_unmet\_setpoint & average difference between the indoor temperatures and the cooling temperature setpoints in the different zones of the building in Celcius degrees. $sum((t\_in, t\_setpoint).clip(min=0) * zone\_volumes)/total\_volume$\\ 
- rh\_in & indoor relative humidity in \%.\\ 
- non\_shiftable\_load & electricity currently consumed by electrical appliances in kWh.\\ 
- solar\_gen & electricity currently being generated by photovoltaic panels in kWh.\\ 
- cooling\_storage\_soc & state of the charge (SOC) of the cooling storage device. From 0 (no energy stored) to 1 (at full capacity).\\ 
- dhw\_storage\_soc & state of the charge (SOC) of the domestic hot water (DHW) storage device. From 0 (no energy stored) to 1 (at full capacity).\\ 
- net\_electricity\_consumption & net electricity consumption of the building (including all energy systems) in the current time step.
+\begin{tabularx}{\linewidth}{lXc}
+Attribute name & Description & Value \\ \hline
+Capacity & Maximum amount of energy the storage device can store & 6.4 kWh \\
+Efficiency & Technical efficiency & 90 \% \\
+Capacity loss coefficient & Storage capacity lost in each charge and discharge cycle (as a fraction of the total capacity) & $1e^{-5}$ \\
+Loss coefficient & Standby hourly losses & 0 \\
+Nominal power & Maximum amount of electric power that the battery can use to charge or discharge & 5 \textcolor{red}{kW}
 \end{tabularx}
-\caption[States of the CityLearn Framework]{States of the CityLearn Framework \textcolor{red}{unvollständig} \cite{vazquez2020citylearn}}\label{tab:citylearn-states}
-\end{table}
-
-\begin{table}[htb]
-\begin{tabularx}{\linewidth}{lX}
-name & description \\ \hline
-month & 1 (January) through 12 (December)\\
-day\_type & type of day as provided by EnergyPlus (from 1 to 8). 1 (Sunday), 2 (Monday), ..., 7 (Saturday), 8 (Holiday)\\
-hour & hour of day (from 1 to 24)\\
- t\_out & outdoor temperature in Celcius degrees.\\
- t\_out\_pred\_6h & outdoor temperature predicted 6h ahead \textcolor{red}{(\nolinebreak accuracy: +-0.3C)}\\
- t\_out\_pred\_12h & outdoor temperature predicted 12h ahead \textcolor{red}{(\nolinebreak accuracy: +-0.65C)}\\
- t\_out\_pred\_24h & outdoor temperature predicted 24h ahead \textcolor{red}{(\nolinebreak accuracy: +-1.35C)}\\
- rh\_out & outdoor relative humidity in \%.\\
- rh\_out\_pred\_6h & outdoor relative humidity predicted 6h ahead \\
- rh\_out\_pred\_12h & outdoor relative humidity predicted 12h ahead \\
- rh\_out\_pred\_24h & outdoor relative humidity predicted 24h ahead \\
- diffuse\_solar\_rad & diffuse solar radiation in $W/m^2$.\\
- diffuse\_solar\_rad\_pred\_6h & diffuse solar radiation predicted 6h ahead \\
- diffuse\_solar\_rad\_pred\_12h & diffuse solar radiation predicted 12h ahead \\
- diffuse\_solar\_rad\_pred\_24h & diffuse solar radiation predicted 24h ahead \\
- direct\_solar\_rad & direct solar radiation in $W/m^2$. \\
- direct\_solar\_rad\_pred\_6h & direct solar radiation predicted 6h ahead \\ 
- direct\_solar\_rad\_pred\_12h & direct solar radiation predicted 12h ahead \\ 
- direct\_solar\_rad\_pred\_24h & direct solar radiation predicted 24h ahead \\ 
- wind\_speed & wind speed in $m/s$ \\
- wind\_speed\_pred\_6h & wind speed predicted 6h ahead \\
- wind\_speed\_pred\_12h & wind speed predicted 12h ahead \\
- wind\_speed\_pred\_24h & wind speed predicted 24h ahead \\
- non\_shiftable\_load & electricity currently consumed by electrical appliances in kWh.\\ 
- solar\_gen & electricity currently being generated by photovoltaic panels in kWh.\\ 
- electrical\_storage\_soc & SOC of the electrical storage from 0 (no energy stored) to 1 (at full capacity). \\
- net\_electricity\_consumption & net electricity consumption of the building (including all energy systems) in the current time step. \\
- electricity\_pricing & Electricity rate in $\$/kWh$ \\
- electricity\_pricing\_pred\_6h & Electricity rate predicted 6 hours ahead. \\
- electricity\_pricing\_pred\_12h & Electricity rate predicted 12 hours ahead. \\
- electricity\_pricing\_pred\_24h & Electricity rate predicted 24 hours ahead. \\
- renewable\_energy\_share & Share of renewable energy in the fuel mix of the grid.
-\end{tabularx}
-\caption[Observation space of the baseline SAC Agent]{Observation space of the baseline SAC Agent}\label{tab:citylearn-states}
-\label{app:observation-space-sac}
+\caption[Attributes of the batteries of each building]{Attributes of the batteries of each building. Description of the attributes obtained from \textcolor{red}{TODO source}}
+\label{app:battery-attributes}
 \end{table}
 
 %\chapter{Figures}\label{chap:App2}
 
 \begin{table}[htb]
-\begin{tabularx}{\linewidth}{lX}
-Attribute Name & Description \\  \hline
-Month & 1\\
-Hour & 2\\ 
-Day Type & 3\\
-Daylight Saving Status & 4\\
-Equipment Electric Power in kWh& 5\\
-Solar Generation in W/kW
-\end{tabularx}
-\caption{\textcolor{red}{Zweite Appendix-Tabelle}}
-\label{tab:buildings-vars}
-\end{table}
-
-\begin{table}[htb]
-\begin{tabularx}{\linewidth}{lXXXXXXX}
-Id & Demonstrator & Energy Consumption Median & Energy Consumption without storage Median & Energy Consumption without storage and PV Median \\  \hline
-1 & 0  & 0.54 & 0.58 & 0.81 \\
-2 & 0  & 0.45 & 0.49 & 0.74 \\
-3 & 0  & 0.25 & 0.28 & 0.56 \\
-4 & 0  & 0.52 & 0.54 & 0.94  \\
-5 & 0  & 0.29 & 0.29 & 0.74 \\
-6 & 0  & 0.5 & 0.56 & 1.08 \\
-7 & 0  & 0.21 & 0.21 & 0.33 \\
-8 & 0  & 0.31 & 0.32 & 0.68 \\
-9 & 0  & 0.36 & 0.38 & 0.46 \\
-10 & 0  & 0.56 & 0.65 & 0.98 \\
-11 & 0  & 0.66 & 0.71 & 1.19 \\
-12 & 0  & 0.0 & 0.0 & 0.0 \\
-13 & 0  & 0.43 & 0.48 & 0.97 \\
-14 & 0  & 0.49 & 0.48 & 0.59 \\
-15 & 0  & 0.12 & 0.0 & 0.0 \\
-16 & 0  & 0.55 & 0.72 & 1.2 \\
-17 & 0  & 0.75 & 0.82 & 1.24 \\
-\end{tabularx}
+\center
+\begin{tabular}{c|c}
+Building Id & Energy Consumption Median 
+%& Energy Consumption without storage Median & Energy Consumption without storage and PV Median 
+\\  \hline
+1  & 0.54 %& 0.58 & 0.81 
+\\
+2  & 0.45 %& 0.49 & 0.74 
+\\
+3  & 0.25 %& 0.28 & 0.56 
+\\
+4 & 0.52 %& 0.54 & 0.94  
+\\
+5 & 0.29 %& 0.29 & 0.74 
+\\
+6 & 0.5 % & 0.56 & 1.08 
+\\
+7 & 0.21 %& 0.21 & 0.33 
+\\
+8 & 0.31 %& 0.32 & 0.68 
+\\
+9  & 0.36 %& 0.38 & 0.46 
+\\
+10 & 0.56 %& 0.65 & 0.98
+\\
+11 & 0.66 %& 0.71 & 1.19 
+\\
+12 & 0.0 %& 0.0 & 0.0 
+\\
+13 & 0.43 %& 0.48 & 0.97 
+\\
+14 & 0.49 %& 0.48 & 0.59 
+\\
+15 & 0.12 %& 0.0 & 0.0 
+\\
+16 & 0.55 %& 0.72 & 1.2 
+\\
+17 & 0.75% & 0.82 & 1.24 \\
+\end{tabular}
 \caption{\textcolor{red}{Zweite Appendix-Tabelle}}
 \label{tab:building-medians}
 \end{table}
