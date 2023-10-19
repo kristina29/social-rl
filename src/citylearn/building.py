@@ -662,7 +662,7 @@ class Building(Environment):
         observations = {k: data[k] for k in self.active_observations if k in data.keys()}
         unknown_observations = list(set([k for k in self.active_observations]).difference(observations.keys()))
         assert len(unknown_observations) == 0, f'Unknown observations: {unknown_observations}'
-        
+
         
         if normalize:
             observations_copy = {k: v for k, v in observations.items()}
@@ -694,7 +694,7 @@ class Building(Environment):
             pass
 
         return observations
-    
+
     def get_periodic_observation_metadata(self) -> Mapping[str, int]:
         r"""Get periodic observation names and their minimum and maximum values for periodic/cyclic normalization.
 
@@ -837,15 +837,33 @@ class Building(Environment):
             low_limit = list(low_limit.values())
             high_limit = list(high_limit.values())
         
-        return spaces.Box(low=np.array(low_limit, dtype='float32'), high=np.array(high_limit, dtype='float32')), \
-               low_limit, high_limit
+        return spaces.Box(low=np.array(low_limit, dtype='float32'), high=np.array(high_limit, dtype='float32')), low_limit, high_limit
 
+    def shared_observation_space(self, shared_observations, normalize=None):
+        normalize = False if normalize is None else normalize
+        normalized_observation_space_limits = self.estimate_observation_space_limits(normalize=True, shared_observations=shared_observations)
+        unnormalized_observation_space_limits = self.estimate_observation_space_limits(normalize=False, shared_observations=shared_observations)
 
-    def update_observation_space(self):
-        _, low_limit, high_limit = self.estimate_observation_space(normalize = None)
+        if normalize:
+            low_limit, high_limit = normalized_observation_space_limits
+            low_limit = [0.0]*len(low_limit)
+            high_limit = [1.0]*len(high_limit)
+        else:
+            low_limit, high_limit = unnormalized_observation_space_limits
+            low_limit = list(low_limit.values())
+            high_limit = list(high_limit.values())
 
+        return low_limit, high_limit
 
-    def estimate_observation_space_limits(self, normalize: bool = None) -> Tuple[Mapping[str, float], Mapping[str, float]]:
+    def update_observation_space(self, shared_low_limit, shared_high_limit):
+        _, low_limit, high_limit = self.estimate_observation_space(normalize=None)
+
+        low_limit.extend(shared_low_limit)
+        high_limit.extend(shared_high_limit)
+
+        return spaces.Box(low=np.array(low_limit, dtype='float32'), high=np.array(high_limit, dtype='float32'))
+
+    def estimate_observation_space_limits(self, normalize: bool = None, shared_observations: list = None) -> Tuple[Mapping[str, float], Mapping[str, float]]:
         r"""Get estimate of observation space limits.
 
         Find minimum and maximum possible values of all the observations, which can then be used by the RL agent to scale the observations and train any function approximators more effectively.
@@ -855,6 +873,8 @@ class Building(Environment):
         normalize : bool, default: False
             Whether to apply min-max normalization bounded between [0, 1]
             and periodic normalization to cyclic observations including hour, day_type and month.
+        shared_observations: list, default: None
+            Observations that are shared. If not None, only the limits of these will be returned.
 
         Returns
         -------
@@ -880,33 +900,34 @@ class Building(Environment):
         }
 
         for key in self.active_observations:
-            if key == 'net_electricity_consumption':
-                net_electric_consumption = self.energy_simulation.non_shiftable_load\
-                    + (self.energy_simulation.dhw_demand)\
-                        + self.energy_simulation.cooling_demand\
-                            + self.energy_simulation.heating_demand\
-                                + (self.energy_simulation.dhw_demand/self.dhw_storage.efficiency)\
-                                    + (self.energy_simulation.cooling_demand/self.cooling_storage.efficiency)\
-                                        + (self.energy_simulation.heating_demand/self.heating_storage.efficiency)\
-                                            + (self.electrical_storage.nominal_power/self.electrical_storage.efficiency_history[0])\
-                                                - data['solar_generation']
-    
-                low_limit[key] = -max(abs(net_electric_consumption))
-                high_limit[key] = max(abs(net_electric_consumption))
+            if shared_observations is None or key in shared_observations:
+                if key == 'net_electricity_consumption':
+                    net_electric_consumption = self.energy_simulation.non_shiftable_load\
+                        + (self.energy_simulation.dhw_demand)\
+                            + self.energy_simulation.cooling_demand\
+                                + self.energy_simulation.heating_demand\
+                                    + (self.energy_simulation.dhw_demand/self.dhw_storage.efficiency)\
+                                        + (self.energy_simulation.cooling_demand/self.cooling_storage.efficiency)\
+                                            + (self.energy_simulation.heating_demand/self.heating_storage.efficiency)\
+                                                + (self.electrical_storage.nominal_power/self.electrical_storage.efficiency_history[0])\
+                                                    - data['solar_generation']
 
-            elif key in ['cooling_storage_soc', 'heating_storage_soc', 'dhw_storage_soc', 'electrical_storage_soc']:
-                low_limit[key] = 0.0
-                high_limit[key] = 1.0
+                    low_limit[key] = -max(abs(net_electric_consumption))
+                    high_limit[key] = max(abs(net_electric_consumption))
 
-            elif key in periodic_observations and normalize:
-                pn = PeriodicNormalization(max(periodic_observations[key]))
-                x_sin, x_cos = pn*np.array(list(periodic_observations[key]))
-                low_limit[f'{key}_cos'], high_limit[f'{key}_cos'] = min(x_cos), max(x_cos)
-                low_limit[f'{key}_sin'], high_limit[f'{key}_sin'] = min(x_sin), max(x_sin)
+                elif key in ['cooling_storage_soc', 'heating_storage_soc', 'dhw_storage_soc', 'electrical_storage_soc']:
+                    low_limit[key] = 0.0
+                    high_limit[key] = 1.0
 
-            else:
-                low_limit[key] = min(data[key])
-                high_limit[key] = max(data[key])
+                elif key in periodic_observations and normalize:
+                    pn = PeriodicNormalization(max(periodic_observations[key]))
+                    x_sin, x_cos = pn*np.array(list(periodic_observations[key]))
+                    low_limit[f'{key}_cos'], high_limit[f'{key}_cos'] = min(x_cos), max(x_cos)
+                    low_limit[f'{key}_sin'], high_limit[f'{key}_sin'] = min(x_sin), max(x_sin)
+
+                else:
+                    low_limit[key] = min(data[key])
+                    high_limit[key] = max(data[key])
 
         low_limit = {k: v - self.__observation_epsilon for k, v in low_limit.items()}
         high_limit = {k: v + self.__observation_epsilon for k, v in high_limit.items()}

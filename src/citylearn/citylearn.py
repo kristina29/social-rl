@@ -166,8 +166,7 @@ class CityLearnEnv(Environment, Env):
             ]
             observation_space = [spaces.Box(low=np.array(low_limit), high=np.array(high_limit), dtype=np.float32)]
         else:
-            observation_space = [b.observation_space + len(self.interchanged_observations) * (len(self.buildings) - 1)
-                                 for b in self.buildings]
+            observation_space = [b.observation_space for b in self.buildings]
 
         return observation_space
 
@@ -205,21 +204,26 @@ class CityLearnEnv(Environment, Env):
         The `shared_observations` values are only included in the first building's observation values. If `central_agent` is False, a list of sublists 
         is returned where each sublist is a list of 1 building's observation values and the sublist in the same order as `buildings`.
         """
-        self.add_shared_observations(None)
-        return [[
-            v for i, b in enumerate(self.buildings) for k, v in b.observations().items() if
-            i == 0 or k not in self.shared_observations
-        ]] if self.central_agent else [list(b.observations().values()) for b in self.buildings]
+        if self.central_agent:
+            observations = [[v for i, b in enumerate(self.buildings) for k, v in b.observations().items() if
+                                i == 0 or k not in self.shared_observations]]
+        else:
+            observations = []
+            for b in self.buildings:
+                own_obs = list(b.observations().values())
 
-    def add_shared_observations(self, observations):
-        shared_obs = ['non_shiftable_load', 'solar_generation', 'electrical_storage_soc', 'net_electricity_consumption']
+                if len(self.interchanged_observations) > 0:
+                    for observed_b in self.buildings:
+                        if not b == observed_b:
+                            observed_obs = observed_b.observations()
 
-        for current_b in self.buildings:
-            b_observations = list(current_b.observations().values())
-            for other_b in self.buildings:
-                if not current_b == other_b:
-                    for obs in shared_obs:
-                        b_observations.append(other_b.observations()[obs])
+                            for key, value in observed_obs.items():
+                                if key in self.interchanged_observations:
+                                    own_obs.append(value)
+
+                observations.append(own_obs)
+
+        return observations
 
     @property
     def observation_names(self) -> List[List[str]]:
@@ -231,11 +235,24 @@ class CityLearnEnv(Environment, Env):
         The `shared_observations` names are only included in the first building's observation names. If `central_agent` is False, a list of sublists 
         is returned where each sublist is a list of 1 building's observation names and the sublist in the same order as `buildings`.
         """
+        if self.central_agent:
+            observation_names = [[k for i, b in enumerate(self.buildings) for k, v in b.observations().items() if
+                                  i == 0 or k not in self.shared_observations]]
+        else:
+            observation_names = []
+            for b in self.buildings:
+                own_obs = list(b.observations().keys())
 
-        return [[
-            k for i, b in enumerate(self.buildings) for k, v in b.observations().items() if
-            i == 0 or k not in self.shared_observations
-        ]] if self.central_agent else [list(b.observations().keys()) for b in self.buildings]
+                if len(self.interchanged_observations) > 0:
+                    for observed_b in self.buildings:
+                        id = observed_b.name
+                        if not b == observed_b:
+                            for o in self.interchanged_observations:
+                                own_obs.append(f'{o}_{id}')
+
+                observation_names.append(own_obs)
+
+        return observation_names
 
     @property
     def net_electricity_consumption_without_storage_and_pv_emission(self) -> np.ndarray:
@@ -1234,23 +1251,26 @@ class CityLearnEnv(Environment, Env):
                             else:
                                 pass
 
-                    building.observation_space = building.estimate_observation_spacexc()
+                    building.observation_space = building.estimate_observation_space()[0]
                     building.action_space = building.estimate_action_space()
                     buildings += (building,)
 
                 else:
                     continue
 
-        for building_name, building_schema in self.schema['buildings'].items():
-            if building_schema['include']:
-                for obs in interchanged_observations:
-                    observation_metadata[f'{obs}_{other_building_name}'] = True
-
         buildings = list(buildings)
 
         if len(interchanged_observations) > 0:
             for b in buildings:
-                b.observation_space = building.update_observation_space(buildings, interchanged_observations)
+                shared_low_limit = []
+                shared_high_limit = []
+                for b_other in buildings:
+                    if not b == b_other:
+                        new_low_limit, new_high_limit = b.shared_observation_space(interchanged_observations)
+                        shared_low_limit.extend(new_low_limit)
+                        shared_high_limit.extend(new_high_limit)
+
+                b.observation_space = b.update_observation_space(shared_low_limit, shared_high_limit)
 
         if kwargs.get('reward_function') is not None:
             reward_function = kwargs['reward_function']
