@@ -35,6 +35,6 @@ for i, ir in enumerate(irs):
     with open(f'job{i}.sh', 'w') as rsh:
         rsh.write(f'''\
 {PREFIX}
-srun python3 src/socialrl.py -s nnb_limitobs1_shared -b 6 -d 2 -e 2 --tql --sac --sacdb2 --autotune --ir {ir} --extra_policy_update
+srun python3 src/socialrl.py -s nnb_limitobs1_shared -b 6 -d 2 -e 2 --tql --sac --sacdb2 --autotune --ir {ir}
 {SUFFIX}
     ''')
