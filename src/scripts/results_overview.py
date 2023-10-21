@@ -34,7 +34,9 @@ sacdb2_dirs = pd.DataFrame({'paths': ['31_randomdemo/d2/ir0.01',
                                    0.01, 0.2, 1, 1.5],
                             })
 
-sacdb2value_dirs = pd.DataFrame({'paths': ['1_randomdemo/d2',
+sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d2',
+                                           '9_interchanged_observations/random_d2_determ',
+                                           '1_randomdemo/d2',
                                            '1_randomdemo/d2_extrapol',
                                            '1_randomdemo/d4',
                                            '1_randomdemo/d4_extrapol',
@@ -49,14 +51,14 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['1_randomdemo/d2',
                                            '7_shifted_demos/demo_b6/non_extra_pol',
                                            '7_shifted_demos/demo_b6/extra_pol',
                                            ],
-                                 'demos': [2, 2,
+                                 'demos': ['2 (shared obs.)', '2 (shared obs, determ)', 2, 2,
                                            4, 4,
                                            'B6', 'B6',
                                            'B6 (determ.)', 'B6 (determ.)',
                                            'B5', 'B5',
                                            'B5 (only B5s)', 'B5 (only B5s)',
                                            'B6 (only B5s)', 'B6 (only B5s)'],
-                                 'extra_pols': [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]})
+                                 'extra_pols': [0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]})
 
 mode = 'sacdb2v'
 var = 2
@@ -165,7 +167,7 @@ def generate_sacdb2value():
         demo = dir[1]['demos']
         extra_pol = dir[1]['extra_pols']
 
-        for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.4, 0.6, 0.8]:
+        for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25]: #, 0.4, 0.6, 0.8]:
             try:
                 file = glob.glob(f'../experiments/SAC_DB2Value/{dir[1]["paths"]}/ir{ir}/kpis_*.csv')[0]
                 kpis = pd.read_csv(file)
@@ -193,20 +195,22 @@ def generate_sacdb2value():
               0.6: 'black',
               0.8: 'magenta'}
     markers = {0: 'o', 1: 'X'}
-    demo_pos = {2: 1,
-                4: 2,
-                'B5': 3,
-                'B6': 4,
-                'B6 (determ.)': 5,
-                'B5 (only B5s)': 6,
-                'B6 (only B5s)': 7}
+    demo_pos = {'2 (shared obs.)': 1,
+                '2 (shared obs, determ)': 2,
+                2: 3,
+                4: 4,
+                'B5': 5,
+                'B6': 6,
+                'B6 (determ.)': 7,
+                'B5 (only B5s)': 8,
+                'B6 (only B5s)': 9}
 
     final_df = pd.DataFrame({'irs': irs,
                              'demos': demos,
                              'fossil_energy_consumptions': fossil_energy_consumptions,
                              'extra_pols': extra_pols})
 
-    fig, ax = plt.subplots(figsize=(12, 7))
+    fig, ax = plt.subplots(figsize=(14, 7))
     final_df['irs'] = final_df['irs'].astype(str)
 
     if var == 1:
@@ -234,7 +238,7 @@ def generate_sacdb2value():
     ax.axhline(BEST_SAC_VALUE + 0.005, ls='--', lw=1, c='grey')
 
     ax.set_xticks(list(demo_pos.values()))
-    ax.set_xticklabels(list(demo_pos.keys()))
+    ax.set_xticklabels(list(demo_pos.keys()), rotation=90)
 
     for t in range(len(xticks)):
         if t % 2 == 1:

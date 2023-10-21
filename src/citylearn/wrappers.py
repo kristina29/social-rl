@@ -15,7 +15,7 @@ class NormalizedObservationWrapper(ObservationWrapper):
 
         if self.env.central_agent:
             for i, b in enumerate(self.env.buildings):
-                s = b.estimate_observation_space(normalize=True)
+                s = b.estimate_observation_space(normalize=True)[0]
                 l, _ = b.normalized_observation_space_limits
 
                 for k, lv, hv in zip(l, s.low, s.high):
@@ -29,7 +29,7 @@ class NormalizedObservationWrapper(ObservationWrapper):
             observation_space = [spaces.Box(low=np.array(low_limit), high=np.array(high_limit), dtype=np.float32)]
 
         else:
-            observation_space = [b.estimate_observation_space(normalize=True) for b in self.env.buildings]
+            observation_space = [b.estimate_observation_space(normalize=True)[0] for b in self.env.buildings]
         
         return observation_space
 
