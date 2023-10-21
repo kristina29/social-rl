@@ -6,6 +6,16 @@
 \noindent
 \todo[inline]{Ziel dieses Kapitels ist eine Einf\"uhrung in die Thematik BlaBlaBla ...}
 
+\section{Pretrained Demonstrator}
+
+\begin{figure}[htb]
+\center
+     \includegraphics[width=\textwidth]{figures/building_correlations.pdf}
+  \caption{}
+  \label{fig:building-correlations}
+\end{figure}
+
+
 \section{SAC using demonstrator transitions}
 \todo[inline]{Font in tabellen beschreibungen verkleinern}
 As mentioned in Section \ref{sec:background-social-learning}, a widely used method to improve learning is sampling demonstrator transitions and storing them in a Prioritized Replay Buffer. These kind of buffer add priorities based on the Temporal difference (TD) error to the transitions: Transistion with a higher TD error have an higher priority, assuming that these are more difficult to learn and hence should be seen more often during training. Thus, transitions with a higher priority are sampled with a higher probability. The priorities are updated during the training process \cite{schaul2015prioritized}.
