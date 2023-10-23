@@ -34,8 +34,10 @@ sacdb2_dirs = pd.DataFrame({'paths': ['31_randomdemo/d2/ir0.01',
                                    0.01, 0.2, 1, 1.5],
                             })
 
-sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d2',
-                                           '9_interchanged_observations/random_d2_determ',
+sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d2/no_extra_pol',
+                                           '9_interchanged_observations/random_d2/extra_pol',
+                                           '9_interchanged_observations/random_d2_determ/no_extra_pol',
+                                           '9_interchanged_observations/random_d2_determ/extra_pol',
                                            '1_randomdemo/d2',
                                            '1_randomdemo/d2_extrapol',
                                            '1_randomdemo/d4',
@@ -51,14 +53,16 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d
                                            '7_shifted_demos/demo_b6/non_extra_pol',
                                            '7_shifted_demos/demo_b6/extra_pol',
                                            ],
-                                 'demos': ['2 (shared obs.)', '2 (shared obs, determ)', 2, 2,
+                                 'demos': ['2 (shared obs.)', '2 (shared obs.)',
+                                           '2 (shared obs, determ)', '2 (shared obs, determ)',
+                                           2, 2,
                                            4, 4,
                                            'B6', 'B6',
                                            'B6 (determ.)', 'B6 (determ.)',
                                            'B5', 'B5',
                                            'B5 (only B5s)', 'B5 (only B5s)',
                                            'B6 (only B5s)', 'B6 (only B5s)'],
-                                 'extra_pols': [0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]})
+                                 'extra_pols': [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]})
 
 mode = 'sacdb2v'
 var = 2
