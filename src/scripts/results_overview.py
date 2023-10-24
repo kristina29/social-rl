@@ -72,20 +72,36 @@ marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info
                                     '2_own_reward/own_marl/no_info_sharing',
                                     '2_own_reward/own_marl2',
                                     '2_own_reward/own_marl3',
+                                    '2_own_reward/own_marl4/info_sharing',
+                                    '2_own_reward/own_marl4/no_info_sharing',
+                                    '2_own_reward/pricesolar/info_sharing',
+                                    '2_own_reward/pricesolar/no_info_sharing',
                                     '2_own_reward_share_obs/own_marl/info_sharing',
                                     '2_own_reward_share_obs/own_marl/no_info_sharing',
                                     '2_own_reward_share_obs/own_marl2',
                                     '2_own_reward_share_obs/own_marl3',
+                                    '2_own_reward_share_obs/own_marl4/info_sharing',
+                                    '2_own_reward_share_obs/own_marl4/no_info_sharing',
+                                    '2_own_reward/pricesolar/info_sharing',
+                                    '2_own_reward/pricesolar/no_info_sharing',
+                                    '3_add_renew_prod/no_obs_sharing/info_sharing',
+                                    '3_add_renew_prod/no_obs_sharing/no_info_sharing',
+                                    '3_add_renew_prod/obs_sharing/info_sharing',
+                                    '3_add_renew_prod/obs_sharing/no_info_sharing',
                                     ],
                           'reward': ['classic', 'classic', 'classic', 'classic',
-                                      'Own1', 'Own1', 'Own2', 'Own3',
-                                      'Own1', 'Own1', 'Own2', 'Own3', ],
+                                     'Own1', 'Own1', 'Own2', 'Own3', 'Own4', 'Own4', 'PriceSolar', 'PriceSolar',
+                                     'Own1', 'Own1', 'Own2', 'Own3', 'Own4', 'Own4', 'PriceSolar', 'PriceSolar',
+                                     'Own4 (renew. prod.)', 'Own4 (renew. prod.)', 'Own4 (renew. prod.)',
+                                     'Own4 (renew. prod.)', ],
                           'info_sharing': ['Yes', 'No', 'Yes', 'No',
-                                           'Yes', 'No', 'Yes', 'Yes',
-                                           'Yes', 'No', 'Yes', 'Yes', ],
+                                           'Yes', 'No', 'Yes', 'Yes', 'Yes', 'No', 'Yes', 'No',
+                                           'Yes', 'No', 'Yes', 'Yes', 'Yes', 'No', 'Yes', 'No',
+                                           'Yes', 'No', 'Yes', 'No', ],
                           'shared_observations': ['Yes', 'Yes', 'No', 'No',
-                                                  'No', 'No', 'No', 'No',
-                                                  'Yes', 'Yes', 'Yes', 'Yes', ]})
+                                                  'No', 'No', 'No', 'No', 'No', 'No', 'No', 'No',
+                                                  'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes',
+                                                  'No', 'No', 'Yes', 'Yes', ]})
 
 mode = 'marl'
 var = 2
@@ -215,9 +231,12 @@ def generate_marl():
               'No': 'tab:orange', }
     markers = {'Yes': 'o', 'No': 'X'}
     reward_pos = {'classic': 1,
-                  'Own1': 2,
-                  'Own2': 3,
-                  'Own3': 4}
+                  'PriceSolar': 2,
+                  'Own1': 3,
+                  'Own2': 4,
+                  'Own3': 5,
+                  'Own4': 6,
+                  'Own4 (renew. prod.)': 7}
 
     final_df = pd.DataFrame({'rewards': rewards,
                              'info_sharings': info_sharings,
@@ -228,7 +247,8 @@ def generate_marl():
 
     if var == 1:
         for i, v in enumerate(final_df['fossil_energy_consumptions']):
-            ax.scatter(reward_pos[rewards[i]], v, color=colors[shared_obs[i]], marker=markers[info_sharings[i]], alpha=0.5)
+            ax.scatter(reward_pos[rewards[i]], v, color=colors[shared_obs[i]], marker=markers[info_sharings[i]],
+                       alpha=0.5)
     else:
         ax = sns.scatterplot(x=final_df['rewards'].map(reward_pos),
                              y='fossil_energy_consumptions',
@@ -263,7 +283,8 @@ def generate_marl():
     handles = [f("s", colors[i]) for i in colors.keys()]
     handles += [f(markers[i], "k") for i in markers.keys()]
 
-    labels = [f'Shared observations: {i}' for i in colors.keys()] + ["Information Sharing: Yes", "Information Sharing: No"]
+    labels = [f'Shared observations: {i}' for i in colors.keys()] + ["Information Sharing: Yes",
+                                                                     "Information Sharing: No"]
 
     plt.legend(handles, labels, bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.title('MARLISA')
