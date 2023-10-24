@@ -100,6 +100,7 @@ class OwnMARL(RewardFunction):
         """
 
         district_fossil_electricity_consumption = self.env.net_fossil_electricity_consumption[self.env.time_step]
+
         reward = np.array(self.price_solar_penalty.calculate()) - district_fossil_electricity_consumption
 
         return reward.tolist()
@@ -151,6 +152,34 @@ class OwnMARL3(RewardFunction):
 
         district_electricity_consumption = self.env.net_electricity_consumption_positive[self.env.time_step]
         reward = np.array(self.price_solar_penalty.calculate()) * district_electricity_consumption
+
+        return reward.tolist()
+
+
+class OwnMARL4(RewardFunction):
+    def __init__(self, env: CityLearnEnv, n_buildings: int):
+        super().__init__(env)
+        self.price_solar_penalty = PriceAndSolarPenaltyReward(env, alpha=0.5)
+        self.n_buildings = n_buildings
+
+    def calculate(self) -> List[float]:
+        r"""Calculates MARL reward.
+
+        Returns
+        -------
+        reward: List[float]
+            Reward for transition to current timestep.
+
+        Notes
+        -----
+        Reward value is calculated as :math:`\textrm{sign}(-e) \times 0.01(e^2) \times \textrm{max}(0, E)`
+        where :math:`e` is the building `electricity_consumption` and :math:`E` is the district `electricity_consumption`.
+        """
+
+        district_fossil_electricity_consumption = self.env.net_fossil_electricity_consumption[self.env.time_step]
+
+        reward = np.array(self.price_solar_penalty.calculate()) - \
+                 (1 / self.n_buildings) * district_fossil_electricity_consumption
 
         return reward.tolist()
 
@@ -267,18 +296,20 @@ class OwnSolarPenaltyReward(RewardFunction):
             battery_input = min(max_battery_input, b.electrical_storage.nominal_power)
             demand = b.net_electricity_consumption_without_storage_and_pv[-1]
             could_have_used = battery_input + demand
-            could_used = min(could_have_used, b.solar_generation[-1]*-1)
+            could_used = min(could_have_used, b.solar_generation[-1] * -1)
             if could_used == 0:
                 reward = 0
-            elif b.electrical_storage_electricity_consumption[-1] < -0.001 and b.net_electricity_consumption[-1] < -0.001:
+            elif b.electrical_storage_electricity_consumption[-1] < -0.001 and b.net_electricity_consumption[
+                -1] < -0.001:
                 reward = -100
                 print('Happened', self.env.time_step)
                 print('electrical_storage_electricity_consumption', b.electrical_storage_electricity_consumption[-1])
                 print('solar_generation', b.solar_generation[-1])
-                print('net_electricity_consumption_without_storage_and_pv', b.net_electricity_consumption_without_storage_and_pv[-1])
+                print('net_electricity_consumption_without_storage_and_pv',
+                      b.net_electricity_consumption_without_storage_and_pv[-1])
                 print('')
             else:
-                used = max(min(b.net_electricity_consumption[-1] - b.solar_generation[-1], b.solar_generation[-1]*-1),
+                used = max(min(b.net_electricity_consumption[-1] - b.solar_generation[-1], b.solar_generation[-1] * -1),
                            0)
                 reward = used - could_used
 
@@ -361,7 +392,8 @@ class TolovskiReward(RewardFunction):
             (same reward for all agents).
         """
         reward = [-1 * (self.env.renewable_generation[self.env.time_step] -
-                        self.env.net_electricity_consumption_positive[self.env.time_step])**2] * len(self.env.buildings)
+                        self.env.net_electricity_consumption_positive[self.env.time_step]) ** 2] * len(
+            self.env.buildings)
 
         return reward
 
@@ -387,6 +419,6 @@ class PriceAndSolarPenaltyReward(RewardFunction):
                 Reward for transition to current timestep.
 
             """
-        reward = self.alpha * np.array(self.pricepenalty.calculate()) +\
-                 (1-self.alpha) * np.array(self.solarpenalty.calculate())
+        reward = self.alpha * np.array(self.pricepenalty.calculate()) + \
+                 (1 - self.alpha) * np.array(self.solarpenalty.calculate())
         return reward.tolist()

@@ -1278,6 +1278,10 @@ class CityLearnEnv(Environment, Env):
             reward_function_type = self.schema['reward_function']['type']
             reward_function_attributes = self.schema['reward_function'].get('attributes', None)
             reward_function_attributes = {} if reward_function_attributes is None else reward_function_attributes
+
+            if reward_function_type == 'citylearn.reward_function.OwnMARL4':
+                reward_function_attributes['n_buildings'] = len(buildings)
+
             reward_function_module = '.'.join(reward_function_type.split('.')[0:-1])
             reward_function_name = reward_function_type.split('.')[-1]
             reward_function_constructor = getattr(importlib.import_module(reward_function_module), reward_function_name)

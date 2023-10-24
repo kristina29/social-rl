@@ -72,20 +72,24 @@ marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info
                                     '2_own_reward/own_marl/no_info_sharing',
                                     '2_own_reward/own_marl2',
                                     '2_own_reward/own_marl3',
+                                    '2_own_reward/pricesolar/info_sharing',
+                                    '2_own_reward/pricesolar/no_info_sharing',
                                     '2_own_reward_share_obs/own_marl/info_sharing',
                                     '2_own_reward_share_obs/own_marl/no_info_sharing',
                                     '2_own_reward_share_obs/own_marl2',
                                     '2_own_reward_share_obs/own_marl3',
+                                    '2_own_reward/pricesolar/info_sharing',
+                                    '2_own_reward/pricesolar/no_info_sharing',
                                     ],
                           'reward': ['classic', 'classic', 'classic', 'classic',
-                                      'Own1', 'Own1', 'Own2', 'Own3',
-                                      'Own1', 'Own1', 'Own2', 'Own3', ],
+                                      'Own1', 'Own1', 'Own2', 'Own3', 'PriceSolar', 'PriceSolar',
+                                      'Own1', 'Own1', 'Own2', 'Own3', 'PriceSolar', 'PriceSolar',],
                           'info_sharing': ['Yes', 'No', 'Yes', 'No',
-                                           'Yes', 'No', 'Yes', 'Yes',
-                                           'Yes', 'No', 'Yes', 'Yes', ],
+                                           'Yes', 'No', 'Yes', 'Yes', 'Yes', 'No',
+                                           'Yes', 'No', 'Yes', 'Yes', 'Yes', 'No',],
                           'shared_observations': ['Yes', 'Yes', 'No', 'No',
-                                                  'No', 'No', 'No', 'No',
-                                                  'Yes', 'Yes', 'Yes', 'Yes', ]})
+                                                  'No', 'No', 'No', 'No', 'No', 'No',
+                                                  'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes',]})
 
 mode = 'marl'
 var = 2
@@ -217,7 +221,8 @@ def generate_marl():
     reward_pos = {'classic': 1,
                   'Own1': 2,
                   'Own2': 3,
-                  'Own3': 4}
+                  'Own3': 4,
+                  'PriceSolar': 5}
 
     final_df = pd.DataFrame({'rewards': rewards,
                              'info_sharings': info_sharings,
