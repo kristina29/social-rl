@@ -7,17 +7,22 @@
 \todo[inline]{Ziel dieses Kapitels ist eine Einf\"uhrung in die Thematik BlaBlaBla ...}
 
 \section{Pretrained Demonstrator}
-As mentioned earlier, we only used six out of the 17 available buildings to design the social agents. These six buildings are referred to as the training buildings in the following. For some of our methods, we used pre-trained demonstrators. We trained these demonstrators using the final hyperparameter values, reward function and state space as described in Section \ref{sec:sac-baseline}. We used two different buildings as pre-trained demonstrators, one among the training buildings and one not a training building.
-
-To select the demonstration buildings, we conducted a Pearson Correlation Coefficient analysis between the non-shiftable load of all buildings and the training buildings (marked with a thick border). The correlations are represented visually in Figure \ref{fig:building-correlations}. We then chose the building with the highest median correlation to the training buildings from the set of training buildings and the remaining ones: Building Five (training building) and Building Six.
-
-
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/building_correlations.pdf}
   \caption{}
   \label{fig:building-correlations}
 \end{figure}
+For some of our methods, we used pre-trained demonstrators. We trained these demonstrators using the final hyperparameter values, reward function and state space as described in Section \ref{sec:sac-baseline}. Also, we scaled the available renewable energy in the grid by the factor $k = 0.5$. We used two different buildings as pre-trained demonstrators, one among the training buildings and one not a training building.
+
+To select the demonstration buildings, we conducted a Pearson Correlation Coefficient analysis between the non-shiftable load of all buildings and the training buildings (marked with a thick border). The correlations are represented visually in Figure \ref{fig:building-correlations}. We then chose the building with the highest median correlation to the training buildings from the set of training buildings and the remaining ones: Building Five (training building) and Building Six.
+\begin{figure}[htb]
+\center
+     \includegraphics[width=\textwidth]{figures/b5_b6_kpis.pdf}
+  \caption{}
+  \label{fig:b5-b6-kpis}
+\end{figure}
+The resulting KPIs of both buildings are visualized in Figure \ref{fig:b5-b6-kpis}. The values of the share of used PV and the fossil energy consumption are somewhat comparable to the (mean) performance of the baseline SAC agents when using all training buildings. However, the average daily renewable share, both from the grid and in total, is worse when using the battery. This effect could be because the energy demand from the grid of both buildings is lower when the battery is in use since more solar energy is utilized. As a result, the proportion of renewable energy used from the grid decreases because the solar generation of the buildings is correlated to the renewable production in the grid. This, in turn, has the same effect on the overall share of renewable energy used.
 
 
 \section{SAC using demonstrator transitions}

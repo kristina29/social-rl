@@ -51,13 +51,18 @@ if __name__ == '__main__':
         , annot=True, xticklabels=True, yticklabels=True, annot_kws={"fontsize":21})
 
     buldings = [3,5,7,8,11,17]
+    lw = 15
+    ax.axvline(6, color='white', lw=lw, zorder=2)
+
     for b in buldings:
         wanted_label = b
         wanted_index = correlations.index.get_loc(wanted_label)
-        x, y, w, h = 0, wanted_index, len(buldings)+1, 1
-        ax.add_patch(Rectangle((x, y), w, h, fill=False, edgecolor='black', lw=2.5, clip_on=False))
+        x, y, w, h = 0.01, wanted_index, len(buldings)-0.09, 1
+        ax.add_patch(Rectangle((x, y), w, h, fill=False, edgecolor='black', lw=2.5, clip_on=False, zorder=3))
+        x, y, w, h = len(buldings)+0.08, wanted_index, 0.91, 1
+        ax.add_patch(Rectangle((x, y), w, h, fill=False, edgecolor='black', lw=2.5, clip_on=False, zorder=3))
 
-    ax.set_xlabel('Building IDs used in Training', fontsize=21)
+    ax.set_xlabel('Training Building IDs', fontsize=21)
     ax.set_ylabel('Building IDs', fontsize=21)
     ax.tick_params(axis='both', which='major', labelsize=21)
     cbar = ax.collections[0].colorbar

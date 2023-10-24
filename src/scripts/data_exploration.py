@@ -99,7 +99,7 @@ def analyze_challenge_data(save, timestamp):
 ##################################################
 
 def analyze_ny_data(save, timestamp):
-    dir = '../../datasets/fuel_mix_ny_2021'
+    dir = '../datasets/fuel_mix_ny_2021'
     fuel_files = os.listdir(dir)
     fuel = pd.read_csv(f'{dir}/{fuel_files[0]}')
     fuel = (fuel.pivot_table(index=['Time Stamp'],
@@ -114,7 +114,7 @@ def analyze_ny_data(save, timestamp):
         fuel = fuel.append(new)
     fuel['Time Stamp'] = pd.to_datetime(fuel['Time Stamp'], format='%m/%d/%Y %H:%M:%S')
 
-    ny_weather = pd.read_csv('../../datasets/weather_ny_42.30_-74.37_2021.csv', skiprows=2)
+    ny_weather = pd.read_csv('../datasets/weather_ny_42.30_-74.37_2021.csv', skiprows=2)
     ny_weather['Time Stamp'] = pd.to_datetime(ny_weather[['Month', 'Day', 'Year', 'Hour', 'Minute']]
                                               .astype(str).apply(' '.join, 1), format='%m %d %Y %H %M')
     ny_weather = ny_weather.drop(columns=['Month', 'Day', 'Year', 'Hour', 'Minute'])
@@ -140,31 +140,31 @@ def analyze_ny_data(save, timestamp):
     ax.set_xlabel('DNI [$W/m^2$]')
 
     # include new weather files
-    ny_weather2 = pd.read_csv('../../datasets/weather_ny_40.86_-72.57_2021.csv', skiprows=2)
+    ny_weather2 = pd.read_csv('../datasets/weather_ny_40.86_-72.57_2021.csv', skiprows=2)
     ny_weather2['Time Stamp'] = pd.to_datetime(
         ny_weather2[['Month', 'Day', 'Year', 'Hour', 'Minute']].astype(str).apply(' '.join, 1), format='%m %d %Y %H %M')
     ny_weather2 = ny_weather2.drop(columns=['Month', 'Day', 'Year', 'Hour', 'Minute'])
-    ny_weather3 = pd.read_csv('../../datasets/weather_ny_42.44_-78.45_2021.csv', skiprows=2)
+    ny_weather3 = pd.read_csv('../datasets/weather_ny_42.44_-78.45_2021.csv', skiprows=2)
     ny_weather3['Time Stamp'] = pd.to_datetime(
         ny_weather3[['Month', 'Day', 'Year', 'Hour', 'Minute']].astype(str).apply(' '.join, 1), format='%m %d %Y %H %M')
     ny_weather3 = ny_weather3.drop(columns=['Month', 'Day', 'Year', 'Hour', 'Minute'])
-    ny_weather4 = pd.read_csv('../../datasets/weather_ny_44.86_-73.61_2021.csv', skiprows=2)
+    ny_weather4 = pd.read_csv('../datasets/weather_ny_44.86_-73.61_2021.csv', skiprows=2)
     ny_weather4['Time Stamp'] = pd.to_datetime(
         ny_weather4[['Month', 'Day', 'Year', 'Hour', 'Minute']].astype(str).apply(' '.join, 1), format='%m %d %Y %H %M')
     ny_weather4 = ny_weather4.drop(columns=['Month', 'Day', 'Year', 'Hour', 'Minute'])
-    ny_weather5 = pd.read_csv('../../datasets/weather_ny_41.14_-73.91_2021.csv', skiprows=2)
+    ny_weather5 = pd.read_csv('../datasets/weather_ny_41.14_-73.91_2021.csv', skiprows=2)
     ny_weather5['Time Stamp'] = pd.to_datetime(
         ny_weather5[['Month', 'Day', 'Year', 'Hour', 'Minute']].astype(str).apply(' '.join, 1), format='%m %d %Y %H %M')
     ny_weather5 = ny_weather5.drop(columns=['Month', 'Day', 'Year', 'Hour', 'Minute'])
-    ny_weather6 = pd.read_csv('../../datasets/weather_ny_43.10_-75.33_2021.csv', skiprows=2)
+    ny_weather6 = pd.read_csv('../datasets/weather_ny_43.10_-75.33_2021.csv', skiprows=2)
     ny_weather6['Time Stamp'] = pd.to_datetime(
         ny_weather6[['Month', 'Day', 'Year', 'Hour', 'Minute']].astype(str).apply(' '.join, 1), format='%m %d %Y %H %M')
     ny_weather6 = ny_weather6.drop(columns=['Month', 'Day', 'Year', 'Hour', 'Minute'])
-    ny_weather7 = pd.read_csv('../../datasets/weather_ny_43.14_-73.97_2021.csv', skiprows=2)
+    ny_weather7 = pd.read_csv('../datasets/weather_ny_43.14_-73.97_2021.csv', skiprows=2)
     ny_weather7['Time Stamp'] = pd.to_datetime(
         ny_weather7[['Month', 'Day', 'Year', 'Hour', 'Minute']].astype(str).apply(' '.join, 1), format='%m %d %Y %H %M')
     ny_weather7 = ny_weather7.drop(columns=['Month', 'Day', 'Year', 'Hour', 'Minute'])
-    ny_weather8 = pd.read_csv('../../datasets/weather_ny_43.38_-76.31_2021.csv', skiprows=2)
+    ny_weather8 = pd.read_csv('../datasets/weather_ny_43.38_-76.31_2021.csv', skiprows=2)
     ny_weather8['Time Stamp'] = pd.to_datetime(
         ny_weather8[['Month', 'Day', 'Year', 'Hour', 'Minute']].astype(str).apply(' '.join, 1), format='%m %d %Y %H %M')
     ny_weather8 = ny_weather8.drop(columns=['Month', 'Day', 'Year', 'Hour', 'Minute'])
@@ -209,7 +209,7 @@ def analyze_ny_data(save, timestamp):
     ##################################################
     # PREPROCESSED FUEL MIX DATA
     ##################################################
-    fuel_mix = pd.read_csv('../citylearn/data/nydata/fuelmix.csv')
+    fuel_mix = pd.read_csv('citylearn/data/nydata/fuelmix.csv')
 
     percent = np.array(fuel_mix['Renewable Share']) * 100
     fig, ax = plt.subplots()
@@ -306,17 +306,15 @@ def analyze_building_weather_correlation():
 # PREPROCESSED NY WEATHER DATA OWN BUILDINGS
 ##################################################
 def analyze_building_weather_correlation_own():
-    ny_weather_prep = pd.read_csv('../citylearn/data/nydata/weather.csv')
+    ny_weather_prep = pd.read_csv('citylearn/data/nydata/weather.csv')
     dhi = np.array(ny_weather_prep['Diffuse Solar Radiation [W/m2]'])
     dni = np.array(ny_weather_prep['Direct Solar Radiation [W/m2]'])
 
-    ny_weather_prep = pd.read_csv('../citylearn/data/nydata/weather.csv')
-    dhi = np.array(ny_weather_prep['Diffuse Solar Radiation [W/m2]'])
-    dni = np.array(ny_weather_prep['Direct Solar Radiation [W/m2]'])
+    renewable = pd.read_csv('citylearn/data/nnb_limitobs1/fuelmix.csv')['Renewable Sources [kWh]']
 
     # Correlation DHI - Solar generation B1
     solar_generation = np.array(
-        pd.read_csv('../citylearn/data/nydata_new_buildings2/Building_1.csv')['Solar Generation [W/kW]'])
+        pd.read_csv('citylearn/data/nydata_new_buildings2/Building_1.csv')['Solar Generation [W/kW]'])
     fig, ax = plt.subplots()
     create_scatter_plot(ax, dhi, solar_generation)
     ax.set_title('Solar generation Building 1 vs. DHI (NY data, own buildings2)')
@@ -329,9 +327,15 @@ def analyze_building_weather_correlation_own():
     ax.set_ylabel('Solar generation [$W/kW$]')
     ax.set_xlabel('DNI [$W/m^2$]')
 
+    fig, ax = plt.subplots()
+    create_scatter_plot(ax, renewable, solar_generation)
+    ax.set_title('Solar generation Building 1 vs. Renewable production (NY data)')
+    ax.set_ylabel('Solar generation [$W/kW$]')
+    ax.set_xlabel('Renewable production [$kW$]')
+
     # Correlation DHI - Solar generation B6
     solar_generation = np.array(
-        pd.read_csv('../citylearn/data/nydata_new_buildings2/Building_6.csv')['Solar Generation [W/kW]'])
+        pd.read_csv('citylearn/data/nydata_new_buildings2/Building_6.csv')['Solar Generation [W/kW]'])
     fig, ax = plt.subplots()
     create_scatter_plot(ax, dhi, solar_generation)
     ax.set_title('Solar generation Building 6 vs. DHI (NY data, own buildings2)')
@@ -344,17 +348,23 @@ def analyze_building_weather_correlation_own():
     ax.set_ylabel('Solar generation [$W/kW$]')
     ax.set_xlabel('DNI [$W/m^2$]')
 
+    fig, ax = plt.subplots()
+    create_scatter_plot(ax, renewable, solar_generation)
+    ax.set_title('Solar generation Building 6 vs. Renewable production (NY data)')
+    ax.set_ylabel('Solar generation [$W/kW$]')
+    ax.set_xlabel('Renewable production [$kW$]')
+
 ##################################################
 # PREPROCESSED NY WEATHER DATA 8 LOCS OWN BUILDINGS
 ##################################################
 def analyze_building_8locsweather_correlation_own(save, timestamp):
-    ny_weather_prep = pd.read_csv('../citylearn/data/nydata/weather_8locs_median.csv')
+    ny_weather_prep = pd.read_csv('citylearn/data/nydata/weather_8locs_median.csv')
     dhi = np.array(ny_weather_prep['Diffuse Solar Radiation [W/m2]'])
     dni = np.array(ny_weather_prep['Direct Solar Radiation [W/m2]'])
 
     # Correlation DHI - Solar generation B1
     solar_generation = np.array(
-        pd.read_csv('../citylearn/data/nydata_new_buildings2/Building_1.csv')['Solar Generation [W/kW]'])
+        pd.read_csv('citylearn/data/nydata_new_buildings2/Building_1.csv')['Solar Generation [W/kW]'])
     fig, ax = plt.subplots()
     create_scatter_plot(ax, dhi, solar_generation)
     ax.set_title('Solar generation Building 1 vs. DHI (NY data 8 locs median, own buildings2)')
@@ -369,7 +379,7 @@ def analyze_building_8locsweather_correlation_own(save, timestamp):
 
     # Correlation DHI - Solar generation B6
     solar_generation = np.array(
-        pd.read_csv('../citylearn/data/nydata_new_buildings2/Building_6.csv')['Solar Generation [W/kW]'])
+        pd.read_csv('citylearn/data/nydata_new_buildings2/Building_6.csv')['Solar Generation [W/kW]'])
     fig, ax = plt.subplots()
     create_scatter_plot(ax, dhi, solar_generation)
     ax.set_title('Solar generation Building 6 vs. DHI (NY data 8 locs median, own buildings2)')
@@ -535,9 +545,9 @@ def analyze_own_building_data(save, timestamp):
 if __name__ == '__main__':
     save = True
     challenge_data = False
-    ny_data = False
+    ny_data = True
     pricing_data = False
-    building_data = True
+    building_data = False
     timestamp = datetime.now().strftime("%Y%m%dT%H%M%S")
 
     if challenge_data:
