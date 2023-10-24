@@ -7,8 +7,9 @@
 \todo[inline]{Ziel dieses Kapitels ist eine Einf\"uhrung in die Thematik BlaBlaBla ...}
 
 \section{Pretrained Demonstrator}
-Wie bereits erwähnt, haben wir für die Konzeption der sozialen Agenten nur sechs der verfügbaren 17 Gebäude genutzt. Für einige unserer Methoden haben vortrainierte Demonstratoren genutzt. Diese haben wir mit den finalen Hyperparameterwerten, Reward Funktion und State Space wie in Kapitel \ref{bla} beschrieben trainiert. Wir haben zwei verschiedene Gebäude als vortrainierte Demonstratoren genutzt, eines der sechs genutzen Gebäude und ein nicht genutztes Gebäude.
-Zur Auswahl der Demonstratorgebäude haben wir den Pearson Correlation Coefficient zwischen dem non-shiftable load von allen Gebäuden und dem der sechs genutzten Gebäuden berechnet. Abbildung \ref{deinemutter} visualisiert diese Korrelationen. 
+As mentioned earlier, we only used six out of the 17 available buildings to design the social agents. These six buildings are referred to as the training buildings in the following. For some of our methods, we used pre-trained demonstrators. We trained these demonstrators using the final hyperparameter values, reward function and state space as described in Section \ref{sec:sac-baseline}. We used two different buildings as pre-trained demonstrators, one among the training buildings and one not a training building.
+
+To select the demonstration buildings, we conducted a Pearson Correlation Coefficient analysis between the non-shiftable load of all buildings and the training buildings (marked with a thick border). The correlations are represented visually in Figure \ref{fig:building-correlations}. We then chose the building with the highest median correlation to the training buildings from the set of training buildings and the remaining ones: Building Five (training building) and Building Six.
 
 
 \begin{figure}[htb]

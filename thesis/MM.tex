@@ -176,6 +176,7 @@ The final cost function calculates how much of the produced solar energy of a bu
 Finally, to calculate the KPIs, we calculate the ratio between a cost function for the values when storage is used and when storage is not used. When no storage is used, the values are determined similarly to the formulas above but using the net (positive) electricity consumption without storage, which is already implemented as part of CityLearn. In addition, the values without storage correspond to the energy demand of the buildings that is not met by PV production at a particular time step. KPI values below 1 indicate better performance compared to not using storage, while values above 1 indicate worse performance.
 
 \section{SAC Baseline}
+\label{sec:sac-baseline}
 \subsection{Architecture}
 We implemented an SAC agent following the calculations presented in section \ref{sec:SAC} as a basis for comparison. We used the implementation provided by CityLearn and customized it according to our requirements, including the autotuning of the temperature parameter $\alpha$. In addition, we extended the implementation with options to clip the gradient of both the critic and policy networks, to use kaiming initialization, and to use the mean squared error loss for the critic networks.
 
