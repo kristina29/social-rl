@@ -125,7 +125,7 @@ class OptimizedRBC(BasicRBC):
             # Early nightime: store DHW and/or cooling energy
             elif hour >= 23 and hour <= 24:
                 a = [0.034 for _ in range(d)]
-                
+
             elif hour >= 1 and hour <= 6:
                 a = [0.05532 for _ in range(d)]
                 

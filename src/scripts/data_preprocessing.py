@@ -51,10 +51,11 @@ def preprocess_data(load_path, save_path, weather) -> pd.DataFrame:
                                 'DHI': WEATHER_VARS[2],
                                 'DNI': WEATHER_VARS[3],
                                 'Wind Speed': WEATHER_VARS[4]})
+        df = median_by_hour(df)
     else:
         df = read_fuel_data(load_path)
+        df = kwh_by_hour(df)
 
-    df = median_by_hour(df)
     df = add_daytype(df)
     df = correct_time_series_start(df)
 
@@ -86,6 +87,18 @@ def preprocess_data(load_path, save_path, weather) -> pd.DataFrame:
 def median_by_hour(df) -> pd.DataFrame:
     df = df.groupby(by=['Year', 'Month', 'Day', 'Hour']).median().reset_index()
     df['Hour'] = df['Hour'] + 1
+
+    return df
+
+
+def kwh_by_hour(df) -> pd.DataFrame:
+    df['Renewable Sources [kWh]'] = 1/12 * df['Renewable Sources [kW]']
+    df['Other [kWh]'] = 1 / 12 * df['Other [kW]']
+    df = df.groupby(by=['Year', 'Month', 'Day', 'Hour']).sum().reset_index()
+    df['Hour'] = df['Hour'] + 1
+
+    df['Renewable Share'] = df['Renewable Sources [kWh]'] / (df['Renewable Sources [kWh]'] + df['Other [kWh]'])
+    df = df.drop(columns=['Renewable Sources [kW]', 'Other [kW]', 'Other [kWh]'])
 
     return df
 
@@ -141,11 +154,11 @@ def read_fuel_data(load_dir) -> pd.DataFrame:
     fuel['Minute'] = pd.DatetimeIndex(fuel['Time Stamp']).minute
 
     # group by renewable and not renewable and convert given MW into kWh
-    fuel['Renewable Sources [kWh]'] = fuel[['Hydro', 'Wind', 'Other Renewables']].sum(axis=1) * 1000
-    fuel['Other [kWh]'] = fuel[['Dual Fuel', 'Natural Gas', 'Nuclear', 'Other Fossil Fuels']].sum(axis=1) * 1000
-    fuel['Renewable Share'] = fuel['Renewable Sources [kWh]'] / (fuel['Renewable Sources [kWh]'] + fuel['Other [kWh]'])
+    fuel['Renewable Sources [kW]'] = fuel[['Hydro', 'Wind', 'Other Renewables']].sum(axis=1) * 1000
+    fuel['Other [kW]'] = fuel[['Dual Fuel', 'Natural Gas', 'Nuclear', 'Other Fossil Fuels']].sum(axis=1) * 1000
+
     fuel = fuel.drop(columns=['Hydro', 'Wind', 'Other Renewables', 'Dual Fuel', 'Natural Gas', 'Nuclear',
-                              'Other Fossil Fuels', 'Other [kWh]'])
+                              'Other Fossil Fuels'])
 
     return fuel
 
@@ -160,18 +173,18 @@ if __name__ == '__main__':
     weather_dir = '../datasets/'
     weather_filepath = f'{weather_dir}weather_ny_42.30_-74.37_2021.csv'
     weather_save_filepath = 'citylearn/data/nydata_new_buildings2/weather.csv'
-    preprocess_data(weather_filepath, weather_save_filepath, weather=True)
+    #preprocess_data(weather_filepath, weather_save_filepath, weather=True)
 
     weather_filenames = [f'{weather_dir}{filename}' for filename in os.listdir(weather_dir) if filename.startswith('weather_ny_')]
     weather_save_filepath = f'citylearn/data/nydata_new_buildings2/weather_{len(weather_filenames)}locs_median.csv'
-    preprocess_data(weather_filenames, weather_save_filepath, weather=True)
+    #preprocess_data(weather_filenames, weather_save_filepath, weather=True)
 
     fuel_mix_dirpath = '../datasets/fuel_mix_ny_2021'
-    fuel_mix_save_filepath = 'citylearn/data/nydata_new_buildings2/fuelmix.csv'
+    fuel_mix_save_filepath = 'citylearn/data/nnb_limitobs1/fuelmix-new.csv'
     fuel_mix = preprocess_data(fuel_mix_dirpath, fuel_mix_save_filepath, weather=False)
 
     carbon_emission_savepath = 'citylearn/data/nydata_new_buildings2/carbon_intensity.csv'
-    generate_carbon_emission_data(fuel_mix, carbon_emission_savepath)
+    #generate_carbon_emission_data(fuel_mix, carbon_emission_savepath)
 
 
 
