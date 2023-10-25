@@ -80,6 +80,8 @@ For our analysis, we used fuel mix data from the New York Independent System Ope
 
 We utilized weather data from NY State to establish a correlation between weather and the amount of renewable energy generated. We obtained the data from the USA Continental \& Mexico dataset from the National Solar Radiation Database (NSRDB) on July 04, 2023. As attributes, we retrieved Global Horizontal Irradiance (GHI), Diffuse Horizontal Irradiance (DHI), Direct Normal Irradiation (DNI), Relative Humidity, Temperature, and Wind Speed at 5-minute intervals. Except for GHI, which we used to generate the solar production time series of the buildings, all values are part of the state of the environment. To better cover geographic differences, we collected these attributes from eight locations across New York State (see Figure~\ref{fig:weather-locations}). We calculated the median across these locations and per hour to obtain a single hourly value for each attribute. The predictions for 6h, 12h, and 24h were based on the correct values, which means our predictions were perfect.
 
+
+
 \subsection{Energy prices}
 \label{sec:prices}
 We used the CityLearn Challenge 2022 price dataset to determine the energy prices. Then, we weighted the price information by the proportion of fossil fuel energy in the grid. The baseline dataset follows an electricity rate that offers lower prices during early morning, late evening, and from October to May. Table~\ref{tab:basic-prices} shows the detailed electricity prices.
