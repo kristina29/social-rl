@@ -7,15 +7,9 @@
 \todo[inline]{Ziel dieses Kapitels ist eine Einf\"uhrung in die Thematik BlaBlaBla ...}
 
 \section{Pretrained Demonstrator}
-\begin{figure}[htb]
-\center
-     \includegraphics[width=\textwidth]{figures/building_correlations.pdf}
-  \caption{}
-  \label{fig:building-correlations}
-\end{figure}
 For some of our methods, we used pre-trained demonstrators. We trained these demonstrators using the final hyperparameter values, reward function and state space as described in Section \ref{sec:sac-baseline}. Also, we scaled the available renewable energy in the grid by the factor $k = 0.5$. We used two different buildings as pre-trained demonstrators, one among the training buildings and one not a training building.
 
-To select the demonstration buildings, we conducted a Pearson Correlation Coefficient analysis between the non-shiftable load of all buildings and the training buildings (marked with a thick border). The correlations are represented visually in Figure \ref{fig:building-correlations}. We then chose the building with the highest median correlation to the training buildings from the set of training buildings and the remaining ones: Building Five (training building) and Building Six.
+To select the demonstration buildings We then chose the building with the highest median correlation to the training buildings from the set of training buildings and the remaining ones: Building Five (training building) and Building Six.
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/b5_b6_kpis.pdf}

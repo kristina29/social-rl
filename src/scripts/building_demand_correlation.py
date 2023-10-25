@@ -57,9 +57,9 @@ if __name__ == '__main__':
     for b in buldings:
         wanted_label = b
         wanted_index = correlations.index.get_loc(wanted_label)
-        x, y, w, h = 0.01, wanted_index, len(buldings)-0.09, 1
+        x, y, w, h = 0, wanted_index, len(buldings)-0.05, 1
         ax.add_patch(Rectangle((x, y), w, h, fill=False, edgecolor='black', lw=2.5, clip_on=False, zorder=3))
-        x, y, w, h = len(buldings)+0.08, wanted_index, 0.91, 1
+        x, y, w, h = len(buldings)+0.05, wanted_index, 0.95, 1
         ax.add_patch(Rectangle((x, y), w, h, fill=False, edgecolor='black', lw=2.5, clip_on=False, zorder=3))
 
     ax.set_xlabel('Training Building IDs', fontsize=21)

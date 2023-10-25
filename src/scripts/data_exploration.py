@@ -542,12 +542,60 @@ def analyze_own_building_data(save, timestamp):
         plt.show()
 
 
+def plot_building_means(save, timestamp):
+    y_min_gen = 10000000000000000
+    y_max_gen = -10000000
+
+    nominal_power = [4.0, 4.0, 4.0, 5.0, 4.0, 4.0, 4.0, 4.0, 4.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0]
+
+    fig, axs = plt.subplots(17, figsize=(15, 15))
+    # fig.suptitle(f'Daily Mean Load and Solar Generation of all Buildings')
+
+    for i in range(1, 18):
+        data = pd.read_csv(f'citylearn/data/nnb_limitobs1/Building_{i}.csv')
+        data = data.groupby(np.arange(len(data)) // 24).mean()
+
+        if (nominal_power[i - 1] * np.array(data['Solar Generation [W/kW]']) / 1000).min() < y_min_gen:
+            y_min_gen = (nominal_power[i - 1] * np.array(data['Solar Generation [W/kW]']) / 1000).min()
+        if (nominal_power[i - 1] * np.array(data['Solar Generation [W/kW]']) / 1000).max() > y_max_gen:
+            y_max_gen = (nominal_power[i - 1] * np.array(data['Solar Generation [W/kW]']) / 1000).max()
+
+        axs[i-1].plot(data['Equipment Electric Power [kWh]'], label='load')
+        axs[i-1].plot(nominal_power[i-1]*np.array(data['Solar Generation [W/kW]'])/1000, label='solar generation')
+        # axs[i-1].legend()
+        axs[i-1].set_ylabel(f'B{i}', fontsize=19, rotation=0, labelpad=43, loc='bottom')
+        # axs[i-1].set_xlabel(f'Time step')
+        axs[i-1].set_ylim([0, 4.3])
+        axs[i-1].set_xlim([-1, 365])
+
+        if not i==17:
+            axs[i-1].set_xticks([])
+        axs[i-1].tick_params(axis='x', which='both', labelsize=19)
+        axs[i - 1].tick_params(axis='y', which='both', labelsize=15)
+        #axs[i - 1].set_yticks([])
+
+    handles, labels = axs[0].get_legend_handles_labels()
+    # plt.tick_params(labelcolor='none', which='both', top=False, bottom=False, left=False, right=False)
+    plt.xlabel("Day of Year", fontsize=21)
+    fig.legend(handles, labels, loc='upper center', fontsize=21)
+    plt.tight_layout(rect=[0, 0, 1, 0.93])
+    fig.subplots_adjust(wspace=0, hspace=0.1)
+
+
+    if save:
+        filename = "../datasets/data_exploration_plots/building-plots-mean_" + timestamp
+        save_multi_image(filename)
+    else:
+        plt.show()
+
+
 if __name__ == '__main__':
     save = True
     challenge_data = False
-    ny_data = True
+    ny_data = False
     pricing_data = False
     building_data = False
+    building_data_means = True
     timestamp = datetime.now().strftime("%Y%m%dT%H%M%S")
 
     if challenge_data:
@@ -562,3 +610,5 @@ if __name__ == '__main__':
         analyze_pricing_data(save, timestamp)
     if building_data:
         analyze_own_building_data(save, timestamp)
+    if building_data_means:
+        plot_building_means(save, timestamp)
