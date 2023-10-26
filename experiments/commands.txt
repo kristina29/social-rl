@@ -48,4 +48,7 @@ scp src/citylearn/data/nnb_limitobs1_shared/* klietz10@134.2.168.52:/mnt/qb/work
 
 scp src/job.sh klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/
 
+mv SAC_transitions_20231026T103850.pkl SAC_transitions_b5.pkl
+
+
 
