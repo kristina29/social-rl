@@ -34,7 +34,15 @@ To implement the SAC agent using the demonstrator transitions, we used the train
 
 The SAC agents using the demonstrator transitions perform worse than the baseline agents on all KPIs. However, using transitions from Building 5 resulted in better scores compared to the use of transitions from Building 6. This is consistent with the performance of both demonstrator buildings, as described in the previous chapter. It is possible that the better-performing Building 5 provides better guidance on how agents should behave.
 
-The policy loss values observed during training increase for all agents instead of decreasing as expected (see Figure \ref{bla}). This observation suggests that with higher probability, actions with a low, possibly even negative, estimated Q-Value are taken. As a result, the agents are more likely to take 'bad' actions with greater certainty, ultimately leading to poorer performance.
+The policy loss values observed during training increase for all agents instead of decreasing as expected. This is illustrated in Figure \ref{fig:prb-losses} for Building 3 and the demonstrator transitions of Building 5, but it also applies to the other training buildings and demonstrator Building 6. This development suggests that with higher probability, actions with a low, possibly even negative, estimated Q-Value are taken. As a result, the agents are more likely to take 'bad' actions with greater certainty, ultimately leading to poorer performance.
+
+\begin{figure}[htb]
+\center
+     \includegraphics[width=0.8\textwidth]{figures/prb_losses.pdf}
+  \caption[Policy losses during training of Building 3]{Policy losses during training of Building 3 for the baseline SAC agent and the SAC agent when filling the PRB with the transitions of demonstrator Building 5 before training.}
+  \label{fig:prb-losses}
+\end{figure}
+
 
 \section{Social Agent I}
 \textcolor{red}{Policy update}
