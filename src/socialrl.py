@@ -81,7 +81,7 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
             train_prbsac(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
                          discount=discount, autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
                          kaiming_initialization=kaiming_initialization, demo_transitions=demo_transitions,
-                         end_exploration_t=end_exploration_t)
+                         end_exploration_t=end_exploration_t, l2_loss=l2_loss)
 
     save_results(all_envs, all_losses, all_rewards, all_eval_results, agents=all_agents, store_agents=store_agents)
 
@@ -172,7 +172,7 @@ def train_sacdb2value(schema, episodes, random_seed, batch_size, discount, autot
 
 
 def train_prbsac(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
-                 kaiming_initialization, demo_transitions, end_exploration_t):
+                 kaiming_initialization, demo_transitions, end_exploration_t, l2_loss):
     env = CityLearnEnv(schema)
 
     with open(demo_transitions, 'rb') as file:
@@ -181,7 +181,7 @@ def train_prbsac(schema, episodes, random_seed, batch_size, discount, autotune_e
     prbsac_model = PRBSAC(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
                           clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization,
                           discount=discount, demonstrator_transitions=demo_transitions,
-                          end_exploration_time_step=end_exploration_t)
+                          end_exploration_time_step=end_exploration_t, l2_loss=l2_loss)
     losses, rewards, eval_results, best_state = prbsac_model.learn(episodes=episodes, deterministic_finish=True)
 
     print('PRB SAC model trained!')
