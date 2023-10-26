@@ -850,7 +850,7 @@ def save_multi_image(filename):
     fig_nums = plt.get_fignums()
     figs = [plt.figure(n) for n in fig_nums]
     for fig in figs:
-        fig.savefig(pp, bbox_inchesstr='tight', format='pdf')
+        fig.savefig(pp, format='pdf')
         plt.close(fig)
     pp.close()
     print("Plots saved in file", f'{filename}.pdf')
