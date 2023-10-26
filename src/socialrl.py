@@ -179,9 +179,9 @@ def train_prbsac(schema, episodes, random_seed, batch_size, discount, autotune_e
         demo_transitions = pickle.load(file)
 
     prbsac_model = PRBSAC(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
-                          clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization,
+                          clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
                           discount=discount, demonstrator_transitions=demo_transitions,
-                          end_exploration_time_step=end_exploration_t, l2_loss=l2_loss)
+                          end_exploration_time_step=end_exploration_t)
     losses, rewards, eval_results, best_state = prbsac_model.learn(episodes=episodes, deterministic_finish=True)
 
     print('PRB SAC model trained!')
