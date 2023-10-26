@@ -156,7 +156,7 @@ def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entr
             o = n
 
         transitions = buffer.buffer
-        t_filename = 'sac_transitions_b5.pkl'
+        t_filename = 'sac_transitions_b6.pkl'
         with open(t_filename, 'wb') as fp:
             pickle.dump(transitions, fp)
             print('Saved transitions to', t_filename)
