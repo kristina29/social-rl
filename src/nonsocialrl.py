@@ -138,7 +138,7 @@ def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entr
 
     print('SAC model trained!')
 
-    save_transitions = False
+    save_transitions = True
     if save_transitions:
         buffer = ReplayBuffer(100000)
         eval_env = copy.deepcopy(env)
@@ -156,7 +156,7 @@ def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entr
             o = n
 
         transitions = buffer.buffer
-        t_filename = 'sac_transitions_b6.pkl'
+        t_filename = 'sac_transitions_b5.pkl'
         with open(t_filename, 'wb') as fp:
             pickle.dump(transitions, fp)
             print('Saved transitions to', t_filename)

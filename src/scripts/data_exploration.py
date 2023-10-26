@@ -8,11 +8,12 @@ import numpy as np
 from datetime import datetime
 
 from mpl_toolkits.basemap import Basemap
+from scipy.stats import pearsonr
 
 from utils import save_multi_image
 
 
-def create_scatter_plot(ax, x,y):
+def create_scatter_plot(ax, x, y):
     ax.scatter(x, y, s=1)
     m, b = np.polyfit(x, y, 1)
     ax.plot(x, m * x + b, color='green')
@@ -40,9 +41,10 @@ def analyze_challenge_data(save, timestamp):
     weather = pd.read_csv('../citylearn/data/citylearn_challenge_2022_phase_all/weather.csv')
 
     # normalize carbon intensity between 0 and 1
-    carbon_intensity = pd.read_csv('../citylearn/data/citylearn_challenge_2022_phase_all/carbon_intensity.csv')['kg_CO2/kWh']
+    carbon_intensity = pd.read_csv('../citylearn/data/citylearn_challenge_2022_phase_all/carbon_intensity.csv')[
+        'kg_CO2/kWh']
     carbon_intensity = (carbon_intensity - np.min(carbon_intensity)) / (
-                np.max(carbon_intensity) - np.min(carbon_intensity))
+            np.max(carbon_intensity) - np.min(carbon_intensity))
 
     # normalize prices between 0 and 1
     pricing = pd.read_csv('../citylearn/data/citylearn_challenge_2022_phase_all/pricing.csv')['Electricity Pricing [$]']
@@ -93,6 +95,7 @@ def analyze_challenge_data(save, timestamp):
         save_multi_image(filename)
     else:
         plt.show()
+
 
 ##################################################
 # REAL DATA FROM NEW YORK ISO AND NREL
@@ -197,8 +200,8 @@ def analyze_ny_data(save, timestamp):
 
     fig = plt.figure(figsize=(8, 8))
     m = Basemap(projection='cyl', resolution='i', area_thresh=100.,
-                llcrnrlat=min(lat)-0.5, urcrnrlat=max(lat)+0.5,
-                  llcrnrlon=min(lon)-2, urcrnrlon=max(lon)+0.8)
+                llcrnrlat=min(lat) - 0.5, urcrnrlat=max(lat) + 0.5,
+                llcrnrlon=min(lon) - 2, urcrnrlon=max(lon) + 0.8)
     m.fillcontinents(color='gray', lake_color='white')
     m.drawcoastlines(color='black', linewidth=1)
     m.drawcountries(color='black', linewidth=1)
@@ -227,6 +230,7 @@ def analyze_ny_data(save, timestamp):
         save_multi_image(filename)
     else:
         plt.show()
+
 
 ##################################################
 # ORIGINAL WEATHER DATA
@@ -266,6 +270,7 @@ def analyze_challenge_weather_data():
     ax.set_ylabel('Solar generation [$W/kW$]')
     ax.set_xlabel('DNI [$W/m^2$]')
 
+
 ##################################################
 # PREPROCESSED NY WEATHER DATA
 ##################################################
@@ -301,6 +306,7 @@ def analyze_building_weather_correlation():
     ax.set_title('Solar generation Building 6 vs. DNI (NY data)')
     ax.set_ylabel('Solar generation [$W/kW$]')
     ax.set_xlabel('DNI [$W/m^2$]')
+
 
 ##################################################
 # PREPROCESSED NY WEATHER DATA OWN BUILDINGS
@@ -353,6 +359,7 @@ def analyze_building_weather_correlation_own():
     ax.set_title('Solar generation Building 6 vs. Renewable production (NY data)')
     ax.set_ylabel('Solar generation [$W/kW$]')
     ax.set_xlabel('Renewable production [$kW$]')
+
 
 ##################################################
 # PREPROCESSED NY WEATHER DATA 8 LOCS OWN BUILDINGS
@@ -417,11 +424,14 @@ def analyze_building_8locsweather_correlation_own(save, timestamp):
     ax.plot(np.arange(len(all_buildings_new_pvprod)), all_buildings_new_pvprod, label='Own buildings')
     ax.plot(np.arange(len(all_buildings_new2_pvprod)), all_buildings_new2_pvprod, label='Own buildings 2')
     ax.axhline(all_buildings_old_pvprod.mean(), c='red')
-    ax.text(0, all_buildings_old_pvprod.mean()+0.1, f'Mean of original buildings {all_buildings_old_pvprod.mean()}', rotation=0)
+    ax.text(0, all_buildings_old_pvprod.mean() + 0.1, f'Mean of original buildings {all_buildings_old_pvprod.mean()}',
+            rotation=0)
     ax.axhline(all_buildings_new_pvprod.mean(), c='red')
-    ax.text(0, all_buildings_new_pvprod.mean()+0.1, f'Mean of own buildings {all_buildings_new_pvprod.mean()}', rotation=0)
+    ax.text(0, all_buildings_new_pvprod.mean() + 0.1, f'Mean of own buildings {all_buildings_new_pvprod.mean()}',
+            rotation=0)
     ax.axhline(all_buildings_new2_pvprod.mean(), c='red')
-    ax.text(0, all_buildings_new2_pvprod.mean()+0.1, f'Mean of own buildings 2 {all_buildings_new2_pvprod.mean()}', rotation=0)
+    ax.text(0, all_buildings_new2_pvprod.mean() + 0.1, f'Mean of own buildings 2 {all_buildings_new2_pvprod.mean()}',
+            rotation=0)
     ax.set_title('Sum of PV production of all buildings')
     ax.set_xlabel('Time step')
     ax.set_ylabel('PV production [W/kW]')
@@ -432,6 +442,7 @@ def analyze_building_8locsweather_correlation_own(save, timestamp):
         save_multi_image(filename)
     else:
         plt.show()
+
 
 ##################################################
 # PRICING DATA
@@ -501,7 +512,7 @@ def analyze_own_building_data(save, timestamp):
 
     nominal_power = [4.0, 4.0, 4.0, 5.0, 4.0, 4.0, 4.0, 4.0, 4.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0]
 
-    for i in range(1,18):
+    for i in range(1, 18):
         data = pd.read_csv(f'citylearn/data/nydata_new_buildings2/Building_{i}.csv')
 
         fig, ax = plt.subplots(nrows=2, sharex=True)
@@ -524,16 +535,16 @@ def analyze_own_building_data(save, timestamp):
         fig.set_figwidth(13)
         fig.suptitle(f'Building {i} - Load vs. Solar Generation')
         ax.plot(data['Equipment Electric Power [kWh]'], label='load')
-        ax.plot(nominal_power[i-1]*np.array(data['Solar Generation [W/kW]'])/1000, label='generation')
+        ax.plot(nominal_power[i - 1] * np.array(data['Solar Generation [W/kW]']) / 1000, label='generation')
         ax.legend()
         ax.set_ylabel(f'kWh')
         ax.set_xlabel(f'Time step')
         ax.set_ylim([0, 9])
 
-        if (nominal_power[i-1]*np.array(data['Solar Generation [W/kW]'])/1000).min() < y_min_gen:
-            y_min_gen = (nominal_power[i-1]*np.array(data['Solar Generation [W/kW]'])/1000).min()
-        if (nominal_power[i-1]*np.array(data['Solar Generation [W/kW]'])/1000).max() > y_max_gen:
-            y_max_gen = (nominal_power[i-1]*np.array(data['Solar Generation [W/kW]'])/1000).max()
+        if (nominal_power[i - 1] * np.array(data['Solar Generation [W/kW]']) / 1000).min() < y_min_gen:
+            y_min_gen = (nominal_power[i - 1] * np.array(data['Solar Generation [W/kW]']) / 1000).min()
+        if (nominal_power[i - 1] * np.array(data['Solar Generation [W/kW]']) / 1000).max() > y_max_gen:
+            y_max_gen = (nominal_power[i - 1] * np.array(data['Solar Generation [W/kW]']) / 1000).max()
 
     if save:
         filename = "../datasets/data_exploration_plots/building-plots_" + timestamp
@@ -560,28 +571,29 @@ def plot_building_means(save, timestamp):
         if (nominal_power[i - 1] * np.array(data['Solar Generation [W/kW]']) / 1000).max() > y_max_gen:
             y_max_gen = (nominal_power[i - 1] * np.array(data['Solar Generation [W/kW]']) / 1000).max()
 
-        axs[i-1].plot(data['Equipment Electric Power [kWh]'], label='load')
-        axs[i-1].plot(nominal_power[i-1]*np.array(data['Solar Generation [W/kW]'])/1000, label='solar generation')
+        axs[i - 1].plot(data['Equipment Electric Power [kWh]'], label='load')
+        axs[i - 1].plot(nominal_power[i - 1] * np.array(data['Solar Generation [W/kW]']) / 1000,
+                        label='solar generation')
         # axs[i-1].legend()
-        axs[i-1].set_ylabel(f'B{i}', fontsize=19, rotation=0, labelpad=43, loc='bottom')
+        axs[i - 1].set_ylabel(f'B{i}', fontsize=19, rotation=0, labelpad=43, loc='bottom')
         # axs[i-1].set_xlabel(f'Time step')
-        axs[i-1].set_ylim([0, 4.3])
-        axs[i-1].set_xlim([-1, 365])
-        axs[i-1].grid()
+        axs[i - 1].set_ylim([0, 4.3])
+        axs[i - 1].set_xlim([-1, 365])
+        axs[i - 1].grid()
 
-        if not i==17:
-            axs[i-1].set_xticks([])
-        axs[i-1].tick_params(axis='x', which='both', labelsize=19)
+        if not i == 17:
+            axs[i - 1].set_xticks([])
+        axs[i - 1].tick_params(axis='x', which='both', labelsize=19)
         axs[i - 1].tick_params(axis='y', which='both', labelsize=15)
-        #axs[i - 1].set_yticks([])
+        # axs[i - 1].set_yticks([])
 
     handles, labels = axs[0].get_legend_handles_labels()
     # plt.tick_params(labelcolor='none', which='both', top=False, bottom=False, left=False, right=False)
-    plt.xticks(np.linspace(0, 365, 13)[:-1], ('Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul' ))
+    plt.xticks(np.linspace(0, 365, 13)[:-1],
+               ('Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'))
     fig.legend(handles, labels, loc='upper center', fontsize=21)
     plt.tight_layout(rect=[0, 0, 1, 0.93])
     fig.subplots_adjust(wspace=0, hspace=0.1)
-
 
     if save:
         filename = "../datasets/data_exploration_plots/building-plots-mean_" + timestamp
@@ -645,20 +657,37 @@ def get_fuel_data():
     return df
 
 
+def weather_correlations(save, timestamp):
+    ny_weather_prep = pd.read_csv('citylearn/data/nnb_limitobs1/weather_8locs_median.csv')
+    fuelmix = get_fuel_data()
+
+    print('Correlation Wind speed and Wind energy', pearsonr(ny_weather_prep['Wind Speed [m/s]'],
+                                                             fuelmix['Wind'])[0])
+    print('Correlation DHI and Other renewable', pearsonr(ny_weather_prep['Diffuse Solar Radiation [W/m2]'],
+                                                          fuelmix['Other Renewables'])[0])
+    print('Correlation DNI and Other renewable', pearsonr(ny_weather_prep['Direct Solar Radiation [W/m2]'],
+                                                          fuelmix['Other Renewables'])[0])
+    print('Correlation Wind speed and Total renewable', pearsonr(ny_weather_prep['Wind Speed [m/s]'],
+                                                                 fuelmix['Renewable Sources [kWh]'])[0])
+    print('Correlation DHI and Total renewable', pearsonr(ny_weather_prep['Diffuse Solar Radiation [W/m2]'],
+                                                          fuelmix['Renewable Sources [kWh]'])[0])
+    print('Correlation DNI and Total renewable', pearsonr(ny_weather_prep['Direct Solar Radiation [W/m2]'],
+                                                          fuelmix['Renewable Sources [kWh]'])[0])
+
+
 def plot_weather_means(save, timestamp):
     ny_weather_prep = pd.read_csv('citylearn/data/nnb_limitobs1/weather_8locs_median.csv')
-    ny_weather_prep = ny_weather_prep.groupby(np.arange(len(ny_weather_prep)) // 24).mean()
-
     fuelmix = get_fuel_data()
+
+    ny_weather_prep = ny_weather_prep.groupby(np.arange(len(ny_weather_prep)) // 24).mean()
     fuelmix = fuelmix.groupby(np.arange(len(fuelmix)) // 24).mean()
 
     print('Hydro generated', fuelmix['Hydro'].sum())
-    print('Hydro share', fuelmix['Hydro'].sum()/fuelmix['Renewable Sources [kWh]'].sum())
+    print('Hydro share', fuelmix['Hydro'].sum() / fuelmix['Renewable Sources [kWh]'].sum())
     print('Wind generated', fuelmix['Wind'].sum())
-    print('Wind share', fuelmix['Wind'].sum()/fuelmix['Renewable Sources [kWh]'].sum())
+    print('Wind share', fuelmix['Wind'].sum() / fuelmix['Renewable Sources [kWh]'].sum())
     print('Other generated', fuelmix['Other Renewables'].sum())
-    print('Other share', fuelmix['Other Renewables'].sum()/fuelmix['Renewable Sources [kWh]'].sum())
-
+    print('Other share', fuelmix['Other Renewables'].sum() / fuelmix['Renewable Sources [kWh]'].sum())
 
     cols = {'Diffuse Solar Radiation [W/m2]': 'DHI',
             'Direct Solar Radiation [W/m2]': 'DNI',
@@ -667,7 +696,7 @@ def plot_weather_means(save, timestamp):
             'Relative Humidity [%]': 'Relative Humidity',
             'Wind': 'Wind Generation',
             'Renewable Sources [kWh]': 'Total Renewable Generation',
-            'Renewable Share': 'Renewable Share',}
+            'Renewable Share': 'Renewable Share', }
 
     units = ['$W/m^2$', '$W/m^2$', '$m/s$', '$°C$', '$\%$', '$kWh$', '$kWh$', '$\%$']
 
@@ -680,21 +709,22 @@ def plot_weather_means(save, timestamp):
             axs[i].plot(fuelmix[name])
         else:
             axs[i].plot(ny_weather_prep[name], label=name)
-        axs[i].set_title(cols[name], fontsize=19, rotation=0, #labelpad=60,
-                          loc='center')
+        axs[i].set_title(cols[name], fontsize=19, rotation=0,  # labelpad=60,
+                         loc='center')
         axs[i].set_ylabel(units[i], fontsize=19)
         # axs[i-1].set_xlabel(f'Time step')
         # axs[i].set_ylim([0, 4.3])
         axs[i].set_xlim([-1, 365])
         axs[i - 1].grid()
 
-        if not i==len(cols)+1:
-            axs[i-1].set_xticks([])
-        axs[i-1].tick_params(axis='x', which='both', labelsize=19)
-        axs[i-1].tick_params(axis='y', which='both', labelsize=17)
-        #axs[i - 1].set_yticks([])
+        if not i == len(cols) + 1:
+            axs[i - 1].set_xticks([])
+        axs[i - 1].tick_params(axis='x', which='both', labelsize=19)
+        axs[i - 1].tick_params(axis='y', which='both', labelsize=17)
+        # axs[i - 1].set_yticks([])
 
-    plt.xticks(np.linspace(0, 365, 13)[:-1], ('Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul' ))
+    plt.xticks(np.linspace(0, 365, 13)[:-1],
+               ('Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'))
     plt.tight_layout(rect=[0, 0, 1, 1])
     fig.subplots_adjust(wspace=0, hspace=0.3)
 
