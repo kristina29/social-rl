@@ -13,12 +13,12 @@ from citylearn.data import DataSet
 from citylearn.utilities import get_active_parts
 from citylearn.wrappers import TabularQLearningWrapper
 from options import parseOptions_nonsocial
-from utils import set_schema_buildings, set_active_observations, save_results
+from utils import set_schema_buildings, set_active_observations, save_results, save_transitions_to
 
 
 def train(dataset_name, random_seed, building_count, episodes, active_observations, batch_size, discount,
           autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc,
-          building_ids, store_agents, end_exploration_t):
+          building_ids, store_agents, end_exploration_t, save_transitions):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
 
@@ -49,7 +49,8 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
         all_envs['SAC Best'] = \
         train_sac(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size, discount=discount,
                   autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
-                  kaiming_initialization=kaiming_initialization, l2_loss=l2_loss, end_exploration_t=end_exploration_t)
+                  kaiming_initialization=kaiming_initialization, l2_loss=l2_loss, end_exploration_t=end_exploration_t,
+                  save_transitions=save_transitions)
 
     save_results(all_envs, all_losses, all_rewards, all_eval_results, agents=all_agents, store_agents=store_agents)
 
@@ -122,7 +123,7 @@ def train_tql(schema, active_observations, episodes):
 
 
 def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
-              kaiming_initialization, l2_loss, end_exploration_t):
+              kaiming_initialization, l2_loss, end_exploration_t, save_transitions):
     env = CityLearnEnv(schema)
     sac_model = SAC(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
                     clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
@@ -138,28 +139,8 @@ def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entr
 
     print('SAC model trained!')
 
-    save_transitions = False
     if save_transitions:
-        buffer = ReplayBuffer(100000)
-        eval_env = copy.deepcopy(env)
-        o = eval_env.reset()
-
-        while not eval_env.done:
-            a = sac_model.predict(o, deterministic=True)
-            n, r, d, _ = eval_env.step(a)
-
-            buffer.push(sac_model.get_normalized_observations(0, sac_model.get_encoded_observations(0, o[0])),
-                        a[0],
-                        sac_model.get_normalized_reward(0, r[0]),
-                        sac_model.get_normalized_observations(0, sac_model.get_encoded_observations(0, n[0])),
-                        d)
-            o = n
-
-        transitions = buffer.buffer
-        t_filename = 'sac_transitions_b6.pkl'
-        with open(t_filename, 'wb') as fp:
-            pickle.dump(transitions, fp)
-            print('Saved transitions to', t_filename)
+        save_transitions_to(env, sac_model, 'SAC')
 
     return env, losses, rewards, eval_results, sac_model, best_state_env
 
@@ -185,6 +166,7 @@ if __name__ == '__main__':
     building_ids = opts.building_ids
     store_agents = opts.store_agents
     end_exploration_t = opts.end_exploration_t
+    save_transitions = opts.save_transitions
 
     if False:
         DATASET_NAME = 'nydata_new_buildings2'
@@ -203,13 +185,14 @@ if __name__ == '__main__':
         store_agents = False
         kaiming_initialization = False
         l2_loss = False
+        save_transitions = False
         end_exploration_t = 7000
 
     train(dataset_name=DATASET_NAME, random_seed=seed, building_count=building_count, episodes=episodes,
           active_observations=active_observations, batch_size=batch_size, discount=discount,
           autotune_entropy=autotune_entropy, clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization,
           l2_loss=l2_loss, exclude_tql=exclude_tql, exclude_rbc=exclude_rbc, building_ids=building_ids,
-          store_agents=store_agents, end_exploration_t=end_exploration_t)
+          store_agents=store_agents, end_exploration_t=end_exploration_t, save_transitions=save_transitions)
 
     # get the end time
     et = time.time()

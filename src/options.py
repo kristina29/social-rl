@@ -104,6 +104,8 @@ def add_nonsocial_options(optParser):
                          help='Ids of the buildings that should be trained. Overwrites the building_count.')
     optParser.add_option('--store', action='store_true', default=False, dest='store_agents',
                          help='Store trained agents.')
+    optParser.add_option('--save_transitions', action='store_true', default=False, dest='save_transitions',
+                         help='Save transitions in a pkl file.')
     optParser.add_option('--end_exploration', action='store', type='int', default=7000, dest='end_exploration_t',
                          help='End exploration time step.')
 

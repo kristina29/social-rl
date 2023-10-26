@@ -7,6 +7,8 @@ from datetime import datetime
 
 import numpy as np
 import pandas as pd
+from citylearn.rl import ReplayBuffer
+
 from citylearn.agents.base import Agent
 
 from citylearn.building import Building
@@ -848,7 +850,7 @@ def save_multi_image(filename):
     fig_nums = plt.get_fignums()
     figs = [plt.figure(n) for n in fig_nums]
     for fig in figs:
-        fig.savefig(pp, bbox_inchesstr='tight', format='pdf')
+        fig.savefig(pp, format='pdf')
         plt.close(fig)
     pp.close()
     print("Plots saved in file", f'{filename}.pdf')
@@ -966,3 +968,26 @@ def save_results(envs: Mapping[str, CityLearnEnv], losses: Mapping[str, Mapping[
     for a_filename in a_filenames:
         print(f'scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/{a_filename} '
               f'experiments/SAC_DB2/{a_filename}')
+
+
+def save_transitions_to(env: CityLearnEnv, model: Agent, name: str):
+    buffer = ReplayBuffer(100000)
+    eval_env = copy.deepcopy(env)
+    o = eval_env.reset()
+
+    while not eval_env.done:
+        a = model.predict(o, deterministic=True)
+        n, r, d, _ = eval_env.step(a)
+
+        buffer.push(model.get_normalized_observations(0, model.get_encoded_observations(0, o[0])),
+                    a[0],
+                    model.get_normalized_reward(0, r[0]),
+                    model.get_normalized_observations(0, model.get_encoded_observations(0, n[0])),
+                    d)
+        o = n
+
+    transitions = buffer.buffer
+    t_filename = f'{name}_transitions_{datetime.now().strftime("%Y%m%dT%H%M%S")}.pkl'
+    with open(t_filename, 'wb') as fp:
+        pickle.dump(transitions, fp)
+        print('Saved transitions to', t_filename)

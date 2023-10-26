@@ -42,6 +42,7 @@ class SAC(RLC):
         self.clip_gradient = clip_gradient
         self.kaiming_initialization = kaiming_initialization
         self.normalized = [False for _ in self.action_space]
+        self.l2_loss = l2_loss
         if l2_loss:
             self.soft_q_criterion = nn.MSELoss()
         else:
