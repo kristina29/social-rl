@@ -19,7 +19,7 @@ source $HOME/.bashrc
 #eval "$(micromamba shell hook --shell=bash)"
 micromamba activate social-rl
 
-srun python3 src/nonsocialrl.py -s nnb_limitobs1 --building_id 5 -e 2 --tql --autotune --store
+srun python3 src/nonsocialrl.py -s nnb_limitobs1 --building_id 5 -e 2 --tql --autotune --store --save_transitions
 
 micromamba deactivate
 
