@@ -8,7 +8,7 @@
 
 \section{Pretrained Demonstrator}
 \label{sec:pretrained-demos}
-For some of our methods, we used pre-trained demonstrators. We trained these demonstrators using the final hyperparameter values, reward function and state space as described in Section \ref{sec:sac-baseline}. Also, we scaled the available renewable energy in the grid by the factor $k = 0.5$. We used two different buildings as pre-trained demonstrators, one among the training buildings and one not a training building.
+For some of our methods, we used pre-trained demonstrators. We trained these demonstrators using the final hyperparameter values, reward function and state space as described in Section~\ref{sec:sac-baseline}. Also, we scaled the available renewable energy in the grid by the factor $k = 0.5$. We used two different buildings as pre-trained demonstrators, one among the training buildings and one not a training building.
 
 \begin{figure}[htb]
 \center
@@ -16,14 +16,14 @@ For some of our methods, we used pre-trained demonstrators. We trained these dem
   \caption{}
   \label{fig:b5-b6-kpis}
 \end{figure}
-We chose the buildings with the highest median PCC to the training buildings from the set of training buildings and the remaining ones: Building Five (training building) and Building Six. The resulting KPIs of both buildings are visualized in Figure \ref{fig:b5-b6-kpis}. The values of the share of used PV and the fossil energy consumption are somewhat comparable to the (mean) performance of the baseline SAC agents when using all training buildings. However, the average daily renewable share, both from the grid and in total, is worse when using the battery. This effect could be because the energy demand from the grid of both buildings is lower when the battery is in use since more solar energy is utilized. As a result, the proportion of renewable energy used from the grid decreases because the solar generation of the buildings is correlated to the renewable production in the grid. This, in turn, has the same effect on the overall share of renewable energy used.
+We chose the buildings with the highest median PCC to the training buildings from the set of training buildings and the remaining ones: Building Five (training building) and Building Six. The resulting KPIs of both buildings are visualized in Figure~\ref{fig:b5-b6-kpis}. The values of the share of used PV and the fossil energy consumption are somewhat comparable to the (mean) performance of the baseline SAC agents when using all training buildings. However, the average daily renewable share, both from the grid and in total, is worse when using the battery. This effect could be because the energy demand from the grid of both buildings is lower when the battery is in use since more solar energy is utilized. As a result, the proportion of renewable energy used from the grid decreases because the solar generation of the buildings is correlated to the renewable production in the grid. This, in turn, has the same effect on the overall share of renewable energy used.
 
 
 \section{SAC using Demonstrator Transitions}
 \todo[inline]{Font in tabellen beschreibungen verkleinern}
 As mentioned in Section~\ref{sec:background-social-learning}, a popular technique to improve learning is by sampling demonstration transitions and storing them in a prioritized replay buffer (PRB). This buffer assigns priorities to transitions based on their temporal difference (TD) error. Transitions with higher TD error are given higher priority because they are expected to be more challenging to learn and should be observed more frequently during training. The transitions with higher priority are more likely to be sampled. Priorities are updated during the training process \cite{schaul2015prioritized}.
 
-To implement the SAC agent using the demonstrator transitions, we used the trained agents previously described in Section~\ref{sec:pretrained-demos}. These agents acted on the complete dataset hourly for an entire year. We saved these transitions and then trained the agents normally, as outlined in Section~\ref{sec:sac-baseline}. The only difference was that we filled the PRB with the demonstrator transitions at the beginning of the training for each agent. We used either the transitions from Building 5 or Building 6, but not both simultaneously. The results in comparison to the baseline SAC agents are visualized in Figure \ref{fig:prb-kpis}.
+To implement the SAC agent using the demonstrator transitions, we used the trained agents previously described in Section~\ref{sec:pretrained-demos}. These agents acted on the complete dataset hourly for an entire year. We saved these transitions and then trained the agents normally, as outlined in Section~\ref{sec:sac-baseline}. The only difference was that we filled the PRB with the demonstrator transitions at the beginning of the training for each agent. We used either the transitions from Building 5 or Building 6, but not both simultaneously. The results in comparison to the baseline SAC agents are visualized in Figure~\ref{fig:prb-kpis}.
 
 \begin{figure}[htb]
 \center
@@ -34,7 +34,7 @@ To implement the SAC agent using the demonstrator transitions, we used the train
 
 The SAC agents using the demonstrator transitions perform worse than the baseline agents on all KPIs. However, using transitions from Building 5 resulted in better scores compared to the use of transitions from Building 6. This is consistent with the performance of both demonstrator buildings, as described in the previous chapter. It is possible that the better-performing Building 5 provides better guidance on how agents should behave.
 
-The policy loss values observed during training increase for all agents instead of decreasing as expected. This is illustrated in Figure \ref{fig:prb-losses} for Building 3 and the demonstrator transitions of Building 5, but it also applies to the other training buildings and demonstrator Building 6. This development suggests that with higher probability, actions with a low, possibly even negative, estimated Q-Value are taken. As a result, the agents are more likely to take 'bad' actions with greater certainty, ultimately leading to poorer performance.
+The policy loss values observed during training increase for all agents instead of decreasing as expected. This is illustrated in Figure~\ref{fig:prb-losses} for Building 3 and the demonstrator transitions of Building 5, but it also applies to the other training buildings and demonstrator Building 6. This development suggests that with higher probability, actions with a low, possibly even negative, estimated Q-Value are taken. As a result, the agents are more likely to take 'bad' actions with greater certainty, ultimately leading to poorer performance.
 
 \begin{figure}[htb]
 \center
@@ -45,7 +45,7 @@ The policy loss values observed during training increase for all agents instead 
 
 
 \section{Social Agent I}
-In our first approach, based on decision biasing, we adjusted the loss function of the policy update. As described in Section \ref{sec:decision-biasing}, decision biasing assumes that demonstrator actions are good and, therefore, the probability of choosing those actions or the Q-value of them should be increased. To accomplish this, we tested six different modes, all of which used an imitation learning rate that we also optimized. Also, we investigated whether it made a difference whether the demonstrated action was sampled from the demonstrator policy or the deterministic action (i.e., the learned mean) was used in one of the modes.
+In our first approach, based on decision biasing, we adjusted the loss function of the policy update. As described in Section~\ref{sec:decision-biasing}, decision biasing assumes that demonstrator actions are good and, therefore, the probability of choosing those actions or the Q-value of them should be increased. To accomplish this, we tested six different modes, all of which used an imitation learning rate that we also optimized. Also, we investigated whether it made a difference whether the demonstrated action was sampled from the demonstrator policy or the deterministic action (i.e., the learned mean) was used in one of the modes.
 
 As a reminder, the classic policy objective function is defined as 
 \begin{align*}
@@ -86,7 +86,7 @@ Mode 3 combines both modes by using the entropy term of mode 2 and the value ter
 	\mathcal{H}_{M5} = \log\pi_{\phi}(a_t^d|s_t) + \alpha_i|\log\pi_{\phi}(a_t^d|s_t)|
 \end{equation}
 
-Table \ref{tab:social-policy-update-modes} summarizes the modes and their entropy and value terms.
+Table~\ref{tab:social-policy-update-modes} summarizes the modes and their entropy and value terms.
 
 {
 \renewcommand{\baselinestretch}{0.9} 
@@ -109,6 +109,45 @@ Table \ref{tab:social-policy-update-modes} summarizes the modes and their entrop
   \label{tab:social-policy-update-modes}
 \end{table}
 }
+
+We conducted experiments testing different modes and imitation learning rates with various demonstrators. An overview of the experiments is provided in Table~\ref{tab:social1-params}, while the achieved $fossi\_energy\_consumption$ KPI values are shown in Figure~\ref{fig:social1-results}. In the figure, points of the same color from the same demonstrator represent different imitation learning rates. However, since there is no clear trend indicating which values achieve the best performance, no distinction is made in the figure. The red dashed line represents the comparison value of the SAC baseline agents, while the gray dashed line shows deviations of 0.5\% compared to the baseline. We consider any deviations greater than 0.5\% to be significant.
+
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
+\begin{table}[htb]
+\center
+\begin{tabular}{c | c | c | c}
+Demonstrator                   & Mode & $\alpha_i$ & Deterministic policy actions \\ \hline
+2 random                       & 1-6  & 0.2                      & Yes                          \\ 
+\rule{0pt}{3ex}% EXTRA vertical height  
+\multirow[t]{2}{*}{2 random}      & 1-3  & 0.01, 0.2, 1, 1.5        & No                           \\
+                               & 4-6  & 0.01, 0.2                & No                           \\
+\rule{0pt}{3ex}% EXTRA vertical height  
+\multirow[t]{2}{*}{4 random}      & 1-3  & 0.01, 0.2, 1, 1.5        & No                           \\
+                               & 4-6  & 0.01, 0.2                & No                           \\
+\rule{0pt}{3ex}% EXTRA vertical height  
+\multirow[t]{2}{*}{Pretrained B5} & 1-3  & 0.01, 0.2, 1, 1.5        & No                           \\
+                               & 4-6  & 0.01, 0.2, 1             & No                           \\
+\rule{0pt}{3ex}% EXTRA vertical height  
+\multirow[t]{2}{*}{Pretrained B6} & 1-3  & 0.01, 0.2, 1, 1.5        & No                           \\
+                               & 4-6  & 0.01, 0.2, 1             & No                          
+\end{tabular}
+  \caption{}
+  \label{tab:social1-params}
+\end{table}
+}
+
+As demonstrators, we used either the pre-trained buildings 5 and 6 presented in Section~\ref{sec:pretrained-demos} or either two or four random demonstrators, which are buildings from the training buildings and not pre-trained. To ensure comparability, we always used the same random demonstrators, which were Buildings 7 and 11 for two demonstrators and additionally Buildings 5 and 17 for four demonstrators.
+
+In the first step, we sampled the demonstrator actions from the demonstrator policy instead of using the Gaussian distribution's learned mean. We tested the imitation learning rates of 0.01 and 0.2 and compared their results. We found that modes 4-6 demonstrated lower performance than the baseline, with slightly better results when using the pre-trained demonstrators than the random demonstrators. Modes 1-3 showed similar performance to the baseline for all demonstrators. Based on these results, we tried even higher imitation learning rates of 1 for modes 1-3 and 4-6 for pre-trained demonstrators and 1.5 for modes 1-3, but it did not lead to better results. Finally, for the two random demonstrators, with an imitation learning rate of 0.2 and deterministic policy actions, we also observed that modes 1-3 performed similarly to the baseline and modes 4-6 performed worse.
+
+\begin{figure}[htb]
+\center
+     \includegraphics[width=\textwidth]{figures/social1_results.pdf}
+  \caption{}
+  \label{fig:social1-results}
+\end{figure}
 
 
 \section{Social Agent II}
