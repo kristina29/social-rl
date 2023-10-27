@@ -92,7 +92,7 @@ For the final SAC algorithm, as given in Algorithm \ref{alg:sac-update}, the aut
 \caption{Soft Actor-Critic \cite{haarnoja2018soft}}
 \label{alg:sac-update}
 \small\textbf{Input:}   $\theta_1,\theta_2,\phi$ \Comment{Initial parameters}
-\begin{algorithmic}
+\begin{algorithmic}[1]
 \State $\bar{\theta}_1 \gets \theta_1, \bar{\theta}_2 \gets \theta_2$ \Comment{Initialize target network weights}
 \State $\mathcal{D} \gets \emptyset$ \Comment{Initialize an empty replay pool}
 \For{each iteration}

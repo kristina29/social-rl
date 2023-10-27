@@ -45,9 +45,9 @@ The policy loss values observed during training increase for all agents instead 
 
 
 \section{Social Agent I}
-\textcolor{red}{Policy update}
-First: normal policy update
+In our first approach, based on decision biasing, we adjusted the loss function of the policy update. As described in Section \ref{sec:decision-biasing}, decision biasing assumes that demonstrator actions are good and, therefore, the probability of choosing those actions should be increased. To accomplish this, we tested six different modes, all of which used an imitation learning rate that we also optimized. Also, we investigated whether it made a difference whether the demonstrated action was sampled from the demonstrator policy or the deterministic action (i.e., the learned mean) was used in one of the modes.
 
+First: normal policy update
 Then: policy update using demonstrator actions
 
 Classical loss $l$ to minimize is is 
