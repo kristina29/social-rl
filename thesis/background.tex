@@ -91,25 +91,25 @@ For the final SAC algorithm, as given in Algorithm \ref{alg:sac-update}, the aut
 \begin{algorithm}
 \caption{Soft Actor-Critic \cite{haarnoja2018soft}}
 \label{alg:sac-update}
-\small\textbf{Input:}   $\theta_1,\theta_2,\phi$ \Comment{Initial parameters}
+\small\textbf{Input:}   $\theta_1,\theta_2,\phi$ \Comment{\footnotesize Initial parameters}
 \begin{algorithmic}[1]
-\State $\bar{\theta}_1 \gets \theta_1, \bar{\theta}_2 \gets \theta_2$ \Comment{Initialize target network weights}
-\State $\mathcal{D} \gets \emptyset$ \Comment{Initialize an empty replay pool}
-\For{each iteration}
-	\For{each environment step}
-		\State $\mathbf{a}_t \sim \pi_{\phi}(\mathbf{a}_t|\mathbf{s}_t)$ \Comment{Sample action from the policy}
-		\State $\mathbf{s}_{t+1} \sim p(\mathbf{s}_{t+1}|\mathbf{s}_t,\mathbf{a}_t)$ \Comment{Sample transition from the environment}
-		\State $\mathcal{D} \gets \mathcal{D} \cup \{(\mathbf{s}_t,\mathbf{a}_t,r(\mathbf{s}_t,\mathbf{a}_t),\mathbf{s}_{t+1})\}$ \Comment{Store the transition in the replay pool}
-	\EndFor
-	\For{each gradient step}
-		\State $\theta_i \gets \theta_i - \lambda_Q \hat{\triangledown}_{\theta_i}J_Q(\theta_i)$ for $i \in \{1,2\}$ \Comment{Update Q-function parameters}
-		\State $\phi \gets \phi - \lambda _{\pi} \hat{\triangledown}_{\phi}J_{\pi}(\phi)$ \Comment{Update policy weights}
-		\State $\alpha \gets \alpha - \lambda  \hat{\triangledown}_{\alpha}J(\alpha)$ \Comment{Adjust temperature}
-		\State $\bar{\theta}_i \gets \tau\theta_i + (1-\tau)\bar{\theta}_i$ for $i \in \{1,2\}$ \Comment{Update target network weights}
-	\EndFor
-\EndFor
+\small \State $\bar{\theta}_1 \gets \theta_1, \bar{\theta}_2 \gets \theta_2$ \Comment{\footnotesize Initialize target network weights}
+\small \State $\mathcal{D} \gets \emptyset$ \Comment{\footnotesize Initialize an empty replay buffer}
+\small \For{each iteration}
+	\small \For{each environment step}
+		\small \State $\mathbf{a}_t \sim \pi_{\phi}(\mathbf{a}_t|\mathbf{s}_t)$ \Comment{\footnotesize Sample action from the policy}
+		\small \State $\mathbf{s}_{t+1} \sim p(\mathbf{s}_{t+1}|\mathbf{s}_t,\mathbf{a}_t)$ \Comment{\footnotesize Sample next state from the environment}
+		\small \State $\mathcal{D} \gets \mathcal{D} \cup \{(\mathbf{s}_t,\mathbf{a}_t,r(\mathbf{s}_t,\mathbf{a}_t),\mathbf{s}_{t+1})\}$ \Comment{\footnotesize Store the transition in the replay buffer}
+	\small \EndFor
+	\small \For{each gradient step}
+		\small \State $\theta_i \gets \theta_i - \lambda_Q \hat{\triangledown}_{\theta_i}J_Q(\theta_i)$ for $i \in \{1,2\}$ \Comment{\footnotesize Update Q-function parameters}
+		\small \State $\phi \gets \phi - \lambda _{\pi} \hat{\triangledown}_{\phi}J_{\pi}(\phi)$ \Comment{\footnotesize Update policy weights}
+		\small \State $\alpha \gets \alpha - \lambda  \hat{\triangledown}_{\alpha}J(\alpha)$ \Comment{\footnotesize Adjust temperature}
+		\small \State $\bar{\theta}_i \gets \tau\theta_i + (1-\tau)\bar{\theta}_i$ for $i \in \{1,2\}$ \Comment{\footnotesize Update target network weights}
+	\small \EndFor
+\small \EndFor
 \end{algorithmic}
-\textbf{Output:}   $\theta_1,\theta_2,\phi$ \Comment{Optimized parameters}
+\small \textbf{Output:}   $\theta_1,\theta_2,\phi$ \Comment{\footnotesize Optimized parameters}
 \end{algorithm}
 
 \section{Social Learning}
@@ -134,37 +134,3 @@ Our approach is based on the 'DB2' method presented by Najar et al. \cite{najar2
 Q'(d) \leftarrow Q'(d) + \alpha_i \cdot [1-Q'(d)],
 \end{equation}
 where $d$ is the observed demonstrator action and $\alpha_i $ is an imitation decision bias rate parameter. 
-
-\begin{algorithm}
-\caption{\textcolor{red}{Mine DB2}}
-\label{alg:sac-update-db2}
-\small\textbf{Input:}   $\theta_1,\theta_2,\phi$ \Comment{Initial parameters}
-\begin{algorithmic}
-\State $\bar{\theta}_1 \gets \theta_1, \bar{\theta}_2 \gets \theta_2$ \Comment{Initialize target network weights}
-\State $\mathcal{D} \gets \emptyset$ \Comment{Initialize an empty replay pool}
-\For{each iteration}
-	\For{each environment step}
-		\State $\mathbf{a}_t \sim \pi_{\phi}(\mathbf{a}_t|\mathbf{s}_t)$ \Comment{Sample action from the policy}
-		\State $\mathbf{s}_{t+1} \sim p(\mathbf{s}_{t+1}|\mathbf{s}_t,\mathbf{a}_t)$ \Comment{Sample transition from the environment}
-		\State $\mathcal{D} \gets \mathcal{D} \cup \{(\mathbf{s}_t,\mathbf{a}_t,r(\mathbf{s}_t,\mathbf{a}_t),\mathbf{s}_{t+1})\}$ \Comment{Store the transition in the replay pool}
-	\EndFor
-	\For{each gradient step}
-		\State $\theta_i \gets \theta_i - \lambda_Q \hat{\triangledown}_{\theta_i}J_Q(\theta_i)$ for $i \in \{1,2\}$ \Comment{Update Q-function parameters}
-		\State $\phi \gets \phi - \lambda _{\pi} \hat{\triangledown}_{\phi}J_{\pi}(\phi)$ \Comment{Update policy weights}
-		\State $\alpha \gets \alpha - \lambda  \hat{\triangledown}_{\alpha}J(\alpha)$ \Comment{Adjust temperature}
-		\State $\bar{\theta}_i \gets \tau\theta_i + (1-\tau)\bar{\theta}_i$ for $i \in \{1,2\}$ \Comment{Update target network weights}
-		\If{agent not a demonstrator}
-			\For{each demonstrator $d$}
-				\State $\mathbf{a}_t^d \sim \pi_{\phi}^d(\mathbf{a}_t^d|\mathbf{s}_t)$
-				\State $q_t^d = \min_i J_Q(\theta_i)$
-				\State $q_t^d = q_t^d + \lambda_d(1-q_t^d)$
-				\State $\phi \gets \phi - \lambda _{\pi} \hat{\triangledown}_{\phi}J_{\pi}(\phi)$ \Comment{halt loss mit diesen q-values berechnen und dann backward step}
-			\EndFor
-		\EndIf
-	\EndFor
-\EndFor
-\end{algorithmic}
-\textbf{Output:}   $\theta_1,\theta_2,\phi$ \Comment{Optimized parameters}
-\end{algorithm}
-
-

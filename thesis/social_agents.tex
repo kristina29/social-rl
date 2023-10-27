@@ -47,12 +47,45 @@ The policy loss values observed during training increase for all agents instead 
 \section{Social Agent I}
 In our first approach, based on decision biasing, we adjusted the loss function of the policy update. As described in Section \ref{sec:decision-biasing}, decision biasing assumes that demonstrator actions are good and, therefore, the probability of choosing those actions should be increased. To accomplish this, we tested six different modes, all of which used an imitation learning rate that we also optimized. Also, we investigated whether it made a difference whether the demonstrated action was sampled from the demonstrator policy or the deterministic action (i.e., the learned mean) was used in one of the modes.
 
+\begin{algorithm}
+\caption{\textcolor{red}{Mine DB2}}
+\label{alg:sac-update-db2}
+\small\textbf{Input:}   $\theta_1,\theta_2,\phi$ \Comment{\footnotesize Initial parameters}
+\begin{algorithmic}
+\small \State $\bar{\theta}_1 \gets \theta_1, \bar{\theta}_2 \gets \theta_2$ \Comment{\footnotesize Initialize target network weights}
+\small \State $\mathcal{D} \gets \emptyset$ \Comment{\footnotesize Initialize an empty replay buffer}
+\small \For{each iteration}
+	\small \For{each environment step}
+		\small \State $\mathbf{a}_t \sim \pi_{\phi}(\mathbf{a}_t|\mathbf{s}_t)$ \Comment{\footnotesize Sample action from the policy}
+		\small \State $\mathbf{s}_{t+1} \sim p(\mathbf{s}_{t+1}|\mathbf{s}_t,\mathbf{a}_t)$ \Comment{\footnotesize Sample next state from the environment}
+		\small \State $\mathcal{D} \gets \mathcal{D} \cup \{(\mathbf{s}_t,\mathbf{a}_t,r(\mathbf{s}_t,\mathbf{a}_t),\mathbf{s}_{t+1})\}$ \Comment{\footnotesize Store the transition in the replay buffer}
+	\small \EndFor
+	\small \For{each gradient step}
+		\small \State $\theta_i \gets \theta_i - \lambda_Q \hat{\triangledown}_{\theta_i}J_Q(\theta_i)$ for $i \in \{1,2\}$ \Comment{\footnotesize Update Q-function parameters}
+		\small \State $\phi \gets \phi - \lambda _{\pi} \hat{\triangledown}_{\phi}J_{\pi}(\phi)$ \Comment{\footnotesize Update policy weights}
+		\small \State $\alpha \gets \alpha - \lambda  \hat{\triangledown}_{\alpha}J(\alpha)$ \Comment{\footnotesize Adjust temperature}
+		\small \State $\bar{\theta}_i \gets \tau\theta_i + (1-\tau)\bar{\theta}_i$ for $i \in \{1,2\}$ \Comment{\footnotesize Update target network weights}
+		\small \If{agent not a demonstrator}
+			\small \For{each demonstrator $d$}
+				\small \State $\mathbf{a}_t^d \sim \pi_{\phi}^d(\mathbf{a}_t^d|\mathbf{s}_t)$
+				\small \State $q_t^d = \min_i J_Q(\theta_i)$
+				\small \State $q_t^d = q_t^d + \lambda_d(1-q_t^d)$
+				\small \State $\phi \gets \phi - \lambda _{\pi} \hat{\triangledown}_{\phi}J_{\pi}(\phi)$ \Comment{\footnotesize halt loss mit diesen q-values berechnen und dann backward step}
+			\small \EndFor
+		\small \EndIf
+	\small \EndFor
+\small \EndFor
+\end{algorithmic}
+\small \textbf{Output:}   $\theta_1,\theta_2,\phi$ \Comment{Optimized parameters}
+\end{algorithm}
+
 First: normal policy update
 Then: policy update using demonstrator actions
 
-Classical loss $l$ to minimize is is 
+Classical loss $J_{\pi}(\phi)$ to minimize is is 
+
 \begin{align*}
-	l &= \mathbb{E}_{s_t \sim \mathcal{D}, \epsilon_t \sim \mathcal{N}}[\alpha \log\pi_{\phi}(f_{\phi}(\epsilon_t;s_t)|s_t)-Q_{\theta}(s_t, f_{\phi}(\epsilon_t;s_t))] \\ 
+	J_{\pi}(\phi) &= \mathbb{E}_{s_t \sim \mathcal{D}, \epsilon_t \sim \mathcal{N}} \left [\alpha \log\pi_{\phi}(f_{\phi}(\epsilon_t;s_t)|s_t)-Q_{\theta}(s_t, f_{\phi}(\epsilon_t;s_t)) \right ] \\ 
 	&=  \mathbb{E}_{s_t \sim \mathcal{D}, \epsilon_t \sim \mathcal{N}}[\alpha \mathcal{H}_{SAC}-\mathcal{V}_{SAC}] \numberthis \label{eqn:policy-loss}
 \end{align*}
 with the entropy term that aims to maximize randomness $\mathcal{H}_{SAC}$ and the value term that aims to maximize the estimated Q-Value of the action $\mathcal{V}_{SAC}$. For incorporating demonstrator actions similar to decision biasing described in chapter \ref{sec:decision-biasing}, so increase the probability of observed demonstrator actions or increase the estimated Q-Value of these, we modify the terms as follows: In mode 1, we use the actions sampled from the demonstrator $f^d_{\Phi}(\epsilon_t;s_t)$ in the value term and increase the estimated Q-Value by adding a fraction of the absolute value of it using the imitation learning rate $\alpha_i$:
