@@ -45,69 +45,48 @@ The policy loss values observed during training increase for all agents instead 
 
 
 \section{Social Agent I}
-In our first approach, based on decision biasing, we adjusted the loss function of the policy update. As described in Section \ref{sec:decision-biasing}, decision biasing assumes that demonstrator actions are good and, therefore, the probability of choosing those actions should be increased. To accomplish this, we tested six different modes, all of which used an imitation learning rate that we also optimized. Also, we investigated whether it made a difference whether the demonstrated action was sampled from the demonstrator policy or the deterministic action (i.e., the learned mean) was used in one of the modes.
+In our first approach, based on decision biasing, we adjusted the loss function of the policy update. As described in Section \ref{sec:decision-biasing}, decision biasing assumes that demonstrator actions are good and, therefore, the probability of choosing those actions or the Q-value of them should be increased. To accomplish this, we tested six different modes, all of which used an imitation learning rate that we also optimized. Also, we investigated whether it made a difference whether the demonstrated action was sampled from the demonstrator policy or the deterministic action (i.e., the learned mean) was used in one of the modes.
 
-\begin{algorithm}
-\caption{\textcolor{red}{Mine DB2}}
-\label{alg:sac-update-db2}
-\small\textbf{Input:}   $\theta_1,\theta_2,\phi$ \Comment{\footnotesize Initial parameters}
-\begin{algorithmic}
-\small \State $\bar{\theta}_1 \gets \theta_1, \bar{\theta}_2 \gets \theta_2$ \Comment{\footnotesize Initialize target network weights}
-\small \State $\mathcal{D} \gets \emptyset$ \Comment{\footnotesize Initialize an empty replay buffer}
-\small \For{each iteration}
-	\small \For{each environment step}
-		\small \State $\mathbf{a}_t \sim \pi_{\phi}(\mathbf{a}_t|\mathbf{s}_t)$ \Comment{\footnotesize Sample action from the policy}
-		\small \State $\mathbf{s}_{t+1} \sim p(\mathbf{s}_{t+1}|\mathbf{s}_t,\mathbf{a}_t)$ \Comment{\footnotesize Sample next state from the environment}
-		\small \State $\mathcal{D} \gets \mathcal{D} \cup \{(\mathbf{s}_t,\mathbf{a}_t,r(\mathbf{s}_t,\mathbf{a}_t),\mathbf{s}_{t+1})\}$ \Comment{\footnotesize Store the transition in the replay buffer}
-	\small \EndFor
-	\small \For{each gradient step}
-		\small \State $\theta_i \gets \theta_i - \lambda_Q \hat{\triangledown}_{\theta_i}J_Q(\theta_i)$ for $i \in \{1,2\}$ \Comment{\footnotesize Update Q-function parameters}
-		\small \State $\phi \gets \phi - \lambda _{\pi} \hat{\triangledown}_{\phi}J_{\pi}(\phi)$ \Comment{\footnotesize Update policy weights}
-		\small \State $\alpha \gets \alpha - \lambda  \hat{\triangledown}_{\alpha}J(\alpha)$ \Comment{\footnotesize Adjust temperature}
-		\small \State $\bar{\theta}_i \gets \tau\theta_i + (1-\tau)\bar{\theta}_i$ for $i \in \{1,2\}$ \Comment{\footnotesize Update target network weights}
-		\small \If{agent not a demonstrator}
-			\small \For{each demonstrator $d$}
-				\small \State $\mathbf{a}_t^d \sim \pi_{\phi}^d(\mathbf{a}_t^d|\mathbf{s}_t)$
-				\small \State $q_t^d = \min_i J_Q(\theta_i)$
-				\small \State $q_t^d = q_t^d + \lambda_d(1-q_t^d)$
-				\small \State $\phi \gets \phi - \lambda _{\pi} \hat{\triangledown}_{\phi}J_{\pi}(\phi)$ \Comment{\footnotesize halt loss mit diesen q-values berechnen und dann backward step}
-			\small \EndFor
-		\small \EndIf
-	\small \EndFor
-\small \EndFor
-\end{algorithmic}
-\small \textbf{Output:}   $\theta_1,\theta_2,\phi$ \Comment{Optimized parameters}
-\end{algorithm}
-
-First: normal policy update
-Then: policy update using demonstrator actions
-
-Classical loss $J_{\pi}(\phi)$ to minimize is is 
-
+As a reminder, the classic policy objective function is defined as 
 \begin{align*}
 	J_{\pi}(\phi) &= \mathbb{E}_{s_t \sim \mathcal{D}, \epsilon_t \sim \mathcal{N}} \left [\alpha \log\pi_{\phi}(f_{\phi}(\epsilon_t;s_t)|s_t)-Q_{\theta}(s_t, f_{\phi}(\epsilon_t;s_t)) \right ] \\ 
 	&=  \mathbb{E}_{s_t \sim \mathcal{D}, \epsilon_t \sim \mathcal{N}}[\alpha \mathcal{H}_{SAC}-\mathcal{V}_{SAC}] \numberthis \label{eqn:policy-loss}
 \end{align*}
-with the entropy term that aims to maximize randomness $\mathcal{H}_{SAC}$ and the value term that aims to maximize the estimated Q-Value of the action $\mathcal{V}_{SAC}$. For incorporating demonstrator actions similar to decision biasing described in chapter \ref{sec:decision-biasing}, so increase the probability of observed demonstrator actions or increase the estimated Q-Value of these, we modify the terms as follows: In mode 1, we use the actions sampled from the demonstrator $f^d_{\Phi}(\epsilon_t;s_t)$ in the value term and increase the estimated Q-Value by adding a fraction of the absolute value of it using the imitation learning rate $\alpha_i$:
+with the entropy term that aims to maximize randomness $\mathcal{H}_{SAC}$ and the value term that aims to maximize the estimated Q-Value of the action $\mathcal{V}_{SAC}$. 
+
+We first trained the agents using the classic SAC algorithm in this social agent. For each gradient step, we incorporated an extra policy update step for each demonstrator $d \in D$, using the social objective function $J_{\pi}^{social}(\phi)$. This social objective comprises different entropy and value terms based on the mode but is fundamentally similar to the conventional objective. The training algorithm of \textcolor{red}{Social Agent I} is given in Appendix \ref{sec:app-algos}, Algorithm \ref{app:sac-social-1}. The only difference to the classic SAC algorithm are lines 14-16.
+
+When operating in mode 1, we use the actions sampled from the demonstrator policy $a_t^d=f^d_{\phi}(\epsilon_t;s_t)$. The estimated Q-value in the value term is then increased by adding a fraction of the absolute value using the imitation learning rate $\alpha_i$:
+
 \begin{equation}
-	\mathcal{V}_{M1} =  Q_{\theta}(s_t, f_{\phi}^d(\epsilon_t;s_t)) + \alpha_i|Q_{\theta}(s_t, f_{\phi}^d(\epsilon_t;s_t))|
+	\mathcal{V}_{M1} = Q_{\theta}(s_t, a_t^d) + \alpha_i|Q_{\theta}(s_t, a_t^d)|
 \end{equation}
-Also, the probability of taking the demonstrator action for the demonstrator is used in the entropy term:
+
+It is important to note that we use the Q-functions of the agent to be trained and not the Q-functions of the demonstrator. In addition, the probability of taking the demonstrator action for the demonstrator $\pi_{\phi}^d(a_t^d|s_t)$ is used in the entropy term:
+
 \begin{equation}
-	\mathcal{H}_{M1} =  \log\pi_{\phi}^d(f_{\phi}^d(\epsilon_t;s_t)|s_t)
+	\mathcal{H}_{M1} = \log\pi_{\phi}^d(a_t^d|s_t)
 \end{equation}
-In mode 2, the probability of taking the demonstrator action is increased by the learning rate:
+
+When operating in mode 2, we increase the probability of taking the demonstrator action using the imitation learning rate:
+
 \begin{equation}
-	\mathcal{H}_{M2} = \log\pi_{\phi}^d(f_{\phi}^d(\epsilon_t;s_t)|s_t) + \alpha_i|\log\pi_{\phi}^d(f_{\phi}^d(\epsilon_t;s_t)|s_t)|
+	\mathcal{H}_{M2} = \log\pi_{\phi}^d(a_t^d|s_t) + \alpha_i|\log\pi_{\phi}^d(a_t^d|s_t)|
 \end{equation}
-Mode 3 combines mode 1 and mode 2. Mode 4-6 are similar to the modes 1-3, but the probability of taking the demonstrator action in the current trained policy is used:
+
+The value term in mode 2 is the one in the classical objective.
+
+Mode 3 combines both modes by using the entropy term of mode 2 and the value term of mode 1. Modes 4-6 are similar to modes 1-3, but the probability of taking the demonstrator action in the current trained policy $\pi_{\phi}(a_t^d|s_t)$ is used:
+
 \begin{equation}
-	\mathcal{H}_{M4} =  \log\pi_{\phi}(f_{\phi}^d(\epsilon_t;s_t)|s_t)
+	\mathcal{H}_{M4} = \log\pi_{\phi}(a_t^d|s_t)
 \end{equation}
+
 \begin{equation}
-	\mathcal{H}_{M5} = \log\pi_{\phi}(f_{\phi}^d(\epsilon_t;s_t)|s_t) + \alpha_i|\log\pi_{\phi}(f_{\phi}^d(\epsilon_t;s_t)|s_t)|
+	\mathcal{H}_{M5} = \log\pi_{\phi}(a_t^d|s_t) + \alpha_i|\log\pi_{\phi}(a_t^d|s_t)|
 \end{equation}
-All modes calculate the loss as defined in Equation \ref{eqn:policy-loss} using the defined entropy and value term. Table \ref{tab:social-policy-update-modes} summarizes the different modes and their entropy and value terms.
+
+Table \ref{tab:social-policy-update-modes} summarizes the modes and their entropy and value terms.
 
 {
 \renewcommand{\baselinestretch}{0.9} 
@@ -126,7 +105,7 @@ All modes calculate the loss as defined in Equation \ref{eqn:policy-loss} using 
   5 & $\mathcal{H}_{M5}$ & $\mathcal{V}_{SAC}$ \\ \hline
   6 & $\mathcal{H}_{M5}$ &  $\mathcal{V}_{M1}$ \\ \hline 
 \end{tabular}
-  \caption[Modes for Social Agent focusing on the policy update]{Modes for Social Agent focusing on the policy update. Mode 1 increases the estimated Q-Value of the demonstrator action, mode 2 increases the probability of the demonstrator action and mode 3 combines both. Mode 4-6 are similar, but the probability of the demonstrator actions in the current trained policy is used instead of their probabilities in the demonstrator policy.}
+  \caption[Modes for Social Agent focusing on the policy update.]{Modes for Social Agent focusing on the policy update. Mode 1 increases the estimated Q-Value of the demonstrator action, mode 2 increases the probability of the demonstrator action and mode 3 combines both. Mode 4-6 are similar, but the probability of the demonstrator actions in the current trained policy is used instead of their probabilities in the demonstrator policy.}
   \label{tab:social-policy-update-modes}
 \end{table}
 }
