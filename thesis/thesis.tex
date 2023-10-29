@@ -27,6 +27,7 @@
 \usepackage[permil]{overpic}
 \usepackage{multirow}
 
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
 \newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
@@ -179,6 +180,7 @@ Thesis period: 01.06.2023~-~01.12.2023
 \textbf{NY}\> New York \\
 \textbf{NYISO}\>New York Independent System Operator \\
 \textbf{PCC}\>Pearson Correlation Coefficient \\
+\textbf{PRB}\>Prioritized Replay Buffer \\
 \textbf{PV}\> Photovoltaic \\
 \textbf{RL}\>Reinforcement learning \\
 \textbf{SAC}\>Soft actor-critic \\
@@ -290,9 +292,9 @@ $total\_used\_of\_available_{t} = total\_used_{t} / total\_could\_have\_used_{t}
 \appendix
 
 %\setcounter{secnumdepth}{-1}
-%\section{Tables}\label{chap:App}
 \chapter{Appendix}\label{chap:App}
-\begin{table}[htb]
+\section{Tables}\label{chap:App}
+\begin{table}[H]
 \begin{tabularx}{\linewidth}{lXc}
 Attribute name & Description & Value \\ \hline
 Capacity & Maximum amount of energy the storage device can store & 6.4 kWh \\
@@ -307,14 +309,14 @@ Nominal power & Maximum amount of electric power that the battery can use to cha
 
 %\chapter{Figures}\label{chap:App2}
 
-\begin{figure}[htb]
+\begin{figure}[H]
     \center
      \includegraphics[width=\textwidth]{figures/building_daily_means.pdf}
   \caption{Daily means of the non-shiftable load and the solar generation of the buildings in kWh.}
   \label{app:building-daily-mean}
 \end{figure}
 
-\begin{table}[htb]
+\begin{table}[H]
 \center
 \begin{tabular}{c|c}
 Building Id & Energy Consumption Median 
@@ -358,14 +360,14 @@ Building Id & Energy Consumption Median
 \label{tab:building-medians}
 \end{table}
 
-\begin{figure}[htb]
+\begin{figure}[H]
     \center
      \includegraphics[width=\textwidth]{figures/weather_daily_means.pdf}
   \caption{}
   \label{app:weather-daily-mean}
 \end{figure}
 
-\begin{table}[htb]
+\begin{table}[H]
 \begin{tabularx}{\linewidth}{l|X}
 Name & Description \\ \hline
 month & 1 (January) through 12 (December)\\
@@ -404,6 +406,66 @@ hour & hour of day (from 1 to 24)\\
 \caption{Available state variables of the baseline SAC Agent}
 \label{app:observation-space-sac}
 \end{table}
+
+\section{Algorithms}\label{sec:app-algos}
+\begin{algorithm}
+\caption{\textcolor{red}{Social Agent I}}
+\label{app:sac-social-1}
+\small\textbf{Input:}   $\theta_1,\theta_2,\phi$ \Comment{\footnotesize Initial parameters}
+\begin{algorithmic}[1]
+\small \State $\bar{\theta}_1 \gets \theta_1, \bar{\theta}_2 \gets \theta_2$ \Comment{\footnotesize Initialize target network weights}
+\small \State $\mathcal{D} \gets \emptyset$ \Comment{\footnotesize Initialize an empty replay buffer}
+\small \For{each iteration}
+	\small \For{each environment step}
+		\small \State $\mathbf{a}_t \sim \pi_{\phi}(\mathbf{a}_t|\mathbf{s}_t)$ \Comment{\footnotesize Sample action from the policy}
+		\small \State $\mathbf{s}_{t+1} \sim p(\mathbf{s}_{t+1}|\mathbf{s}_t,\mathbf{a}_t)$ \Comment{\footnotesize Sample next state from the environment}
+		\small \State $\mathcal{D} \gets \mathcal{D} \cup \{(\mathbf{s}_t,\mathbf{a}_t,r(\mathbf{s}_t,\mathbf{a}_t),\mathbf{s}_{t+1})\}$ \Comment{\footnotesize Store the transition in the replay buffer}
+	\small \EndFor
+	\small \For{each gradient step}
+		\small \State $\theta_i \gets \theta_i - \lambda_Q \hat{\triangledown}_{\theta_i}J_Q(\theta_i)$ for $i \in \{1,2\}$ \Comment{\footnotesize Update Q-function parameters}
+		\small \State $\phi \gets \phi - \lambda _{\pi} \hat{\triangledown}_{\phi}J_{\pi}(\phi)$ \Comment{\footnotesize Update policy weights}
+		\small \State $\alpha \gets \alpha - \lambda  \hat{\triangledown}_{\alpha}J(\alpha)$ \Comment{\footnotesize Adjust temperature}
+		\small \State $\bar{\theta}_i \gets \tau\theta_i + (1-\tau)\bar{\theta}_i$ for $i \in \{1,2\}$ \Comment{\footnotesize Update target network weights}
+		\small \For{each demonstrator $d$}
+			\small \State $\mathbf{a}_t^d \sim \pi_{\phi}^d(\mathbf{a}_t^d|\mathbf{s}_t)$
+			\small \State $\phi \gets \phi - \lambda _{\pi} \hat{\triangledown}_{\phi}J_{\pi}^{social}(\phi)$ \Comment{\footnotesize Social policy update}
+		\small \EndFor
+	\small \EndFor
+\small \EndFor
+\end{algorithmic}
+\small \textbf{Output:}   $\theta_1,\theta_2,\phi$ \Comment{Optimized parameters}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{\textcolor{red}{Social Agent II}}
+\label{app:sac-social-2}
+\small\textbf{Input:}   $\theta_1,\theta_2,\phi$ \Comment{\footnotesize Initial parameters}
+\begin{algorithmic}[1]
+\small \State $\bar{\theta}_1 \gets \theta_1, \bar{\theta}_2 \gets \theta_2$ \Comment{\footnotesize Initialize target network weights}
+\small \State $\mathcal{D} \gets \emptyset$ \Comment{\footnotesize Initialize an empty replay buffer}
+\small \For{each iteration}
+	\small \For{each environment step}
+		\small \State $\mathbf{a}_t \sim \pi_{\phi}(\mathbf{a}_t|\mathbf{s}_t)$ \Comment{\footnotesize Sample action from the policy}
+		\small \State $\mathbf{s}_{t+1} \sim p(\mathbf{s}_{t+1}|\mathbf{s}_t,\mathbf{a}_t)$ \Comment{\footnotesize Sample next state from the environment}
+		\small \State $\mathcal{D} \gets \mathcal{D} \cup \{(\mathbf{s}_t,\mathbf{a}_t,r(\mathbf{s}_t,\mathbf{a}_t),\mathbf{s}_{t+1})\}$ \Comment{\footnotesize Store the transition in the replay buffer}
+	\small \EndFor
+	\small \For{each gradient step}
+		\small \State $\theta_i \gets \theta_i - \lambda_Q \hat{\triangledown}_{\theta_i}J_Q(\theta_i)$ for $i \in \{1,2\}$ \Comment{\footnotesize Update Q-function parameters}
+		\small \State $\phi \gets \phi - \lambda _{\pi} \hat{\triangledown}_{\phi}J_{\pi}(\phi)$ \Comment{\footnotesize Update policy weights}
+		\small \State $\alpha \gets \alpha - \lambda  \hat{\triangledown}_{\alpha}J(\alpha)$ \Comment{\footnotesize Adjust temperature}
+		\small \State $\bar{\theta}_i \gets \tau\theta_i + (1-\tau)\bar{\theta}_i$ for $i \in \{1,2\}$ \Comment{\footnotesize Update target network weights}
+		\small \For{each demonstrator $d$}
+			\small \State $\theta_i \gets \theta_i - \lambda_Q \hat{\triangledown}_{\theta_i}J_Q^{social}(\theta_i)$ for $i \in \{1,2\}$ \Comment{\footnotesize Social Q-function update}
+			\small \State $\bar{\theta}_i \gets \tau\theta_i + (1-\tau)\bar{\theta}_i$ for $i \in \{1,2\}$ \Comment{\footnotesize Update target network weights}
+			\small \If{extra policy update}
+				\small \State $\phi \gets \phi - \lambda _{\pi} \hat{\triangledown}_{\phi}J_{\pi}(\phi)$ \Comment{\footnotesize Update policy weights}
+			\small \EndIf
+		\small \EndFor
+	\small \EndFor
+\small \EndFor
+\end{algorithmic}
+\small \textbf{Output:}   $\theta_1,\theta_2,\phi$ \Comment{Optimized parameters}
+\end{algorithm}
 
 %\end{appendices)
 

@@ -98,7 +98,11 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
         ].dropna()
 
         kpi['rank'] = kpi['kpi'].map(kpi_names)
-        kpi = kpi[kpi['env_id'] == 'SAC']
+
+        if i==0:
+            kpi = kpi[kpi['env_id'] == 'SAC Best']
+        else:
+            kpi = kpi[kpi['env_id'] == 'PRB_SAC']
 
         kpi['env_id'] = names[i]
         kpi = kpi.drop(columns=['net_value', 'net_value_without_storage'])
@@ -114,7 +118,7 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
     column_count = 1
     env_count = len(kpis)
     kpi_count = len(kpis['kpi'].unique())
-    figsize = (16.0 * column_count, 0.125 * env_count * kpi_count * row_count)
+    figsize = (18.0 * column_count, 0.125 * env_count * kpi_count * row_count)
     fig, ax = plt.subplots(row_count, column_count, figsize=figsize)
 
     width = 0.9
@@ -146,9 +150,9 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
     ax.set_yticklabels(labels, fontsize=21)
     ax.tick_params(axis='both', which='major', labelsize=21)
 
-    ax.legend(loc='upper left', bbox_to_anchor=(1.0, 1.0), framealpha=0.0, fontsize=21)
     #fig.suptitle('KPIs at district-level', fontsize=16)
-    plt.tight_layout()
+    plt.tight_layout(rect=[0, 0, 0.75, 1])
+    ax.legend(loc='upper right', bbox_to_anchor=(1.6, 1.0), framealpha=0, fontsize=21)
     #plt.show()
     fig.savefig("kpis.pdf")
 
@@ -156,12 +160,13 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
 
 
 if __name__ == '__main__':
-    kpis = [pd.read_csv('../experiments/SAC/10_b5_demonstrator/kpis_20231002T132420.csv'),
-            pd.read_csv('../experiments/SAC/09_b6_demonstrator/kpis_20231002T132428.csv')]
+    kpis = [pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_20231002T130931.csv'),
+            pd.read_csv('../experiments/SAC_DB2/33_demo_replaybuffer/demo_b6/kpis_20231026T122547.csv'),
+            pd.read_csv('../experiments/SAC_DB2/33_demo_replaybuffer/demo_b5/kpis_20231026T121912.csv')]
 
     if len(kpis) == 1:
         plot_district_kpis1(kpis[0])
     else:
-        plot_district_kpis_multiple(kpis, ['Building 5', 'Building 6'])
+        plot_district_kpis_multiple(kpis, ['Baseline SAC', 'Transitions of Building 5', 'Transitions of Building 6'])
 
-    plt.show()
+    #plt.show()
