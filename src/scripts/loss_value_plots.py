@@ -5,6 +5,10 @@ from typing import List
 import numpy as np
 from matplotlib import pyplot as plt
 
+plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "Helvetica"
+    })
 
 def plot_losses(losses: Mapping[str, Mapping[int, Mapping[str, List[float]]]]) -> List[plt.Figure]:
 
@@ -18,8 +22,8 @@ def plot_losses(losses: Mapping[str, Mapping[int, Mapping[str, List[float]]]]) -
 
     ax.set_ylabel(f'Policy loss value', fontsize=21)
     ax.set_xlabel('Time step', fontsize=21)
-    ax.tick_params(axis='x', which='both', labelsize=18)
-    ax.tick_params(axis='y', which='both', labelsize=18)
+    ax.tick_params(axis='x', which='both', labelsize=21)
+    ax.tick_params(axis='y', which='both', labelsize=21)
     #ax.set_title(f'{env_name}')
     ax.grid(axis='y')
     ax.legend(fontsize=21)

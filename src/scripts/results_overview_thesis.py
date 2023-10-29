@@ -5,6 +5,11 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
+plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "Helvetica"
+    })
+
 BEST_SAC_VALUE = 0.929
 Y_LIM = [0.91, 1.005]
 sacdb2_dirs = pd.DataFrame({'paths': ['31_randomdemo/d2/ir0.01',
@@ -98,7 +103,7 @@ marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info
                                                   'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes',
                                                   'No', 'No', 'Yes', 'Yes', ]})
 
-mode = 'sacdb2v'
+mode = 'sacdb2'
 var = 2
 
 

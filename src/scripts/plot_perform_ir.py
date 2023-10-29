@@ -39,7 +39,9 @@ def plot(dirs):
         fossil_energy2.append(v)
 
     fig, ax = plt.subplots()
+    ax.plot(irs, fossil_energy)
     ax.scatter(irs, fossil_energy)
+    ax.plot(irs2, fossil_energy2)
     ax.scatter(irs2, fossil_energy2)
     plt.show()
 

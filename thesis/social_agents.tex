@@ -155,7 +155,7 @@ In the next step, we incorporated a social Q-Value objective into the algorithm 
 \begin{equation}
 	J_Q^{social}(\theta)=\mathbb{E}_{s_t\sim\mathcal{D}}\left[\frac{1}{2}\left ( Q_{\theta}(s_t,a_t^d) - \left(Q_{\bar{\theta}}(s_t,a_t^d) + \alpha_i \left|Q_{\bar{\theta}}(s_t,a_t^d)\right| \right) \right )^2 \right].
 \end{equation}
-In this context, we again use an imitation learning rate $\alpha_i$ to update the objective. The objective also follows the assumption of decision biasing, that the actions performed by the demonstrator, denoted as $a_t^d$, are good and therefore should have a higher Q-value. After that, a soft update of the target network parameters is performed, optionally followed by another standard policy update. For a detailed description of the algorithm used in Social Agent II, please refer to Appendix\ref{sec:app-algos}, Algorithm~\ref{app:sac-social-2}.
+In this context, we again use an imitation learning rate $\alpha_i$ to update the objective. The objective also follows the assumption of decision biasing, that the actions performed by the demonstrator, denoted as $a_t^d$, are good and therefore should have a higher Q-value. After that, a soft update of the target network parameters is performed, optionally followed by another standard policy update. For a detailed description of the algorithm used in Social Agent II, please refer to Appendix~\ref{sec:app-algos}, Algorithm~\ref{app:sac-social-2}.
 
 {
 \renewcommand{\baselinestretch}{0.9} 
@@ -184,12 +184,18 @@ Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.
 \end{table}
 }
 
+We again conducted a series of experiments using the Social Agent II. In each experiment, we compared the KPI value for fossil energy consumption to the SAC baseline. We again used the same random demonstrators or the pre-trained demonstrators as in Social Agent. We kept the other general conditions reward function, hyperparameter values, and early stopping method unchanged. Using the two random demonstrators, we also tried to extend the state space by allowing the buildings to observe the building-specific values of all other buildings. These building-specific values are the non-shiftable load, the solar generation, the SOC of the battery and the net electricity consumption. In addition, we tested the deterministic demonstrator action, i.e., the learned mean of the Gaussian distribution for some demonstrators. An overview of the experiments performed is given in Table \ref{tab:social2-params}. The values for the imitation learning rates were tested between $1e^{-4}$ and $0.8$. We conducted one experiment with an additional policy update and one experiment without for each of the experiments run.
+
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/social2_results.pdf}
   \caption{}
   \label{fig:social2-results}
 \end{figure}
+
+Figure \ref{fig:social2-results} shows the results of the experiments. Same-colored dots represent imitation learning rates for a demonstrator that are either very small ($\leq 0.01$) or very large ($\geq 0.4$). These rates performed worse than the others, so we grouped them for better visualization. Moreover, we did not distinguish in the figure whether an experiment was conducted with or without an additional policy update, as we observed no significant differences here. We again considered deviations of at least 0.5 \% compared to the SAC baseline to be significantly better or worse.
+
+In the results, it is first noticeable that not as bad values as for Social Agent I are achieved. Most experiments show an improvement in fossil energy consumption that is about the same as the baseline SAC or slightly worse. The worst-performing experiments, on average, use four random demonstrators. The use of shared observations does not have any significant impact on the performance of the agents.
 
 \section{Shifted loads}
 Social Agent II with shifted loads
