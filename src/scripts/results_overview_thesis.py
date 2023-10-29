@@ -6,6 +6,7 @@ import pandas as pd
 import seaborn as sns
 
 BEST_SAC_VALUE = 0.929
+Y_LIM = [0.91, 1.005]
 sacdb2_dirs = pd.DataFrame({'paths': ['31_randomdemo/d2/ir0.01',
                                       '31_randomdemo/d2/ir0.2',
                                       '31_randomdemo/d2/ir1',
@@ -48,21 +49,15 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d
                                            '8_determ_actions/demo_b6/extra_pol_update',
                                            '3_demo_b5',
                                            '5_demo_b5_policyupdate',
-                                           '7_shifted_demos/demo_b5/non_extra_pol',
-                                           '7_shifted_demos/demo_b5/extra_pol',
-                                           '7_shifted_demos/demo_b6/non_extra_pol',
-                                           '7_shifted_demos/demo_b6/extra_pol',
                                            ],
-                                 'demos': ['2 (shared obs.)', '2 (shared obs.)',
-                                           '2 (shared obs, determ)', '2 (shared obs, determ)',
-                                           2, 2,
-                                           4, 4,
+                                 'demos': ['2 random\n(shared obs.)', '2 random\n(shared obs.)',
+                                           '2 random\n(shared obs.,\ndeterm.)', '2 random\n(shared obs.,\ndeterm.)',
+                                           '2 random', '2 random',
+                                           '4 random', '4 random',
                                            'B6', 'B6',
                                            'B6 (determ.)', 'B6 (determ.)',
-                                           'B5', 'B5',
-                                           'B5 (only B5s)', 'B5 (only B5s)',
-                                           'B6 (only B5s)', 'B6 (only B5s)'],
-                                 'extra_pols': [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]})
+                                           'B5', 'B5',],
+                                 'extra_pols': [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]})
 
 marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info_sharing',
                                     '1_marlisa_classic/with_shared_obs/without_info_sharing',
@@ -103,7 +98,7 @@ marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info
                                                   'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes',
                                                   'No', 'No', 'Yes', 'Yes', ]})
 
-mode = 'sacdb2'
+mode = 'sacdb2v'
 var = 2
 
 
@@ -168,6 +163,7 @@ def generate_sacdb2():
             points.set_offsets(vertices)
     xticks = ax.get_xticks()
     ax.set_xlim(xticks[0] - 0.2, xticks[-1] + 0.2)  # the limits need to be moved to show all the jittered dots
+    ax.set_ylim(Y_LIM[0], Y_LIM[1])
 
     ax.axhline(BEST_SAC_VALUE, ls='--', lw=1, c='red', zorder=2)
     ax.axhline(BEST_SAC_VALUE - 0.005, ls='--', lw=1, c='grey', zorder=2)
@@ -297,7 +293,8 @@ def generate_sacdb2value():
         demo = dir[1]['demos']
         extra_pol = dir[1]['extra_pols']
 
-        for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25]:  # , 0.4, 0.6, 0.8]:
+        for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25, 0.4, 0.6, 0.8]:
+        #for ir in [0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25, 0.4]:#, 0.6, 0.8]:
             try:
                 file = glob.glob(f'../experiments/SAC_DB2Value/{dir[1]["paths"]}/ir{ir}/kpis_*.csv')[0]
                 kpis = pd.read_csv(file)
@@ -306,84 +303,98 @@ def generate_sacdb2value():
                 v = round(kpis.loc['fossil_energy_consumption', 'net_value'] /
                           kpis.loc['fossil_energy_consumption', 'net_value_without_storage'], 3)
 
-                irs.append(ir)
+                if ir <= 0.01:
+                    irs.append('$<=$ 0.01')
+                elif ir >= 0.4:
+                    irs.append('$>=$ 0.4')
+                else:
+                    irs.append(ir)
                 extra_pols.append(extra_pol)
                 demos.append(demo)
                 fossil_energy_consumptions.append(v)
             except:
                 print('Missing')
 
-    colors = {0.0001: 'tab:blue',
-              0.001: 'tab:orange',
-              0.01: 'tab:green',
-              0.03: 'tab:red',
-              0.05: 'tab:purple',
-              0.1: 'tab:brown',
-              0.15: 'tab:pink',
-              0.2: 'tab:grey',
-              0.4: 'yellow',
-              0.6: 'black',
-              0.8: 'magenta'}
+    colors = {#0.0001: 'tab:blue',
+              #0.001: 'tab:orange',
+              r'$\leq$0.01': 'tab:pink',
+              0.03: 'tab:blue',
+              0.05: 'tab:orange',
+              0.1: 'tab:green',
+              0.15: 'tab:red',
+              0.2: 'tab:purple',
+              r'$\geq$ 0.4': 'tab:grey',
+              #0.6: 'black',
+              #0.8: 'magenta'
+            }
     markers = {0: 'o', 1: 'X'}
-    demo_pos = {'2 (shared obs.)': 1,
-                '2 (shared obs, determ)': 2,
-                2: 3,
-                4: 4,
+    demo_pos = {'2 random\n(shared obs.)': 1,
+                '2 random\n(shared obs.,\ndeterm.)': 2,
+                '2 random': 3,
+                '4 random': 4,
                 'B5': 5,
                 'B6': 6,
-                'B6 (determ.)': 7,
-                'B5 (only B5s)': 8,
-                'B6 (only B5s)': 9}
+                'B6 (determ.)': 7}
 
     final_df = pd.DataFrame({'irs': irs,
                              'demos': demos,
                              'fossil_energy_consumptions': fossil_energy_consumptions,
                              'extra_pols': extra_pols})
 
-    fig, ax = plt.subplots(figsize=(14, 7))
+    fig, ax = plt.subplots(figsize=(15, 10))
     final_df['irs'] = final_df['irs'].astype(str)
 
-    if var == 1:
-        for i, v in enumerate(final_df['fossil_energy_consumptions']):
-            ax.scatter(demo_pos[demos[i]], v, color=colors[irs[i]], marker=markers[extra_pols[i]], alpha=0.5)
-    else:
-        ax = sns.scatterplot(x=final_df['demos'].map(demo_pos),
-                             y='fossil_energy_consumptions',
-                             hue=final_df['irs'].values,  # .map(colors),
-                             data=final_df,
-                             style='extra_pols',
-                             zorder=4)
-        for points in ax.collections:
-            vertices = points.get_offsets().data
-            if len(vertices) > 0:
-                vertices[:, 0] += np.random.uniform(-0.35, 0.35, vertices.shape[0])
-                points.set_offsets(vertices)
-        xticks = ax.get_xticks()
-        ax.set_xlim(xticks[0] - 0.5, xticks[-1] + 0.5)  # the limits need to be moved to show all the jittered dots
-        sns.move_legend(ax, bbox_to_anchor=(1.01, 1.02), loc='upper left')  # needs seaborn 0.11.2
-        sns.despine()
+    ax = sns.scatterplot(x=final_df['demos'].map(demo_pos),
+                         y='fossil_energy_consumptions',
+                         hue=final_df['irs'].values,  # .map(colors),
+                         data=final_df,
+                         zorder=4,
+                         s=150)
+    for points in ax.collections:
+        vertices = points.get_offsets().data
+        if len(vertices) > 0:
+            vertices[:, 0] += np.random.uniform(-0.35, 0.35, vertices.shape[0])
+            points.set_offsets(vertices)
+    xticks = ax.get_xticks()
+    ax.set_xlim(xticks[0] - 0.01, xticks[-1] + 0.01)  # the limits need to be moved to show all the jittered dots
+    ax.set_ylim(Y_LIM[0], Y_LIM[1])
 
-    ax.axhline(BEST_SAC_VALUE, ls='--', lw=1, c='red')
-    ax.axhline(BEST_SAC_VALUE - 0.005, ls='--', lw=1, c='grey')
-    ax.axhline(BEST_SAC_VALUE + 0.005, ls='--', lw=1, c='grey')
+    #sns.move_legend(ax, loc='upper right')  # needs seaborn 0.11.2
+    #sns.despine()
+
+    ax.axhline(BEST_SAC_VALUE, ls='--', lw=1, c='red', zorder=2)
+    ax.axhline(BEST_SAC_VALUE - 0.005, ls='--', lw=1, c='grey', zorder=2)
+    ax.axhline(BEST_SAC_VALUE + 0.005, ls='--', lw=1, c='grey', zorder=2)
+
+    ax.text(0.001, BEST_SAC_VALUE - 0.0003, 'SAC Baseline', color='r', ha='left', va='top',
+            transform=ax.get_yaxis_transform(), fontsize=17)
 
     ax.set_xticks(list(demo_pos.values()))
-    ax.set_xticklabels(list(demo_pos.keys()), rotation=90)
+    ax.set_xticklabels(list(demo_pos.keys()), rotation=0)
+
+    ax.tick_params(axis='both', which='major', labelsize=17)
+
+    ax.set_ylabel('KPI $fossil\_energy\_consumption$', fontsize=19)
+    ax.set_xlabel('Demonstrators', fontsize=19)
 
     for t in range(len(xticks)):
         if t % 2 == 1:
-            ax.axvline(xticks[t] - 0.5, c='#E6E6E6', lw=0.5)
-            ax.axvline(xticks[t] + 0.5, c='#E6E6E6', lw=0.5)
+            ax.axvline(xticks[t] - 0.5, c='#E6E6E6', lw=0.5, zorder=1)
+            ax.axvline(xticks[t] + 0.5, c='#E6E6E6', lw=0.5, zorder=1)
 
     f = lambda m, c: plt.plot([], [], marker=m, color=c, ls="none")[0]
 
-    handles = [f("s", colors[i]) for i in colors.keys()]
-    handles += [f(markers[i], "k") for i in markers.keys()]
+    handles = [f("o", colors[i]) for i in colors.keys()]
 
-    labels = [f'ir {i}' for i in colors.keys()] + ["No extra policy update", "Extra policy update"]
+    labels = [i for i in colors.keys()]
 
-    # plt.legend(handles, labels, bbox_to_anchor=(1.05, 1), loc='upper left')
-    plt.title('SACDB2 Value')
+    plt.legend(handles, labels, #bbox_to_anchor=(1.05, 1),
+             loc='upper right', title='Imitation\nlearning rate', #r'$\alpha_i$',
+               title_fontsize=19,
+              fontsize=17, markerscale=2)
+    plt.tight_layout()
+
+    fig.savefig('results2.pdf')
 
 
 if __name__ == '__main__':

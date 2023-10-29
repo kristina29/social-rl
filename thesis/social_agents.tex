@@ -137,7 +137,7 @@ Demonstrator                   & Mode & $\alpha_i$ & Deterministic policy action
   \label{tab:social1-params}
 \end{table}
 }
-
+\todo[inline]{early stopping}
 As demonstrators, we used either the pre-trained buildings 5 and 6 presented in Section~\ref{sec:pretrained-demos} or either two or four random demonstrators, which are buildings from the training buildings and not pre-trained. To ensure comparability, we always used the same random demonstrators, which were Buildings 7 and 11 for two demonstrators and additionally Buildings 5 and 17 for four demonstrators.
 
 In the first step, we sampled the demonstrator actions from the demonstrator policy instead of using the Gaussian distribution's learned mean. We tested the imitation learning rates of 0.01 and 0.2 and compared their results. We found that modes 4-6 demonstrated lower performance than the baseline, with slightly better results when using the pre-trained demonstrators than the random demonstrators. Modes 1-3 showed similar performance to the baseline for all demonstrators. Based on these results, we tried even higher imitation learning rates of 1 for modes 1-3 and 4-6 for pre-trained demonstrators and 1.5 for modes 1-3, but it did not lead to better results. Finally, for the two random demonstrators, with an imitation learning rate of 0.2 and deterministic policy actions, we also observed that modes 1-3 performed similarly to the baseline and modes 4-6 performed worse.
@@ -153,9 +153,47 @@ In the first step, we sampled the demonstrator actions from the demonstrator pol
 \section{Social Agent II}
 Since the social policy update did not improve the performance of the models, we decided to focus on the Q-Value update in the next step. For this, we also first conducted classical Q-Value and policy updates as defined in Algorithm \ref{alg:sac-update}. Next, we performed a social Q-Value update on both Q-Value networks where we defined the target values as follows:
 \begin{equation}
-	Q_{\bar{\theta}}(a_t^d,s_t) + \alpha_i|Q_{\bar{\theta}}(a_t^d,s_t)| 
+	J_Q^{social}(\theta)=\mathbb{E}_{s_t\sim\mathcal{D}}\left[\frac{1}{2}\left ( Q_{\theta}(s_t,a_t^d) - \left(Q_{\bar{\theta}}(s_t,a_t^d) + \alpha_i \left|Q_{\bar{\theta}}(s_t,a_t^d)\right| \right) \right )^2 \right],
 \end{equation}
+
 This follows the assumption of decision biasing, that actions taken by the demonstrator $a_t^d$ are good and should thus have a higher Q-Value as proposed by \cite{najar2020actions}. Afterwards, a soft update of the target networks parameters is performed, and, optionally, a standard policy update.
+
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
+\begin{table}[htb]
+\center
+\begin{tabularx}{\textwidth}{c | Y | Y | Y}
+Demonstrator                   & $\alpha_i$                                     & Deterministic policy actions & Shared observations \\ \hline
+\rule{0pt}{3ex}% EXTRA vertical height  
+\multirow[t]{3}{*}{2 random}      & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2                & No                           & No                  \\
+\rule{0pt}{2ex}% EXTRA vertical height  
+                               & 0.03, 0.05, 0.1, 0.15, 0.2, 0.25                               & No                           & Yes                 \\
+\rule{0pt}{2ex}% EXTRA vertical height  
+                               & 0.1, 0.15, 0.2, 0.25                                           & Yes                          & Yes                 \\
+\rule{0pt}{3ex}% EXTRA vertical height  
+4 random                       & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15                     & No                           & No                  \\
+\rule{0pt}{3ex}% EXTRA vertical height  
+Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.4, 0.6, 0.8 & No                           & No                  \\
+\rule{0pt}{3ex}% EXTRA vertical height  
+\multirow[t]{2}{*}{Pretrained B6} & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.4, 0.6, 0.8 & No                           & No                  \\
+\rule{0pt}{2ex}% EXTRA vertical height  
+                               & 0.1, 0.15, 0.2, 0.4, 0.6, 0.8                                  & Yes                          & No                 
+\end{tabularx}
+  \caption{}
+  \label{tab:social2-params}
+\end{table}
+}
+
+\begin{figure}[htb]
+\center
+     \includegraphics[width=\textwidth]{figures/social2_results.pdf}
+  \caption{}
+  \label{fig:social2-results}
+\end{figure}
+
+\section{Shifted loads}
+Social Agent II with shifted loads
 
 
 
