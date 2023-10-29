@@ -137,7 +137,7 @@ Demonstrator                   & Mode & $\alpha_i$ & Deterministic policy action
   \label{tab:social1-params}
 \end{table}
 }
-\todo[inline]{early stopping}
+\todo[inline]{early stopping, determ. vs not determ: $a_t^d \sim \pi^d(a_t|s_t)$ vs $a_t^d=f^d(\epsilon_t;s_t)$}
 As demonstrators, we used either the pre-trained buildings 5 and 6 presented in Section~\ref{sec:pretrained-demos} or either two or four random demonstrators, which are buildings from the training buildings and not pre-trained. To ensure comparability, we always used the same random demonstrators, which were Buildings 7 and 11 for two demonstrators and additionally Buildings 5 and 17 for four demonstrators.
 
 In the first step, we sampled the demonstrator actions from the demonstrator policy instead of using the Gaussian distribution's learned mean. We tested the imitation learning rates of 0.01 and 0.2 and compared their results. We found that modes 4-6 demonstrated lower performance than the baseline, with slightly better results when using the pre-trained demonstrators than the random demonstrators. Modes 1-3 showed similar performance to the baseline for all demonstrators. Based on these results, we tried even higher imitation learning rates of 1 for modes 1-3 and 4-6 for pre-trained demonstrators and 1.5 for modes 1-3, but it did not lead to better results. Finally, for the two random demonstrators, with an imitation learning rate of 0.2 and deterministic policy actions, we also observed that modes 1-3 performed similarly to the baseline and modes 4-6 performed worse.
@@ -151,12 +151,11 @@ In the first step, we sampled the demonstrator actions from the demonstrator pol
 
 
 \section{Social Agent II}
-Since the social policy update did not improve the performance of the models, we decided to focus on the Q-Value update in the next step. For this, we also first conducted classical Q-Value and policy updates as defined in Algorithm \ref{alg:sac-update}. Next, we performed a social Q-Value update on both Q-Value networks where we defined the target values as follows:
+In the next step, we incorporated a social Q-Value objective into the algorithm and made an extra update step of the Q-Networks accordingly. To achieve this, we initially followed the steps of the standard SAC algorithm, similar to social agent I. During each update step, we carried out an additional social Q-value update for both Q-value networks, utilizing the following social objective function:
 \begin{equation}
-	J_Q^{social}(\theta)=\mathbb{E}_{s_t\sim\mathcal{D}}\left[\frac{1}{2}\left ( Q_{\theta}(s_t,a_t^d) - \left(Q_{\bar{\theta}}(s_t,a_t^d) + \alpha_i \left|Q_{\bar{\theta}}(s_t,a_t^d)\right| \right) \right )^2 \right],
+	J_Q^{social}(\theta)=\mathbb{E}_{s_t\sim\mathcal{D}}\left[\frac{1}{2}\left ( Q_{\theta}(s_t,a_t^d) - \left(Q_{\bar{\theta}}(s_t,a_t^d) + \alpha_i \left|Q_{\bar{\theta}}(s_t,a_t^d)\right| \right) \right )^2 \right].
 \end{equation}
-
-This follows the assumption of decision biasing, that actions taken by the demonstrator $a_t^d$ are good and should thus have a higher Q-Value as proposed by \cite{najar2020actions}. Afterwards, a soft update of the target networks parameters is performed, and, optionally, a standard policy update.
+In this context, we again use an imitation learning rate $\alpha_i$ to update the objective. The objective also follows the assumption of decision biasing, that the actions performed by the demonstrator, denoted as $a_t^d$, are good and therefore should have a higher Q-value. After that, a soft update of the target network parameters is performed, optionally followed by another standard policy update. For a detailed description of the algorithm used in Social Agent II, please refer to Appendix\ref{sec:app-algos}, Algorithm~\ref{app:sac-social-2}.
 
 {
 \renewcommand{\baselinestretch}{0.9} 
