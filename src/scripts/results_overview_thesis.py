@@ -103,7 +103,7 @@ marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info
                                                   'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes',
                                                   'No', 'No', 'Yes', 'Yes', ]})
 
-mode = 'sacdb2'
+mode = 'sacdb2v'
 var = 2
 
 
@@ -298,7 +298,7 @@ def generate_sacdb2value():
         demo = dir[1]['demos']
         extra_pol = dir[1]['extra_pols']
 
-        for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25, 0.4, 0.6, 0.8]:
+        for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.6, 0.8]:
         #for ir in [0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25, 0.4]:#, 0.6, 0.8]:
             try:
                 file = glob.glob(f'../experiments/SAC_DB2Value/{dir[1]["paths"]}/ir{ir}/kpis_*.csv')[0]
@@ -308,8 +308,8 @@ def generate_sacdb2value():
                 v = round(kpis.loc['fossil_energy_consumption', 'net_value'] /
                           kpis.loc['fossil_energy_consumption', 'net_value_without_storage'], 3)
 
-                if ir <= 0.01:
-                    irs.append('$<=$ 0.01')
+                if ir <= 0.03:
+                    irs.append('$<=$ 0.03')
                 elif ir >= 0.4:
                     irs.append('$>=$ 0.4')
                 else:
@@ -322,12 +322,13 @@ def generate_sacdb2value():
 
     colors = {#0.0001: 'tab:blue',
               #0.001: 'tab:orange',
-              r'$\leq$0.01': 'tab:pink',
-              0.03: 'tab:blue',
+              r'$\leq$0.03': 'tab:blue',
               0.05: 'tab:orange',
               0.1: 'tab:green',
               0.15: 'tab:red',
               0.2: 'tab:purple',
+              0.25: 'tab:brown',
+              0.3: 'tab:pink',
               r'$\geq$ 0.4': 'tab:grey',
               #0.6: 'black',
               #0.8: 'magenta'
