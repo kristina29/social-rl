@@ -114,7 +114,6 @@ class SACDB2VALUE(SAC):
             demo_state = state
             if self.n_interchanged_obs > 0:
                 demo_state = state[:, :-self.n_interchanged_obs]
-            print('buh')
             demonstrator_actions, log_pi, _ = demonstrator_policy.sample(demo_state, self.deterministic_demo)
 
             target_q_values = torch.min(
