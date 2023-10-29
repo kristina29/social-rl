@@ -112,7 +112,7 @@ class SACDB2VALUE(SAC):
     def social_q_value_update(self, i, state, demonstrator_policy):
         with torch.no_grad():
             demo_state = state
-            if self.n_interchanged_obs > 0:
+            if self.n_interchanged_obs > 0 and self.pretrained_demonstrator is not None:
                 demo_state = state[:, :-self.n_interchanged_obs]
             demonstrator_actions, log_pi, _ = demonstrator_policy.sample(demo_state, self.deterministic_demo)
 
