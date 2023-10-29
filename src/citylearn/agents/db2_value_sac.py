@@ -111,7 +111,11 @@ class SACDB2VALUE(SAC):
 
     def social_q_value_update(self, i, state, demonstrator_policy):
         with torch.no_grad():
-            demonstrator_actions, log_pi, _ = demonstrator_policy.sample(state, self.deterministic_demo)
+            demo_state = state
+            if self.n_interchanged_obs > 0:
+                demo_state = state[:, :-self.n_interchanged_obs]
+            print('buh')
+            demonstrator_actions, log_pi, _ = demonstrator_policy.sample(demo_state, self.deterministic_demo)
 
             target_q_values = torch.min(
                 self.target_soft_q_net1[i](state, demonstrator_actions),

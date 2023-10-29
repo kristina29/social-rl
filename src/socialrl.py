@@ -153,7 +153,8 @@ def train_sacdb2value(schema, episodes, random_seed, batch_size, discount, autot
                                     discount=discount, imitation_lr=imitation_lr,
                                     pretrained_demonstrator=pretrained_demonstrator,
                                     deterministic_demo=deterministic_demo, extra_policy_update=extra_policy_update,
-                                    end_exploration_time_step=end_exploration_t)
+                                    end_exploration_time_step=end_exploration_t,
+                                    n_interchanged_obs=len(env.interchanged_observations)*(len(env.buildings)-1))
     losses, rewards, eval_results, best_state = sacdb2value_model.learn(episodes=episodes, deterministic_finish=True)
 
     best_state_env = copy.deepcopy(sacdb2value_model.env)
