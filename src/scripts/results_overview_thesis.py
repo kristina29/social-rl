@@ -300,6 +300,8 @@ def generate_marl():
 def generate_sacdb2value():
     dirs = sacdb2value_dirs
 
+    fig, ax = plt.subplots()
+
     for dir in dirs.iterrows():
         demo = dir[1]['demos']
         extra_pol = dir[1]['extra_pols']
@@ -323,8 +325,12 @@ def generate_sacdb2value():
                 extra_pols.append(extra_pol)
                 demos.append(demo)
                 fossil_energy_consumptions.append(v)
+
             except:
                 print('Missing')
+
+    ax.legend()
+    ax.set_xscale('log', base=2)
 
     colors = {  # 0.0001: 'tab:blue',
         # 0.001: 'tab:orange',
@@ -409,6 +415,7 @@ def generate_sacdb2value():
     plt.tight_layout()
 
     fig.savefig('results2.pdf')
+
 
 
 if __name__ == '__main__':
