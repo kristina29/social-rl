@@ -8,7 +8,7 @@
 
 \section{Pretrained Demonstrator}
 \label{sec:pretrained-demos}
-\todo[inline]{Building 3}
+\todo[inline]{Building 3, evtl generell demonstratoren hier vorstellen also auch 'random' 2 und 4 und dann sagen sind immer die gleichen weil wegen vergleichbarkeit}
 For some of our methods, we used pre-trained demonstrators. We trained these demonstrators using the final hyperparameter values, reward function and state space as described in Section~\ref{sec:sac-baseline}. Also, we scaled the available renewable energy in the grid by the factor $k = 0.5$. We used two different buildings as pre-trained demonstrators, one among the training buildings and one not a training building.
 
 \begin{figure}[htb]
@@ -199,7 +199,17 @@ Figure \ref{fig:social2-results} shows the results of the first experiments. \te
 First, we notice that overall, better results than with Social Agent I are achieved. The results of the fossil energy consumption KPI are either comparable or slightly worse than the SAC baseline. Additionally, moderate imitation learning rates produce better results than high or low rates. For random demonstrators, the best results are achieved with rates between 0.03 and 0.1, while for pre-trained demonstrators, the rates should be 0.15 or 0.2. Using random demonstrators does not enhance performance compared to the SAC baseline while using four random demonstrators leads to worse results than using two. The pre-trained demonstrator Building 5 has similar best KPI values to using two random demonstrators. The best results are achieved using demonstrator Building 6, with a fossil energy consumption KPI value of 0.921 when sampled demonstrator actions and 0.916 with deterministic demonstrator actions. Thus, about 1.5 \% more fossil energy can be saved than by using the baseline SAC agents.
 
 \subsection{Shared observations}
-Social Agent II with shifted loads
+In our next step, we investigated the impact on the performances of the agents by allowing them to observe the building-specific parameters of other buildings. We achieved this by expanding the state space by these parameters, namely the non-shiftable load, solar generation, battery SOC, and net electricity consumption. We then ran experiments using the most successful demonstrators from the previous experiments, which are the pre-trained Building 6 and the two random demonstrators to cover this scenario as well. In these experiments, we compared the results with and without additional policy updates and with deterministic and sampled demonstrator actions. The imitation learning rates were set to values that had previously performed well, as well as smaller and larger values, to detect any differences.
+
+\begin{figure}[htb]
+\center
+     \includegraphics[width=0.8\textwidth]{figures/social2_results_sharedobs.pdf}
+  \caption{}
+  \label{fig:social2-results-sharedobs}
+\end{figure}
+
+Figure \ref{fig:social2-results-sharedobs} shows the KPI values for fossil energy consumption of the experiments, which vary based on the imitation learning rate and demonstrators used. All experiments perform similarly to or worse than the SAC baseline. When using random demonstrators and deterministic actions, higher imitation learning rates than when using sampled actions achieve the best result. The best performance is achieved using the pre-trained Building 6 as a demonstrator with deterministic behavior, although the results are still worse than without using the shared parameters.
+
 
 \subsection{Shifted loads}
 Social Agent II with shifted loads

@@ -159,6 +159,9 @@ def generate_sacdb2value():
 
     plt.show()
 
+    fig.savefig('results3.pdf')
+    fig2.savefig('results4.pdf')
+
 
 
 if __name__ == '__main__':
