@@ -214,6 +214,8 @@ Figure \ref{fig:social2-results-sharedobs} shows the KPI values for fossil energ
 \subsection{Shifted loads}
 In our next set of experiments, we aimed to determine whether the performances of the agents would improve when all buildings had similar energy consumption and solar generation. To achieve this, we first selected a base building and increased its non-shiftable load and solar generation times by a random value between 0.2 and 1. We also increased the median energy consumption per hour by the same value. This process was repeated five times, resulting in six training buildings. For each of these, we trained the Social Agent II using the same hyperparameter values, reward function, early stopping method and state space as for the SAC Baseline.
 
+We chose Buildings 3 and 5 as the base buildings because they perform differently based on the KPIs of the pre-trained demonstrators. For base Building 3, we used the pre-trained Building 3 and the pre-trained Building 6 as demonstrators. We chose the former because we assumed similar time series data in the demonstrator would lead to faster or better learning. The latter we used because it performed better in previous experiments. For the second base Building 5, we used the pre-trained demonstrators Building 5 and Building 6 with the same reasoning. We tested imitation learning rates with moderate values ranging from 0.05 to 0.3 because of the results of previous experiments. Each experiment was performed with and without an additional policy update.
+
 \begin{figure}[htb]
 \center
      \includegraphics[width=0.8\textwidth]{figures/social2_results_shifted.pdf}
