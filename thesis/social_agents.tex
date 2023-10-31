@@ -212,7 +212,14 @@ Figure \ref{fig:social2-results-sharedobs} shows the KPI values for fossil energ
 
 
 \subsection{Shifted loads}
-Social Agent II with shifted loads
+In our next set of experiments, we aimed to determine whether the performances of the agents would improve when all buildings had similar energy consumption and solar generation. To achieve this, we first selected a base building and increased its non-shiftable load and solar generation times by a random value between 0.2 and 1. We also increased the median energy consumption per hour by the same value. This process was repeated five times, resulting in six training buildings. For each of these, we trained the Social Agent II using the same hyperparameter values, reward function, early stopping method and state space as for the SAC Baseline.
+
+\begin{figure}[htb]
+\center
+     \includegraphics[width=0.8\textwidth]{figures/social2_results_shifted.pdf}
+  \caption{}
+  \label{fig:social2-results-shifted}
+\end{figure}
 
 
 
