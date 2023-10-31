@@ -6,9 +6,9 @@ import pandas as pd
 import seaborn as sns
 
 plt.rcParams.update({
-        "text.usetex": True,
-        "font.family": "Helvetica"
-    })
+    "text.usetex": True,
+    "font.family": "Helvetica"
+})
 
 BEST_SAC_VALUE = 0.929
 Y_LIM = [0.91, 1.005]
@@ -54,6 +54,10 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d
                                            '8_determ_actions/demo_b6/extra_pol_update',
                                            '3_demo_b5',
                                            '5_demo_b5_policyupdate',
+                                           '9_interchanged_observations/demo_b6/no_extra_policy_update',
+                                           '9_interchanged_observations/demo_b6/extra_policy_update',
+                                           '9_interchanged_observations/demo_b6_determ/no_extra_pol_update',
+                                           '9_interchanged_observations/demo_b6_determ/extra_pol_update',
                                            ],
                                  'demos': ['2 random\n(shared obs.)', '2 random\n(shared obs.)',
                                            '2 random\n(shared obs.,\ndeterm.)', '2 random\n(shared obs.,\ndeterm.)',
@@ -61,8 +65,10 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d
                                            '4 random', '4 random',
                                            'B6', 'B6',
                                            'B6 (determ.)', 'B6 (determ.)',
-                                           'B5', 'B5',],
-                                 'extra_pols': [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]})
+                                           'B5', 'B5',
+                                           'B6\n(shared obs.)', 'B6\n(shared obs.)',
+                                           'B6\n(shared obs.,\ndeterm.)', 'B6\n(shared obs.,\ndeterm.)'],
+                                 'extra_pols': [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]})
 
 marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info_sharing',
                                     '1_marlisa_classic/with_shared_obs/without_info_sharing',
@@ -103,7 +109,7 @@ marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info
                                                   'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes',
                                                   'No', 'No', 'Yes', 'Yes', ]})
 
-mode = 'sacdb2'
+mode = 'sacdb2v'
 var = 2
 
 
@@ -174,7 +180,7 @@ def generate_sacdb2():
     ax.axhline(BEST_SAC_VALUE - 0.005, ls='--', lw=1, c='grey', zorder=2)
     ax.axhline(BEST_SAC_VALUE + 0.005, ls='--', lw=1, c='grey', zorder=2)
 
-    ax.text(0.001, BEST_SAC_VALUE-0.0003, 'SAC Baseline', color='r', ha='left', va='top',
+    ax.text(0.001, BEST_SAC_VALUE - 0.0003, 'SAC Baseline', color='r', ha='left', va='top',
             transform=ax.get_yaxis_transform(), fontsize=17)
 
     ax.set_xticks(list(demo_pos.values()))
@@ -196,8 +202,8 @@ def generate_sacdb2():
 
     labels = [f'Mode {i}' for i in colors.keys()]
 
-    legend = plt.legend(handles, labels, #bbox_to_anchor=(1.05, 1),
-                 loc='upper right', fontsize=21, markerscale=2)
+    legend = plt.legend(handles, labels,  # bbox_to_anchor=(1.05, 1),
+                        loc='upper right', fontsize=21, markerscale=2)
 
     plt.tight_layout()
 
@@ -294,12 +300,14 @@ def generate_marl():
 def generate_sacdb2value():
     dirs = sacdb2value_dirs
 
+    fig, ax = plt.subplots()
+
     for dir in dirs.iterrows():
         demo = dir[1]['demos']
         extra_pol = dir[1]['extra_pols']
 
-        for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25, 0.4, 0.6, 0.8]:
-        #for ir in [0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25, 0.4]:#, 0.6, 0.8]:
+        for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.6, 0.8]:
+            # for ir in [0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25, 0.4]:#, 0.6, 0.8]:
             try:
                 file = glob.glob(f'../experiments/SAC_DB2Value/{dir[1]["paths"]}/ir{ir}/kpis_*.csv')[0]
                 kpis = pd.read_csv(file)
@@ -317,21 +325,26 @@ def generate_sacdb2value():
                 extra_pols.append(extra_pol)
                 demos.append(demo)
                 fossil_energy_consumptions.append(v)
+
             except:
                 print('Missing')
 
-    colors = {#0.0001: 'tab:blue',
-              #0.001: 'tab:orange',
-              r'$\leq$0.01': 'tab:pink',
-              0.03: 'tab:blue',
-              0.05: 'tab:orange',
-              0.1: 'tab:green',
-              0.15: 'tab:red',
-              0.2: 'tab:purple',
-              r'$\geq$ 0.4': 'tab:grey',
-              #0.6: 'black',
-              #0.8: 'magenta'
-            }
+    ax.legend()
+    ax.set_xscale('log', base=2)
+
+    colors = {  # 0.0001: 'tab:blue',
+        # 0.001: 'tab:orange',
+        r'$\leq$0.01': 'tab:pink',
+        0.03: 'tab:blue',
+        0.05: 'tab:orange',
+        0.1: 'tab:green',
+        0.15: 'tab:red',
+        0.2: 'tab:purple',
+        0.3: 'tab:brown',
+        r'$\geq$ 0.4': 'tab:grey',
+        # 0.6: 'black',
+        # 0.8: 'magenta'
+    }
     markers = {0: 'o', 1: 'X'}
     demo_pos = {'2 random\n(shared obs.)': 1,
                 '2 random\n(shared obs.,\ndeterm.)': 2,
@@ -339,7 +352,9 @@ def generate_sacdb2value():
                 '4 random': 4,
                 'B5': 5,
                 'B6': 6,
-                'B6 (determ.)': 7}
+                'B6 (determ.)': 7,
+                'B6\n(shared obs.)': 8,
+                'B6\n(shared obs.,\ndeterm.)': 9}
 
     final_df = pd.DataFrame({'irs': irs,
                              'demos': demos,
@@ -364,8 +379,8 @@ def generate_sacdb2value():
     ax.set_xlim(xticks[0] - 0.01, xticks[-1] + 0.01)  # the limits need to be moved to show all the jittered dots
     ax.set_ylim(Y_LIM[0], Y_LIM[1])
 
-    #sns.move_legend(ax, loc='upper right')  # needs seaborn 0.11.2
-    #sns.despine()
+    # sns.move_legend(ax, loc='upper right')  # needs seaborn 0.11.2
+    # sns.despine()
 
     ax.axhline(BEST_SAC_VALUE, ls='--', lw=1, c='red', zorder=2)
     ax.axhline(BEST_SAC_VALUE - 0.005, ls='--', lw=1, c='grey', zorder=2)
@@ -393,13 +408,14 @@ def generate_sacdb2value():
 
     labels = [i for i in colors.keys()]
 
-    plt.legend(handles, labels, #bbox_to_anchor=(1.05, 1),
-             loc='upper right', title='Imitation\nlearning rate', #r'$\alpha_i$',
+    plt.legend(handles, labels,
+               loc='upper right', title='Imitation\nlearning rate',
                title_fontsize=19,
-              fontsize=17, markerscale=2)
+               fontsize=17, markerscale=2)
     plt.tight_layout()
 
     fig.savefig('results2.pdf')
+
 
 
 if __name__ == '__main__':
