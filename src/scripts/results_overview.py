@@ -56,6 +56,10 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d
                                            '7_shifted_demos/b5_demo_b5/extra_pol',
                                            '7_shifted_demos/b5_demo_b6/non_extra_pol',
                                            '7_shifted_demos/b5_demo_b6/extra_pol',
+                                           '7_shifted_demos/b3_demo_b3/non_extra_pol',
+                                           '7_shifted_demos/b3_demo_b3/extra_pol',
+                                           '7_shifted_demos/b3_demo_b6/non_extra_pol',
+                                           '7_shifted_demos/b3_demo_b6/extra_pol',
                                            ],
                                  'demos': ['2 (shared obs.)', '2 (shared obs.)',
                                            '2 (shared obs, determ)', '2 (shared obs, determ)',
@@ -67,7 +71,9 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d
                                            'B6 (shared obs., determ)', 'B6 (shared obs., determ)',
                                            'B5', 'B5',
                                            'B5 (only B5s)', 'B5 (only B5s)',
-                                           'B6 (only B5s)', 'B6 (only B5s)'],
+                                           'B6 (only B5s)', 'B6 (only B5s)',
+                                           'B3 (only B3s)', 'B3 (only B3s)',
+                                           'B6 (only B3s)', 'B6 (only B3s)'],
                                  'extra_pols': [0, 1,  # 2 shared
                                                 0, 1,  # 2 shared determ
                                                 0, 1,  # 2
@@ -79,6 +85,8 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d
                                                 0, 1,  # B5
                                                 0, 1,  # B5 only B5s
                                                 0, 1,  # B6 only B5s
+                                                0, 1,
+                                                0, 1
                                                 ]})
 
 marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info_sharing',
@@ -352,7 +360,9 @@ def generate_sacdb2value():
                 'B6 (shared obs.)': 8,
                 'B6 (shared obs., determ)': 9,
                 'B5 (only B5s)': 10,
-                'B6 (only B5s)': 11}
+                'B6 (only B5s)': 11,
+                'B3 (only B3s)': 12,
+                'B6 (only B3s)': 13}
 
     final_df = pd.DataFrame({'irs': irs,
                              'demos': demos,
