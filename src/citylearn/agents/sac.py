@@ -21,7 +21,7 @@ from citylearn.rl import PolicyNetwork, ReplayBuffer, SoftQNetwork
 
 class SAC(RLC):
     def __init__(self, autotune_entropy: bool=False, clip_gradient: bool=False, kaiming_initialization: bool=False,
-                 l2_loss: bool=False, *args, **kwargs):
+                 l2_loss: bool=False, n_interchanged_obs: int=0, *args, **kwargs):
         r"""Initialize :class:`SAC`.
 
         Parameters
@@ -43,6 +43,7 @@ class SAC(RLC):
         self.kaiming_initialization = kaiming_initialization
         self.normalized = [False for _ in self.action_space]
         self.l2_loss = l2_loss
+        self.n_interchanged_obs = n_interchanged_obs
         if l2_loss:
             self.soft_q_criterion = nn.MSELoss()
         else:

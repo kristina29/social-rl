@@ -27,7 +27,7 @@ def plot(dirs):
         irs.append(ir)
         fossil_energy.append(v)
 
-    for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.4, 0.6, 0.8]:
+    for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.6, 0.8]:
         file = glob.glob(f'{dirs[1]}/ir{ir}/kpis_*.csv')[0]
         kpis = pd.read_csv(file)
         kpis = kpis.set_index('kpi')
