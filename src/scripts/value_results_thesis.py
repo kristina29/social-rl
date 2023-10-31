@@ -13,7 +13,7 @@ plt.rcParams.update({
 
 BEST_SAC_VALUE = 0.929
 BEST_SAC_B3 = 0.94
-BEST_SAC_B5 = 0.953
+BEST_SAC_B5 = 0.957
 Y_LIM = [0.91, 1.005]
 
 sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d2/no_extra_pol',
