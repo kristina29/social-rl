@@ -216,8 +216,8 @@ def generate_sacdb2value():
     ax3.axhline(BEST_SAC_B3 - 0.005, ls='--', lw=1, c='red', zorder=2)
     ax3.axhline(BEST_SAC_B3 + 0.005, ls='--', lw=1, c='red', zorder=2)
     ax3.axhline(BEST_SAC_B5, ls='--', lw=1, c='blue', zorder=2)
-    ax3.axhline(BEST_SAC_B5 - 0.005, ls='--', lw=1, c='blue', zorder=2)
-    ax3.axhline(BEST_SAC_B5 + 0.005, ls='--', lw=1, c='blue', zorder=2)
+    ax3.axhline(BEST_SAC_B5 - 0.005, ls=':', lw=1, c='blue', zorder=2)
+    ax3.axhline(BEST_SAC_B5 + 0.005, ls=':', lw=1, c='blue', zorder=2)
 
     #ax3.text(0.001, BEST_SAC_VALUE - 0.0003, 'SAC Baseline', color='r', ha='left', va='top',
     #         transform=ax.get_yaxis_transform(), fontsize=17)
