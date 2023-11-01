@@ -41,7 +41,7 @@ scp src/citylearn/data/nnb_limitobs1/schema.json klietz10@134.2.168.52:/mnt/qb/w
 scp src/citylearn/data/nnb_limitobs1_marlisa/schema.json klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nnb_limitobs1_marlisa/
 
 
-scp src/citylearn/data/nnblo1_onlyb3shifted/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nnblo1_onlyb3shifted/
+scp src/citylearn/data/nnblo1_onlyb5shifted/schema.json klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nnblo1_onlyb5shifted/
 
 
 scp src/citylearn/data/nnb_limitobs1_shared/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nnb_limitobs1_shared/
