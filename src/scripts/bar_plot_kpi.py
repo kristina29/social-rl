@@ -1,5 +1,6 @@
 from collections import Mapping
 
+import numpy as np
 import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
@@ -100,15 +101,15 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
         kpi['rank'] = kpi['kpi'].map(kpi_names)
 
         if i==0:
-            kpi = kpi[kpi['env_id'] == 'SAC Best']
+            kpi = kpi[kpi['env_id'] == 'SAC']
         else:
-            kpi = kpi[kpi['env_id'] == 'SAC Best']
+            kpi = kpi[kpi['env_id'] == 'SAC']
 
         kpi['env_id'] = names[i]
         kpi = kpi.drop(columns=['net_value', 'net_value_without_storage'])
         kpi = kpi.sort_values(by='rank')
 
-        values.extend(list(kpi['value']))
+        values.extend(list(np.around(kpi['value'], 3)))
         kpi_ids.extend(list(kpi['kpi']))
         env_ids.extend(list(kpi['env_id']))
 
@@ -160,13 +161,12 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
 
 
 if __name__ == '__main__':
-    kpis = [pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_20231002T130931.csv'),
-            pd.read_csv('../experiments/SAC/16_shifted_buildings/shifted_b3/kpis_20231031T173335.csv'),
-            pd.read_csv('../experiments/SAC/16_shifted_buildings/shifted_b5/kpis_20231031T194250.csv')]
+    kpis = [pd.read_csv('../experiments/SAC/10_b5_demonstrator/kpis_20231002T132420.csv'),
+            pd.read_csv('../experiments/SAC/09_b6_demonstrator/kpis_20231002T132428.csv'),]
 
     if len(kpis) == 1:
         plot_district_kpis1(kpis[0])
     else:
-        plot_district_kpis_multiple(kpis, ['Baseline SAC', 'Shifted Building 3', 'Shifted Building 5'])
+        plot_district_kpis_multiple(kpis, ['Building 5', 'Building 6'])
 
     #plt.show()
