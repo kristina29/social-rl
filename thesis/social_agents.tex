@@ -214,7 +214,16 @@ Figure \ref{fig:social2-results-sharedobs} shows the KPI values for fossil energ
 \subsection{Shifted loads}
 In our next set of experiments, we aimed to determine whether the performances of the agents would improve when all buildings had similar energy consumption and solar generation. To achieve this, we first selected a base building and increased its non-shiftable load and solar generation times by a random value between 0.2 and 1. We also increased the median energy consumption per hour by the same value. This process was repeated five times, resulting in six training buildings. For each of these, we trained the Social Agent II using the same hyperparameter values, reward function, early stopping method and state space as for the SAC Baseline.
 
-We chose Buildings 3 and 5 as the base buildings because they perform differently based on the KPIs of the pre-trained demonstrators. For base Building 3, we used the pre-trained Building 3 and the pre-trained Building 6 as demonstrators. We chose the former because we assumed similar time series data in the demonstrator would lead to faster or better learning. The latter we used because it performed better in previous experiments. For the second base Building 5, we used the pre-trained demonstrators Building 5 and Building 6 with the same reasoning. We tested imitation learning rates with moderate values ranging from 0.05 to 0.3 because of the results of previous experiments. Each experiment was performed with and without an additional policy update.
+We chose Buildings 3 and 5 as the base buildings because they perform differently based on the KPIs of the pre-trained demonstrators. For base Building 3, we used the pre-trained Building 3 and the pre-trained Building 6 as demonstrators. We chose the former because we assumed similar time series data in the demonstrator would lead to faster or better learning. The latter we used because it performed better in previous experiments. For the second base Building 5, we used the pre-trained demonstrators Building 5 and Building 6 with the same reasoning. We tested imitation learning rates with moderate values ranging from 0.1 to 0.3 because of the results of previous experiments. Each experiment was performed with and without an additional policy update.
+
+\begin{figure}[htb]
+\center
+     \includegraphics[width=\textwidth]{figures/shifted_sac_kpis.pdf}
+  \caption{}
+  \label{fig:sac-shifted-kpis}
+\end{figure}
+
+To compare the results with SAC baseline agents, we trained nonsocial agents for this set of buildings respectively. The KPI values for these agents are shown in Figure \ref{fig:sac-shifted-kpis}. For fossil energy consumption, which is the most relevant KPI for us, the agents for the new buildings perform slightly worse. The agents for the shifted versions of building 3 save almost 1 \% less fossil energy, and the agents for the shifted versions of building 5 save almost 3 \% less compared to the standard training buildings. However, for the KPIs of average renewable energy share overall and from the grid, the agents for each building perform slightly better than the agents of the original buildings. It is noticeable that both shifted building sets use a lower fraction of the solar energy produced than without a battery.
 
 \begin{figure}[htb]
 \center
@@ -223,6 +232,6 @@ We chose Buildings 3 and 5 as the base buildings because they perform differentl
   \label{fig:social2-results-shifted}
 \end{figure}
 
-
+The fossil energy consumption KPI values of the experiments in comparison to the values of the baseline SAC agents are visualized in Figure \ref{fig:social2-results-shifted}. The agents perform worse than the baseline at an imitation learning rate of 0.1 for both building sets and demonstrators. For higher imitation learning rates, the results are about the same as those of the baseline, but no better values are achieved. The results are not significantly different depending on the demonstrator used.
 
 
