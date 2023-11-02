@@ -1,0 +1,103 @@
+kpi,name,level,env_id,value,net_value,net_value_without_storage
+1 - average_daily_renewable_share,District,district,RBC,0.0,0.0,0.0
+1 - average_daily_renewable_share,District,district,SAC,0.0008944271909999337,0.0008366600265340768,0.0
+1 - average_daily_renewable_share,District,district,SAC Best,0.0013038404810405213,0.000999999999999987,0.0
+1 - average_daily_renewable_share_grid,District,district,RBC,0.0,0.0,0.0
+1 - average_daily_renewable_share_grid,District,district,SAC,0.0004472135954999242,0.00044721359550001314,0.0
+1 - average_daily_renewable_share_grid,District,district,SAC Best,0.002302172886644285,0.0018708286933869797,0.0
+1 - load_factor,District,district,RBC,0.0,0.0,0.0
+1 - load_factor,District,district,SAC,0.0014832396974191432,0.0011401754250991486,0.0
+1 - load_factor,District,district,SAC Best,0.0011401754250991486,0.0010954451150103324,0.0
+1 - used_pv_of_total_share,Building_11,building,RBC,0.0,0.0,0.0
+1 - used_pv_of_total_share,Building_11,building,SAC,0.02207260745811427,0.0018165902124584973,0.0
+1 - used_pv_of_total_share,Building_11,building,SAC Best,0.03000000000000002,0.002345207879911715,0.0
+1 - used_pv_of_total_share,Building_17,building,RBC,0.0,0.0,0.0
+1 - used_pv_of_total_share,Building_17,building,SAC,0.02568657236767886,0.0032710854467592277,0.0
+1 - used_pv_of_total_share,Building_17,building,SAC Best,0.042276470997470915,0.005176871642217913,0.0
+1 - used_pv_of_total_share,Building_3,building,RBC,0.0,0.0,0.0
+1 - used_pv_of_total_share,Building_3,building,SAC,0.027151427218472357,0.004847679857416334,0.0
+1 - used_pv_of_total_share,Building_3,building,SAC Best,0.017564168070250255,0.0030495901363953716,0.0
+1 - used_pv_of_total_share,Building_5,building,RBC,0.0,0.0,0.0
+1 - used_pv_of_total_share,Building_5,building,SAC,0.02262078690054795,0.002774887385102325,0.0
+1 - used_pv_of_total_share,Building_5,building,SAC Best,0.0078230428862432,0.0008366600265340765,0.0
+1 - used_pv_of_total_share,Building_7,building,RBC,0.0,0.0,0.0
+1 - used_pv_of_total_share,Building_7,building,SAC,0.013049904214207878,0.0030000000000000005,0.0
+1 - used_pv_of_total_share,Building_7,building,SAC Best,0.006465291950097865,0.0013038404810405255,0.0
+1 - used_pv_of_total_share,Building_8,building,RBC,0.0,0.0,0.0
+1 - used_pv_of_total_share,Building_8,building,SAC,0.02828957405122957,0.004266145801540306,0.0
+1 - used_pv_of_total_share,Building_8,building,SAC Best,0.03545842636102172,0.005338539126015654,0.0
+1 - used_pv_of_total_share,District,district,RBC,0.0,0.0,0.0
+1 - used_pv_of_total_share,District,district,SAC,0.011886967653695377,0.0019235384061671366,0.0
+1 - used_pv_of_total_share,District,district,SAC Best,0.014449913494550772,0.0020493901531919217,0.0
+average_daily_peak,District,district,RBC,0.0,0.0,0.0
+average_daily_peak,District,district,SAC,0.007536577472566735,0.07943739673478725,0.0
+average_daily_peak,District,district,SAC Best,0.006058052492344371,0.06379890281188208,0.0
+carbon_emissions,Building_11,building,RBC,0.0,0.0,0.0
+carbon_emissions,Building_11,building,SAC,0.007085195833567417,26.389663086140477,0.0
+carbon_emissions,Building_11,building,SAC Best,0.004847679857416265,19.969336438650092,0.0
+carbon_emissions,Building_17,building,RBC,0.0,0.0,0.0
+carbon_emissions,Building_17,building,SAC,0.003420526275297437,19.35175765402176,0.0
+carbon_emissions,Building_17,building,SAC Best,0.005683308895353157,31.377280530664613,0.0
+carbon_emissions,Building_3,building,RBC,0.0,0.0,0.0
+carbon_emissions,Building_3,building,SAC,0.01317193987231946,30.9303329403353,0.0
+carbon_emissions,Building_3,building,SAC Best,0.0054497706373754645,13.011072426975305,0.0
+carbon_emissions,Building_5,building,RBC,0.0,0.0,0.0
+carbon_emissions,Building_5,building,SAC,0.0030331501776206466,8.783045787196906,0.0
+carbon_emissions,Building_5,building,SAC Best,0.0065574385243019695,19.319201207606913,0.0
+carbon_emissions,Building_7,building,RBC,0.0,0.0,0.0
+carbon_emissions,Building_7,building,SAC,0.004324349662087956,11.943916828243472,0.0
+carbon_emissions,Building_7,building,SAC Best,0.007382411530116663,21.643955292413608,0.0
+carbon_emissions,Building_8,building,RBC,0.0,0.0,0.0
+carbon_emissions,Building_8,building,SAC,0.008228000972289606,24.754607698365916,0.0
+carbon_emissions,Building_8,building,SAC Best,0.006870225614927076,20.835711274156203,0.0
+carbon_emissions,District,district,RBC,0.0,0.0,0.0
+carbon_emissions,District,district,SAC,0.0040865633483405245,10.949156049668645,0.0
+carbon_emissions,District,district,SAC Best,0.0015165750888103096,6.610306475497304,0.0
+cost,Building_11,building,RBC,0.0,8.718876257866944,8.362894235849387
+cost,Building_11,building,SAC,0.006595452979136448,34.21187984896459,8.362894235849387
+cost,Building_11,building,SAC Best,0.0056302753041036395,17.902079242367407,8.362894235849387
+cost,Building_17,building,RBC,0.0,12.84531610354514,12.415991051865433
+cost,Building_17,building,SAC,0.0038340579025361956,15.263256362912749,12.415991051865433
+cost,Building_17,building,SAC Best,0.005941380311005215,36.36858414483605,12.415991051865433
+cost,Building_3,building,RBC,0.0,5.340177543865001,4.811123860388507
+cost,Building_3,building,SAC,0.010839741694339369,30.64709276913561,4.811123860388507
+cost,Building_3,building,SAC Best,0.0038470768123342928,13.385424281658118,4.811123860388507
+cost,Building_5,building,RBC,0.0,6.806590923509395,6.351327483290204
+cost,Building_5,building,SAC,0.00406201920231801,16.76402521174411,6.351327483290204
+cost,Building_5,building,SAC Best,0.005848076606885309,20.735508440836362,6.351327483290204
+cost,Building_7,building,RBC,0.0,6.74532266092603,6.196144365651805
+cost,Building_7,building,SAC,0.00477493455452532,18.32528227067736,6.196144365651805
+cost,Building_7,building,SAC Best,0.00701427116670008,23.02834165761821,6.196144365651805
+cost,Building_8,building,RBC,0.0,6.836554234407949,6.361613395987078
+cost,Building_8,building,SAC,0.007681145747868595,29.281994607608343,6.361613395987078
+cost,Building_8,building,SAC Best,0.007661592523751198,23.48616250688889,6.361613395987078
+cost,District,district,RBC,0.0,7.882139620686765,7.416590267771565
+cost,District,district,SAC,0.004062019202317994,17.313459411683134,7.416590267771565
+cost,District,district,SAC Best,0.001788854381999843,10.128424285149094,7.416590267771565
+electricity_consumption,Building_11,building,RBC,0.0,0.0,0.0
+electricity_consumption,Building_11,building,SAC,0.006655824516917453,51.06955027215331,0.0
+electricity_consumption,Building_11,building,SAC Best,0.005069516742254591,38.3379601217904,0.0
+electricity_consumption,Building_17,building,RBC,0.0,0.0,0.0
+electricity_consumption,Building_17,building,SAC,0.0035355339059327247,37.301788672932055,0.0
+electricity_consumption,Building_17,building,SAC Best,0.005522680508593686,61.14196396665745,0.0
+electricity_consumption,Building_3,building,RBC,0.0,0.0,0.0
+electricity_consumption,Building_3,building,SAC,0.013700364958642488,62.50089108564776,0.0
+electricity_consumption,Building_3,building,SAC Best,0.005983310120660632,27.58487856960786,0.0
+electricity_consumption,Building_5,building,RBC,0.0,0.0,0.0
+electricity_consumption,Building_5,building,SAC,0.0030495901363954184,15.629235144433153,0.0
+electricity_consumption,Building_5,building,SAC Best,0.006906518659932779,38.52625868417534,0.0
+electricity_consumption,Building_7,building,RBC,0.0,0.0,0.0
+electricity_consumption,Building_7,building,SAC,0.004494441010848854,24.696819090724823,0.0
+electricity_consumption,Building_7,building,SAC Best,0.007797435475847118,43.44572960027237,0.0
+electricity_consumption,Building_8,building,RBC,0.0,0.0,0.0
+electricity_consumption,Building_8,building,SAC,0.008354639429682157,49.64816556228421,0.0
+electricity_consumption,Building_8,building,SAC Best,0.00634822809924155,38.8971885397903,0.0
+electricity_consumption,District,district,RBC,0.0,0.0,0.0
+electricity_consumption,District,district,SAC,0.003911521443121602,21.610119604019115,0.0
+electricity_consumption,District,district,SAC Best,0.0010954451150103667,12.070247814357673,0.0
+fossil_energy_consumption,District,district,RBC,0.0,0.5818248877481599,0.5822721013407004
+fossil_energy_consumption,District,district,SAC,0.003286335345030963,128.9769836183966,0.5822721013407004
+fossil_energy_consumption,District,district,SAC Best,0.002167948338867901,78.48534549328302,0.5822721013407004
+ramping,District,district,RBC,0.0,0.0,0.0
+ramping,District,district,SAC,0.006340346993658927,137.1320550498671,0.0
+ramping,District,district,SAC Best,0.004159326868617084,91.26021848374049,0.0

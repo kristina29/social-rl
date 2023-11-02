@@ -5,231 +5,197 @@
   "simulation_end_time_step": 8759,
   "episodes": 1,
   "seconds_per_time_step": 3600,
-  "fuel_mix": "fuelmix.csv",
-  "fuel_mix_attribute": "energy_consumption_median",
+  "fuel_mix": null,
+  "fuel_mix_attribute": null,
   "observations": {
     "month": {
       "active": true,
-      "shared_in_central_agent": true,
-      "bins": 12
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "day_type": {
       "active": true,
-      "shared_in_central_agent": true,
-      "bins": 7
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "hour": {
       "active": true,
-      "shared_in_central_agent": true,
-      "bins": 24
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "daylight_savings_status": {
       "active": false,
-      "shared_in_central_agent": true,
-      "bins": 2
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "outdoor_dry_bulb_temperature": {
       "active": true,
-      "shared_in_central_agent": true,
-      "bins": 8
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "outdoor_dry_bulb_temperature_predicted_6h": {
       "active": true,
-      "shared_in_central_agent": true,
-      "bins": 8
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "outdoor_dry_bulb_temperature_predicted_12h": {
       "active": true,
-      "shared_in_central_agent": true,
-      "bins": 8
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "outdoor_dry_bulb_temperature_predicted_24h": {
       "active": true,
-      "shared_in_central_agent": true,
-      "bins": 8
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "outdoor_relative_humidity": {
       "active": true,
-      "shared_in_central_agent": true,
-      "bins": 8
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "outdoor_relative_humidity_predicted_6h": {
       "active": true,
-      "shared_in_central_agent": true,
-      "bins": 8
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "outdoor_relative_humidity_predicted_12h": {
       "active": true,
-      "shared_in_central_agent": true,
-      "bins": 8
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "outdoor_relative_humidity_predicted_24h": {
       "active": true,
-      "shared_in_central_agent": true,
-      "bins": 8
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "diffuse_solar_irradiance": {
       "active": true,
-      "shared_in_central_agent": true,
-      "bins": 8
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "diffuse_solar_irradiance_predicted_6h": {
       "active": true,
-      "shared_in_central_agent": true,
-      "bins": 8
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "diffuse_solar_irradiance_predicted_12h": {
       "active": true,
-      "shared_in_central_agent": true,
-      "bins": 8
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "diffuse_solar_irradiance_predicted_24h": {
       "active": true,
-      "shared_in_central_agent": true,
-      "bins": 8
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "direct_solar_irradiance": {
       "active": true,
-      "shared_in_central_agent": true,
-      "bins": 8
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "direct_solar_irradiance_predicted_6h": {
       "active": true,
-      "shared_in_central_agent": true,
-      "bins": 8
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "direct_solar_irradiance_predicted_12h": {
       "active": true,
-      "shared_in_central_agent": true,
-      "bins": 8
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "direct_solar_irradiance_predicted_24h": {
       "active": true,
-      "shared_in_central_agent": true,
-      "bins": 8
-    },
-    "wind_speed": {
-      "active": true,
-      "shared_in_central_agent": true,
-      "bins": 8
-    },
-    "wind_speed_predicted_6h": {
-      "active": true,
-      "shared_in_central_agent": true,
-      "bins": 8
-    },
-    "wind_speed_predicted_12h": {
-      "active": true,
-      "shared_in_central_agent": true,
-      "bins": 8
-    },
-    "wind_speed_predicted_24h": {
-      "active": true,
-      "shared_in_central_agent": true,
-      "bins": 8
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "carbon_intensity": {
-      "active": false,
-      "shared_in_central_agent": true,
-      "bins": 8
+      "active": true,
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": true
     },
     "indoor_dry_bulb_temperature": {
       "active": false,
-      "shared_in_central_agent": false,
-      "bins": 8
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": false
     },
     "average_unmet_cooling_setpoint_difference": {
       "active": false,
-      "shared_in_central_agent": false,
-      "bins": 5
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": false
     },
     "indoor_relative_humidity": {
       "active": false,
-      "shared_in_central_agent": false,
-      "bins": 8
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": false
     },
     "non_shiftable_load": {
       "active": true,
-      "shared_in_central_agent": false,
-      "bins": 8
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": false
     },
     "solar_generation": {
       "active": true,
-      "shared_in_central_agent": false,
-      "bins": 10
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": false
     },
     "cooling_storage_soc": {
       "active": false,
-      "shared_in_central_agent": false,
-      "bins": 10
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": false
     },
     "heating_storage_soc": {
       "active": false,
-      "shared_in_central_agent": false,
-      "bins": 10
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": false
     },
     "dhw_storage_soc": {
       "active": false,
-      "shared_in_central_agent": false,
-      "bins": 10
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": false
     },
     "electrical_storage_soc": {
       "active": true,
-      "shared_in_central_agent": false,
-      "bins": 10
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": false
     },
     "net_electricity_consumption": {
       "active": true,
-      "shared_in_central_agent": false,
-      "bins": 10
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": false
     },
     "electricity_pricing": {
       "active": true,
-      "shared_in_central_agent": false,
-      "bins": 10
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": false
     },
     "electricity_pricing_predicted_6h": {
       "active": true,
-      "shared_in_central_agent": false,
-      "bins": 10
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": false
     },
     "electricity_pricing_predicted_12h": {
       "active": true,
-      "shared_in_central_agent": false,
-      "bins": 10
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": false
     },
     "electricity_pricing_predicted_24h": {
       "active": true,
-      "shared_in_central_agent": false,
-      "bins": 10
-    },
-    "renewable_energy_produced": {
-      "active": false,
-      "shared_in_central_agent": true,
-      "bins": 6
-    },
-    "renewable_energy_share": {
-      "active": true,
-      "shared_in_central_agent": true,
-      "bins": 6
+      "interchanged_between_agents": false,
+      "shared_in_central_agent": false
     }
   },
   "actions": {
     "cooling_storage": {
-      "active": false,
-      "bins": 12
+      "active": false
     },
     "heating_storage": {
-      "active": false,
-      "bins": 12
+      "active": false
     },
     "dhw_storage": {
-      "active": false,
-      "bins": 12
+      "active": false
     },
     "electrical_storage": {
-      "active": true,
-      "bins": 12
+      "active": true
     }
   },
   "agent": {
@@ -242,7 +208,6 @@
       "discount": 0.99,
       "tau": 0.005,
       "lr": 0.003,
-      "alpha": 0.01,
       "batch_size": 256,
       "replay_buffer_capacity": 100000.0,
       "start_training_time_step": 6000,
@@ -254,23 +219,18 @@
     }
   },
   "reward_function": {
-    "type": "citylearn.reward_function.PriceAndSolarPenaltyReward",
-    "attributes": {
-          "alpha": 0.5
-    }
+    "type": "citylearn.reward_function.RewardFunction",
+    "attributes": null
   },
   "buildings": {
     "Building_1": {
       "include": true,
       "demonstrator": false,
       "energy_simulation": "Building_1.csv",
-      "weather": "weather_8locs_median.csv",
+      "weather": "weather.csv",
       "carbon_intensity": "carbon_intensity.csv",
       "pricing": "pricing.csv",
-      "pricing_weight_fossil": 20,
-      "energy_consumption_median": 0.54,
-      "energy_consumption_without_storage_median": 0.58,
-      "energy_consumption_without_storage_and_pv_median": 0.81,
+      "pricing_weight_fossil": 0,
       "inactive_observations": [],
       "inactive_actions": [],
       "electrical_storage": {
@@ -296,13 +256,10 @@
       "include": true,
       "demonstrator": false,
       "energy_simulation": "Building_2.csv",
-      "weather": "weather_8locs_median.csv",
+      "weather": "weather.csv",
       "carbon_intensity": "carbon_intensity.csv",
       "pricing": "pricing.csv",
-      "pricing_weight_fossil": 20,
-      "energy_consumption_median": 0.45,
-      "energy_consumption_without_storage_median": 0.49,
-      "energy_consumption_without_storage_and_pv_median": 0.74,
+      "pricing_weight_fossil": 0,
       "inactive_observations": [],
       "inactive_actions": [],
       "electrical_storage": {
@@ -328,13 +285,10 @@
       "include": true,
       "demonstrator": false,
       "energy_simulation": "Building_3.csv",
-      "weather": "weather_8locs_median.csv",
+      "weather": "weather.csv",
       "carbon_intensity": "carbon_intensity.csv",
       "pricing": "pricing.csv",
-      "pricing_weight_fossil": 20,
-      "energy_consumption_median": 0.25,
-      "energy_consumption_without_storage_median": 0.28,
-      "energy_consumption_without_storage_and_pv_median": 0.56,
+      "pricing_weight_fossil": 0,
       "inactive_observations": [],
       "inactive_actions": [],
       "electrical_storage": {
@@ -360,13 +314,10 @@
       "include": true,
       "demonstrator": false,
       "energy_simulation": "Building_4.csv",
-      "weather": "weather_8locs_median.csv",
+      "weather": "weather.csv",
       "carbon_intensity": "carbon_intensity.csv",
       "pricing": "pricing.csv",
-      "pricing_weight_fossil": 20,
-      "energy_consumption_median": 0.52,
-      "energy_consumption_without_storage_median": 0.54,
-      "energy_consumption_without_storage_and_pv_median": 0.94,
+      "pricing_weight_fossil": 0,
       "inactive_observations": [],
       "inactive_actions": [],
       "electrical_storage": {
@@ -392,13 +343,10 @@
       "include": true,
       "demonstrator": false,
       "energy_simulation": "Building_5.csv",
-      "weather": "weather_8locs_median.csv",
+      "weather": "weather.csv",
       "carbon_intensity": "carbon_intensity.csv",
       "pricing": "pricing.csv",
-      "pricing_weight_fossil": 20,
-      "energy_consumption_median": 0.29,
-      "energy_consumption_without_storage_median": 0.29,
-      "energy_consumption_without_storage_and_pv_median": 0.74,
+      "pricing_weight_fossil": 0,
       "inactive_observations": [],
       "inactive_actions": [],
       "electrical_storage": {
@@ -424,13 +372,10 @@
       "include": true,
       "demonstrator": false,
       "energy_simulation": "Building_6.csv",
-      "weather": "weather_8locs_median.csv",
+      "weather": "weather.csv",
       "carbon_intensity": "carbon_intensity.csv",
       "pricing": "pricing.csv",
-      "pricing_weight_fossil": 20,
-      "energy_consumption_median": 0.5,
-      "energy_consumption_without_storage_median": 0.56,
-      "energy_consumption_without_storage_and_pv_median": 1.08,
+      "pricing_weight_fossil": 0,
       "inactive_observations": [],
       "inactive_actions": [],
       "electrical_storage": {
@@ -456,13 +401,10 @@
       "include": true,
       "demonstrator": false,
       "energy_simulation": "Building_7.csv",
-      "weather": "weather_8locs_median.csv",
+      "weather": "weather.csv",
       "carbon_intensity": "carbon_intensity.csv",
       "pricing": "pricing.csv",
-      "pricing_weight_fossil": 20,
-      "energy_consumption_median": 0.21,
-      "energy_consumption_without_storage_median": 0.21,
-      "energy_consumption_without_storage_and_pv_median": 0.33,
+      "pricing_weight_fossil": 0,
       "inactive_observations": [],
       "inactive_actions": [],
       "electrical_storage": {
@@ -488,13 +430,10 @@
       "include": true,
       "demonstrator": false,
       "energy_simulation": "Building_8.csv",
-      "weather": "weather_8locs_median.csv",
+      "weather": "weather.csv",
       "carbon_intensity": "carbon_intensity.csv",
       "pricing": "pricing.csv",
-      "pricing_weight_fossil": 20,
-      "energy_consumption_median": 0.31,
-      "energy_consumption_without_storage_median": 0.32,
-      "energy_consumption_without_storage_and_pv_median": 0.68,
+      "pricing_weight_fossil": 0,
       "inactive_observations": [],
       "inactive_actions": [],
       "electrical_storage": {
@@ -520,13 +459,10 @@
       "include": true,
       "demonstrator": false,
       "energy_simulation": "Building_9.csv",
-      "weather": "weather_8locs_median.csv",
+      "weather": "weather.csv",
       "carbon_intensity": "carbon_intensity.csv",
       "pricing": "pricing.csv",
-      "pricing_weight_fossil": 20,
-      "energy_consumption_median": 0.36,
-      "energy_consumption_without_storage_median": 0.38,
-      "energy_consumption_without_storage_and_pv_median": 0.46,
+      "pricing_weight_fossil": 0,
       "inactive_observations": [],
       "inactive_actions": [],
       "electrical_storage": {
@@ -552,13 +488,10 @@
       "include": true,
       "demonstrator": false,
       "energy_simulation": "Building_10.csv",
-      "weather": "weather_8locs_median.csv",
+      "weather": "weather.csv",
       "carbon_intensity": "carbon_intensity.csv",
       "pricing": "pricing.csv",
-      "pricing_weight_fossil": 20,
-      "energy_consumption_median": 0.56,
-      "energy_consumption_without_storage_median": 0.65,
-      "energy_consumption_without_storage_and_pv_median": 0.98,
+      "pricing_weight_fossil": 0,
       "inactive_observations": [],
       "inactive_actions": [],
       "electrical_storage": {
@@ -584,13 +517,10 @@
       "include": true,
       "demonstrator": false,
       "energy_simulation": "Building_11.csv",
-      "weather": "weather_8locs_median.csv",
+      "weather": "weather.csv",
       "carbon_intensity": "carbon_intensity.csv",
       "pricing": "pricing.csv",
-      "pricing_weight_fossil": 20,
-      "energy_consumption_median": 0.66,
-      "energy_consumption_without_storage_median": 0.71,
-      "energy_consumption_without_storage_and_pv_median": 1.19,
+      "pricing_weight_fossil": 0,
       "inactive_observations": [],
       "inactive_actions": [],
       "electrical_storage": {
@@ -616,13 +546,10 @@
       "include": true,
       "demonstrator": false,
       "energy_simulation": "Building_12.csv",
-      "weather": "weather_8locs_median.csv",
+      "weather": "weather.csv",
       "carbon_intensity": "carbon_intensity.csv",
       "pricing": "pricing.csv",
-      "pricing_weight_fossil": 20,
-      "energy_consumption_median": 0,
-      "energy_consumption_without_storage_median": 0,
-      "energy_consumption_without_storage_and_pv_median": 0,
+      "pricing_weight_fossil": 0,
       "inactive_observations": [],
       "inactive_actions": [],
       "electrical_storage": {
@@ -648,13 +575,10 @@
       "include": true,
       "demonstrator": false,
       "energy_simulation": "Building_13.csv",
-      "weather": "weather_8locs_median.csv",
+      "weather": "weather.csv",
       "carbon_intensity": "carbon_intensity.csv",
       "pricing": "pricing.csv",
-      "pricing_weight_fossil": 20,
-      "energy_consumption_median": 0.43,
-      "energy_consumption_without_storage_median": 0.48,
-      "energy_consumption_without_storage_and_pv_median": 0.97,
+      "pricing_weight_fossil": 0,
       "inactive_observations": [],
       "inactive_actions": [],
       "electrical_storage": {
@@ -680,13 +604,10 @@
       "include": true,
       "demonstrator": false,
       "energy_simulation": "Building_14.csv",
-      "weather": "weather_8locs_median.csv",
+      "weather": "weather.csv",
       "carbon_intensity": "carbon_intensity.csv",
       "pricing": "pricing.csv",
-      "pricing_weight_fossil": 20,
-      "energy_consumption_median": 0.49,
-      "energy_consumption_without_storage_median": 0.48,
-      "energy_consumption_without_storage_and_pv_median": 0.59,
+      "pricing_weight_fossil": 0,
       "inactive_observations": [],
       "inactive_actions": [],
       "electrical_storage": {
@@ -712,13 +633,10 @@
       "include": true,
       "demonstrator": false,
       "energy_simulation": "Building_15.csv",
-      "weather": "weather_8locs_median.csv",
+      "weather": "weather.csv",
       "carbon_intensity": "carbon_intensity.csv",
       "pricing": "pricing.csv",
-      "pricing_weight_fossil": 20,
-      "energy_consumption_median": 0.12,
-      "energy_consumption_without_storage_median": 0,
-      "energy_consumption_without_storage_and_pv_median": 0,
+      "pricing_weight_fossil": 0,
       "inactive_observations": [],
       "inactive_actions": [],
       "electrical_storage": {
@@ -744,13 +662,10 @@
       "include": true,
       "demonstrator": false,
       "energy_simulation": "Building_16.csv",
-      "weather": "weather_8locs_median.csv",
+      "weather": "weather.csv",
       "carbon_intensity": "carbon_intensity.csv",
       "pricing": "pricing.csv",
-      "pricing_weight_fossil": 20,
-      "energy_consumption_median": 0.55,
-      "energy_consumption_without_storage_median": 0.72,
-      "energy_consumption_without_storage_and_pv_median": 1.2,
+      "pricing_weight_fossil": 0,
       "inactive_observations": [],
       "inactive_actions": [],
       "electrical_storage": {
@@ -776,13 +691,10 @@
       "include": true,
       "demonstrator": false,
       "energy_simulation": "Building_17.csv",
-      "weather": "weather_8locs_median.csv",
+      "weather": "weather.csv",
       "carbon_intensity": "carbon_intensity.csv",
       "pricing": "pricing.csv",
-      "pricing_weight_fossil": 20,
-      "energy_consumption_median": 0.75,
-      "energy_consumption_without_storage_median": 0.82,
-      "energy_consumption_without_storage_and_pv_median": 1.24,
+      "pricing_weight_fossil": 0,
       "inactive_observations": [],
       "inactive_actions": [],
       "electrical_storage": {

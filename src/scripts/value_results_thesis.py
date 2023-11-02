@@ -11,7 +11,7 @@ plt.rcParams.update({
     "font.family": "Helvetica"
 })
 
-BEST_SAC_VALUE = 0.929
+BEST_SAC_VALUE = 0.9298
 BEST_SAC_B3 = 0.94
 BEST_SAC_B5 = 0.957
 Y_LIM = [0.91, 1.005]

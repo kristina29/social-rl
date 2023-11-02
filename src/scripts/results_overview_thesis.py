@@ -10,7 +10,7 @@ plt.rcParams.update({
     "font.family": "Helvetica"
 })
 
-BEST_SAC_VALUE = 0.929
+BEST_SAC_VALUE = 0.9298
 Y_LIM = [0.91, 1.005]
 sacdb2_dirs = pd.DataFrame({'paths': ['31_randomdemo/d2/ir0.01',
                                       '31_randomdemo/d2/ir0.2',
@@ -109,7 +109,7 @@ marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info
                                                   'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes',
                                                   'No', 'No', 'Yes', 'Yes', ]})
 
-mode = 'sacdb2v'
+mode = 'sacdb2'
 var = 2
 
 
