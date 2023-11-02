@@ -372,6 +372,26 @@ class FossilPenaltyReward(RewardFunction):
         return reward
 
 
+class FossilAbsolutPenaltyReward(RewardFunction):
+    def __init__(self, env: CityLearnEnv):
+        super().__init__(env)
+
+    def calculate(self) -> List[float]:
+        r"""The reward is defined to minimize the consumed fossil energy in the total electricity consumption.
+
+        The reward is the negative consumed fossil energy at the current time step.
+
+        Returns
+        -------
+        reward: List[float]
+            Reward for transition to current timestep.
+
+        """
+        reward = [-self.env.net_fossil_electricity_consumption[self.env.time_step]] * len(self.env.buildings)
+
+        return reward
+
+
 class TolovskiReward(RewardFunction):
     def __init__(self, env: CityLearnEnv):
         super().__init__(env)
