@@ -33,7 +33,8 @@ To implement the SAC agent using the demonstrator transitions, we used the train
   \label{fig:prb-kpis}
 \end{figure}
 
-The SAC agents using the demonstrator transitions perform worse than the baseline agents on all KPIs. However, using transitions from Building 6 resulted in better scores compared to the use of transitions from Building 5. This is contrary to the performance of both demonstrator buildings, as described in the previous chapter. It is possible that Building 6 provides better guidance on how agents should behave since it has a higher median PCC to the training buildings than Building 5.
+The SAC agents using the demonstrator transitions perform worse than the baseline agents on all KPIs. However, using transitions from Building 6 resulted in better scores compared to the use of transitions from Building 5. This is contrary to the performance of both demonstrator buildings, as described in the previous chapter. 
+%Also, Building 6 has a lower median PCCIt is possible that Building 6 provides better guidance on how agents should behave since it has a higher median PCC to the training buildings than Building 5.
 
 The policy loss values observed during training increase for all agents instead of decreasing as expected. This is illustrated in Figure~\ref{fig:prb-losses} for Building 3 and the demonstrator transitions of Building 5, but it also applies to the other training buildings and demonstrator Building 6. This development suggests that with higher probability, actions with a low, possibly even negative, estimated Q-Value are taken. As a result, the agents are more likely to take 'bad' actions with greater certainty, ultimately leading to poorer performance.
 
@@ -236,3 +237,8 @@ The fossil energy consumption KPI values of the experiments in comparison to the
 
 
 \section{MARLISA Agent}
+\subsection{Background}
+
+\subsection{Reward Functions}
+
+\subsection{Results}

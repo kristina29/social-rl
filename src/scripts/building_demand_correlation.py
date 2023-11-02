@@ -4,7 +4,8 @@ from matplotlib import pyplot as plt
 
 import seaborn as sns
 from matplotlib.patches import Rectangle
-from scipy.stats import pearsonr
+#from scipy.stats import pearsonr
+from scipy.stats import spearmanr
 
 DIR_PATH = 'citylearn/data/nydata_new_buildings2'
 
@@ -30,7 +31,7 @@ if __name__ == '__main__':
         for b_id2, demand2 in demands.items():
             val = correlations.iloc[b_id-1][b_id2]
             if np.isnan(val):
-                correlations.iloc[b_id-1][b_id2] = pearsonr(demand, demand2)[0]
+                correlations.iloc[b_id-1][b_id2] = spearmanr(demand, demand2)[0]
 
     correlations = correlations.drop(columns=[1,2,4,6,9,10,12,13,14,15,16])
     for b_id in range(1, n_buildings + 1):
