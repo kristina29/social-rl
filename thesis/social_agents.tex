@@ -114,6 +114,8 @@ Table~\ref{tab:social-policy-update-modes} summarizes the modes and their entrop
 
 We conducted experiments testing different modes and imitation learning rates with various demonstrators. An overview of the experiments is provided in Table~\ref{tab:social1-params}, while the achieved $fossi\_energy\_consumption$ KPI values are shown in Figure~\ref{fig:social1-results}. In the figure, points of the same color from the same demonstrator represent different imitation learning rates. However, since there is no clear trend indicating which values achieve the best performance, no distinction is made in the figure. The red dashed line represents the comparison value of the SAC baseline agents, while the gray dashed line shows deviations of 0.5\% compared to the baseline. We consider any deviations greater than 0.5\% to be significant.
 
+\todo[inline]{we use 'agent' and 'building' interchangeable }
+
 {
 \renewcommand{\baselinestretch}{0.9} 
 \normalsize
@@ -238,6 +240,11 @@ The fossil energy consumption KPI values of the experiments in comparison to the
 
 \section{MARLISA Agent}
 \subsection{Background}
+For our next set of experiments, we aimed to train CityLearn's Multi-Agent Reinforcement Learning with Iterative Sequential Action Selection (MARLISA) algorithm to reduce the amount of fossil energy consumed. In this chapter, we will provide a brief overview of how the algorithm works. MARLISA is an extension of SAC, designed to coordinate the behavior of multiple agents by using a reward function with both individual and shared objectives. Moreover, the agents predict their future energy consumption based on the predictions of other agents and share this information with each other, where the order of the agents is randomized.
+
+A key difference between the setup of MARLISA in the paper and ours is that in MARLISA,  buildings can share any excess energy produced within the district. Further, the agents were trained to control the charging and discharging of the storage tank for domestic hot water and chilled water rather than the battery, as in our setup.
+
+In the study, the performance of the MARLISA agents was evaluated based on their ability to minimize annual peak consumption, average daily peak consumption, ramping, annual net energy consumption from the grid, and maximize the average daily load factor. The authors compared the performance of the MARLISA agents with an RBC used as a baseline. The authors calculated the KPIs compared to the performance of the RBC, and not in comparison to without using any storage as we did. The results showed that the MARLISA agents outperformed the RBC in all metrics studied, with the smallest improvement in minimizing net electricity demands at only about 1 \%. More information on the metrics, the MARLISA algorithm, and the evaluation procedure and results can be found in the paper. 
 
 \subsection{Reward Functions}
 
