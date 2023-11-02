@@ -6,11 +6,11 @@ import re
 
 optParser = OptionParser(option_class=Option)
 optParser.add_option('--building', action='store', dest='building_path',
-                     default='citylearn/data/nnblo1_onlyb5shifted/Building_5.csv')
-optParser.add_option('--median', action='store', type='int', dest='median', default=0.29)
+                     default='citylearn/data/nnblo1_onlyb3shifted/Building_3.csv')
+optParser.add_option('--median', action='store', type='int', dest='median', default=0.25)
 optParser.add_option('-n', action='store', type='int', dest='n', default=5)
 optParser.add_option('--r', action='store', type='int', dest='r', default=1)
-optParser.add_option('--output', action='store', dest='output_path', default='citylearn/data/nnblo1_onlyb5shifted/')
+optParser.add_option('--output', action='store', dest='output_path', default='citylearn/data/nnblo1_onlyb3shifted/')
 
 opts, args = optParser.parse_args()
 

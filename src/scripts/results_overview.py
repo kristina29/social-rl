@@ -46,12 +46,20 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d
                                            '4_demo_b6_policyupdate',
                                            '8_determ_actions/demo_b6/non_extra_pol_update',
                                            '8_determ_actions/demo_b6/extra_pol_update',
+                                           '9_interchanged_observations/demo_b6/no_extra_policy_update',
+                                           '9_interchanged_observations/demo_b6/extra_policy_update',
+                                           '9_interchanged_observations/demo_b6_determ/no_extra_pol_update',
+                                           '9_interchanged_observations/demo_b6_determ/extra_pol_update',
                                            '3_demo_b5',
                                            '5_demo_b5_policyupdate',
-                                           '7_shifted_demos/demo_b5/non_extra_pol',
-                                           '7_shifted_demos/demo_b5/extra_pol',
-                                           '7_shifted_demos/demo_b6/non_extra_pol',
-                                           '7_shifted_demos/demo_b6/extra_pol',
+                                           '7_shifted_demos/b5_demo_b5/non_extra_pol',
+                                           '7_shifted_demos/b5_demo_b5/extra_pol',
+                                           '7_shifted_demos/b5_demo_b6/non_extra_pol',
+                                           '7_shifted_demos/b5_demo_b6/extra_pol',
+                                           '7_shifted_demos/b3_demo_b3/non_extra_pol',
+                                           '7_shifted_demos/b3_demo_b3/extra_pol',
+                                           '7_shifted_demos/b3_demo_b6/non_extra_pol',
+                                           '7_shifted_demos/b3_demo_b6/extra_pol',
                                            ],
                                  'demos': ['2 (shared obs.)', '2 (shared obs.)',
                                            '2 (shared obs, determ)', '2 (shared obs, determ)',
@@ -59,10 +67,27 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d
                                            4, 4,
                                            'B6', 'B6',
                                            'B6 (determ.)', 'B6 (determ.)',
+                                           'B6 (shared obs.)', 'B6 (shared obs.)',
+                                           'B6 (shared obs., determ)', 'B6 (shared obs., determ)',
                                            'B5', 'B5',
                                            'B5 (only B5s)', 'B5 (only B5s)',
-                                           'B6 (only B5s)', 'B6 (only B5s)'],
-                                 'extra_pols': [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]})
+                                           'B6 (only B5s)', 'B6 (only B5s)',
+                                           'B3 (only B3s)', 'B3 (only B3s)',
+                                           'B6 (only B3s)', 'B6 (only B3s)'],
+                                 'extra_pols': [0, 1,  # 2 shared
+                                                0, 1,  # 2 shared determ
+                                                0, 1,  # 2
+                                                0, 1,  # 4
+                                                0, 1,  # B6
+                                                0, 1,  # B6 determ
+                                                0, 1,  # B6 shared
+                                                0, 1,  # B6 shared determ
+                                                0, 1,  # B5
+                                                0, 1,  # B5 only B5s
+                                                0, 1,  # B6 only B5s
+                                                0, 1,
+                                                0, 1
+                                                ]})
 
 marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info_sharing',
                                     '1_marlisa_classic/with_shared_obs/without_info_sharing',
@@ -103,7 +128,7 @@ marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info
                                                   'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes',
                                                   'No', 'No', 'Yes', 'Yes', ]})
 
-mode = 'marl'
+mode = 'sacdb2v'
 var = 2
 
 
@@ -297,7 +322,7 @@ def generate_sacdb2value():
         demo = dir[1]['demos']
         extra_pol = dir[1]['extra_pols']
 
-        for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25]:  # , 0.4, 0.6, 0.8]:
+        for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.6, 0.8]:
             try:
                 file = glob.glob(f'../experiments/SAC_DB2Value/{dir[1]["paths"]}/ir{ir}/kpis_*.csv')[0]
                 kpis = pd.read_csv(file)
@@ -332,8 +357,12 @@ def generate_sacdb2value():
                 'B5': 5,
                 'B6': 6,
                 'B6 (determ.)': 7,
-                'B5 (only B5s)': 8,
-                'B6 (only B5s)': 9}
+                'B6 (shared obs.)': 8,
+                'B6 (shared obs., determ)': 9,
+                'B5 (only B5s)': 10,
+                'B6 (only B5s)': 11,
+                'B3 (only B3s)': 12,
+                'B6 (only B3s)': 13}
 
     final_df = pd.DataFrame({'irs': irs,
                              'demos': demos,

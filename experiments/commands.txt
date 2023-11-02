@@ -41,11 +41,14 @@ scp src/citylearn/data/nnb_limitobs1/schema.json klietz10@134.2.168.52:/mnt/qb/w
 scp src/citylearn/data/nnb_limitobs1_marlisa/schema.json klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nnb_limitobs1_marlisa/
 
 
-scp src/citylearn/data/nnblo1_onlyb5shifted/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nnblo1_onlyb5shifted/
+scp src/citylearn/data/citylearn_challenge_2022_phase_all/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/citylearn_challenge_2022_phase_all/
 
 
 scp src/citylearn/data/nnb_limitobs1_shared/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nnb_limitobs1_shared/
 
 scp src/job.sh klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/
+
+mv agents/SAC_agent_20231030T145351.pkl agents/SAC_agent_Building3.pkl
+
 
 
