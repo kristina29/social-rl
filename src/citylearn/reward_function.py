@@ -184,6 +184,31 @@ class OwnMARL4(RewardFunction):
         return reward.tolist()
 
 
+class OwnMARL5(RewardFunction):
+    def __init__(self, env: CityLearnEnv):
+        super().__init__(env)
+
+    def calculate(self) -> List[float]:
+        r"""Calculates MARL reward.
+
+        Returns
+        -------
+        reward: List[float]
+            Reward for transition to current timestep.
+
+        Notes
+        -----
+        Reward value is calculated as :math:`\textrm{sign}(-e) \times 0.01(e^2) \times \textrm{max}(0, E)`
+        where :math:`e` is the building `electricity_consumption` and :math:`E` is the district `electricity_consumption`.
+        """
+
+        district_fossil_electricity_consumption = self.env.net_fossil_electricity_consumption[self.env.time_step]
+
+        reward = [-0.01 * max(b.net_electricity_consumption_cost[b.time_step] ** 2, 0) * district_fossil_electricity_consumption for b in self.env.buildings]
+
+        return reward.tolist()
+
+
 class IndependentSACReward(RewardFunction):
     def __init__(self, env: CityLearnEnv):
         super().__init__(env)
