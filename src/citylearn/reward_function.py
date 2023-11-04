@@ -206,7 +206,7 @@ class OwnMARL5(RewardFunction):
 
         reward = [-0.01 * max(b.net_electricity_consumption_cost[b.time_step] ** 2, 0) * district_fossil_electricity_consumption for b in self.env.buildings]
 
-        return reward.tolist()
+        return reward
 
 
 class IndependentSACReward(RewardFunction):
