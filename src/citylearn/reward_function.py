@@ -286,7 +286,9 @@ class OwnMARL8(RewardFunction):
         if np.any(reward == 0):
             print("district_fossil_electricity_consumption", district_fossil_electricity_consumption)
             print("solar_penalty", np.array(self.solar_penalty.calculate())**2)
-            print("")
+            print("e_consumption", [b.net_electricity_consumption[self.env.time_step] for b in self.env.buildings])
+            print("soc", [b.net_electricity_consumption for b in self.env.buildings])
+            print("soc", [b.electrical_storage.soc[-1] / b.electrical_storage.capacity_history[0] for b in self.env.buildings])
 
         return reward.tolist()
 
