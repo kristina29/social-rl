@@ -204,7 +204,7 @@ class OwnMARL5(RewardFunction):
 
         district_fossil_electricity_consumption = self.env.net_fossil_electricity_consumption[self.env.time_step]
 
-        reward = [-0.01 * max(b.net_electricity_consumption_cost[b.time_step] ** 2, 0) * district_fossil_electricity_consumption for b in self.env.buildings]
+        reward = [-0.01 * (b.net_electricity_consumption[b.time_step]) ** 2 * district_fossil_electricity_consumption for b in self.env.buildings]
 
         return reward
 
@@ -229,7 +229,7 @@ class OwnMARL6(RewardFunction):
 
         district_fossil_electricity_consumption = self.env.net_fossil_electricity_consumption[self.env.time_step]
 
-        reward = [-max(b.net_electricity_consumption_cost[b.time_step] ** 2, 0) * district_fossil_electricity_consumption for b in self.env.buildings]
+        reward = [- (b.net_electricity_consumption[b.time_step]) ** 2 * district_fossil_electricity_consumption for b in self.env.buildings]
 
         return reward
 
