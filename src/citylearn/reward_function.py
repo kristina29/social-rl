@@ -290,6 +290,9 @@ class OwnMARL8(RewardFunction):
             print("soc", [b.electrical_storage.soc[-1] / b.electrical_storage.capacity_history[0] for b in self.env.buildings])
             print("")
 
+        if district_fossil_electricity_consumption == 0:
+            reward = [50] * len(self.env.buildings)
+
         return reward.tolist()
 
 
