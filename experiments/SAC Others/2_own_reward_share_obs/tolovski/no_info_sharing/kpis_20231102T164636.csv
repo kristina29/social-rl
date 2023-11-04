@@ -1,0 +1,103 @@
+kpi,value,net_value,net_value_without_storage,name,level,env_id
+1 - average_daily_renewable_share,1.006,0.649,0.645,District,district,RBC
+1 - average_daily_renewable_share_grid,1.005,0.89,0.885,District,district,RBC
+1 - load_factor,0.99,0.849,0.857,District,district,RBC
+1 - used_pv_of_total_share,1.154,0.166,0.144,District,district,RBC
+average_daily_peak,0.981,10.581,10.782,District,district,RBC
+carbon_emissions,1.067,3619.98,3412.055,District,district,RBC
+cost,1.065,3885.378,3670.012,District,district,RBC
+electricity_consumption,1.067,7090.072,6683.189,District,district,RBC
+fossil_energy_consumption,1.066,39924.514,37460.062,District,district,RBC
+ramping,1.036,22365.165,21583.846,District,district,RBC
+electricity_consumption,1.099,4978.403,4528.42,Building_3,building,RBC
+carbon_emissions,1.098,2561.917,2332.712,Building_3,building,RBC
+cost,1.091,2819.502,2584.57,Building_3,building,RBC
+1 - used_pv_of_total_share,1.201,0.208,0.173,Building_3,building,RBC
+electricity_consumption,1.072,6056.782,5652.286,Building_5,building,RBC
+carbon_emissions,1.072,3088.284,2881.739,Building_5,building,RBC
+cost,1.07,3285.179,3071.658,Building_5,building,RBC
+1 - used_pv_of_total_share,1.179,0.144,0.122,Building_5,building,RBC
+electricity_consumption,1.087,6021.631,5540.207,Building_7,building,RBC
+carbon_emissions,1.088,3056.977,2810.394,Building_7,building,RBC
+cost,1.088,3199.842,2939.918,Building_7,building,RBC
+1 - used_pv_of_total_share,1.087,0.235,0.216,Building_7,building,RBC
+electricity_consumption,1.068,6405.353,5997.7,Building_8,building,RBC
+carbon_emissions,1.068,3273.388,3064.868,Building_8,building,RBC
+cost,1.066,3513.228,3296.626,Building_8,building,RBC
+1 - used_pv_of_total_share,1.176,0.177,0.151,Building_8,building,RBC
+electricity_consumption,1.042,7956.698,7635.149,Building_11,building,RBC
+carbon_emissions,1.042,4066.338,3901.761,Building_11,building,RBC
+cost,1.04,4376.478,4206.557,Building_11,building,RBC
+1 - used_pv_of_total_share,1.117,0.085,0.076,Building_11,building,RBC
+electricity_consumption,1.035,11121.564,10745.375,Building_17,building,RBC
+carbon_emissions,1.035,5672.976,5480.857,Building_17,building,RBC
+cost,1.033,6118.038,5920.74,Building_17,building,RBC
+1 - used_pv_of_total_share,1.166,0.148,0.127,Building_17,building,RBC
+1 - average_daily_renewable_share,1.013,0.653,0.645,District,district,MARLISA
+1 - average_daily_renewable_share_grid,1.005,0.89,0.885,District,district,MARLISA
+1 - load_factor,0.991,0.849,0.857,District,district,MARLISA
+1 - used_pv_of_total_share,1.025,0.148,0.144,District,district,MARLISA
+average_daily_peak,1.002,10.803,10.782,District,district,MARLISA
+carbon_emissions,1.049,3543.855,3412.055,District,district,MARLISA
+cost,1.047,3809.254,3670.012,District,district,MARLISA
+electricity_consumption,1.048,6940.727,6683.189,District,district,MARLISA
+fossil_energy_consumption,1.041,38993.073,37460.062,District,district,MARLISA
+ramping,1.036,22369.818,21583.846,District,district,MARLISA
+electricity_consumption,1.152,5216.543,4528.42,Building_3,building,MARLISA
+carbon_emissions,1.152,2687.014,2332.712,Building_3,building,MARLISA
+cost,1.147,2964.37,2584.57,Building_3,building,MARLISA
+1 - used_pv_of_total_share,1.119,0.194,0.173,Building_3,building,MARLISA
+electricity_consumption,1.02,5765.447,5652.286,Building_5,building,MARLISA
+carbon_emissions,1.019,2937.612,2881.739,Building_5,building,MARLISA
+cost,1.016,3120.08,3071.658,Building_5,building,MARLISA
+1 - used_pv_of_total_share,0.936,0.114,0.122,Building_5,building,MARLISA
+electricity_consumption,1.032,5718.416,5540.207,Building_7,building,MARLISA
+carbon_emissions,1.034,2905.744,2810.394,Building_7,building,MARLISA
+cost,1.039,3054.283,2939.918,Building_7,building,MARLISA
+1 - used_pv_of_total_share,0.982,0.212,0.216,Building_7,building,MARLISA
+electricity_consumption,1.068,6404.403,5997.7,Building_8,building,MARLISA
+carbon_emissions,1.067,3269.549,3064.868,Building_8,building,MARLISA
+cost,1.063,3505.662,3296.626,Building_8,building,MARLISA
+1 - used_pv_of_total_share,1.081,0.163,0.151,Building_8,building,MARLISA
+electricity_consumption,1.015,7746.217,7635.149,Building_11,building,MARLISA
+carbon_emissions,1.015,3960.467,3901.761,Building_11,building,MARLISA
+cost,1.018,4280.295,4206.557,Building_11,building,MARLISA
+1 - used_pv_of_total_share,1.088,0.083,0.076,Building_11,building,MARLISA
+electricity_consumption,1.004,10793.334,10745.375,Building_17,building,MARLISA
+carbon_emissions,1.004,5502.747,5480.857,Building_17,building,MARLISA
+cost,1.002,5930.833,5920.74,Building_17,building,MARLISA
+1 - used_pv_of_total_share,0.946,0.12,0.127,Building_17,building,MARLISA
+1 - average_daily_renewable_share,1.0,0.645,0.645,District,district,MARLISA Best
+1 - average_daily_renewable_share_grid,1.0,0.885,0.885,District,district,MARLISA Best
+1 - load_factor,1.0,0.857,0.857,District,district,MARLISA Best
+1 - used_pv_of_total_share,1.0,0.144,0.144,District,district,MARLISA Best
+average_daily_peak,1.0,10.782,10.782,District,district,MARLISA Best
+carbon_emissions,1.0,3412.563,3412.055,District,district,MARLISA Best
+cost,1.0,3670.419,3670.012,District,district,MARLISA Best
+electricity_consumption,1.0,6684.259,6683.189,District,district,MARLISA Best
+fossil_energy_consumption,1.0,37466.688,37460.062,District,district,MARLISA Best
+ramping,1.0,21581.512,21583.846,District,district,MARLISA Best
+electricity_consumption,1.001,4531.96,4528.42,Building_3,building,MARLISA Best
+carbon_emissions,1.001,2334.462,2332.712,Building_3,building,MARLISA Best
+cost,1.001,2586.206,2584.57,Building_3,building,MARLISA Best
+1 - used_pv_of_total_share,1.001,0.173,0.173,Building_3,building,MARLISA Best
+electricity_consumption,1.0,5652.286,5652.286,Building_5,building,MARLISA Best
+carbon_emissions,1.0,2881.739,2881.739,Building_5,building,MARLISA Best
+cost,1.0,3071.658,3071.658,Building_5,building,MARLISA Best
+1 - used_pv_of_total_share,1.0,0.122,0.122,Building_5,building,MARLISA Best
+electricity_consumption,1.0,5540.214,5540.207,Building_7,building,MARLISA Best
+carbon_emissions,1.0,2810.398,2810.394,Building_7,building,MARLISA Best
+cost,1.0,2939.919,2939.918,Building_7,building,MARLISA Best
+1 - used_pv_of_total_share,1.0,0.216,0.216,Building_7,building,MARLISA Best
+electricity_consumption,1.0,6000.573,5997.7,Building_8,building,MARLISA Best
+carbon_emissions,1.0,3066.161,3064.868,Building_8,building,MARLISA Best
+cost,1.0,3297.432,3296.626,Building_8,building,MARLISA Best
+1 - used_pv_of_total_share,0.999,0.151,0.151,Building_8,building,MARLISA Best
+electricity_consumption,1.0,7635.149,7635.149,Building_11,building,MARLISA Best
+carbon_emissions,1.0,3901.761,3901.761,Building_11,building,MARLISA Best
+cost,1.0,4206.557,4206.557,Building_11,building,MARLISA Best
+1 - used_pv_of_total_share,1.0,0.076,0.076,Building_11,building,MARLISA Best
+electricity_consumption,1.0,10745.375,10745.375,Building_17,building,MARLISA Best
+carbon_emissions,1.0,5480.857,5480.857,Building_17,building,MARLISA Best
+cost,1.0,5920.74,5920.74,Building_17,building,MARLISA Best
+1 - used_pv_of_total_share,1.0,0.127,0.127,Building_17,building,MARLISA Best

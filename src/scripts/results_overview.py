@@ -99,6 +99,9 @@ marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info
                                     '2_own_reward/own_marl3',
                                     '2_own_reward/own_marl4/info_sharing',
                                     '2_own_reward/own_marl4/no_info_sharing',
+                                    '2_own_reward/fossil_abs',
+                                    '2_own_reward/fossil_share',
+                                    '2_own_reward/tolovski',
                                     '2_own_reward/pricesolar/info_sharing',
                                     '2_own_reward/pricesolar/no_info_sharing',
                                     '2_own_reward_share_obs/own_marl/info_sharing',
@@ -107,6 +110,12 @@ marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info
                                     '2_own_reward_share_obs/own_marl3',
                                     '2_own_reward_share_obs/own_marl4/info_sharing',
                                     '2_own_reward_share_obs/own_marl4/no_info_sharing',
+                                    '2_own_reward_share_obs/fossil_abs/info_sharing',
+                                    '2_own_reward_share_obs/fossil_abs/no_info_sharing',
+                                    '2_own_reward_share_obs/fossil_share/info_sharing',
+                                    '2_own_reward_share_obs/fossil_share/no_info_sharing',
+                                    '2_own_reward_share_obs/tolovski/info_sharing',
+                                    '2_own_reward_share_obs/tolovski/no_info_sharing',
                                     '2_own_reward/pricesolar/info_sharing',
                                     '2_own_reward/pricesolar/no_info_sharing',
                                     '3_add_renew_prod/no_obs_sharing/info_sharing',
@@ -115,20 +124,20 @@ marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info
                                     '3_add_renew_prod/obs_sharing/no_info_sharing',
                                     ],
                           'reward': ['classic', 'classic', 'classic', 'classic',
-                                     'Own1', 'Own1', 'Own2', 'Own3', 'Own4', 'Own4', 'PriceSolar', 'PriceSolar',
-                                     'Own1', 'Own1', 'Own2', 'Own3', 'Own4', 'Own4', 'PriceSolar', 'PriceSolar',
+                                     'Own1', 'Own1', 'Own2', 'Own3', 'Own4', 'Own4', 'FossilAbs', 'FossilShare', 'Tolovski', 'PriceSolar', 'PriceSolar',
+                                     'Own1', 'Own1', 'Own2', 'Own3', 'Own4', 'Own4', 'FossilAbs', 'FossilAbs', 'FossilShare', 'FossilShare', 'Tolovski', 'Tolovski', 'PriceSolar', 'PriceSolar',
                                      'Own4 (renew. prod.)', 'Own4 (renew. prod.)', 'Own4 (renew. prod.)',
                                      'Own4 (renew. prod.)', ],
                           'info_sharing': ['Yes', 'No', 'Yes', 'No',
-                                           'Yes', 'No', 'Yes', 'Yes', 'Yes', 'No', 'Yes', 'No',
-                                           'Yes', 'No', 'Yes', 'Yes', 'Yes', 'No', 'Yes', 'No',
+                                           'Yes', 'No', 'Yes', 'Yes', 'Yes', 'No', 'Yes', 'Yes', 'Yes', 'Yes', 'No',
+                                           'Yes', 'No', 'Yes', 'Yes', 'Yes', 'No', 'Yes', 'No', 'Yes', 'No', 'Yes', 'No', 'Yes', 'No',
                                            'Yes', 'No', 'Yes', 'No', ],
                           'shared_observations': ['Yes', 'Yes', 'No', 'No',
-                                                  'No', 'No', 'No', 'No', 'No', 'No', 'No', 'No',
-                                                  'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes',
+                                                  'No', 'No', 'No', 'No', 'No', 'No', 'No', 'No', 'No', 'No', 'No',
+                                                  'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes',
                                                   'No', 'No', 'Yes', 'Yes', ]})
 
-mode = 'sacdb2v'
+mode = 'marl'
 var = 2
 
 
@@ -240,17 +249,20 @@ def generate_marl():
         info_sharing = dir[1]['info_sharing']
         shared_ob = dir[1]['shared_observations']
 
-        file = glob.glob(f'../experiments/SAC Others/{dir[1]["paths"]}/kpis_*.csv')[0]
-        kpis = pd.read_csv(file)
-        kpis = kpis.set_index('kpi')
-        kpis = kpis[(kpis['env_id'] == 'MARLISA Best') & (kpis['level'] == 'district')]
-        v = round(kpis.loc['fossil_energy_consumption', 'net_value'] /
-                  kpis.loc['fossil_energy_consumption', 'net_value_without_storage'], 3)
+        try:
+            file = glob.glob(f'../experiments/SAC Others/{dir[1]["paths"]}/kpis_*.csv')[0]
+            kpis = pd.read_csv(file)
+            kpis = kpis.set_index('kpi')
+            kpis = kpis[(kpis['env_id'] == 'MARLISA Best') & (kpis['level'] == 'district')]
+            v = round(kpis.loc['fossil_energy_consumption', 'net_value'] /
+                      kpis.loc['fossil_energy_consumption', 'net_value_without_storage'], 3)
 
-        rewards.append(reward)
-        info_sharings.append(info_sharing)
-        shared_obs.append(shared_ob)
-        fossil_energy_consumptions.append(v)
+            rewards.append(reward)
+            info_sharings.append(info_sharing)
+            shared_obs.append(shared_ob)
+            fossil_energy_consumptions.append(v)
+        except:
+            pass
 
     colors = {'Yes': 'tab:blue',
               'No': 'tab:orange', }
@@ -261,7 +273,10 @@ def generate_marl():
                   'Own2': 4,
                   'Own3': 5,
                   'Own4': 6,
-                  'Own4 (renew. prod.)': 7}
+                  'Own4 (renew. prod.)': 7,
+                  'FossilAbs': 8,
+                  'FossilShare': 9,
+                  'Tolovski': 10}
 
     final_df = pd.DataFrame({'rewards': rewards,
                              'info_sharings': info_sharings,
