@@ -298,7 +298,7 @@
     }
   },
   "reward_function": {
-    "type": "citylearn.reward_function.OwnMARL5",
+    "type": "citylearn.reward_function.OwnMARL7",
     "attributes": null
   },
   "buildings": {
