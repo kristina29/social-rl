@@ -283,6 +283,11 @@ class OwnMARL8(RewardFunction):
 
         reward = -np.array(self.solar_penalty.calculate())**2 * district_fossil_electricity_consumption
 
+        if np.any(reward == 0):
+            print("district_fossil_electricity_consumption", district_fossil_electricity_consumption)
+            print("solar_penalty", np.array(self.solar_penalty.calculate())**2)
+            print("")
+
         return reward.tolist()
 
 
