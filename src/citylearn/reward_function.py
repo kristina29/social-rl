@@ -281,14 +281,16 @@ class OwnMARL8(RewardFunction):
 
         district_fossil_electricity_consumption = self.env.net_fossil_electricity_consumption[-1]
 
-        reward = -np.array(self.solar_penalty.calculate())**2 * district_fossil_electricity_consumption
+        reward = - abs(np.array(self.solar_penalty.calculate())) - (1/len(self.env.buildings) * district_fossil_electricity_consumption)
 
-        if np.any(reward == 0):
-            print("district_fossil_electricity_consumption", district_fossil_electricity_consumption)
-            print("solar_penalty", np.array(self.solar_penalty.calculate())**2)
-            print("e_consumption", [b.net_electricity_consumption[-1] for b in self.env.buildings])
-            print("soc", [b.electrical_storage.soc[-1] / b.electrical_storage.capacity_history[0] for b in self.env.buildings])
-            print("")
+        #if np.any(reward == 0):
+        # print("district_fossil_electricity_consumption", district_fossil_electricity_consumption)
+        # print("solar_penalty", np.array(self.solar_penalty.calculate())**2)
+        # print("e_consumption", [b.net_electricity_consumption[self.env.time_step] for b in self.env.buildings])
+        # print("e_consumption", [b.net_electricity_consumption[-1] for b in self.env.buildings])
+        # print("soc", [b.electrical_storage.soc[-1] / b.electrical_storage.capacity_history[0] for b in self.env.buildings])
+        # print("reward", reward)
+        # print("")
 
         reward.tolist()
 
