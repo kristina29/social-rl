@@ -247,5 +247,59 @@ A key difference between the setup of MARLISA in the paper and ours is that in M
 In the study, the performance of the MARLISA agents was evaluated based on their ability to minimize annual peak consumption, average daily peak consumption, ramping, annual net energy consumption from the grid, and maximize the average daily load factor. The authors compared the performance of the MARLISA agents with an RBC used as a baseline. The authors calculated the KPIs compared to the performance of the RBC, and not in comparison to without using any storage as we did. The results showed that the MARLISA agents outperformed the RBC in all metrics studied, with the smallest improvement in minimizing net electricity demands at only about 1 \%. More information on the metrics, the MARLISA algorithm, and the evaluation procedure and results can be found in the paper. 
 
 \subsection{Reward Functions}
+\begin{equation}
+	r = -E_{used_f}
+\end{equation}
+\begin{equation}
+	r_{fossil_t}^b
+\end{equation}
+\begin{equation}
+	r = r_t^b - E_{used_f}
+\end{equation}
+with $\eta=0.5$
+\begin{equation}
+	r = r_t^b - E_{net_{pos}}
+\end{equation}
+with $\eta=0.5$
+\begin{equation}
+	r = r_t^b \cdot E_{net_{pos}}
+\end{equation}
+with $\eta=0.5$
+\begin{equation}
+	r = r_t^b - \frac{1}{|B|} E_{used_f}
+\end{equation}
+with $\eta=0.5$
+\begin{equation}
+	r = -0.01(e_{net}^{b})^2 \cdot E_{used_f}
+\end{equation}
+\begin{equation}
+	r = -(e_{net}^{b})^2 \cdot E_{used_f}
+\end{equation}
+\begin{equation}
+	r = r_t^b \cdot E_{used_f}
+\end{equation}
+with $\eta=0.5$
+\begin{equation}
+	r = - (r_t^b)^2 \cdot E_{used_f}
+\end{equation}
+with $\eta=0.5$
+\begin{equation}
+	r = -0.01 (r_t^b)^2 \cdot E_{used_f}
+\end{equation}
+with $\eta=0.5$
+\begin{equation}
+	r_t^b
+\end{equation}
+with $\eta=0.5$
+\begin{equation}
+	r_{solar_t}^b
+\end{equation}
+\begin{equation}
+	r_{tolovski_t}^b
+\end{equation}
+\begin{equation}
+	r_{MARL_t}^b = sign(e_{net}^b)\cdot0.01(e_{net}^b)^2\cdot E_{net}
+\end{equation}
+with $E_{net}=\sum_{b\in B}e_{net}^b$
 
 \subsection{Results}
