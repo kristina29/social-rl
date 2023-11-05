@@ -1,3 +1,4 @@
+import math
 from typing import List
 import numpy as np
 from citylearn.citylearn import CityLearnEnv
@@ -267,37 +268,21 @@ class OwnMARL8(RewardFunction):
 
     def calculate(self) -> List[float]:
         r"""Calculates MARL reward.
-
         Returns
         -------
         reward: List[float]
             Reward for transition to current timestep.
-
         Notes
         -----
         Reward value is calculated as :math:`\textrm{sign}(-e) \times 0.01(e^2) \times \textrm{max}(0, E)`
         where :math:`e` is the building `electricity_consumption` and :math:`E` is the district `electricity_consumption`.
         """
 
-        district_fossil_electricity_consumption = self.env.net_fossil_electricity_consumption[-1]
+        district_fossil_electricity_consumption = self.env.net_fossil_electricity_consumption[self.env.time_step]
 
-        reward = - abs(np.array(self.solar_penalty.calculate())) - (1/len(self.env.buildings) * district_fossil_electricity_consumption)
+        reward = -np.array(self.solar_penalty.calculate())**2 * district_fossil_electricity_consumption
 
-        #if np.any(reward == 0):
-        # print("district_fossil_electricity_consumption", district_fossil_electricity_consumption)
-        # print("solar_penalty", np.array(self.solar_penalty.calculate())**2)
-        # print("e_consumption", [b.net_electricity_consumption[self.env.time_step] for b in self.env.buildings])
-        # print("e_consumption", [b.net_electricity_consumption[-1] for b in self.env.buildings])
-        # print("soc", [b.electrical_storage.soc[-1] / b.electrical_storage.capacity_history[0] for b in self.env.buildings])
-        # print("reward", reward)
-        # print("")
-
-        reward.tolist()
-
-        if district_fossil_electricity_consumption == 0:
-            reward = [50] * len(self.env.buildings)
-
-        return reward
+        return reward.tolist()
 
 
 class OwnMARL9(RewardFunction):
@@ -324,6 +309,37 @@ class OwnMARL9(RewardFunction):
         reward = -0.01 * np.array(self.solar_penalty.calculate())**2 * district_fossil_electricity_consumption
 
         return reward.tolist()
+
+
+class OwnMARL10(RewardFunction):
+    def __init__(self, env: CityLearnEnv):
+        super().__init__(env)
+        self.solar_penalty = SolarPenaltyReward(env)
+
+    def calculate(self) -> List[float]:
+        r"""Calculates MARL reward.
+
+        Returns
+        -------
+        reward: List[float]
+            Reward for transition to current timestep.
+
+        Notes
+        -----
+        Reward value is calculated as :math:`\textrm{sign}(-e) \times 0.01(e^2) \times \textrm{max}(0, E)`
+        where :math:`e` is the building `electricity_consumption` and :math:`E` is the district `electricity_consumption`.
+        """
+
+        district_fossil_electricity_consumption = self.env.net_fossil_electricity_consumption[self.env.time_step]
+
+        reward = [-0.01 * (b.net_electricity_consumption[b.time_step]) ** 2 * district_fossil_electricity_consumption
+                  for b in self.env.buildings]
+
+        if district_fossil_electricity_consumption < 1:
+            reward = np.array(reward) + 50 * math.exp(-1)
+            reward = reward.tolist()
+
+        return reward
 
 
 class IndependentSACReward(RewardFunction):
