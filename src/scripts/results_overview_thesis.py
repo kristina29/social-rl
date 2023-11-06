@@ -109,7 +109,7 @@ marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info
                                                   'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes',
                                                   'No', 'No', 'Yes', 'Yes', ]})
 
-mode = 'sacdb2'
+mode = 'sacdb2v'
 var = 2
 
 
@@ -304,30 +304,33 @@ def generate_sacdb2value():
 
     for dir in dirs.iterrows():
         demo = dir[1]['demos']
-        extra_pol = dir[1]['extra_pols']
 
-        for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.6, 0.8]:
-            # for ir in [0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25, 0.4]:#, 0.6, 0.8]:
-            try:
-                file = glob.glob(f'../experiments/SAC_DB2Value/{dir[1]["paths"]}/ir{ir}/kpis_*.csv')[0]
-                kpis = pd.read_csv(file)
-                kpis = kpis.set_index('kpi')
-                kpis = kpis[(kpis['env_id'] == 'SAC_DB2Value Best') & (kpis['level'] == 'district')]
-                v = round(kpis.loc['fossil_energy_consumption', 'net_value'] /
-                          kpis.loc['fossil_energy_consumption', 'net_value_without_storage'], 3)
+        if not 'shared' in demo :
 
-                if ir <= 0.01:
-                    irs.append('$<=$ 0.01')
-                elif ir >= 0.4:
-                    irs.append('$>=$ 0.4')
-                else:
-                    irs.append(ir)
-                extra_pols.append(extra_pol)
-                demos.append(demo)
-                fossil_energy_consumptions.append(v)
+            extra_pol = dir[1]['extra_pols']
 
-            except:
-                print('Missing')
+            for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.6, 0.8]:
+                # for ir in [0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25, 0.4]:#, 0.6, 0.8]:
+                try:
+                    file = glob.glob(f'../experiments/SAC_DB2Value/{dir[1]["paths"]}/ir{ir}/kpis_*.csv')[0]
+                    kpis = pd.read_csv(file)
+                    kpis = kpis.set_index('kpi')
+                    kpis = kpis[(kpis['env_id'] == 'SAC_DB2Value Best') & (kpis['level'] == 'district')]
+                    v = round(kpis.loc['fossil_energy_consumption', 'net_value'] /
+                              kpis.loc['fossil_energy_consumption', 'net_value_without_storage'], 3)
+
+                    if ir <= 0.01:
+                        irs.append('$<=$ 0.01')
+                    elif ir >= 0.4:
+                        irs.append('$>=$ 0.4')
+                    else:
+                        irs.append(ir)
+                    extra_pols.append(extra_pol)
+                    demos.append(demo)
+                    fossil_energy_consumptions.append(v)
+
+                except:
+                    print('Missing')
 
     ax.legend()
     ax.set_xscale('log', base=2)
@@ -346,15 +349,16 @@ def generate_sacdb2value():
         # 0.8: 'magenta'
     }
     markers = {0: 'o', 1: 'X'}
-    demo_pos = {'2 random\n(shared obs.)': 1,
-                '2 random\n(shared obs.,\ndeterm.)': 2,
-                '2 random': 3,
-                '4 random': 4,
-                'B5': 5,
-                'B6': 6,
-                'B6 (determ.)': 7,
-                'B6\n(shared obs.)': 8,
-                'B6\n(shared obs.,\ndeterm.)': 9}
+    demo_pos = {#'2 random\n(shared obs.)': 1,
+                #'2 random\n(shared obs.,\ndeterm.)': 2,
+                '2 random': 1, #3,
+                '4 random': 2, #4,
+                'B5': 3, #5,
+                'B6': 4, #6,
+                'B6 (determ.)': 5, #7,
+                #'B6\n(shared obs.)': 8,
+                #'B6\n(shared obs.,\ndeterm.)': 9
+        }
 
     final_df = pd.DataFrame({'irs': irs,
                              'demos': demos,
