@@ -83,9 +83,9 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d
 def generate_sacdb2value():
     dirs = sacdb2value_dirs
 
-    fig, ax = plt.subplots()
-    fig2, ax2 = plt.subplots()
-    fig3, ax3 = plt.subplots()
+    fig, ax = plt.subplots(figsize=(15,8))
+    fig2, ax2 = plt.subplots(figsize=(15,8))
+    fig3, ax3 = plt.subplots(figsize=(15,8))
 
     i = 0
 
@@ -170,14 +170,14 @@ def generate_sacdb2value():
         #    prev, = ax.plot(temp_irs, temp_foss)
             i += 1
 
-    ax.legend()
+    ax.legend( loc='upper right', fontsize=17)
     ax.set_xscale('log', base=2)
     ax.set_ylim(0.91, 0.96)
     ax2.set_ylim(0.91, 0.96)
-    ax2.legend()
+    ax2.legend( loc='upper right', fontsize=17)
     ax2.set_xscale('log', base=2)
     #ax3.set_ylim(0.91, 0.96)
-    ax3.legend()
+    ax3.legend( loc='upper right', fontsize=17)
     ax3.set_xscale('log', base=2)
 
     from matplotlib.ticker import ScalarFormatter
@@ -189,7 +189,7 @@ def generate_sacdb2value():
     ax.set_xticks(np.unique(ax1_irs))
     ax.set_xticklabels(np.unique(ax1_irs))
     ax2.set_xticks(np.unique(ax2_irs))
-    ax2.set_xticklabels(np.unique(ax2_irs))
+    ax2.set_xticklabels(np.unique(ax2_irs), rotation=45)
     ax3.set_xticks(np.unique(ax3_irs))
     ax3.set_xticklabels(np.unique(ax3_irs))
     ax.grid(zorder=1)
@@ -219,9 +219,14 @@ def generate_sacdb2value():
     ax3.axhline(BEST_SAC_B5 - 0.005, ls=':', lw=1, c='blue', zorder=2)
     ax3.axhline(BEST_SAC_B5 + 0.005, ls=':', lw=1, c='blue', zorder=2)
 
+    ax.tick_params(axis='both', which='major', labelsize=17)
+    ax2.tick_params(axis='both', which='major', labelsize=17)
+    ax3.tick_params(axis='both', which='major', labelsize=17)
+
     #ax3.text(0.001, BEST_SAC_VALUE - 0.0003, 'SAC Baseline', color='r', ha='left', va='top',
     #         transform=ax.get_yaxis_transform(), fontsize=17)
 
+    plt.tight_layout()
     plt.show()
 
     fig.savefig('results3.pdf')
