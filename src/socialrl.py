@@ -76,7 +76,7 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
                               end_exploration_t=end_exploration_t, save_transitions=save_transitions)
 
     # Train DDPG agent with demonstrator transitions
-    if demo_transitions is not None and ddpg:
+    if ddpg:
         all_envs['DDPG'], all_losses['DDPG'], all_rewards['DDPG'], all_eval_results['DDPG'], \
         all_agents['DDPG'] = \
             train_ddpg(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
@@ -221,7 +221,7 @@ def train_prbddpg(schema, episodes, random_seed, batch_size, discount, demo_tran
     return env, losses, rewards, eval_results, prbddpg_model
 
 
-def train_prbddpg(schema, episodes, random_seed, batch_size, discount, end_exploration_t, l2_loss):
+def train_ddpg(schema, episodes, random_seed, batch_size, discount, end_exploration_t, l2_loss):
     env = CityLearnEnv(schema)
 
     ddpg_model = DDPG(env=env, seed=random_seed, batch_size=batch_size, l2_loss=l2_loss,
