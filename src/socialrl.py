@@ -75,6 +75,13 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
                               deterministic_demo=deterministic_demo, extra_policy_update=extra_policy_update,
                               end_exploration_t=end_exploration_t, save_transitions=save_transitions)
 
+    # Train DDPG agent with demonstrator transitions
+    if demo_transitions is not None and ddpg:
+        all_envs['DDPG'], all_losses['DDPG'], all_rewards['DDPG'], all_eval_results['DDPG'], \
+        all_agents['DDPG'] = \
+            train_ddpg(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
+                          discount=discount, end_exploration_t=end_exploration_t, l2_loss=l2_loss)
+
     # Train SAC agent with demonstrator transitions
     if demo_transitions is not None and ddpg:
         all_envs['PRB_DDPG'], all_losses['PRB_DDPG'], all_rewards['PRB_DDPG'], all_eval_results['PRB_DDPG'], \
@@ -82,6 +89,7 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
             train_prbddpg(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
                           discount=discount, demo_transitions=demo_transitions,
                           end_exploration_t=end_exploration_t, l2_loss=l2_loss)
+
     if demo_transitions is not None and not exclude_sac:
         all_envs['PRB_SAC'], all_losses['PRB_SAC'], all_rewards['PRB_SAC'], all_eval_results['PRB_SAC'], \
         all_agents['PRB_SAC'] = \
@@ -211,6 +219,19 @@ def train_prbddpg(schema, episodes, random_seed, batch_size, discount, demo_tran
     print('PRB DDPG model trained!')
 
     return env, losses, rewards, eval_results, prbddpg_model
+
+
+def train_prbddpg(schema, episodes, random_seed, batch_size, discount, end_exploration_t, l2_loss):
+    env = CityLearnEnv(schema)
+
+    ddpg_model = DDPG(env=env, seed=random_seed, batch_size=batch_size, l2_loss=l2_loss,
+                        discount=discount, demonstrator_transitions=demo_transitions,
+                        end_exploration_time_step=end_exploration_t)
+    losses, rewards, eval_results, best_state = ddpg_model.learn(episodes=episodes, deterministic_finish=True)
+
+    print('DDPG model trained!')
+
+    return env, losses, rewards, eval_results, ddpg_model
 
 
 if __name__ == '__main__':
