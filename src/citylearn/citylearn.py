@@ -654,9 +654,9 @@ class CityLearnEnv(Environment, Env):
 
     @property
     def renewable_generation(self) -> np.ndarray:
-        """Summend `Building.solar_generation, in [kWh]` + `FuelMix.renewable_energy_produced, in [kWh]`"""
+        """Summend `Building.solar_generation, in [kWh]`"""
 
-        return self.buildings[0].fuel_mix.renewable_energy_produced[:len(self.solar_generation)] + self.solar_generation
+        return self.buildings[0].fuel_mix.renewable_energy_produced[:self.time_step]
 
     @property
     def demonstrator_count(self) -> int:
