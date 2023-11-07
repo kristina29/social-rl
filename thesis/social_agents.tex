@@ -257,6 +257,9 @@ A key difference between the setup of MARLISA in the paper and ours is that in M
 In the study, the performance of the MARLISA agents was evaluated based on their ability to minimize annual peak consumption, average daily peak consumption, ramping, annual net energy consumption from the grid, and maximize the average daily load factor. The authors compared the performance of the MARLISA agents with an RBC used as a baseline. The authors calculated the KPIs compared to the performance of the RBC, and not in comparison to without using any storage as we did. The results showed that the MARLISA agents outperformed the RBC in all metrics studied, with the smallest improvement in minimizing net electricity demands at only about 1 \%. More information on the metrics, the MARLISA algorithm, and the evaluation procedure and results can be found in the paper. 
 
 \subsection{Reward Functions}
+	2. Shared reward
+Annahme/Idee: Durch social aspekt kann verfügbare erneuerbare Energie im Grid verbessert werden $-->$ Preis Penalty nur anteil erneuerbare, bedenkt nicht den verbrauch durch die anderen agents $-->$ strafe wenn insgesamt zu viel genutzt wird (kombi personal \& shared reward)
+
 \begin{equation}
 	r = -E_{used_f}
 \end{equation}
