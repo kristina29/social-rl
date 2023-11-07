@@ -237,6 +237,9 @@ early stopping often way better than final trained one (e.g. best: 1.011 vs 0.92
 \section{MARLISA Agent}
 
 \subsection{Reward Functions}
+	2. Shared reward
+Annahme/Idee: Durch social aspekt kann verfügbare erneuerbare Energie im Grid verbessert werden $-->$ Preis Penalty nur anteil erneuerbare, bedenkt nicht den verbrauch durch die anderen agents $-->$ strafe wenn insgesamt zu viel genutzt wird (kombi personal \& shared reward)
+
 \begin{equation}
 	r = -E_{used_f}
 \end{equation}

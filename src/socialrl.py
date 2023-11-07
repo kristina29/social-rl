@@ -78,7 +78,7 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
     # Train DDPG agent with demonstrator transitions
     if ddpg:
         all_envs['DDPG'], all_losses['DDPG'], all_rewards['DDPG'], all_eval_results['DDPG'], \
-        all_agents['DDPG'] = \
+        all_agents['DDPG'], all_envs['DDPG Best'] = \
             train_ddpg(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
                           discount=discount, end_exploration_t=end_exploration_t, l2_loss=l2_loss)
 
@@ -229,9 +229,16 @@ def train_ddpg(schema, episodes, random_seed, batch_size, discount, end_explorat
                         end_exploration_time_step=end_exploration_t)
     losses, rewards, eval_results, best_state = ddpg_model.learn(episodes=episodes, deterministic_finish=True)
 
+    best_state_env = copy.deepcopy(ddpg_model.env)
+    eval_observations = best_state_env.reset()
+
+    while not best_state_env.done:
+        actions = best_state.predict(eval_observations, deterministic=True)
+        eval_observations, eval_rewards, _, _ = best_state_env.step(actions)
+
     print('DDPG model trained!')
 
-    return env, losses, rewards, eval_results, ddpg_model
+    return env, losses, rewards, eval_results, ddpg_model, best_state_env
 
 
 if __name__ == '__main__':
