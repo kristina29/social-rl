@@ -34,9 +34,10 @@ def plot_losses(losses: Mapping[str, Mapping[int, Mapping[str, List[float]]]]) -
 
 if __name__ == '__main__':
     loss_files = ['../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/losses_20231002T130931.pkl',
-                  '../experiments/SAC_DB2/33_demo_replaybuffer/demo_b5/losses_20231026T121912.pkl']
-    agents = ['SAC', 'PRB_SAC']
-    names = ['Baseline SAC', 'Transitions of Building 5']
+                  '../experiments/SAC_DB2/32_demo_b5/ir0.2/socialMode2/losses_20231002T160209.pkl',
+                  '../experiments/SAC_DB2/32_demo_b5/ir0.2/socialMode5/losses_20231002T160836.pkl']
+    agents = ['SAC', 'SAC_DB2', 'SAC_DB2']
+    names = ['x', 'Mode 2', 'Mode 5']
 
     final_losses = {}
 

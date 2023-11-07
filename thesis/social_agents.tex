@@ -148,6 +148,8 @@ In the first step, we sampled the demonstrator actions from the demonstrator pol
 \subsection{Discussion}
 POT Losses B3 von demo B5 ir0.2
 
+Loss mostly weird for modes 4-6 beside mode 5 \& 6 when using ir 1 (than also similar performance as mode 1-3)
+
 \section{Social Agent II}
 \subsection{Method and Results}
 In the next step, we incorporated a social Q-Value objective into the algorithm and made an extra update step of the Q-Networks accordingly. To achieve this, we initially followed the steps of the standard SAC algorithm, similar to social agent I. During each update step, we carried out an additional social Q-value update for both Q-value networks, utilizing the following social objective function:
