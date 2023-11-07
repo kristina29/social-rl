@@ -4,15 +4,13 @@
 \chapter{Social Agents}
    \label{sec:social-agents}
 \noindent
-\todo[inline]{Ziel dieses Kapitels ist eine Einf\"uhrung in die Thematik BlaBlaBla ...}
+\todo[inline]{Ziel dieses Kapitels ist eine Einf\"uhrung in die Thematik BlaBlaBla ..., IRGENDWO AM ANFANG einzelne besitmmte gebäude als B\{id\}, e.g. B6 for building 6}
 
-\section{SAC using Demonstrator Transitions}
+\section{Imitation Learning}
 \todo[inline]{Font in tabellen beschreibungen verkleinern}
 
 \subsection{Method and Results}
-As mentioned in Section~\ref{sec:background-social-learning}, a popular technique to improve learning is by sampling demonstration transitions and storing them in a prioritized replay buffer (PRB). This buffer assigns priorities to transitions based on their temporal difference (TD) error. Transitions with higher TD error are given higher priority because they are expected to be more challenging to learn and should be observed more frequently during training. The transitions with higher priority are more likely to be sampled. Priorities are updated during the training process \cite{schaul2015prioritized}.
-
-To implement the SAC agent using the demonstrator transitions, we used the trained agents previously described in Section~\ref{sec:pretrained-demos}. These agents acted on the complete dataset hourly for an entire year. We saved these transitions and then trained the agents normally, as outlined in Section~\ref{sec:sac-baseline}. The only difference was that we filled the PRB with the demonstrator transitions at the beginning of the training for each agent. We used either the transitions from Building 5 or Building 6, but not both simultaneously. The results in comparison to the baseline SAC agents are visualized in Figure~\ref{fig:prb-kpis}.
+To implement the SAC agents using the demonstrator transitions for imitation learning, we used the trained agents previously described in Section~\ref{sec:pretrained-demos}. These agents acted on the complete dataset hourly for an entire year. We saved these transitions and then trained the agents normally, as outlined in Section~\ref{sec:sac-baseline}. The only difference was that we filled the PRB with the demonstrator transitions at the beginning of the training for each agent. We used either the transitions from Building 5 or Building 6, but not both simultaneously. The results in comparison to the baseline SAC agents are visualized in Figure~\ref{fig:prb-kpis}.
 
 \begin{figure}[htb]
 \center
@@ -22,8 +20,10 @@ To implement the SAC agent using the demonstrator transitions, we used the train
 \end{figure}
 
 The SAC agents using the demonstrator transitions perform worse than the baseline agents on all KPIs. However, using transitions from Building 6 resulted in better scores compared to the use of transitions from Building 5. This is contrary to the performance of both demonstrator buildings, as described in the previous chapter. 
-%Also, Building 6 has a lower median PCCIt is possible that Building 6 provides better guidance on how agents should behave since it has a higher median PCC to the training buildings than Building 5.
 
+We conducted additional experiments using the DDPG algorithm to confirm that the SAC algorithm was not responsible for the poor results. For this, we first trained the training buildings without demonstrator transitions using DDPG. Then, we trained the buildings, including the same demonstrator transitions as before in their PRB. The results are visualized in Appendix \ref{sec:app-figures}, Figure \ref{app:prb-ddpg-kpis}. The DDPG agents without imitation learning achieved worse results than the SAC baseline agents in all KPIs, with a decline of about 2.5 \% in fossil energy savings. The agents that used imitation learning, on the other hand, performed even worse, consuming more fossil energy than without using the battery. However, unlike the SAC agents, in the case of fossil energy consumption and the total daily share of renewable energy, the agents with the demonstrator transitions of B5 performed better than those with the transitions of B6.
+
+\subsection{Discussion}
 The policy loss values observed during training increase for all agents instead of decreasing as expected. This is illustrated in Figure~\ref{fig:prb-losses} for Building 3 and the demonstrator transitions of Building 5, but it also applies to the other training buildings and demonstrator Building 6. This development suggests that with higher probability, actions with a low, possibly even negative, estimated Q-Value are taken. As a result, the agents are more likely to take 'bad' actions with greater certainty, ultimately leading to poorer performance.
 
 \begin{figure}[htb]
@@ -33,8 +33,10 @@ The policy loss values observed during training increase for all agents instead 
   \label{fig:prb-losses}
 \end{figure}
 
-\subsection{Discussion}
 
+Imitation learning (soll ja nicht unbedingt imitieren, sondern 'miteinander arbeiten', kein human demonstrator)
+
+DDPG baseline and with demonstrator transitions not tuned, tuning could improve their performance. but increasing loss still indicates that imitation learning not good method for our goal of fossil energy consumption reduction. since DDPG baseline (without tuning) worse results than SAC we stay with SAC for further methods of decision biasing
 
 \section{Social Agent I}
 \subsection{Method and Results}

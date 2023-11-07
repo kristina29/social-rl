@@ -128,7 +128,8 @@ For the final SAC algorithm, as given in Algorithm \ref{alg:sac-update}, the aut
 \subsection{General Methods}
 \subsubsection*{Imitation Learning}
 Demonstrator transitions in replay buffer \cite{vecerik2017leveraging}
-Imitation learning (soll ja nicht unbedingt imitieren, sondern 'miteinander arbeiten', kein human demonstrator)
+
+As mentioned in Section~\ref{sec:background-social-learning}, a popular technique to improve learning is by sampling demonstration transitions and storing them in a prioritized replay buffer (PRB). This buffer assigns priorities to transitions based on their temporal difference (TD) error. Transitions with higher TD error are given higher priority because they are expected to be more challenging to learn and should be observed more frequently during training. The transitions with higher priority are more likely to be sampled. Priorities are updated during the training process \cite{schaul2015prioritized}.
 
 \subsubsection*{Decision Biasing}
 \label{sec:decision-biasing}
