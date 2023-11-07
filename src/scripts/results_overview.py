@@ -137,7 +137,7 @@ marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info
                                                   'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes',
                                                   'No', 'No', 'Yes', 'Yes', ]})
 
-mode = 'marl'
+mode = 'sacdb2'
 var = 2
 
 
