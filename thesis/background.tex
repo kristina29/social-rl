@@ -9,6 +9,7 @@ This chapter provides the necessary background knowledge to comprehend our appro
 
 \section{Reinforcement Learning}
 \label{sec:reinforcement-learning}
+\subsection{General}
 As defined by Sutton and Barto \cite{sutton2018reinforcement}, RL is a machine learning method that aims to choose actions to maximize a numerical reward. RL agents learn these actions through a trial-and-error approach based on the received rewards. Actions can affect both immediate rewards and long-term rewards. In contrast to supervised methods, RL does not need labeled data for learning and does not try to discover inherent structure in data as unsupervised methods.
 
 \begin{figure}[htb]
@@ -112,8 +113,8 @@ For the final SAC algorithm, as given in Algorithm \ref{alg:sac-update}, the aut
 \small \textbf{Output:}   $\theta_1,\theta_2,\phi$ \Comment{\footnotesize Optimized parameters}
 \end{algorithm}
 
-\subsection{Proximal Policy Optimization}
-\cite{schulman2017proximal}
+\subsection{Deep Deterministic Policy Gradient}
+\cite{lillicrap2015continuous}
 
 \section{Social Learning}
 \label{sec:background-social-learning}
@@ -124,11 +125,12 @@ For the final SAC algorithm, as given in Algorithm \ref{alg:sac-update}, the aut
 
 \textit{Social learning} is a term initially from psychology and has various definitions. Essentially, it refers to the act of learning from others \cite{reed2010social, toyokawa2019social, witt2023social}. In this thesis, we interpret social learning as observing the actions and possibly rewards of demonstrators and incorporating them into the training process of the RL agent.
 
-\subsection{Imitation Learning}
+\subsection{General Methods}
+\subsubsection*{Imitation Learning}
 Demonstrator transitions in replay buffer \cite{vecerik2017leveraging}
 Imitation learning (soll ja nicht unbedingt imitieren, sondern 'miteinander arbeiten', kein human demonstrator)
 
-\subsection{Decision Biasing}
+\subsubsection*{Decision Biasing}
 \label{sec:decision-biasing}
 Decision Biasing is a method for modeling social learning. It observes which actions the demonstrator takes and assumes that they are good. Therefore, the policy to be trained is biased towards the demonstrator's actions. In the literature, this method is used to model the behavior of study participants. However, the experiments always have discrete, often even only binary, action spaces. Therefore, we had to adapt the method for our continuous setting, which we present in section \ref{sec:met-mat}. 
 
@@ -137,3 +139,10 @@ Our approach is based on the 'DB2' method presented by Najar et al. \cite{najar2
 Q'(d) \leftarrow Q'(d) + \alpha_i \cdot [1-Q'(d)],
 \end{equation}
 where $d$ is the observed demonstrator action and $\alpha_i $ is an imitation decision bias rate parameter. 
+
+\subsection{MARLISA Algorithm}
+For our next set of experiments, we aimed to train CityLearn's Multi-Agent Reinforcement Learning with Iterative Sequential Action Selection (MARLISA) algorithm to reduce the amount of fossil energy consumed. In this chapter, we will provide a brief overview of how the algorithm works. MARLISA is an extension of SAC, designed to coordinate the behavior of multiple agents by using a reward function with both individual and shared objectives. Moreover, the agents predict their future energy consumption based on the predictions of other agents and share this information with each other, where the order of the agents is randomized.
+
+A key difference between the setup of MARLISA in the paper and ours is that in MARLISA,  buildings can share any excess energy produced within the district. Further, the agents were trained to control the charging and discharging of the storage tank for domestic hot water and chilled water rather than the battery, as in our setup.
+
+In the study, the performance of the MARLISA agents was evaluated based on their ability to minimize annual peak consumption, average daily peak consumption, ramping, annual net energy consumption from the grid, and maximize the average daily load factor. The authors compared the performance of the MARLISA agents with an RBC used as a baseline. The authors calculated the KPIs compared to the performance of the RBC, and not in comparison to without using any storage as we did. The results showed that the MARLISA agents outperformed the RBC in all metrics studied, with the smallest improvement in minimizing net electricity demands at only about 1 \%. More information on the metrics, the MARLISA algorithm, and the evaluation procedure and results can be found in the paper. 

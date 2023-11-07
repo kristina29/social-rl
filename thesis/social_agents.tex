@@ -6,20 +6,6 @@
 \noindent
 \todo[inline]{Ziel dieses Kapitels ist eine Einf\"uhrung in die Thematik BlaBlaBla ...}
 
-\section{Pretrained Demonstrator}
-\label{sec:pretrained-demos}
-\todo[inline]{Building 3, evtl generell demonstratoren hier vorstellen also auch 'random' 2 und 4 und dann sagen sind immer die gleichen weil wegen vergleichbarkeit}
-For some of our methods, we used pre-trained demonstrators. We trained these demonstrators using the final hyperparameter values, reward function and state space as described in Section~\ref{sec:sac-baseline}. Also, we scaled the available renewable energy in the grid by the factor $k = 0.5$. We used two different buildings as pre-trained demonstrators, one among the training buildings and one not a training building.
-
-\begin{figure}[htb]
-\center
-     \includegraphics[width=\textwidth]{figures/b5_b6_kpis.pdf}
-  \caption{}
-  \label{fig:b5-b6-kpis}
-\end{figure}
-We chose the buildings with the highest median PCC to the training buildings from the set of training buildings and the remaining ones: Building Five (training building) and Building Six. The resulting KPIs of both buildings are visualized in Figure~\ref{fig:b5-b6-kpis}. The values of the share of used PV and the fossil energy consumption are somewhat comparable to the (mean) performance of the baseline SAC agents when using all training buildings. However, the average daily renewable share, both from the grid and in total, is worse when using the battery. This effect could be because the energy demand from the grid of both buildings is lower when the battery is in use since more solar energy is utilized. As a result, the proportion of renewable energy used from the grid decreases because the solar generation of the buildings is correlated to the renewable production in the grid. This, in turn, has the same effect on the overall share of renewable energy used.
-
-
 \section{SAC using Demonstrator Transitions}
 \todo[inline]{Font in tabellen beschreibungen verkleinern}
 
@@ -249,12 +235,6 @@ The fossil energy consumption KPI values of the experiments in comparison to the
 early stopping often way better than final trained one (e.g. best: 1.011 vs 0.921)
 
 \section{MARLISA Agent}
-\subsection{Background}
-For our next set of experiments, we aimed to train CityLearn's Multi-Agent Reinforcement Learning with Iterative Sequential Action Selection (MARLISA) algorithm to reduce the amount of fossil energy consumed. In this chapter, we will provide a brief overview of how the algorithm works. MARLISA is an extension of SAC, designed to coordinate the behavior of multiple agents by using a reward function with both individual and shared objectives. Moreover, the agents predict their future energy consumption based on the predictions of other agents and share this information with each other, where the order of the agents is randomized.
-
-A key difference between the setup of MARLISA in the paper and ours is that in MARLISA,  buildings can share any excess energy produced within the district. Further, the agents were trained to control the charging and discharging of the storage tank for domestic hot water and chilled water rather than the battery, as in our setup.
-
-In the study, the performance of the MARLISA agents was evaluated based on their ability to minimize annual peak consumption, average daily peak consumption, ramping, annual net energy consumption from the grid, and maximize the average daily load factor. The authors compared the performance of the MARLISA agents with an RBC used as a baseline. The authors calculated the KPIs compared to the performance of the RBC, and not in comparison to without using any storage as we did. The results showed that the MARLISA agents outperformed the RBC in all metrics studied, with the smallest improvement in minimizing net electricity demands at only about 1 \%. More information on the metrics, the MARLISA algorithm, and the evaluation procedure and results can be found in the paper. 
 
 \subsection{Reward Functions}
 	2. Shared reward
@@ -316,3 +296,5 @@ with $\eta=0.5$
 with $E_{net}=\sum_{b\in B}e_{net}^b$
 
 \subsection{Results}
+
+\subsection{Discussion}
