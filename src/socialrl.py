@@ -5,6 +5,7 @@ import time
 from citylearn.agents.db2_sac import SACDB2
 from citylearn.agents.db2_value_sac import SACDB2VALUE
 from citylearn.agents.dpb_sac import PRBSAC
+from citylearn.agents.ddpg import DDPG, PRBDDPG
 from citylearn.citylearn import CityLearnEnv
 from citylearn.data import DataSet
 from citylearn.utilities import get_active_parts
@@ -18,7 +19,7 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
           batch_size, autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc,
           exclude_sac, exclude_sacdb2, exclude_sacdb2value, mode, imitation_lr, building_ids, store_agents,
           pretrained_demonstrator, demo_transitions, deterministic_demo, extra_policy_update, end_exploration_t,
-          save_transitions):
+          save_transitions, ddpg):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
 
@@ -45,8 +46,8 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
 
     # Train soft actor-critic (SAC) agent for comparison
     if not exclude_sac:
-        all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'], all_eval_results['SAC'], all_agents['SAC'],\
-            all_envs['SAC Best'] = \
+        all_envs['SAC'], all_losses['SAC'], all_rewards['SAC'], all_eval_results['SAC'], all_agents['SAC'], \
+        all_envs['SAC Best'] = \
             train_sac(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
                       discount=discount, autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
                       kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
@@ -74,8 +75,22 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
                               deterministic_demo=deterministic_demo, extra_policy_update=extra_policy_update,
                               end_exploration_t=end_exploration_t, save_transitions=save_transitions)
 
+    # Train DDPG agent with demonstrator transitions
+    if ddpg:
+        all_envs['DDPG'], all_losses['DDPG'], all_rewards['DDPG'], all_eval_results['DDPG'], \
+        all_agents['DDPG'] = \
+            train_ddpg(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
+                          discount=discount, end_exploration_t=end_exploration_t, l2_loss=l2_loss)
+
     # Train SAC agent with demonstrator transitions
-    if demo_transitions is not None:
+    if demo_transitions is not None and ddpg:
+        all_envs['PRB_DDPG'], all_losses['PRB_DDPG'], all_rewards['PRB_DDPG'], all_eval_results['PRB_DDPG'], \
+        all_agents['PRB_DDPG'] = \
+            train_prbddpg(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
+                          discount=discount, demo_transitions=demo_transitions,
+                          end_exploration_t=end_exploration_t, l2_loss=l2_loss)
+
+    if demo_transitions is not None and not exclude_sac:
         all_envs['PRB_SAC'], all_losses['PRB_SAC'], all_rewards['PRB_SAC'], all_eval_results['PRB_SAC'], \
         all_agents['PRB_SAC'] = \
             train_prbsac(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
@@ -154,7 +169,7 @@ def train_sacdb2value(schema, episodes, random_seed, batch_size, discount, autot
                                     pretrained_demonstrator=pretrained_demonstrator,
                                     deterministic_demo=deterministic_demo, extra_policy_update=extra_policy_update,
                                     end_exploration_time_step=end_exploration_t,
-                                    n_interchanged_obs=len(env.interchanged_observations)*(len(env.buildings)-1))
+                                    n_interchanged_obs=len(env.interchanged_observations) * (len(env.buildings) - 1))
     losses, rewards, eval_results, best_state = sacdb2value_model.learn(episodes=episodes, deterministic_finish=True)
 
     best_state_env = copy.deepcopy(sacdb2value_model.env)
@@ -190,6 +205,35 @@ def train_prbsac(schema, episodes, random_seed, batch_size, discount, autotune_e
     return env, losses, rewards, eval_results, prbsac_model
 
 
+def train_prbddpg(schema, episodes, random_seed, batch_size, discount, demo_transitions, end_exploration_t, l2_loss):
+    env = CityLearnEnv(schema)
+
+    with open(demo_transitions, 'rb') as file:
+        demo_transitions = pickle.load(file)
+
+    prbddpg_model = PRBDDPG(env=env, seed=random_seed, batch_size=batch_size, l2_loss=l2_loss,
+                        discount=discount, demonstrator_transitions=demo_transitions,
+                        end_exploration_time_step=end_exploration_t)
+    losses, rewards, eval_results, best_state = prbddpg_model.learn(episodes=episodes, deterministic_finish=True)
+
+    print('PRB DDPG model trained!')
+
+    return env, losses, rewards, eval_results, prbddpg_model
+
+
+def train_ddpg(schema, episodes, random_seed, batch_size, discount, end_exploration_t, l2_loss):
+    env = CityLearnEnv(schema)
+
+    ddpg_model = DDPG(env=env, seed=random_seed, batch_size=batch_size, l2_loss=l2_loss,
+                        discount=discount, demonstrator_transitions=demo_transitions,
+                        end_exploration_time_step=end_exploration_t)
+    losses, rewards, eval_results, best_state = ddpg_model.learn(episodes=episodes, deterministic_finish=True)
+
+    print('DDPG model trained!')
+
+    return env, losses, rewards, eval_results, ddpg_model
+
+
 if __name__ == '__main__':
     st = time.time()
 
@@ -222,6 +266,7 @@ if __name__ == '__main__':
     extra_policy_update = opts.extra_policy_update
     end_exploration_t = opts.end_exploration_t
     save_transitions = opts.save_transitions
+    ddpg = opts.ddpg
 
     if False:
         DATASET_NAME = 'nydata_new_buildings2'
@@ -251,6 +296,7 @@ if __name__ == '__main__':
         extra_policy_update = False
         end_exploration_t = 7000
         save_transitions = False
+        ddpg = False
 
     if pretrained_demonstrator is not None:
         demonstrators_count = 1
@@ -267,7 +313,7 @@ if __name__ == '__main__':
           mode=mode, imitation_lr=imitation_lr, building_ids=building_ids, store_agents=store_agents,
           pretrained_demonstrator=pretrained_demonstrator, demo_transitions=demo_transitions,
           deterministic_demo=deterministic_demo, extra_policy_update=extra_policy_update,
-          end_exploration_t=end_exploration_t, save_transitions=save_transitions)
+          end_exploration_t=end_exploration_t, save_transitions=save_transitions, ddpg=ddpg)
 
     # get the end time
     et = time.time()

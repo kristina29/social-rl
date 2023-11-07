@@ -234,7 +234,8 @@ class RegressionBuffer:
     
     def __len__(self):
         return len(self.x)
-    
+
+
 class SoftQNetwork(nn.Module):
     def __init__(self, num_inputs, num_actions, hidden_size=[400,300], kaiming_initialization=False, init_w=3e-3):
         super(SoftQNetwork, self).__init__()
@@ -258,3 +259,40 @@ class SoftQNetwork(nn.Module):
         x = self.ln2(F.relu(self.linear2(x)))
         x = self.linear3(x)
         return x
+
+
+class DDPGActor(nn.Module):
+    def __init__(self, num_inputs, num_actions, hidden_size=[400, 300],
+                 kaiming_initialization=False, init_w=3e-3, target_noise=0.2, target_noise_clip=0.5):
+        super(DDPGActor, self).__init__()
+
+        self.target_noise = target_noise
+        self.target_noise_clip = target_noise_clip
+
+        self.linear1 = nn.Linear(num_inputs, hidden_size[0])
+        self.linear2 = nn.Linear(hidden_size[0], hidden_size[1])
+        self.linear3 = nn.Linear(hidden_size[1], num_actions)
+
+        if kaiming_initialization:
+            init.kaiming_normal_(self.linear3.weight, mode='fan_in')
+            init.kaiming_normal_(self.linear3.weight, mode='fan_in')
+        else:
+            self.linear3.weight.data.uniform_(-init_w, init_w)
+            self.linear3.bias.data.uniform_(-init_w, init_w)
+
+    def forward(self, state):
+        x = F.relu(self.linear1(state))
+        x = F.relu(self.linear2(x))
+        x = F.tanh(self.linear3(x))
+        return x
+
+    def sample(self, state, deterministic):
+        with torch.no_grad():
+            action = self.forward(state)
+
+        if not deterministic:
+            noise = action.clone().data.normal_(0, self.target_noise)
+            noise = noise.clamp(-self.target_noise_clip, self.target_noise_clip)
+            action = (action + noise).clamp(-1, 1)
+
+        return action
