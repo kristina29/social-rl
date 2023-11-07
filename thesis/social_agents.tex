@@ -80,7 +80,7 @@ Mode 3 combines both modes by using the entropy term of mode 2 and the value ter
 	\mathcal{H}_{M5} = \log\pi_{\phi}(a_t^d|s_t) + \alpha_i|\log\pi_{\phi}(a_t^d|s_t)|
 \end{equation}
 
-Table~\ref{tab:social-policy-update-modes} summarizes the modes and their entropy and value terms.
+Table~\ref{tab:social-policy-update-modes} summarizes the modes and their entropy and value terms. To avoid numerical errors, we have clipped the policy loss to values between -100 and 100 when implementing the social policy update. Additionally, if the probability of taking the demonstrator action in the policy to be trained is zero, we set the log probability to $1e^{-100}$.
 
 {
 \renewcommand{\baselinestretch}{0.9} 
@@ -149,6 +149,8 @@ In the first step, we sampled the demonstrator actions from the demonstrator pol
 POT Losses B3 von demo B5 ir0.2
 
 Loss mostly weird for modes 4-6 beside mode 5 \& 6 when using ir 1 (than also similar performance as mode 1-3)
+
+Loss 'weird': at beginn at each batch high, than lowers during this batch, but overall increasing. maybe because probability of taking demonstrator actions for agent to be trained very low, but high alpha (high cerainity to actually not do this), similar pattern in alpha loss (but with negative loss in beginn of batch and than converting to zero during batch) --> overestimated entropy termin --> higher loss
 
 \section{Social Agent II}
 \subsection{Method and Results}

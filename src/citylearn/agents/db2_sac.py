@@ -76,7 +76,8 @@ class SACDB2(SAC):
             current_losses = {'q1_losses': [],
                               'q2_losses': [],
                               'policy_losses': [],
-                              'alpha_losses': []}
+                              'alpha_losses': [],
+                              'alpha_vals': []}
 
             o = self.get_encoded_observations(i, o)
             n = self.get_encoded_observations(i, n)
@@ -103,6 +104,7 @@ class SACDB2(SAC):
                     current_losses['q2_losses'].append(q2_loss)
                     current_losses['policy_losses'].append(policy_loss)
                     current_losses['alpha_losses'].append(alpha_loss)
+                    current_losses['alpha_vals'].append(self.alpha[i])
 
                     # Use demonstrator actions for updating policy
                     for demonstrator_policy in self.demonstrator_policy_net:
