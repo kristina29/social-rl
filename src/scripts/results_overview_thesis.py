@@ -165,7 +165,7 @@ def generate_sacdb2():
                              'modes': modes,
                              'fossil_energy_consumptions': fossil_energy_consumptions})
 
-    fig, ax = plt.subplots(figsize=(15, 10))
+    fig, ax = plt.subplots(figsize=(15, 7))
 
     ax = sns.scatterplot(x=final_df['demos'].map(demo_pos),
                          y='fossil_energy_consumptions',
@@ -181,7 +181,7 @@ def generate_sacdb2():
             points.set_offsets(vertices)
     xticks = ax.get_xticks()
     ax.set_xlim(xticks[0] - 0.2, xticks[-1] + 0.2)  # the limits need to be moved to show all the jittered dots
-    ax.set_ylim(Y_LIM[0], Y_LIM[1])
+    # ax.set_ylim(Y_LIM[0], Y_LIM[1])
 
     ax.axhline(BEST_SAC_VALUE, ls='--', lw=1, c='red', zorder=2)
     ax.axhline(BEST_SAC_VALUE - 0.005, ls='--', lw=1, c='grey', zorder=2)
@@ -211,7 +211,7 @@ def generate_sacdb2():
     labels = [f'Mode {i}' for i in colors.keys()] + [r"$\alpha_i\leq$ 0.2", r"$\alpha_i\geq$ 1"]
 
     legend = plt.legend(handles, labels,  # bbox_to_anchor=(1.05, 1),
-                        loc='upper right', fontsize=20, markerscale=2)
+                        loc='upper right', fontsize=20, markerscale=2, ncol=2)
 
     plt.tight_layout()
 
