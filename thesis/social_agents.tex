@@ -148,6 +148,8 @@ In the first step, we sampled the demonstrator actions from the demonstrator pol
 Based on these results, we tried even higher imitation learning rates of $\alpha_i = 1$ for modes 1-3 and 4-6 for pre-trained demonstrators and $\alpha_i = 1.5$ for modes 1-3 and 5. This led to slightly better results for mode 3 with the four random demonstrators and mode 2 with demonstrator B5, both with $\alpha_i = 1$. Modes 5-6 achieved comparable results to the baseline with the higher imitation learning rates, while mode 4 still performed worse. Finally, for the two random demonstrators, with $\alpha_i = 0.2$ and deterministic policy actions, we also observed that modes 1-3 performed similarly to the baseline and modes 4-6 performed worse.
 
 \subsection{Discussion}
+\todo[inline]{Figures alle die gleiche Schriftart}
+
 To better understand the performance differences between modes 1-3 and 4-6, we investigate the policy loss of the standard SAC policy update and the change in the entropy value during training. The courses for B3 with demonstrator B5 and $\alpha_i = 0.2$ are visualized for modes 2 and 5 in Figure \ref{fig:social1-losses} as an example.  
 \begin{figure}[htb]
 \center
@@ -202,11 +204,11 @@ We conducted a new series of experiments using the Social Agent II. In each expe
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/social2_results.pdf}
-  \caption{}
+  \caption[Results of the fossil energy consumption KPI of the Social Agent II.]{Results of the fossil energy consumption KPI of the Social Agent II depending on the imitation learning rate and the demonstrators. The shaded area shows the standard deviation between the experimenters with and without additional policy update. For demonstrator B6, one experiment was conducted with sampled and one with deterministic (determ.) demonstrator actions. }
   \label{fig:social2-results}
 \end{figure}
 
-Figure \ref{fig:social2-results} shows the results of the first experiments. \textcolor{red}{TODO Dots of the same color represent imitation learning rates for a demonstrator that are either very small ($\leq 0.01$) or very large ($\geq 0.4$). These rates performed worse than the others, so we grouped them for better visualization. In addition, we did not distinguish in the figure whether an experiment was conducted with or without an additional policy update, as we did not find significant differences here}. Again, we considered deviations of at least 0.5 \% compared to the SAC baseline significantly better or worse.
+Figure \ref{fig:social2-results} shows the results of the first experiments. The graphs show the mean value from the respective experiment with and without additional policy updates, and the area shows the standard deviation of both experiments. The results did not show an evident positive or negative influence of the additional update on performance. Again, we considered deviations of at least 0.5 \% compared to the SAC baseline significantly better or worse.
 
 First, we notice that overall, better results than with Social Agent I are achieved. The results of the fossil energy consumption KPI are either comparable or slightly worse than the SAC baseline. Additionally, moderate imitation learning rates produce better results than high or low rates. For random demonstrators, the best results are achieved with rates between 0.03 and 0.1, while for pre-trained demonstrators, the rates should be 0.15 or 0.2. Using random demonstrators does not enhance performance compared to the SAC baseline while using four random demonstrators leads to worse results than using two. The pre-trained demonstrator B5 has similar best KPI values to using two random demonstrators. The best results are achieved using demonstrator B6, with a fossil energy consumption KPI value of 0.921 when sampled demonstrator actions and 0.916 with deterministic demonstrator actions. Thus, about 1.5 \% more fossil energy can be saved than by using the baseline SAC agents.
 
@@ -215,13 +217,12 @@ In our next step, we investigated the impact on the performances of the agents b
 
 \begin{figure}[htb]
 \center
-     \includegraphics[width=0.8\textwidth]{figures/social2_results_sharedobs.pdf}
+     \includegraphics[width=\textwidth]{figures/social2_results_sharedobs.pdf}
   \caption{}
   \label{fig:social2-results-sharedobs}
 \end{figure}
 
 Figure \ref{fig:social2-results-sharedobs} shows the KPI values for fossil energy consumption of the experiments, which vary based on the imitation learning rate and demonstrators used. All experiments perform similarly to or worse than the SAC baseline. When using random demonstrators and deterministic actions, higher imitation learning rates than when using sampled actions achieve the best result. The best performance is achieved using the pre-trained B6 as a demonstrator with deterministic behavior, although the results are still worse than without using the shared parameters.
-
 
 \subsection{Shifted loads}
 In our next set of experiments, we aimed to determine whether the performances of the agents would improve when all buildings had similar energy consumption and solar generation. To achieve this, we first selected a base building and increased its non-shiftable load and solar generation times by a random value between 0.2 and 1. We also increased the median energy consumption per hour by the same value. This process was repeated five times, resulting in six training buildings. For each of these, we trained the Social Agent II using the same hyperparameter values, reward function, early stopping method and state space as for the SAC Baseline.

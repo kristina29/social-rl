@@ -46,7 +46,11 @@ def plot_district_kpis1(kpis) -> plt.Figure:
 
     plt.rcParams.update({
         "text.usetex": True,
-        "font.family": "Helvetica"
+        #"font.family": "Helvetica"
+    })
+    sns.rcParams.update({
+        "text.usetex": True,
+        # "font.family": "Helvetica"
     })
 
     for s in ['right', 'top']:
@@ -103,16 +107,8 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
 
         if i==0:
             kpi = kpi[kpi['env_id'] == 'SAC Best']
-            c = 'tab:blue'
-        elif i==1:
-            kpi = kpi[kpi['env_id'] == 'DDPG Best']
-            c = 'tab:red'
         else:
-            kpi = kpi[kpi['env_id'] == 'PRB_DDPG']
-            if i==2:
-                c = 'tab:orange'
-            else:
-                c = 'tab:green'
+            kpi = kpi[kpi['env_id'] == 'SAC Best']
 
         kpi['env_id'] = names[i]
         kpi = kpi.drop(columns=['net_value', 'net_value_without_storage'])
@@ -133,7 +129,7 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
 
     width = 0.9
 
-    sns.barplot(x='value', y='kpi', data=kpis, hue='env_id', ax=ax, width=width, palette=['tab:blue','tab:red','tab:orange','tab:green'])
+    sns.barplot(x='value', y='kpi', data=kpis, hue='env_id', ax=ax, width=width)#, palette=['tab:blue','tab:red','tab:orange','tab:green'])
     ax.axvline(1.0, color='black', linestyle='--', linewidth=1, label='')
     ax.set_xlabel(None)
     ax.set_ylabel(None)
@@ -161,8 +157,8 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
     ax.tick_params(axis='both', which='major', labelsize=21)
 
     #fig.suptitle('KPIs at district-level', fontsize=16)
-    plt.tight_layout(rect=[0, 0, 0.72, 1])
-    ax.legend(loc='upper right', bbox_to_anchor=(1.73, 1.0), framealpha=0, fontsize=21)
+    plt.tight_layout(rect=[0, 0, 0.8, 1])
+    ax.legend(loc='upper right', bbox_to_anchor=(1.43, 1.0), framealpha=0, fontsize=21)
     #plt.show()
     fig.savefig("kpis.pdf")
 
@@ -171,13 +167,19 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
 
 if __name__ == '__main__':
     kpis = [pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
-            pd.read_csv('../experiments/SAC/DDPG/kpis_20231107T143713.csv'),
-            pd.read_csv('../experiments/SAC_DB2/33_demo_replaybuffer/demo_b5_ddpg/kpis_20231106T170835.csv'),
-            pd.read_csv('../experiments/SAC_DB2/33_demo_replaybuffer/demo_b6_ddpg/kpis_20231106T170845.csv'),]
+            #pd.read_csv('../experiments/SAC/DDPG/kpis_20231107T143713.csv'),
+            #pd.read_csv('../experiments/SAC_DB2/33_demo_replaybuffer/demo_b5_ddpg/kpis_20231106T170835.csv'),
+            #pd.read_csv('../experiments/SAC_DB2/33_demo_replaybuffer/demo_b6_ddpg/kpis_20231106T170845.csv'),
+            pd.read_csv('../experiments/SAC/16_shifted_buildings/shifted_b3/kpis_20231031T173335.csv'),
+            pd.read_csv('../experiments/SAC/16_shifted_buildings/shifted_b5/kpis_20231031T194250.csv'),
+    ]
 
     if len(kpis) == 1:
         plot_district_kpis1(kpis[0])
     else:
-        plot_district_kpis_multiple(kpis, ['Baseline SAC', 'DDPG', 'DDPG with transitions of B5', 'DDPG with transitions of B6'])
+        plot_district_kpis_multiple(kpis, ['Baseline SAC',
+                                           #'DDPG', 'DDPG with transitions of B5', 'DDPG with transitions of B6',
+                                           'Shifted B3', 'Shifted B5'
+                                           ])
 
     #plt.show()
