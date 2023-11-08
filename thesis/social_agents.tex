@@ -134,11 +134,9 @@ Demonstrator                   & Mode & $\alpha_i$ & Deterministic policy action
 \end{table}
 }
 \todo[inline]{early stopping, determ. vs not determ: $a_t^d \sim \pi^d(a_t|s_t)$ vs $a_t^d=f^d(\epsilon_t;s_t)$}
-As demonstrators, we used either the pre-trained buildings 5 and 6 presented in Section~\ref{sec:pretrained-demos} or either two or four random demonstrators, which are buildings from the training buildings and not pre-trained. To ensure comparability, we always used the same random demonstrators, which were Buildings 7 and 11 for two demonstrators and additionally Buildings 5 and 17 for four demonstrators.
+As demonstrators, we used either the pre-trained B5 and B6 presented in Section~\ref{sec:pretrained-demos} or either two or four random demonstrators, which are buildings from the training buildings and not pre-trained. To ensure comparability, we always used the same random demonstrators, which were B7 and B11 for two demonstrators and additionally B5 and B17 for four demonstrators.
 
 In the first step, we sampled the demonstrator actions from the demonstrator policy instead of using the Gaussian distribution's learned mean. We tested the imitation learning rates of $\alpha_i = 0.01$ and $\alpha_i = 0.2$ and compared their results. We found that modes 4-6 demonstrated lower performance than the baseline, with slightly better results when using the pre-trained demonstrators than the random demonstrators. Modes 1-3 showed similar performance to the baseline for all demonstrators. 
-
-Based on these results, we tried even higher imitation learning rates of $\alpha_i = 1$ for modes 1-3 and 4-6 for pre-trained demonstrators and $\alpha_i = 1.5$ for modes 1-3 and 5. This led to slightly better results for mode 3 with the four random demonstrators and mode 2 with demonstrator B5, both with $\alpha_i = 1$. Modes 5-6 achieved comparable results to the baseline with the higher imitation learning rates, while mode 4 still performed worse. Finally, for the two random demonstrators, with $\alpha_i = 0.2$ and deterministic policy actions, we also observed that modes 1-3 performed similarly to the baseline and modes 4-6 performed worse.
 
 \begin{figure}[htb]
 \center
@@ -147,12 +145,22 @@ Based on these results, we tried even higher imitation learning rates of $\alpha
   \label{fig:social1-results}
 \end{figure}
 
+Based on these results, we tried even higher imitation learning rates of $\alpha_i = 1$ for modes 1-3 and 4-6 for pre-trained demonstrators and $\alpha_i = 1.5$ for modes 1-3 and 5. This led to slightly better results for mode 3 with the four random demonstrators and mode 2 with demonstrator B5, both with $\alpha_i = 1$. Modes 5-6 achieved comparable results to the baseline with the higher imitation learning rates, while mode 4 still performed worse. Finally, for the two random demonstrators, with $\alpha_i = 0.2$ and deterministic policy actions, we also observed that modes 1-3 performed similarly to the baseline and modes 4-6 performed worse.
+
 \subsection{Discussion}
-POT Losses B3 von demo B5 ir0.2
+To better understand the performance differences between modes 1-3 and 4-6, we investigate the policy loss of the standard SAC policy update and the change in the entropy value during training. The courses for B3 with demonstrator B5 and $\alpha_i = 0.2$ are visualized for modes 2 and 5 in Figure \ref{fig:social1-losses} as an example.  
+\begin{figure}[htb]
+\center
+     \includegraphics[width=\textwidth]{figures/social1_losses.pdf}
+  \caption{}
+  \label{fig:social1-losses}
+\end{figure}
 
-Loss mostly weird for modes 4-6 beside mode 5 \& 6 when using ir 1 (than also similar performance as mode 1-3)
+In mode 2, the policy loss decreases as expected during training, and the entropy converges quickly to a value between 0.5 and 1. However, during training with mode 5, the entropy value increases. At the same time, the policy loss also increases, with sudden gains at the beginning of a new batch and an initial reduction in the loss within the batch. This behavior disappears in modes 5 and 6 when using higher imitation learning rates. The expected behavior, as in mode 2, can be observed, resulting in better performance. In mode 4, however, no changes can be observed as the imitation learning rate increases.
 
-Loss 'weird': at beginn at each batch high, than lowers during this batch, but overall increasing. maybe because probability of taking demonstrator actions for agent to be trained very low, but high alpha (high cerainity to actually not do this), similar pattern in alpha loss (but with negative loss in beginn of batch and than converting to zero during batch) --> overestimated entropy termin --> higher loss
+If the probability of demonstrator actions is increased sufficiently in the entropy term $\mathcal{H}_{M5}$, the effect disappears. Therefore, we assume that the demonstrator actions in the policy of the agent to be trained are very unlikely, which in turn increases the entropy. As a result, there is more uncertainty about which action to take, leading to an overall increase in policy loss and, ultimately, poorer performance.
+
+To summarize, our approaches increased the probability or Q-values of the demonstrator actions in the agent's policy to be trained. However, overall, they only resulted in minimal fossil energy savings compared to our SAC baseline. The decision-biasing approach is still promising, so in our subsequent experiments, we directly biased the Q-value of the demonstrator actions in the Q-networks.
 
 \section{Social Agent II}
 \subsection{Method and Results}

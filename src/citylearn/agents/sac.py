@@ -412,7 +412,6 @@ class SAC(RLC):
 
             # Based on https://docs.cleanrl.dev/rl-algorithms/sac/#implementation-details
             if self.autotune_entropy:
-                # self.target_entropy[i] = -torch.prod(torch.tensor(self.action_space[i].shape)).item()
                 self.target_entropy[i] = -torch.Tensor(self.action_space[i].shape)
                 self.log_alpha[i] = torch.zeros(1, requires_grad=True)
                 self.alpha[i] = self.log_alpha[i].exp().item()

@@ -13,7 +13,7 @@ plt.rcParams.update({
 
 def plot_losses(losses, include_alpha) -> List[plt.Figure]:
 
-    fig, (ax, ax2) = plt.subplots(2,1, figsize=(14,12), sharex=True)
+    fig, (ax, ax2) = plt.subplots(2,1, figsize=(14,9), sharex=True)
     #ax2 = ax.twinx()
     i = 0
     for env_name, env_values in losses.items():
@@ -25,7 +25,7 @@ def plot_losses(losses, include_alpha) -> List[plt.Figure]:
         i += 1
 
     ax.set_ylabel(f'Policy loss value', fontsize=21)
-    ax2.set_ylabel(r'Entropy $\alpha$', fontsize=21)
+    ax2.set_ylabel(r'Entropy $\alpha$', fontsize=21, labelpad=15)
     ax2.set_xlabel('Time step', fontsize=21)
     ax2.tick_params(axis='x', which='both', labelsize=21)
     ax.tick_params(axis='y', which='both', labelsize=21)
@@ -37,7 +37,8 @@ def plot_losses(losses, include_alpha) -> List[plt.Figure]:
     handles, labels = ax.get_legend_handles_labels()
     #handles.append(Line2D([0], [0], label=r'$\alpha$', color='black', linewidth=2, linestyle= (5, (10, 3))))
 
-    fig.legend(handles=handles, fontsize=21)
+    fig.legend(handles=handles, bbox_to_anchor=(0.074, 0.99),
+               loc='upper left', fontsize=21)
     plt.tight_layout()
 
     fig.savefig('losses.pdf')
@@ -47,7 +48,7 @@ def plot_losses(losses, include_alpha) -> List[plt.Figure]:
 if __name__ == '__main__':
     loss_files = [#'../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/losses_20231002T130931.pkl',
                   '../experiments/SAC_DB2/32_demo_b5/ir0.2/socialMode2/losses_20231107T200708.pkl',
-                  '../experiments/SAC_DB2/32_demo_b5/ir0.2/socialMode5/losses_20231107T201820.pkl']
+                  '../experiments/SAC_DB2/32_demo_b5/ir0.2/socialMode5/losses_20231107T201820.pkl' ]
     agents = [#'SAC',
          'SAC_DB2', 'SAC_DB2']
     names = [#'x',
