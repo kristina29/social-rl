@@ -204,13 +204,13 @@ We conducted a new series of experiments using the Social Agent II. In each expe
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/social2_results.pdf}
-  \caption[Results of the fossil energy consumption KPI of the Social Agent II.]{Results of the fossil energy consumption KPI of the Social Agent II depending on the imitation learning rate and the demonstrators. The shaded area shows the standard deviation between the experimenters with and without additional policy update. For demonstrator B6, one experiment was conducted with sampled and one with deterministic (determ.) demonstrator actions. }
+  \caption[Results of the fossil energy consumption KPI of the Social Agent II.]{Results of the fossil energy consumption KPI of the Social Agent II depending on the imitation learning rate and the demonstrators. The shaded areas show the standard deviation between the experiments with and without additional policy update, and the graphs show the mean value of them. For demonstrator B6, one experiment was conducted with sampled and one with deterministic (determ.) demonstrator actions.}
   \label{fig:social2-results}
 \end{figure}
 
 Figure \ref{fig:social2-results} shows the results of the first experiments. The graphs show the mean value from the respective experiment with and without additional policy updates, and the area shows the standard deviation of both experiments. The results did not show an evident positive or negative influence of the additional update on performance. Again, we considered deviations of at least 0.5 \% compared to the SAC baseline significantly better or worse.
 
-First, we notice that overall, better results than with Social Agent I are achieved. The results of the fossil energy consumption KPI are either comparable or slightly worse than the SAC baseline. Additionally, moderate imitation learning rates produce better results than high or low rates. For random demonstrators, the best results are achieved with rates between 0.03 and 0.1, while for pre-trained demonstrators, the rates should be 0.15 or 0.2. Using random demonstrators does not enhance performance compared to the SAC baseline while using four random demonstrators leads to worse results than using two. The pre-trained demonstrator B5 has similar best KPI values to using two random demonstrators. The best results are achieved using demonstrator B6, with a fossil energy consumption KPI value of 0.921 when sampled demonstrator actions and 0.916 with deterministic demonstrator actions. Thus, about 1.5 \% more fossil energy can be saved than by using the baseline SAC agents.
+First, we notice that overall, better results than with Social Agent I are achieved. The results of the fossil energy consumption KPI are either comparable or slightly worse than the SAC baseline. Additionally, moderate imitation learning rates produce better results than high or low rates. For random demonstrators, the best results are achieved with rates between 0.03 and 0.1, while for pre-trained demonstrators, the rates should be 0.15 or 0.2. Using random demonstrators does not enhance performance compared to the SAC baseline while using four random demonstrators leads to worse results than using two. The pre-trained demonstrator B5 has similar best KPI values to using two random demonstrators. The best results are achieved using demonstrator B6, with a fossil energy consumption KPI value of 0.921 without additional policy update and 0.916 with additional update. Thus, about 1.5 \% more fossil energy can be saved than by using the baseline SAC agents.
 
 \subsection{Shared observations}
 In our next step, we investigated the impact on the performances of the agents by allowing them to observe the building-specific parameters of other buildings. We achieved this by expanding the state space by these parameters, namely the non-shiftable load, solar generation, battery SOC, and net electricity consumption. We then ran experiments using the most successful demonstrators from the previous experiments, which are the pre-trained B6 and the two random demonstrators to cover this scenario as well. In these experiments, we compared the results with and without additional policy updates and with deterministic and sampled demonstrator actions. The imitation learning rates were set to values that had previously performed well, as well as smaller and larger values, to detect any differences.
@@ -218,7 +218,7 @@ In our next step, we investigated the impact on the performances of the agents b
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/social2_results_sharedobs.pdf}
-  \caption{}
+  \caption[Results of the Social Agent II with shared observations.]{Results of the fossil energy consumption KPI of the Social Agent II with shared observation. The shaded areas show the standard deviation between the experiments with and without additional policy update, and the graphs show the mean value of them. One experiment with sampled and one with deterministic (determ.) demonstrator actions was conducted for both demonstrators.}
   \label{fig:social2-results-sharedobs}
 \end{figure}
 
@@ -229,12 +229,10 @@ In our next set of experiments, we aimed to determine whether the performances o
 
 We chose B3 and B5 as the base buildings because they perform differently based on the KPIs of the pre-trained demonstrators. For base B3, we used the pre-trained B3 and the pre-trained B6 as demonstrators. We chose the former because we assumed similar time series data in the demonstrator would lead to faster or better learning. The latter we used because it performed better in previous experiments. For the second base B5, we used the pre-trained demonstrators B5 and B6 with the same reasoning. We tested imitation learning rates with moderate values ranging from 0.1 to 0.3 because of the results of previous experiments. Each experiment was performed with and without an additional policy update.
 
-\todo[inline]{Legen title, e.g. 'Demonstrator (Building data)'}
-
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/shifted_sac_kpis.pdf}
-  \caption{}
+  \caption[Results of the SAC Agents for the shifted data of B3 and B5.]{Results of the SAC Agents for the shifted data of B3 and B5 compared to the SAC baseline results of the training buildings.}
   \label{fig:sac-shifted-kpis}
 \end{figure}
 
@@ -242,15 +240,17 @@ To compare the results with SAC baseline agents, we trained nonsocial agents for
 
 \begin{figure}[htb]
 \center
-     \includegraphics[width=0.8\textwidth]{figures/social2_results_shifted.pdf}
-  \caption{}
+     \includegraphics[width=\textwidth]{figures/social2_results_shifted.pdf}
+  \caption[Results of the Social Agent II for shifted building data.]{Results of the fossil energy consumption KPI of the Social Agent II for shifted building data of B3 and B5. The shaded areas show the standard deviation between the experiments with and without additional policy update, and the graphs show the mean value of them.}
   \label{fig:social2-results-shifted}
 \end{figure}
 
-The fossil energy consumption KPI values of the experiments in comparison to the values of the baseline SAC agents are visualized in Figure \ref{fig:social2-results-shifted}. The agents perform worse than the baseline at an imitation learning rate of 0.1 for both building sets and demonstrators. For higher imitation learning rates, the results are about the same as those of the baseline, but no better values are achieved. The results are not significantly different depending on the demonstrator used.
+The fossil energy consumption KPI values of the experiments in comparison to the values of the SAC agents are visualized in Figure \ref{fig:social2-results-shifted}. The agents perform worse than the classic SAC algorithm at an imitation learning rate of 0.1 for both building sets and demonstrators. For higher imitation learning rates, the results are about the same as those of SAC, but no better values are achieved. The results are not significantly different depending on the demonstrator used.
 
 \subsection{Discussion}
-early stopping often way better than final trained one (e.g. best: 1.011 vs 0.921)
+early stopping often way better than final trained one (e.g. best: 1.011 vs 0.921) (differences with interchanged obs  0.5\%, shifted B3 2\%)
+
+
 
 \section{MARLISA Agent}
 

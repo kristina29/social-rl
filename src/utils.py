@@ -953,14 +953,22 @@ def save_results(envs: Mapping[str, CityLearnEnv], losses: Mapping[str, Mapping[
                 pickle.dump(agent_obj, fp, protocol=pickle.HIGHEST_PROTOCOL)
                 print(f'{agent_name} agent saved to {a_filename}')
 
+    env_filename = f'envs_{timestamp}.pkl'
+    with open(env_filename, 'wb') as fp:
+        pickle.dump(envs, fp)
+        print(f'Environments dictionary saved to {env_filename}')
+
+
     print('')
     print('---------------------------------')
     print('COPY COMMANDS')
     print('---------------------------------')
     print(f'scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/{p_filename}.pdf '
           f'experiments/SAC_DB2/{p_filename}.pdf')
-    print(f'scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/{k_filename} '
+    print(f'scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/{k_filename}'
           f'experiments/SAC_DB2/{k_filename}')
+    print(f'scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/{env_filename}'
+          f'experiments/SAC_DB2/{env_filename}')
     print(f'scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/{l_filename} '
           f'experiments/SAC_DB2/{l_filename}')
     print(f'scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/{r_filename} '

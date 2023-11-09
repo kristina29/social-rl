@@ -75,7 +75,14 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d
                                              0, 0, 0, 0,
                                              0, 0,
                                              0, 0, 0, 0,
-                                             1, 1, 1, 1, 1, 1, 1, 1]
+                                             1, 1, 1, 1, 1, 1, 1, 1],
+                                 'colors': [None, None, None, None,
+                                            None, None, None, None,
+                                            None, None, None, None,
+                                            None, None,
+                                            None, None, None, None,
+                                            'lightskyblue', 'lightskyblue', 'blue', 'blue',
+                                            'lawngreen', 'lawngreen', 'green', 'green', ]
                                  })
 
 
@@ -83,8 +90,8 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d
 def generate_sacdb2value():
     dirs = sacdb2value_dirs
 
-    #fig, ax = plt.subplots(figsize=(15,7))
-    #fig2, ax2 = plt.subplots(figsize=(15,7))
+    fig, ax = plt.subplots(figsize=(15,7))
+    fig2, ax2 = plt.subplots(figsize=(15,7))
     fig3, ax3 = plt.subplots(figsize=(15,7))
 
     i = 0
@@ -121,125 +128,88 @@ def generate_sacdb2value():
                 print('Missing')
 
         if i == 1 and dir[1]['shared_obs'] == 1:
-            #means = np.array([(g + h) / 2 for g, h in zip(temp_foss, temp_foss1)])
-            #mins = [min(g, h) for g, h in zip(temp_foss, temp_foss1)]
-            #maxs = [max(g, h) for g, h in zip(temp_foss, temp_foss1)]
-            #std = np.array([np.std(np.array([g,h])) for g, h in zip(temp_foss, temp_foss1)])
+            means = np.array([(g + h) / 2 for g, h in zip(temp_foss, temp_foss1)])
+            std = np.array([np.std(np.array([g,h])) for g, h in zip(temp_foss, temp_foss1)])
 
-            #c, = ax.plot(temp_irs, means, label=demo, zorder=3)
-            #ax.scatter(temp_irs, means, c = c.get_color(), zorder=3)
-            #ax.scatter(temp_irs, maxs, alpha=0.5, c=c.get_color())
-            #ax.plot(temp_irs, maxs, alpha=0.5, c=c.get_color())
-            #ax.fill_between(temp_irs, means - std, means + std, alpha=0.2, zorder=3)
-            #ax.errorbar(temp_irs, means, std, linestyle='None', marker='^', label=demo)
+            c, = ax.plot(temp_irs, means, label=demo, zorder=3)
+            ax.scatter(temp_irs, means, c = c.get_color(), zorder=3)
+            ax.fill_between(temp_irs, means - std, means + std, alpha=0.2, zorder=3)
 
-            #ax1_irs.extend(temp_irs)
-
+            ax1_irs.extend(temp_irs)
             i = 0
         elif i == 1 and dir[1]['shared_obs'] == 0 and dir[1]['shifted'] == 0:
-            #means = np.array([(g + h) / 2 for g, h in zip(temp_foss, temp_foss1)])
-            #mins = [min(g, h) for g, h in zip(temp_foss, temp_foss1)]
-            #maxs = [max(g, h) for g, h in zip(temp_foss, temp_foss1)]
-            #std = np.array([np.std(np.array([g,h])) for g, h in zip(temp_foss, temp_foss1)])
-            #c, = ax2.plot(temp_irs, means, label=demo, zorder=3)
-            #ax2.scatter(temp_irs, means, c = c.get_color(), zorder=3)
-            #ax.scatter(temp_irs, maxs, alpha=0.5, c=c.get_color())
-            #ax.plot(temp_irs, maxs, alpha=0.5, c=c.get_color())
-            #ax2.fill_between(temp_irs, means - std, means + std, alpha=0.2, zorder=3)
-            #ax2.errorbar(temp_irs, means, std, linestyle='None', marker='o', label=demo, c=c.get_color())
+            means = np.array([(g + h) / 2 for g, h in zip(temp_foss, temp_foss1)])
+            std = np.array([np.std(np.array([g,h])) for g, h in zip(temp_foss, temp_foss1)])
+            c, = ax2.plot(temp_irs, means, label=demo, zorder=3)
+            ax2.scatter(temp_irs, means, c = c.get_color(), zorder=3)
+            ax2.fill_between(temp_irs, means - std, means + std, alpha=0.2, zorder=3)
 
-            #temp_irs = [float(x) for x in temp_irs]
-            #ax2_irs.extend(temp_irs)
-
+            ax2_irs.extend(temp_irs)
             i = 0
         elif i == 1 and dir[1]['shared_obs'] == 0 and dir[1]['shifted'] == 1:
+            c = dir[1]['colors']
             means = np.array([(g + h) / 2 for g, h in zip(temp_foss, temp_foss1)])
-            #mins = [min(g, h) for g, h in zip(temp_foss, temp_foss1)]
-            #maxs = [max(g, h) for g, h in zip(temp_foss, temp_foss1)]
             std = np.array([np.std(np.array([g,h])) for g, h in zip(temp_foss, temp_foss1)])
-            c, = ax3.plot(temp_irs, means, label=demo, zorder=3)
-            ax3.scatter(temp_irs, means, c = c.get_color(), zorder=3)
-            #ax.scatter(temp_irs, maxs, alpha=0.5, c=c.get_color())
-            #ax.plot(temp_irs, maxs, alpha=0.5, c=c.get_color())
-            ax3.fill_between(temp_irs, means - std, means + std, alpha=0.2, zorder=3)
-            #ax2.errorbar(temp_irs, means, std, linestyle='None', marker='o', label=demo, c=c.get_color())
+            ax3.plot(temp_irs, means, label=demo, c=c, zorder=3)
+            ax3.scatter(temp_irs, means, c=c, zorder=3)
+            ax3.fill_between(temp_irs, means - std, means + std, color=c, alpha=0.2, zorder=3)
 
             ax3_irs.extend(temp_irs)
 
             i = 0
         else:
-        #    ax.scatter(temp_irs, temp_foss, label=demo)
-        #    prev, = ax.plot(temp_irs, temp_foss)
             i += 1
 
-    #ax.legend(loc='lower left', fontsize=17, ncol=2)
-    #ax.set_xscale('log', base=2)
-    #ax.set_ylim(0.91, 0.96)
-    #ax.set_ylabel('KPI $fossil\_energy\_consumption$', fontsize=19)
-    #ax.set_xlabel(r'Imitation learning rate $\alpha_i$', fontsize=19)
-    #ax2.set_ylim(0.91, 0.96)
-    #ax2.legend( loc='lower left', #bbox_to_anchor=(0.007, 0.99),
-    #            fontsize=17, ncol=2)
-    #ax2.set_xscale('log', base=2)
-    #ax2.set_ylabel('KPI $fossil\_energy\_consumption$', fontsize=19)
-    #ax2.set_xlabel(r'Imitation learning rate $\alpha_i$', fontsize=19)
-    #ax3.set_ylim(0.91, 0.96)
-    ax3.legend( loc='upper right', fontsize=17)
-    ax3.set_xscale('log', base=2)
-    ax3.set_ylabel('KPI $fossil\_energy\_consumption$', fontsize=19)
-    ax3.set_xlabel(r'Imitation learning rate $\alpha_i$', fontsize=19)
+    for a in [ax, ax2, ax3]:
+        a.set_xscale('log', base=2)
+        a.set_ylim(0.91, 0.975)
+        a.set_ylabel('KPI $fossil\_energy\_consumption$', fontsize=19)
+        a.set_xlabel(r'Imitation learning rate $\alpha_i$', fontsize=19)
+        a.grid(zorder=1)
+        a.tick_params(axis='both', which='major', labelsize=17)
 
-    from matplotlib.ticker import ScalarFormatter
-    #for axis in [ax.xaxis, ax.yaxis]:
-    #    axis.set_major_formatter(ScalarFormatter())
-    #for axis in [ax2.xaxis, ax2.yaxis]:
-    #    axis.set_major_formatter(FormatStrFormatter('%.4f'))
+    ax.legend(loc='upper left', title=r'Demonstrator', title_fontsize=18, fontsize=17, ncol=2)
+    ax2.legend( loc='upper left', title=r'Demonstrator', title_fontsize=18, fontsize=17, ncol=2)
+    ax3.legend(loc='lower left', fontsize=17, title=r'Demonstrator (Building Data)', title_fontsize=18, ncol=2)
 
-    #ax.set_xticks(np.unique(ax1_irs))
-    #ax.set_xticklabels(np.unique(ax1_irs))
-    #ax2.set_xticks(np.unique(ax2_irs))
-    #ax2.set_xticklabels(np.unique(ax2_irs), rotation=45)
+    ax.set_xticks(np.unique(ax1_irs))
+    ax.set_xticklabels(np.unique(ax1_irs))
+    ax2.set_xticks(np.unique(ax2_irs))
+    ax2.set_xticklabels(np.unique(ax2_irs), rotation=45)
     ax3.set_xticks(np.unique(ax3_irs))
     ax3.set_xticklabels(np.unique(ax3_irs))
-    #ax.grid(zorder=1)
-    #ax2.grid(zorder=1)
-    ax3.grid(zorder=1)
 
-    #ax.get_xaxis().set_major_formatter(ScalarFormatter())
-    #ax.set_xticklabels(np.unique(ax1_irs))
-    #ax2.set_xticklabels(np.unique(ax2_irs))
+    ax.axhline(BEST_SAC_VALUE, ls='--', lw=1, c='red', zorder=2)
+    ax.axhline(BEST_SAC_VALUE - 0.005, ls='--', lw=1, c='grey', zorder=2)
+    ax.axhline(BEST_SAC_VALUE + 0.005, ls='--', lw=1, c='grey', zorder=2)
+    ax.text(0.001, BEST_SAC_VALUE - 0.0003, 'SAC Baseline', color='r', ha='left', va='top',
+             transform=ax.get_yaxis_transform(), fontsize=17)
 
-    # ax.axhline(BEST_SAC_VALUE, ls='--', lw=1, c='red', zorder=2)
-    # ax.axhline(BEST_SAC_VALUE - 0.005, ls='--', lw=1, c='grey', zorder=2)
-    # ax.axhline(BEST_SAC_VALUE + 0.005, ls='--', lw=1, c='grey', zorder=2)
-    #
-    # ax.text(0.001, BEST_SAC_VALUE - 0.0003, 'SAC Baseline', color='r', ha='left', va='top',
-    #         transform=ax.get_yaxis_transform(), fontsize=17)
-    #ax2.axhline(BEST_SAC_VALUE, ls='--', lw=1, c='red', zorder=2)
-    #ax2.axhline(BEST_SAC_VALUE - 0.005, ls='--', lw=1, c='grey', zorder=2)
-    #ax2.axhline(BEST_SAC_VALUE + 0.005, ls='--', lw=1, c='grey', zorder=2)
+    ax2.axhline(BEST_SAC_VALUE, ls='--', lw=1, c='red', zorder=2)
+    ax2.axhline(BEST_SAC_VALUE - 0.005, ls='--', lw=1, c='grey', zorder=2)
+    ax2.axhline(BEST_SAC_VALUE + 0.005, ls='--', lw=1, c='grey', zorder=2)
+    ax2.text(0.001, BEST_SAC_VALUE - 0.0003, 'SAC Baseline', color='r', ha='left', va='top',
+            transform=ax2.get_yaxis_transform(), fontsize=17)
 
-    #ax2.text(0.001, BEST_SAC_VALUE - 0.0003, 'SAC Baseline', color='r', ha='left', va='top',
-    #        transform=ax2.get_yaxis_transform(), fontsize=17)
-    ax3.axhline(BEST_SAC_B3, ls='--', lw=1, c='red', zorder=2)
-    ax3.axhline(BEST_SAC_B3 - 0.005, ls='--', lw=1, c='red', zorder=2)
-    ax3.axhline(BEST_SAC_B3 + 0.005, ls='--', lw=1, c='red', zorder=2)
-    ax3.axhline(BEST_SAC_B5, ls='--', lw=1, c='blue', zorder=2)
-    ax3.axhline(BEST_SAC_B5 - 0.005, ls=':', lw=1, c='blue', zorder=2)
-    ax3.axhline(BEST_SAC_B5 + 0.005, ls=':', lw=1, c='blue', zorder=2)
+    ax3.axhline(BEST_SAC_B3, ls='--', lw=1, c='tab:green', zorder=2)
+    ax3.axhline(BEST_SAC_B3 - 0.005, ls=':', lw=1.5, c='tab:green', zorder=2)
+    ax3.axhline(BEST_SAC_B3 + 0.005, ls=':', lw=1.5, c='tab:green', zorder=2)
+    ax3.axhline(BEST_SAC_B5, ls='--', lw=1, c='tab:blue', zorder=2)
+    ax3.axhline(BEST_SAC_B5 - 0.005, ls=':', lw=1.5, c='tab:blue', zorder=2)
+    ax3.axhline(BEST_SAC_B5 + 0.005, ls=':', lw=1.5, c='tab:blue', zorder=2)
+    ax3.text(0.001, BEST_SAC_B3 - 0.0003, 'SAC (Shifted B3)', color='tab:green', ha='left', va='top',
+             transform=ax3.get_yaxis_transform(), fontsize=17)
+    ax3.text(0.001, BEST_SAC_B5 - 0.0003, 'SAC (Shifted B5)', color='tab:blue', ha='left', va='top',
+             transform=ax3.get_yaxis_transform(), fontsize=17)
 
-    #ax.tick_params(axis='both', which='major', labelsize=17)
-    #ax2.tick_params(axis='both', which='major', labelsize=17)
-    ax3.tick_params(axis='both', which='major', labelsize=17)
+    fig.tight_layout()
+    fig2.tight_layout()
+    fig3.tight_layout()
 
-    #ax3.text(0.001, BEST_SAC_VALUE - 0.0003, 'SAC Baseline', color='r', ha='left', va='top',
-    #         transform=ax.get_yaxis_transform(), fontsize=17)
-
-    plt.tight_layout()
     plt.show()
 
-    #fig.savefig('results3.pdf')
-    #fig2.savefig('results4.pdf')
+    fig.savefig('results3.pdf')
+    fig2.savefig('results4.pdf')
     fig3.savefig('results5.pdf')
 
 
