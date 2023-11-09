@@ -250,6 +250,10 @@ The fossil energy consumption KPI values of the experiments in comparison to the
 \subsection{Discussion}
 early stopping often way better than final trained one (e.g. best: 1.011 vs 0.921) (differences with interchanged obs  0.5\%, shifted B3 2\%)
 
+policy loss of social II clearly decreases, even further than in sac baseline. but q-value loss slowly increases during training, maybe this causes the high difference between ealry stopping and final agent. this is unterstützt durch beobachtung that loss decreases less for shifted B2 data. so maybe in beginning social q value helpful for finding a good solution quickly, but after that hurtful and another target
+
+Shifted buildings --> battery capacity not changed
+
 
 
 \section{MARLISA Agent}

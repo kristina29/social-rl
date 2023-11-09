@@ -1,14 +1,11 @@
 import pickle
-from collections import Mapping
 from typing import List
 
 import numpy as np
 from matplotlib import pyplot as plt
-from matplotlib.lines import Line2D
 
 plt.rcParams.update({
         "text.usetex": True,
-        "font.family": "Helvetica"
     })
 
 def plot_losses(losses, include_alpha) -> List[plt.Figure]:
