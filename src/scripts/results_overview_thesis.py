@@ -109,7 +109,7 @@ marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info
                                                   'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes',
                                                   'No', 'No', 'Yes', 'Yes', ]})
 
-mode = 'sacdb2v'
+mode = 'sacdb2'
 var = 2
 
 
@@ -127,7 +127,11 @@ def get_data_sacdb2(dirs):
                 v = round(kpis.loc['fossil_energy_consumption', 'net_value'] /
                           kpis.loc['fossil_energy_consumption', 'net_value_without_storage'], 3)
 
-                irs.append(ir)
+                if ir <= 0.2:
+                    irs.append(r'$\leq$ 0.2')
+                elif ir >= 1:
+                    irs.append(r'$\geq$ 1')
+                #irs.append(ir)
                 demos.append(demo)
                 modes.append(m)
                 fossil_energy_consumptions.append(v)
@@ -153,18 +157,21 @@ def generate_sacdb2():
                 '4 random': 3,
                 'B5': 4,
                 'B6': 5}
+    markers = {r'$\leq$ 0.2': 'o',
+               r'$\geq$ 1': 'X'}
 
     final_df = pd.DataFrame({'irs': irs,
                              'demos': demos,
                              'modes': modes,
                              'fossil_energy_consumptions': fossil_energy_consumptions})
 
-    fig, ax = plt.subplots(figsize=(15, 10))
+    fig, ax = plt.subplots(figsize=(15, 7))
 
     ax = sns.scatterplot(x=final_df['demos'].map(demo_pos),
                          y='fossil_energy_consumptions',
                          hue=final_df['modes'].map(colors),
                          data=final_df,
+                         style="irs",
                          zorder=4,
                          s=150)
     for points in ax.collections:
@@ -174,7 +181,7 @@ def generate_sacdb2():
             points.set_offsets(vertices)
     xticks = ax.get_xticks()
     ax.set_xlim(xticks[0] - 0.2, xticks[-1] + 0.2)  # the limits need to be moved to show all the jittered dots
-    ax.set_ylim(Y_LIM[0], Y_LIM[1])
+    # ax.set_ylim(Y_LIM[0], Y_LIM[1])
 
     ax.axhline(BEST_SAC_VALUE, ls='--', lw=1, c='red', zorder=2)
     ax.axhline(BEST_SAC_VALUE - 0.005, ls='--', lw=1, c='grey', zorder=2)
@@ -198,12 +205,13 @@ def generate_sacdb2():
 
     f = lambda m, c: plt.plot([], [], marker=m, color=c, ls="none")[0]
 
-    handles = [f("o", colors[i]) for i in colors.keys()]
+    handles = [f("s", colors[i]) for i in colors.keys()]
+    handles += [f(markers[i], "k") for i in markers.keys()]
 
-    labels = [f'Mode {i}' for i in colors.keys()]
+    labels = [f'Mode {i}' for i in colors.keys()] + [r"$\alpha_i\leq$ 0.2", r"$\alpha_i\geq$ 1"]
 
     legend = plt.legend(handles, labels,  # bbox_to_anchor=(1.05, 1),
-                        loc='upper right', fontsize=21, markerscale=2)
+                        loc='upper right', fontsize=20, markerscale=2, ncol=2)
 
     plt.tight_layout()
 

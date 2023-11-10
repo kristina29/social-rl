@@ -195,7 +195,7 @@ Thesis period: 01.06.2023~-~01.12.2023
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Der Haupttext, ab hier mit arabischer Numerierung
-%%% Mit \input{dateiname} werden die Datei `dateiname' eingebunden
+%%% Mit \input{dateiname} werden die Datei `dateiname' eingebundent
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \pagenumbering{arabic}
@@ -254,42 +254,43 @@ Referenzen: \cite{SaaSchTue97,TueConSaa96ismis,SchTueSaa98preprint}
 \cleardoublepage
 
 %%
-\input{results}
-Used PV of available\\
-$possible\_battery\_input_{b,t} = \min(\min(C^b_t-SOC^b_t, 0), max\_input\_power_{b, \textcolor{red}{t=last}})$\\
-\\
-$could\_used\_without\_pv_{b,t} = possible\_battery\_input_{b,t} + net\_electricity\_consumption\_without\_storage\_and\_pv_{b,t} $ \\
-\\
-$could\_used\_with\_pv_{b,t} = \max(possible\_battery\_input_{b,t} + net\_electricity\_consumption\_without\_storage\_and\_pv_{b,t} - solar\_generation_{b,t}*-1, 0)$ \\
-\\
-$pv\_could\_have\_used_{b,t} = \min(solar\_generation_{b,t}*-1, could\_used\_without\_pv_{b,t})$ \\
-\\
-$pv\_used_{b,t} = E_{used_{pv_{b,t}}} = \max(\min(e_{net}^b - e_{pv}^b, - e_{pv}^b), 0) $ \\
-\\
-$pv\_used\_of\_available_{b,t} = used_{b,t}/pv\_could\_have\_used_{b,t}$\\
-\\
-$grid\_could\_have\_used_{t} = \min(E_{r,grid_{t}}, \sum_{b\in Buildings}could\_used\_with\_pv_{b,t})$ \\
-\\
-$grid\_used_{t} = E_{used_{r,grid_{t}}} = \min(E_{net_{pos}}, E_{r, grid})$ \\
-\\
-$grid\_used\_of\_available_{t} = grid\_used_{b,t} / grid\_could\_have\_used_{b,t}$ \\
-\\
-$total\_could\_have\_used_{t} = \min(E_{r,grid_{t}} + \sum_{b\in Buildings} \min(solar\_generation_{b,t}*-1, could\_used\_without\_pv_{b,t}), \sum_{b\in Buildings}could\_used\_with\_pv_{b,t}))$ \\
-\\
-$total\_used_{t} = E_{used_{r}} = E_{used_{r,grid}}  + E_{used_{pv}}$ \\
-\\
-$total\_used\_of\_available_{t} = total\_used_{t} / total\_could\_have\_used_{t}$
+%\input{results}
+%Used PV of available\\
+%$possible\_battery\_input_{b,t} = \min(\min(C^b_t-SOC^b_t, 0), max\_input\_power_{b, \textcolor{red}{t=last}})$\\
+%\\
+%$could\_used\_without\_pv_{b,t} = possible\_battery\_input_{b,t} + net\_electricity\_consumption\_without\_storage\_and\_pv_{b,t} $ \\
+%\\
+%$could\_used\_with\_pv_{b,t} = \max(possible\_battery\_input_{b,t} + net\_electricity\_consumption\_without\_storage\_and\_pv_{b,t} - solar\_generation_{b,t}*-1, 0)$ \\
+%\\
+%$pv\_could\_have\_used_{b,t} = \min(solar\_generation_{b,t}*-1, could\_used\_without\_pv_{b,t})$ \\
+%\\
+%$pv\_used_{b,t} = E_{used_{pv_{b,t}}} = \max(\min(e_{net}^b - e_{pv}^b, - e_{pv}^b), 0) $ \\
+%\\
+%$pv\_used\_of\_available_{b,t} = used_{b,t}/pv\_could\_have\_used_{b,t}$\\
+%\\
+%$grid\_could\_have\_used_{t} = \min(E_{r,grid_{t}}, \sum_{b\in Buildings}could\_used\_with\_pv_{b,t})$ \\
+%\\
+%$grid\_used_{t} = E_{used_{r,grid_{t}}} = \min(E_{net_{pos}}, E_{r, grid})$ \\
+%\\
+%$grid\_used\_of\_available_{t} = grid\_used_{b,t} / grid\_could\_have\_used_{b,t}$ \\
+%\\
+%$total\_could\_have\_used_{t} = \min(E_{r,grid_{t}} + \sum_{b\in Buildings} \min(solar\_generation_{b,t}*-1, could\_used\_without\_pv_{b,t}), \sum_{b\in Buildings}could\_used\_with\_pv_{b,t}))$ \\
+%\\
+%$total\_used_{t} = E_{used_{r}} = E_{used_{r,grid}}  + E_{used_{pv}}$ \\
+%\\
+%$total\_used\_of\_available_{t} = total\_used_{t} / total\_could\_have\_used_{t}$
+%
+%
+%\cleardoublepage
 
-
-\cleardoublepage
 
 %%
-\input{discussion}
-\cleardoublepage
+%\input{discussion}
+%\cleardoublepage
 
 %%
-\input{conclusion}
-\cleardoublepage
+%\input{conclusion}
+%\cleardoublepage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Appendix
@@ -311,15 +312,6 @@ Nominal power & Maximum amount of electric power that the battery can use to cha
 \caption[Attributes of the batteries of each building]{Attributes of the batteries of each building. Description of the attributes obtained from \textcolor{red}{TODO source}}
 \label{app:battery-attributes}
 \end{table}
-
-%\chapter{Figures}\label{chap:App2}
-
-\begin{figure}[H]
-    \center
-     \includegraphics[width=\textwidth]{figures/building_daily_means.pdf}
-  \caption{Daily means of the non-shiftable load and the solar generation of the buildings in kWh.}
-  \label{app:building-daily-mean}
-\end{figure}
 
 \begin{table}[H]
 \center
@@ -365,13 +357,6 @@ Building Id & Energy Consumption Median
 \label{tab:building-medians}
 \end{table}
 
-\begin{figure}[H]
-    \center
-     \includegraphics[width=\textwidth]{figures/weather_daily_means.pdf}
-  \caption{}
-  \label{app:weather-daily-mean}
-\end{figure}
-
 \begin{table}[H]
 \begin{tabularx}{\linewidth}{l|X}
 Name & Description \\ \hline
@@ -412,6 +397,29 @@ hour & hour of day (from 1 to 24)\\
 \label{app:observation-space-sac}
 \end{table}
 
+\section{Figures}\label{sec:app-figures}
+\begin{figure}[H]
+    \center
+     \includegraphics[width=\textwidth]{figures/building_daily_means.pdf}
+  \caption{Daily means of the non-shiftable load and the solar generation of the buildings in kWh.}
+  \label{app:building-daily-mean}
+\end{figure}
+
+\begin{figure}[H]
+    \center
+     \includegraphics[width=\textwidth]{figures/weather_daily_means.pdf}
+  \caption{}
+  \label{app:weather-daily-mean}
+\end{figure}
+
+\begin{figure}[H]
+    \center
+     \includegraphics[width=\textwidth]{figures/prb_ddpg_kpis.pdf}
+  \caption{}
+  \label{app:prb-ddpg-kpis}
+\end{figure}
+
+
 \section{Algorithms}\label{sec:app-algos}
 \begin{algorithm}
 \caption{\textcolor{red}{Social Agent I}}
@@ -443,7 +451,7 @@ hour & hour of day (from 1 to 24)\\
 
 \begin{algorithm}
 \caption{\textcolor{red}{Social Agent II}}
-\label{app:sac-social-1}
+\label{app:sac-social-2}
 \small\textbf{Input:}   $\theta_1,\theta_2,\phi$ \Comment{\footnotesize Initial parameters}
 \begin{algorithmic}[1]
 \small \State $\bar{\theta}_1 \gets \theta_1, \bar{\theta}_2 \gets \theta_2$ \Comment{\footnotesize Initialize target network weights}

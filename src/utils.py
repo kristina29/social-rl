@@ -917,6 +917,36 @@ def save_kpis(envs: Mapping[str, CityLearnEnv], filename):
     kpis.to_csv(filename, index=False)
 
 
+def get_all_data(envs: Mapping[str, CityLearnEnv]):
+    data = {}
+
+    for k, v in envs.items():
+        env_data = {}
+        env_data['net_fossil_electricity_consumption'] = v.net_fossil_electricity_consumption
+        env_data['renewable_energy_produced'] = v.buildings[0].fuel_mix.renewable_energy_produced
+        env_data['net_renewable_electricity_grid_consumption'] = v.net_renewable_electricity_grid_consumption
+        env_data['net_renewable_electricity_consumption'] = v.net_renewable_electricity_consumption
+
+        building_data = {}
+        for b in v.buildings:
+            b_data = {}
+            b_data['capacity_history'] = b.electrical_storage.capacity_history
+            b_data['soc'] = b.electrical_storage.soc
+            b_data['loss_coeff'] = b.electrical_storage.loss_coefficient
+            b_data['efficiency_history'] = b.electrical_storage.efficiency_history
+            b_data['nominal_power'] = b.electrical_storage.nominal_power
+            b_data['net_electricity_consumption_without_storage_and_pv'] = b.net_electricity_consumption_without_storage_and_pv
+            b_data['solar_generation'] = b.solar_generation
+            b_data['used_pv_electricity'] = b.used_pv_electricity
+
+            building_data[b.name] = b_data
+
+        env_data['building_data'] = building_data
+        data[k] = env_data
+
+    return data
+
+
 def save_results(envs: Mapping[str, CityLearnEnv], losses: Mapping[str, Mapping[str, List[float]]],
                  rewards: Mapping[str, List[List[float]]], eval_results: Mapping[str, Mapping[str, List[float]]],
                  agents: Mapping[str, Agent], store_agents: bool=False):
@@ -953,6 +983,12 @@ def save_results(envs: Mapping[str, CityLearnEnv], losses: Mapping[str, Mapping[
                 pickle.dump(agent_obj, fp, protocol=pickle.HIGHEST_PROTOCOL)
                 print(f'{agent_name} agent saved to {a_filename}')
 
+    data_filename = f'all_data_{timestamp}.pkl'
+    with open(data_filename, 'wb') as fp:
+        pickle.dump(get_all_data(envs), fp)
+        print(f'Fossil consumpions saved to {data_filename}')
+
+
     print('')
     print('---------------------------------')
     print('COPY COMMANDS')
@@ -961,6 +997,8 @@ def save_results(envs: Mapping[str, CityLearnEnv], losses: Mapping[str, Mapping[
           f'experiments/SAC_DB2/{p_filename}.pdf')
     print(f'scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/{k_filename} '
           f'experiments/SAC_DB2/{k_filename}')
+    print(f'scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/{data_filename} '
+          f'experiments/SAC_DB2/{data_filename}')
     print(f'scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/{l_filename} '
           f'experiments/SAC_DB2/{l_filename}')
     print(f'scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/{r_filename} '
