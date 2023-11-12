@@ -148,6 +148,16 @@ Q'(d) \leftarrow Q'(d) + \alpha_i \cdot [1-Q'(d)].
 \end{equation}
 
 \subsection{MARLISA Algorithm}
-For our next set of experiments, we aimed to train CityLearn's Multi-Agent Reinforcement Learning with Iterative Sequential Action Selection (MARLISA) algorithm to reduce the amount of fossil energy consumed. In this chapter, we will provide a brief overview of how the algorithm works. MARLISA is an extension of SAC, designed to coordinate the behavior of multiple agents by using a reward function with both individual and shared objectives. Moreover, the agents predict their future energy consumption based on the predictions of other agents and share this information with each other, where the order of the agents is randomized.
+This section presents the Multi-Agent Reinforcement Learning with Iterative Sequential Action Selection (MARLISA) algorithm, a specific algorithm designed for social learning \cite{vazquez2020marlisa}. The MARLISA algorithm is an extension of the SAC reinforcement learning method that enables coordination between agents through a collective reward function and the exchange of building-specific information. 
 
+The reward function $r_{MARL_t}^b$ focuses on individual and collective goals. It encourages agents to reduce both their own electricity consumption $e_{net}^b$ and the total consumption of the entire neighborhood, i.e., all trained buildings $b \in B$ together:
+\begin{equation}
+	r_{MARL_t}^b = -sign(e_{net}^b)\cdot0.01(e_{net}^b)^2\cdot \min \left \{0, \sum_{b \in B} e_{net}^b \right \}.
+\end{equation}
+The reward is negative when the building $b$ consumes more energy than it generates, and the neighborhood consumes more energy than it produces overall. The reward is positive if the building produces excess energy, but the neighborhood consumes too much energy. In all other cases, the reward is zero. Although the paper does not describe the scaling factor 0.01, it is included in the implementation. The authors found that the exponents were the best empirically.
+
+The collective reward in MARLISA leads to additional stochasticity, mitigated by exchanging information between agents. By sharing data, the agents can make more accurate predictions about potential rewards for current states and subsequent actions. A gradient-boosting decision tree is trained to predict the future energy consumption of a building, taking into account both the state and the chosen action. The agents are ordered randomly, and each agent selects an action, then estimates the next energy consumption and passes this prediction on to the following agent. This iterative communication allows for improved coordination as the agents gradually refine their actions based on the predictions of the other agents. The advantage of this method is that each agent only has to share two variables with another agent, so the algorithm is scalable.
+
+
+The trained agents are evaluated based on their ability to minimize annual net peak demand, average daily peak demand, total ramp and annual net demand, and maximize the district's average daily load factor. A Rule-Based Controller (RBC) is trained as a baseline, and the cost functions are compared with it. The MARLISA algorithm shows an improvement for all metrics compared to the RBC in different climate zones.
 
