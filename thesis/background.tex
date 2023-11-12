@@ -9,7 +9,7 @@ This chapter provides the necessary background knowledge to comprehend our appro
 
 \section{Reinforcement Learning}
 \label{sec:reinforcement-learning}
-\subsection{General}
+\subsection{Fundamentals of Reinforcement Learning}
 As defined by Sutton and Barto \cite{sutton2018reinforcement}, RL is a machine learning method that aims to choose actions to maximize a numerical reward. RL agents learn these actions through a trial-and-error approach based on the received rewards. Actions can affect both immediate rewards and long-term rewards. In contrast to supervised methods, RL does not need labeled data for learning and does not try to discover inherent structure in data as unsupervised methods.
 
 \todo[inline]{Die plots optimiere ich während ihr korrekturlest, aber könnt natürlich trotzdem gerne schreiben wenn euch was dazu auffällt :D}
@@ -115,19 +115,20 @@ For the final SAC algorithm, as given in Algorithm \ref{alg:sac-update}, the aut
 \end{algorithm}
 
 \section{Social Learning}
+\todo[inline]{Name 'agent to train' as learner}
+
 \label{sec:background-social-learning}
+\textit{Social learning} is a term initially derived from psychology and has various definitions. Essentially, it refers to the act of learning from others \cite{reed2010social, toyokawa2019social, witt2023social}. In this thesis, we interpret social learning as observing the actions and possibly rewards of demonstrators and incorporating them into the training process of the RL agent. We distinguish between algorithm-independent methods, which we present first, and specific social algorithms.
 
-
-\cite{hester2018deep}
-
-
-\textit{Social learning} is a term initially from psychology and has various definitions. Essentially, it refers to the act of learning from others \cite{reed2010social, toyokawa2019social, witt2023social}. In this thesis, we interpret social learning as observing the actions and possibly rewards of demonstrators and incorporating them into the training process of the RL agent.
-
-\subsection{General Methods}
+\subsection{Algorithm-independent Methods}
 \subsubsection*{Imitation Learning}
-Demonstrator transitions in replay buffer \cite{vecerik2017leveraging}
+\textit{Imitation learning} is a technique used to improve the learning of reinforcement agents. The agent is presented with either demonstrator actions or the demonstrator agent itself as input, and it tries to mimic the actions of the demonstrator. This technique assumes that the policy of the demonstrator is optimal. There are various types of imitation learning, such as behavior cloning or inverse reinforcement learning. We used behavior cloning, where a data set $\mathcal{D}=\{(s_t, a_t, r_t, s_{t+1}, d_t)\}$ of demonstration transitions is provided \cite{osa2018algorithmic}. This dataset enables the direct calculation of the deterministic demonstrator policy $\pi^*(s_t)$. The policy of the learner $\pi_{\phi}$ is then trained using the objective
+\begin{equation}
+	\phi^* = \argmin_{\phi}\mathbb{E}_{(s^*,a^*)\sim \mathcal{D}}\left [\mathcal{L}(a^*, \pi_{\phi}(s^*)) \right ].
+\end{equation}
+Behavior cloning assumes that the data is independent and identically distributed. Also, there may be a mismatch between the state spaces of the demonstrator and the learner. To overcome these challenges, the training dataset can be created by combining the demonstrator transitions with transitions created by rolling out the learner policy on the environment \cite{ross2011reduction}. 
 
-As mentioned in Section~\ref{sec:background-social-learning}, a popular technique to improve learning is by sampling demonstration transitions and storing them in a prioritized replay buffer (PRB). This buffer assigns priorities to transitions based on their temporal difference (TD) error. Transitions with higher TD error are given higher priority because they are expected to be more challenging to learn and should be observed more frequently during training. The transitions with higher priority are more likely to be sampled. Priorities are updated during the training process \cite{schaul2015prioritized}.
+To integrate the demonstration transitions into the learning algorithm, we have stored them in a prioritized replay buffer (PRB) before starting training \cite{vecerik2017leveraging, hester2018deep}. This buffer prioritizes the transitions based on their temporal difference (TD) error. Transitions with a higher TD error are given a higher priority as it is assumed that they are more challenging to learn and should be observed more frequently during training. The transitions with a higher priority are more likely to be sampled. The priorities are updated during the training process \cite{schaul2015prioritized}.
 
 \subsubsection*{Decision Biasing}
 \label{sec:decision-biasing}
