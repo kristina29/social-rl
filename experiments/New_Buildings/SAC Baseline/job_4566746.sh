@@ -17,7 +17,6 @@ source $HOME/.bashrc
 
 # insert your commands here
 #eval "$(micromamba shell hook --shell=bash)"
-micromamba activate social-rl
--s nnb_limitobs1 --autotune --building_ids 1 --building_ids 2 --building_ids 4 --building_ids 6 --building_ids 9 --building_ids 14 -e 2 --tql --sacdb2 --sacdb2value
+micromamba activate social-rl -s nnb_limitobs1 --autotune --building_ids 1 --building_ids 2 --building_ids 4 --building_ids 6 --building_ids 9 --building_ids 14 -e 2 --tql --sacdb2 --sacdb2value
 micromamba deactivate
 
