@@ -455,7 +455,7 @@ def generate_eval():
         demo = dir[1]['demos']
         extra_pol = dir[1]['extra_pols']
 
-        for ir in [0.05, 0.1, 0.15, 0.2, 0.3]:
+        for ir in [0.05, 0.1, 0.15, 0.2, 0.3, 0.35, 0.4]:
             try:
                 file = glob.glob(f'../experiments/New_Buildings/{dir[1]["paths"]}/ir{ir}/kpis_*.csv')[0]
                 kpis = pd.read_csv(file)
