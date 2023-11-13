@@ -1,0 +1,103 @@
+kpi,value,net_value,net_value_without_storage,name,level,env_id
+1 - average_daily_renewable_share,1.001,0.629,0.629,District,district,RBC
+1 - average_daily_renewable_share_grid,1.005,0.866,0.862,District,district,RBC
+1 - load_factor,0.99,0.851,0.86,District,district,RBC
+1 - used_pv_of_total_share,1.144,0.177,0.155,District,district,RBC
+average_daily_peak,0.999,10.437,10.446,District,district,RBC
+carbon_emissions,1.064,3569.007,3361.154,District,district,RBC
+cost,1.061,3836.092,3621.81,District,district,RBC
+electricity_consumption,1.064,6989.772,6582.646,District,district,RBC
+fossil_energy_consumption,1.068,38969.312,36490.844,District,district,RBC
+ramping,1.061,20792.825,19597.992,District,district,RBC
+electricity_consumption,1.054,7810.107,7411.591,Building_1,building,RBC
+carbon_emissions,1.054,3987.087,3783.391,Building_1,building,RBC
+cost,1.052,4294.741,4084.007,Building_1,building,RBC
+1 - used_pv_of_total_share,1.166,0.158,0.136,Building_1,building,RBC
+electricity_consumption,1.063,6959.268,6549.758,Building_2,building,RBC
+carbon_emissions,1.063,3549.832,3340.685,Building_2,building,RBC
+cost,1.06,3803.668,3588.019,Building_2,building,RBC
+1 - used_pv_of_total_share,1.194,0.169,0.142,Building_2,building,RBC
+electricity_consumption,1.053,7142.548,6785.789,Building_4,building,RBC
+carbon_emissions,1.052,3657.542,3475.528,Building_4,building,RBC
+cost,1.05,3939.192,3752.009,Building_4,building,RBC
+1 - used_pv_of_total_share,1.132,0.107,0.095,Building_4,building,RBC
+electricity_consumption,1.054,7724.599,7331.304,Building_6,building,RBC
+carbon_emissions,1.054,3926.422,3725.806,Building_6,building,RBC
+cost,1.052,4151.092,3945.13,Building_6,building,RBC
+1 - used_pv_of_total_share,1.071,0.173,0.162,Building_6,building,RBC
+electricity_consumption,1.092,5291.127,4843.548,Building_9,building,RBC
+carbon_emissions,1.092,2707.221,2478.494,Building_9,building,RBC
+cost,1.087,2951.091,2714.04,Building_9,building,RBC
+1 - used_pv_of_total_share,1.198,0.207,0.172,Building_9,building,RBC
+electricity_consumption,1.066,7010.985,6573.883,Building_14,building,RBC
+carbon_emissions,1.066,3585.941,3363.022,Building_14,building,RBC
+cost,1.063,3876.769,3647.656,Building_14,building,RBC
+1 - used_pv_of_total_share,1.105,0.246,0.223,Building_14,building,RBC
+1 - average_daily_renewable_share,0.981,0.616,0.629,District,district,SAC_DB2Value
+1 - average_daily_renewable_share_grid,0.97,0.836,0.862,District,district,SAC_DB2Value
+1 - load_factor,0.99,0.851,0.86,District,district,SAC_DB2Value
+1 - used_pv_of_total_share,0.792,0.122,0.155,District,district,SAC_DB2Value
+average_daily_peak,0.919,9.6,10.446,District,district,SAC_DB2Value
+carbon_emissions,0.936,3154.221,3361.154,District,district,SAC_DB2Value
+cost,0.934,3390.16,3621.81,District,district,SAC_DB2Value
+electricity_consumption,0.936,6175.742,6582.646,District,district,SAC_DB2Value
+fossil_energy_consumption,0.931,33977.33,36490.844,District,district,SAC_DB2Value
+ramping,0.993,19455.072,19597.992,District,district,SAC_DB2Value
+electricity_consumption,0.926,6859.541,7411.591,Building_1,building,SAC_DB2Value
+carbon_emissions,0.925,3501.508,3783.391,Building_1,building,SAC_DB2Value
+cost,0.922,3766.366,4084.007,Building_1,building,SAC_DB2Value
+1 - used_pv_of_total_share,0.8,0.109,0.136,Building_1,building,SAC_DB2Value
+electricity_consumption,0.931,6095.97,6549.758,Building_2,building,SAC_DB2Value
+carbon_emissions,0.932,3112.047,3340.685,Building_2,building,SAC_DB2Value
+cost,0.931,3341.3,3588.019,Building_2,building,SAC_DB2Value
+1 - used_pv_of_total_share,0.801,0.114,0.142,Building_2,building,SAC_DB2Value
+electricity_consumption,0.963,6536.431,6785.789,Building_4,building,SAC_DB2Value
+carbon_emissions,0.964,3350.657,3475.528,Building_4,building,SAC_DB2Value
+cost,0.965,3620.208,3752.009,Building_4,building,SAC_DB2Value
+1 - used_pv_of_total_share,0.775,0.073,0.095,Building_4,building,SAC_DB2Value
+electricity_consumption,0.96,7040.646,7331.304,Building_6,building,SAC_DB2Value
+carbon_emissions,0.961,3579.146,3725.806,Building_6,building,SAC_DB2Value
+cost,0.959,3783.42,3945.13,Building_6,building,SAC_DB2Value
+1 - used_pv_of_total_share,0.838,0.136,0.162,Building_6,building,SAC_DB2Value
+electricity_consumption,0.894,4331.491,4843.548,Building_9,building,SAC_DB2Value
+carbon_emissions,0.894,2215.562,2478.494,Building_9,building,SAC_DB2Value
+cost,0.888,2410.616,2714.04,Building_9,building,SAC_DB2Value
+1 - used_pv_of_total_share,0.782,0.135,0.172,Building_9,building,SAC_DB2Value
+electricity_consumption,0.942,6190.375,6573.883,Building_14,building,SAC_DB2Value
+carbon_emissions,0.942,3166.403,3363.022,Building_14,building,SAC_DB2Value
+cost,0.937,3419.052,3647.656,Building_14,building,SAC_DB2Value
+1 - used_pv_of_total_share,0.757,0.169,0.223,Building_14,building,SAC_DB2Value
+1 - average_daily_renewable_share,0.978,0.614,0.629,District,district,SAC_DB2Value Best
+1 - average_daily_renewable_share_grid,0.965,0.832,0.862,District,district,SAC_DB2Value Best
+1 - load_factor,0.987,0.849,0.86,District,district,SAC_DB2Value Best
+1 - used_pv_of_total_share,0.742,0.115,0.155,District,district,SAC_DB2Value Best
+average_daily_peak,0.889,9.29,10.446,District,district,SAC_DB2Value Best
+carbon_emissions,0.925,3116.873,3361.154,District,district,SAC_DB2Value Best
+cost,0.921,3344.587,3621.81,District,district,SAC_DB2Value Best
+electricity_consumption,0.925,6105.233,6582.646,District,district,SAC_DB2Value Best
+fossil_energy_consumption,0.919,33527.44,36490.844,District,district,SAC_DB2Value Best
+ramping,0.986,19322.738,19597.992,District,district,SAC_DB2Value Best
+electricity_consumption,0.915,6784.158,7411.591,Building_1,building,SAC_DB2Value Best
+carbon_emissions,0.915,3461.274,3783.391,Building_1,building,SAC_DB2Value Best
+cost,0.909,3712.095,4084.007,Building_1,building,SAC_DB2Value Best
+1 - used_pv_of_total_share,0.723,0.098,0.136,Building_1,building,SAC_DB2Value Best
+electricity_consumption,0.917,6006.208,6549.758,Building_2,building,SAC_DB2Value Best
+carbon_emissions,0.917,3063.453,3340.685,Building_2,building,SAC_DB2Value Best
+cost,0.914,3278.93,3588.019,Building_2,building,SAC_DB2Value Best
+1 - used_pv_of_total_share,0.702,0.1,0.142,Building_2,building,SAC_DB2Value Best
+electricity_consumption,0.956,6484.139,6785.789,Building_4,building,SAC_DB2Value Best
+carbon_emissions,0.956,3323.435,3475.528,Building_4,building,SAC_DB2Value Best
+cost,0.956,3588.544,3752.009,Building_4,building,SAC_DB2Value Best
+1 - used_pv_of_total_share,0.753,0.071,0.095,Building_4,building,SAC_DB2Value Best
+electricity_consumption,0.951,6972.925,7331.304,Building_6,building,SAC_DB2Value Best
+carbon_emissions,0.951,3542.225,3725.806,Building_6,building,SAC_DB2Value Best
+cost,0.946,3731.752,3945.13,Building_6,building,SAC_DB2Value Best
+1 - used_pv_of_total_share,0.764,0.124,0.162,Building_6,building,SAC_DB2Value Best
+electricity_consumption,0.879,4257.102,4843.548,Building_9,building,SAC_DB2Value Best
+carbon_emissions,0.878,2176.186,2478.494,Building_9,building,SAC_DB2Value Best
+cost,0.871,2362.758,2714.04,Building_9,building,SAC_DB2Value Best
+1 - used_pv_of_total_share,0.737,0.127,0.172,Building_9,building,SAC_DB2Value Best
+electricity_consumption,0.932,6126.865,6573.883,Building_14,building,SAC_DB2Value Best
+carbon_emissions,0.932,3134.665,3363.022,Building_14,building,SAC_DB2Value Best
+cost,0.93,3393.442,3647.656,Building_14,building,SAC_DB2Value Best
+1 - used_pv_of_total_share,0.773,0.172,0.223,Building_14,building,SAC_DB2Value Best
