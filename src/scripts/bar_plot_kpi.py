@@ -3,8 +3,10 @@ from collections import Mapping
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt, rc
 
+rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
+rc('text', usetex=True)
 
 def plot_district_kpis1(kpis) -> plt.Figure:
     kpis = kpis[kpis['level'] == 'district'].copy()
@@ -105,8 +107,8 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
 
         kpi['rank'] = kpi['kpi'].map(kpi_names)
 
-        if i==0:
-            kpi = kpi[kpi['env_id'] == 'SAC Best']
+        if i==0 or i==2:
+            kpi = kpi[kpi['env_id'] == 'RBC']
         else:
             kpi = kpi[kpi['env_id'] == 'SAC Best']
 
@@ -134,10 +136,6 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
     ax.set_xlabel(None)
     ax.set_ylabel(None)
 
-    plt.rcParams.update({
-        "text.usetex": True,
-        "font.family": "Helvetica"
-    })
 
     for s in ['right', 'top']:
         ax.spines[s].set_visible(False)
@@ -157,8 +155,8 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
     ax.tick_params(axis='both', which='major', labelsize=21)
 
     #fig.suptitle('KPIs at district-level', fontsize=16)
-    plt.tight_layout(rect=[0, 0, 0.8, 1])
-    ax.legend(loc='upper right', bbox_to_anchor=(1.43, 1.0), framealpha=0, fontsize=21)
+    plt.tight_layout(rect=[0, 0, 0.75, 1])
+    ax.legend(loc='upper right', bbox_to_anchor=(1.52, 1.0), framealpha=0, fontsize=21)
     #plt.show()
     fig.savefig("kpis.pdf")
 
@@ -167,19 +165,18 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
 
 if __name__ == '__main__':
     kpis = [pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
-            #pd.read_csv('../experiments/SAC/DDPG/kpis_20231107T143713.csv'),
-            #pd.read_csv('../experiments/SAC_DB2/33_demo_replaybuffer/demo_b5_ddpg/kpis_20231106T170835.csv'),
-            #pd.read_csv('../experiments/SAC_DB2/33_demo_replaybuffer/demo_b6_ddpg/kpis_20231106T170845.csv'),
-            pd.read_csv('../experiments/SAC/16_shifted_buildings/shifted_b3/kpis_20231031T173335.csv'),
-            pd.read_csv('../experiments/SAC/16_shifted_buildings/shifted_b5/kpis_20231031T194250.csv'),
+            pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
+            pd.read_csv('../experiments/New_Buildings/SAC Baseline/kpis_20231113T132158.csv'),
+            pd.read_csv('../experiments/New_Buildings/SAC Baseline/kpis_20231113T132158.csv'),
     ]
 
     if len(kpis) == 1:
         plot_district_kpis1(kpis[0])
     else:
-        plot_district_kpis_multiple(kpis, ['Baseline SAC',
-                                           #'DDPG', 'DDPG with transitions of B5', 'DDPG with transitions of B6',
-                                           'Shifted B3', 'Shifted B5'
+        plot_district_kpis_multiple(kpis, ['RBC (Training)',
+                                           'Baseline SAC (Training)',
+                                           'RBC (Evaluation)',
+                                           'SAC (Evaluation)',
                                            ])
 
     #plt.show()
