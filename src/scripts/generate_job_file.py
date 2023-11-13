@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-irs = [0.1, 0.15, 0.2, 0.3]
+irs = [0.05, 0.1, 0.2, 0.3]
 #ir = 1.5
 
 PREFIX = '''\
@@ -35,6 +35,6 @@ for i, ir in enumerate(irs):
     with open(f'job{i}.sh', 'w') as rsh:
         rsh.write(f'''\
 {PREFIX}
-srun python3 src/socialrl.py -s nnblo1_onlyb5shifted -b 6 --pretrained_demonstrator agents/SAC_agent_Building5.pkl -e 2 --tql --sac --sacdb2 --autotune --ir {ir}
+srun python3 src/socialrl.py -s nnb_limitobs1 --building_ids 1 --building_ids 2 --building_ids 4 --building_ids 6 --building_ids 9 --building_ids 14 --pretrained_demonstrator agents/SAC_agent_Building5.pkl -e 2 --tql --sac --sacdb2 --autotune --ir {ir} --extra_policy_update --deterministic_demo
 {SUFFIX}
     ''')
