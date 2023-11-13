@@ -6,12 +6,24 @@
   \label{Discussion}
   
 \section{Evaluation on new Buildings}
+In the preceding sections, we presented the theoretical foundations and development of our social approach to reducing fossil energy consumption. This chapter will evaluate our method on a new set of buildings. For the assessment, we selected the six buildings 1, 2, 4, 6, 9 and 14 (see Section~\ref{sec:building-data}), which we will refer to as evaluation buildings. These buildings were not included in the training set to avoid overlap. Using the same hyperparameters, reward function, and early stopping method, we first used the asocial SAC algorithm to train each building.
 
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/eval_kpis.pdf}
   \caption{}
   \label{fig:eval-kpis}
+\end{figure}
+
+Figure~\ref{fig:eval-kpis} shows the KPI results of the RBC and SAC agents for both the training and evaluation buildings. The performance of the RBC agents is consistent across the building sets, with a slight improvement in the utilization of produced solar energy in the evaluation group. This indicates that when deploying RBC in evaluation buildings, the increase in the use of fossil fuels compared to without using the battery is similar to that of training buildings. 
+
+On the other hand, the SAC agents of the evaluation buildings perform better than the baseline SAC agents in all KPIs except for the share of total renewable energy used. Notably, using battery storage in evaluation buildings facilitates an additional reduction of fossil energy consumption by approximately 1 \% compared to the training group.
+
+\begin{figure}[htb]
+\center
+     \includegraphics[width=\textwidth]{figures/eval_results.pdf}
+  \caption{}
+  \label{fig:eval-results}
 \end{figure}
   
 \section{Final Discussion}

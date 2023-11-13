@@ -6,10 +6,8 @@ import pandas as pd
 import seaborn as sns
 from matplotlib.ticker import FormatStrFormatter
 
-plt.rcParams.update({
-    "text.usetex": True,
-#    "font.family": "Helvetica"
-})
+plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
+plt.rc('text', usetex=True)
 
 BEST_SAC_VALUE = 0.93
 BEST_SAC_B3 = 0.94
@@ -88,18 +86,18 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d
                                             'lawngreen', 'lawngreen', 'green', 'green', ]
                                  })
 
-eval_dirs = pd.DataFrame({'paths': ['Demo_B5/extra_pol',
-                                    'Demo_B5/no_extra_pol',
+eval_dirs = pd.DataFrame({'paths': [#'Demo_B5/extra_pol',
+                                    #'Demo_B5/no_extra_pol',
                                     'Demo_B6/extra_pol',
                                     'Demo_B6/no_extra_pol',
                                     'Demo_B11/extra_pol',
                                     'Demo_B11/no_extra_pol',
                                     ],
-                                 'demos': ['B5', 'B5',
-                                           'B6', 'B6',
-                                           'B11', 'B11',
+                                 'demos': [#'B5', 'B5',
+                                           'B6 (determ.)', 'B6 (determ.)',
+                                           'B11 (determ.)', 'B11 (determ.)',
                                            ],
-                                 'extra_pols': [1, 0,
+                                 'extra_pols': [#1, 0,
                                                 1, 0,
                                                 1, 0,
                                                 ]})
@@ -283,7 +281,7 @@ def generate_eval():
 
     for a in [ax]:
         a.set_xscale('log', base=2)
-        a.set_ylim(0.91, 0.975)
+        a.set_ylim(0.905, 0.955)
         a.set_ylabel('KPI $fossil\_energy\_consumption$', fontsize=19)
         a.set_xlabel(r'Imitation learning rate $\alpha_i$', fontsize=19)
         a.grid(zorder=1)
@@ -297,7 +295,7 @@ def generate_eval():
     ax.axhline(BEST_EVAL, ls='--', lw=1, c='red', zorder=2)
     ax.axhline(BEST_EVAL - 0.005, ls='--', lw=1, c='grey', zorder=2)
     ax.axhline(BEST_EVAL + 0.005, ls='--', lw=1, c='grey', zorder=2)
-    ax.text(0.001, BEST_EVAL - 0.0003, 'SAC Baseline', color='r', ha='left', va='top',
+    ax.text(0.001, BEST_EVAL - 0.0003, 'SAC', color='r', ha='left', va='top',
              transform=ax.get_yaxis_transform(), fontsize=17)
 
 
@@ -306,7 +304,7 @@ def generate_eval():
 
     plt.show()
 
-    #fig.savefig('results3.pdf')
+    fig.savefig('results.pdf')
 
 
 
