@@ -92,15 +92,19 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d
 
 
 eval_dirs = pd.DataFrame({'paths': ['Demo_B5/extra_pol',
-                                           'Demo_B5/no_extra_pol',
-                                           'Demo_B6/extra_pol',
-                                           'Demo_B6/no_extra_pol',
-                                           ],
+                                    'Demo_B5/no_extra_pol',
+                                    'Demo_B6/extra_pol',
+                                    'Demo_B6/no_extra_pol',
+                                    'Demo_B11/extra_pol',
+                                    'Demo_B11/no_extra_pol',
+                                    ],
                                  'demos': ['B5', 'B5',
                                            'B6', 'B6',
+                                           'B11', 'B11',
                                            ],
                                  'extra_pols': [1, 0,
-                                                1, 0
+                                                1, 0,
+                                                1, 0,
                                                 ]})
 
 marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info_sharing',
@@ -480,7 +484,8 @@ def generate_eval():
               0.8: 'magenta'}
     markers = {0: 'o', 1: 'X'}
     demo_pos = {'B5': 1,
-                'B6': 2,}
+                'B6': 2,
+                'B11': 3}
 
     final_df = pd.DataFrame({'irs': irs,
                              'demos': demos,
