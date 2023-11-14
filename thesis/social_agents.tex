@@ -151,7 +151,7 @@ Based on these results, we tried even higher imitation learning rates of $\alpha
 \subsection{Discussion}
 \todo[inline]{Figures alle die gleiche Schriftart}
 
-To better understand the performance differences between modes 1-3 and 4-6, we investigate the policy loss of the standard SAC policy update and the change in the entropy value during training. The courses for B3 with demonstrator B5 and $\alpha_i = 0.2$ are visualized for modes 2 and 5 in Figure~\ref{fig:social1-losses} as an example.  
+To better understand the performance differences between modes 1-3 and 4-6, we investigate the policy loss of the standard SAC policy update and the change in the entropy value during training. The courses for B3 with demonstrator B5 and $\alpha_i = 0.2$ are visualized for modes 2 and 5 in Figure~\ref{fig:social1-losses} as an example. 
 \begin{figure}[htb]
 \center
      \includegraphics[width=0.8\textwidth]{figures/social1_losses.pdf}
@@ -159,9 +159,9 @@ To better understand the performance differences between modes 1-3 and 4-6, we i
   \label{fig:social1-losses}
 \end{figure}
 
-In mode 2, the policy loss decreases as expected during training, and the entropy converges quickly to a value between 0.5 and 1. However, during training with mode 5, the entropy value increases. At the same time, the policy loss also increases, with sudden gains at the beginning of a new batch and an initial reduction in the loss within the batch. This behavior disappears in modes 5 and 6 when using higher imitation learning rates. The expected behavior, as in mode 2, can be observed, resulting in better performance. In mode 4, however, no changes can be observed as the imitation learning rate increases.
+In mode 2, the policy loss decreases as expected during training, and the entropy converges quickly to a value between 0.5 and 1. However, during training with mode 5, the entropy value increases. At the same time, the policy loss also increases, with sudden gains at the beginning of a new batch and an initial reduction in the loss within the batch. This behavior disappears in modes 5 and 6 when using higher imitation learning rates. The expected behavior, as in mode 2, can be observed, resulting in better performance. In mode 4, however, no changes can be observed as the imitation learning rate increases. The loss curves of mode 1 and 3 are similiar to mode 2.
 
-If the probability of demonstrator actions is increased sufficiently in the entropy term $\mathcal{H}_{M5}$, the effect disappears. Therefore, we assume that the demonstrator actions in the policy of the agent to be trained are very unlikely, which in turn increases the entropy. As a result, there is more uncertainty about which action to take, leading to an overall increase in policy loss and, ultimately, poorer performance.
+If the probability of demonstrator actions is increased sufficiently in the entropy term $\mathcal{H}_{M5}$, the effect disappears. Therefore, we assume that the demonstrator actions in the policy of the agent to be trained are very unlikely, which in turn increases the entropy. As a result, there is more uncertainty about which action to take, leading to an overall increase in policy loss and, ultimately, poorer performance. Increasing the value term as in $\mathcal{V}_{M1}$ should decrease the overall policy loss, however, this does not have a significant effect on the final performance based on our results. 
 
 To summarize, our approaches increased the probability or Q-values of the demonstrator actions in the agent's policy to be trained. However, overall, they only resulted in minimal fossil energy savings compared to our SAC baseline. The decision-biasing approach is still promising, so in our subsequent experiments, we directly biased the Q-value of the demonstrator actions in the Q-networks.
 
