@@ -1,0 +1,43 @@
+kpi,value,net_value,net_value_without_storage,name,level,env_id
+1 - average_daily_renewable_share,0.997,0.591,0.593,District,district,RBC
+1 - average_daily_renewable_share_grid,1.01,0.928,0.919,District,district,RBC
+1 - load_factor,0.996,0.919,0.923,District,district,RBC
+1 - used_pv_of_total_share,1.117,0.168,0.151,District,district,RBC
+average_daily_peak,1.004,2.98,2.967,District,district,RBC
+carbon_emissions,1.051,4302.339,4095.262,District,district,RBC
+cost,1.049,4591.322,4375.972,District,district,RBC
+electricity_consumption,1.05,8445.704,8041.101,District,district,RBC
+fossil_energy_consumption,1.055,7966.658,7552.184,District,district,RBC
+ramping,1.035,6045.633,5841.318,District,district,RBC
+electricity_consumption,1.05,8445.704,8041.101,Building_16,building,RBC
+carbon_emissions,1.051,4302.339,4095.262,Building_16,building,RBC
+cost,1.049,4591.322,4375.972,Building_16,building,RBC
+1 - used_pv_of_total_share,1.117,0.168,0.151,Building_16,building,RBC
+1 - average_daily_renewable_share,1.023,0.606,0.593,District,district,SAC
+1 - average_daily_renewable_share_grid,0.986,0.906,0.919,District,district,SAC
+1 - load_factor,0.984,0.908,0.923,District,district,SAC
+1 - used_pv_of_total_share,0.702,0.106,0.151,District,district,SAC
+average_daily_peak,0.881,2.613,2.967,District,district,SAC
+carbon_emissions,0.908,3717.579,4095.262,District,district,SAC
+cost,0.896,3922.562,4375.972,District,district,SAC
+electricity_consumption,0.909,7312.282,8041.101,District,district,SAC
+fossil_energy_consumption,0.904,6826.928,7552.184,District,district,SAC
+ramping,1.05,6136.287,5841.318,District,district,SAC
+electricity_consumption,0.909,7312.282,8041.101,Building_16,building,SAC
+carbon_emissions,0.908,3717.579,4095.262,Building_16,building,SAC
+cost,0.896,3922.562,4375.972,Building_16,building,SAC
+1 - used_pv_of_total_share,0.702,0.106,0.151,Building_16,building,SAC
+1 - average_daily_renewable_share,1.007,0.597,0.593,District,district,SAC Best
+1 - average_daily_renewable_share_grid,0.984,0.904,0.919,District,district,SAC Best
+1 - load_factor,0.987,0.91,0.923,District,district,SAC Best
+1 - used_pv_of_total_share,0.698,0.105,0.151,District,district,SAC Best
+average_daily_peak,0.876,2.601,2.967,District,district,SAC Best
+carbon_emissions,0.889,3642.032,4095.262,District,district,SAC Best
+cost,0.882,3859.404,4375.972,District,district,SAC Best
+electricity_consumption,0.89,7156.148,8041.101,District,district,SAC Best
+fossil_energy_consumption,0.884,6678.772,7552.184,District,district,SAC Best
+ramping,1.023,5974.845,5841.318,District,district,SAC Best
+electricity_consumption,0.89,7156.148,8041.101,Building_16,building,SAC Best
+carbon_emissions,0.889,3642.032,4095.262,Building_16,building,SAC Best
+cost,0.882,3859.404,4375.972,Building_16,building,SAC Best
+1 - used_pv_of_total_share,0.698,0.105,0.151,Building_16,building,SAC Best

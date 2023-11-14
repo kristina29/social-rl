@@ -20,7 +20,7 @@ git
 
 scp src/citylearn/data/testenv/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/testenv/ 
 
-find '/Users/kristina/Documents/Studium/Informatik M.Sc. - Tü/SoSe 2023/social-rl/experiments/SAC_DB2/99_bla' -name '*.sh' -delete
+find '/Users/kristina/Documents/Studium/Informatik M.Sc. - Tü/SoSe 2023/social-rl/experiments/SAC_DB2Value/8_determ_actions/demo_b14' -name '*.sh' -delete
 
 find '/Users/kristina/Documents/Studium/Informatik M.Sc. - Tü/SoSe 2023/social-rl/experiments/SAC_DB2/99_bla' -name '*.pdf' -delete
 
@@ -46,9 +46,9 @@ scp src/citylearn/data/citylearn_challenge_2022_phase_all/* klietz10@134.2.168.5
 
 scp src/citylearn/data/nnb_limitobs1_shared/* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/citylearn/data/nnb_limitobs1_shared/
 
-scp src/job.sh klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/
+scp src/job* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/
 
-mv agents/SAC_agent_20231113T143302.pkl agents/SAC_agent_Building11.pkl
+mv agents/SAC_agent_20231114T160153.pkl agents/SAC_agent_Building14.pkl
 
 
 
