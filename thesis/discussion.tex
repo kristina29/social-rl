@@ -25,6 +25,11 @@ On the other hand, the SAC agents of the evaluation buildings perform better tha
   \caption{}
   \label{fig:eval-results}
 \end{figure}
+
+To evaluate the effectiveness of our social method, we used a pre-trained demonstrator to train Social Agent II for the evaluation buildings. We used deterministic demonstrator actions and chose B11 and B6 as pre-trained demonstrators based on their correlation in energy consumption with the evaluation buildings. B11 has the highest median correlation without being part of the evaluation group, and B6 has the highest correlation within the group and performed the best in the training phase. We tested various imitation learning rates to determine the need for parameter tuning.
+
+The mean value of the fossil energy consumption KPI was calculated for one experiment with and without additional policy update, as shown in Figure \ref{fig:eval-results}. Based on our analysis, we found that demonstrators B6 and B11 achieved the highest average saving of fossil energy at imitation learning rates of 0.2 and 0.3, respectively. We also discovered that the agents perform best when using demonstrator B6 with a rate of 0.25 and an additional policy update. Under these conditions, we can save about 1 \% more fossil energy than with the classic SAC agents. However, the savings achieved are lower compared to the training buildings.
+
   
 \section{Final Discussion}
 policy loss good indicator for final performance and stability of results
