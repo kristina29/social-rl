@@ -47,6 +47,8 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d
                                            '4_demo_b6_policyupdate',
                                            '8_determ_actions/demo_b6/non_extra_pol_update',
                                            '8_determ_actions/demo_b6/extra_pol_update',
+                                           '8_determ_actions/demo_b16/no_extra_pol_update',
+                                           '8_determ_actions/demo_b16/extra_pol_update',
                                            '9_interchanged_observations/demo_b6/no_extra_policy_update',
                                            '9_interchanged_observations/demo_b6/extra_policy_update',
                                            '9_interchanged_observations/demo_b6_determ/no_extra_pol_update',
@@ -68,6 +70,7 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d
                                            4, 4,
                                            'B6', 'B6',
                                            'B6 (determ.)', 'B6 (determ.)',
+                                           'B16 (determ.)', 'B16 (determ.)',
                                            'B6 (shared obs.)', 'B6 (shared obs.)',
                                            'B6 (shared obs., determ)', 'B6 (shared obs., determ)',
                                            'B5', 'B5',
@@ -81,6 +84,7 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d
                                                 0, 1,  # 4
                                                 0, 1,  # B6
                                                 0, 1,  # B6 determ
+                                                0, 1,  # B16 determ
                                                 0, 1,  # B6 shared
                                                 0, 1,  # B6 shared determ
                                                 0, 1,  # B5
@@ -392,10 +396,11 @@ def generate_sacdb2value():
                 'B6 (determ.)': 7,
                 'B6 (shared obs.)': 8,
                 'B6 (shared obs., determ)': 9,
-                'B5 (only B5s)': 10,
-                'B6 (only B5s)': 11,
-                'B3 (only B3s)': 12,
-                'B6 (only B3s)': 13}
+                'B16 (determ.)': 10,
+                'B5 (only B5s)': 11,
+                'B6 (only B5s)': 12,
+                'B3 (only B3s)': 13,
+                'B6 (only B3s)': 14}
 
     final_df = pd.DataFrame({'irs': irs,
                              'demos': demos,

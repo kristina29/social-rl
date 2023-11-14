@@ -15,7 +15,13 @@ def read_building_solar_minus_demand(b_id):
     df = pd.read_csv(f'{DIR_PATH}/Building_{b_id}.csv')
     solar = nominal_power[b_id - 1] * np.array(df['Solar Generation [W/kW]']) / 1000
     demand = np.array(df['Equipment Electric Power [kWh]'])
-    return solar - demand
+
+    diff = demand - solar
+
+    covered = len(diff[diff <= 0])/len(diff)
+    print(f"Building {b_id} covered: {covered*100} %")
+
+    return diff
 
 
 if __name__ == '__main__':
@@ -30,7 +36,6 @@ if __name__ == '__main__':
     correlations = pd.DataFrame(columns=cols,
                                 index=list(range(1, n_buildings+1)))
     for b_id, demand in demands.items():
-        print(b_id)
         for b_id2, demand2 in demands.items():
             val = correlations.iloc[b_id-1][b_id2]
             if np.isnan(val):
