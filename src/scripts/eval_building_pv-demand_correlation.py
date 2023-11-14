@@ -15,7 +15,7 @@ def read_building_solar_minus_demand(b_id):
     df = pd.read_csv(f'{DIR_PATH}/Building_{b_id}.csv')
     solar = nominal_power[b_id - 1] * np.array(df['Solar Generation [W/kW]']) / 1000
     demand = np.array(df['Equipment Electric Power [kWh]'])
-    return solar - demand
+    return demand - solar
 
 
 if __name__ == '__main__':
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     correlations = correlations.drop(columns=[3,5,7,8,10,11,12,13,15,16,17])
     for b_id in range(1, n_buildings + 1):
         b_correlations = np.array(correlations.iloc[b_id-1][:-1])
-        correlations.iloc[b_id-1]['Median'] = np.median(b_correlations)
+        correlations.iloc[b_id-1]['Median'] = np.mean(b_correlations)
 
     #correlations.to_csv('../building_correlations.csv')
     correlations = correlations.astype('float64')

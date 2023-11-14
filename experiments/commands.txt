@@ -48,7 +48,7 @@ scp src/citylearn/data/nnb_limitobs1_shared/* klietz10@134.2.168.52:/mnt/qb/work
 
 scp src/job.sh klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/
 
-mv agents/SAC_agent_20231113T143302.pkl agents/SAC_agent_Building11.pkl
+mv agents/SAC_agent_20231114T155908.pkl agents/SAC_agent_Building16.pkl
 
 
 
