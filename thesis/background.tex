@@ -148,6 +148,7 @@ Q'(d) \leftarrow Q'(d) + \alpha_i \cdot [1-Q'(d)].
 \end{equation}
 
 \subsection{MARLISA Algorithm}
+\label{sec:marlisa}
 This section presents the Multi-Agent Reinforcement Learning with Iterative Sequential Action Selection (MARLISA) algorithm, a specific algorithm designed for social learning \cite{vazquez2020marlisa}. The MARLISA algorithm is an extension of the SAC reinforcement learning method that enables coordination between agents through a collective reward function and the exchange of building-specific information. 
 
 The reward function $r_{MARL_t}^b$ focuses on individual and collective goals. It encourages agents to reduce both their own electricity consumption $e_{net}^b$ and the total consumption of the entire neighborhood, i.e., all trained buildings $b \in B$ together:
