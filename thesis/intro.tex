@@ -3,64 +3,26 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Introduction}\label{Introduction}
+Climate change is one of the greatest challenges facing humanity today. Its potential impacts range from agricultural disruption that could lead to food insecurity, health impacts resulting from heatwaves and the spread of disease to socio-economic upheaval due to resource scarcity and population displacement \cite{parmesan2022climate}. The main driver of climate change is the emission of greenhouse gases, especially carbon dioxide (CO2) \cite{mikhaylov2020global}. The generation of electricity and heat was responsible for about 31 \% of all greenhouse gas emissions worldwide and 43 \% of CO2 emissions in 2020 \cite{owidemissionsbysector}.
 
-\todo[inline]{introduction, background (additional chapters), structure of thesis}
+In addition, urbanization and transitions such as the electrification of transport are increasing energy consumption \cite{vazquez2020citylearn, owidenergyproductionconsumption}, further emphasizing the need for low-carbon energy systems. The growing share of renewable energy sources leads to uncertainty in energy production due to their volatile nature. Conventional energy systems require consumption to be synchronized with generation. Oversizing the energy infrastructure would be conceivable to secure supply, but this would involve considerable investment \cite{vazquez2020citylearn, suberu2014energy}.
 
-- Weltweiter Energieverbrauch steigt seit über 20 jahren \cite{energy2023statistical} zb wegen zunehmender urbanization und bspw electrikautos \cite{vazquez2020citylearn}
-- Dies und der zunehmender anteil führt zu neuen herausforderung in der sicherung eines stabilen energienetzes \cite{energy2023statistical, vazquez2020citylearn} 
-- 
+Demand shifting is a more efficient approach to manage energy consumption. It involves reallocating the energy demand to times of high availability of renewable energy and using energy storage systems. The objectives of demand shifting include reducing peak energy demand, lowering electricity costs, improving grid reliability and promoting the integration of renewable energy. The literature has considered exemplary energy systems such as domestic hot water, electric vehicles or storage devices used in building energy systems \cite{vazquez2019reinforcement}. We focus on buildings for demand-side management since they account for 30 \% of the world's final energy consumption \cite{iea2023tracking}. However, because electricity has a higher intrinsic value to consumers than its price, price increases are insufficient for demand shifting when the availability of renewable energy is low. Instead, an automation of the process is necessary \cite{vazquez2019reinforcement}.
 
+Artificial intelligence can automate energy systems to optimize fossil fuel savings while ensuring consumer satisfaction using reinforcement learning (RL). This agent-based method can be customized to specific objectives by adjusting a reward function. Agents can be trained individually for each building or collectively for multiple buildings and can manage both energy storage and direct demand shifting. 
 
-- Rolling blackouts -> one solution oversize energy systems, but high investments neccessary [0]
-- Increasing storage -> improve security of supply and reduce cost [0]
-- RES -> introduce uncertainity in energy generation, shift demand to high availability [0], electrifiying only meaningful if energy generation is decarbonized, also mismatch between energy availability and demand [2]
-- Often only single-agent considered [1]
-- "When large amounts of energy storage are available, there is a risk of the energy consuming agents acting greedily by taking non-coordinated peak shifting actions that can lead to an overall peak shifting rather than peak reduction" [3]
+Many studies using RL focus on reducing energy costs or consumption, often combined with measuring user satisfaction. Furthermore, many methods use algorithms for single agents and thus only deal with the demand reduction of individual buildings. However, optimizing the interaction between multiple buildings and their mutual influence is a more realistic and challenging task \cite{vazquez2019reinforcement}.
 
-Advantages RL
-- Data-driven and model-free -> cost-effictive, plug-and-play [0]
-Comparison to Rule-based Control (RBC) and model predictive control (MPC) - tutorial citylearn
+Our research investigates how agents can utilize social information to improve the performance of multi-agent RL. The existing literature includes cooperative multi-agent systems in autonomous microgrids \cite{kofinas2018fuzzy}, a focus on balancing supply and demand \cite{zhang2017deep}, and efforts to reduce peak demand through electric vehicles \cite{jiang2018multiple}. Reducing the peak demand is often the objective in multi-agent studies \cite{marinescu2015p, dusparic2015maximizing}, however, this is not our goal. Algorithms such as Q-learning are widely used \cite{tan2018fast, jiang2011dynamic}, but the traditional forms are unsuitable for continuous action spaces, leading us to consider actor-critic methods applied in contexts such as microgrids and production systems \cite{nakabi2021deep, lu2020multi}.
 
+Psychological theories suggest that some human behaviors can be modeled using reinforcement learning algorithms  \cite{jara2019theory, lee2021joint}. More specifically, there are several theories, as for excampe decision biasing or value shaping, for modeling how study participants incorporate information into their decisions through demonstrators \cite{{najar2020actions, selbing2014demonstrator, toyokawa2019social, witt2023social}}. As far as we know, these theories only consider discrete action spaces and have yet to be applied in the context of demand management. Our work attempts to fill this gap by applying insights from psychology to the energy management domain and investigating the potential of social learning to improve the efficiency of RL algorithms in this domain.
 
+Our research focuses on reducing fossil fuel consumption in multiple buildings equipped with storage systems using multi-agent reinforcement learning techniques. We aim to investigate how social information can assist in achieving this objective. Therefore, we aim not to develop an algorithm that optimizes fossil fuel consumption.
 
-Challenges in Energiesicherung:
-- Transport electrification due to reducing environmental impact of transport \cite{zhang2020role}
-- Global climate change -> low carbon energy systems, thus more renewable energy
+Our work is structured as follows: 
+In Chapter 2, we explain the necessary knowledge about RL and the Soft Actor-Critic (SAC) algorithm that we have used. We also discuss algorithm-independent methods for social learning and the MARLISA algorithm. 
+Chapter 3 presents the CityLearn framework, which we used to model the environment and our adaptations. We also provide details on the data sets, key performance indicators (KPIs), and how we trained the SAC baseline agents. We also present their final performance and the demonstrators we used for the social methods. 
+Chapter 4 presents these social methods in detail, describing our experiments, listing the results, and discussing them. 
+In Chapter 5, we evaluate the method with the highest performance on a new dataset, discuss these results again, and present future research approaches.  
+Finally, in Chapter 6, we summarize our approach and results.
 
-
-Traditionell: Energie muss verbraucht werden wenn sie produziert wird --> gilt auch für erneuerbare 
-
-"Incorporating Social Learning into Multi-Agent Reinforcement Learning to Lower Carbon Emissions in Energy Systems"
-
-
-GENERELL: Lower Carbon Emissions in Energy Systems
-- Climate change one of biggest human challenge (e.g. agricultural disruptions leading to food insecurity, health impacts from heatwaves and disease spread, socio-economic challenges due to resource scarcity and displacement of populations)
-- Main driver of climate change: greenhouse gas emissions, particularly carbon dioxide (CO2)
-- 2020 main source: electricity and heat (world-wide about 31 \% of all greenhouse, 43 \% of co2)
-- Hence low-carbon energy systems important. at the same time increasing world wide energy consumption due to urbanization and e.g. transport electrificaton
-- This in combination increases the share of renewable energy sources, which introduces more uncertainity in energy generation. traditionally, energy must be consumed when it is prodcued. 
-- one solution would be to oversize energy systems thus always but for that high investmens neccessary
-- more efficient: demand-shift and storage. hence, a shift of demand to time points where high availablity of renewable energy is given as well as introducing energy storage is of interest- the storage improves the security of energy systems and reduces costs.
-- Goals of demand-shift: reduce peak energy demand, lower electricity costs, enhance grid reliability, and increase the integration and utilization of renewable energy sources
-
-- often used for demand-side management: buildings are used because operations of buildings account for 30 \% of global final energy consumption 
-- demand-side management must be automated because electricity is more valueable for consumer than the price --> just increasing the price when no renewable energy available is not sufficient
-- usage of articial intelligence allows to automate energy systems with regard to fossil energy savings while still satisfy the consumer
-- reinforcement learning is agent-based AI method that can be adapted to specific goals using a reward that the agents aims to maximize over time. either one agent per building is trained or one agent for multiple buildings e.g. in an small autonomous grid that manages all buildings. the agents determine either how the energy storage is used or directly shift the demand. 
-- Relevant energy systems where you can improve are for example domestic hot water, electric vehicle or storage devices used in building energy systems
-- Many publications focus reducing the energy cost or energy consumption, both also combined with the satisfaction. 
-- many publications only use single-agent algorithms, so only focus on the demand-response of one single building. however, it is more realistic and importand to optimize the interaction of multiple buildings and how they may influence each other
-- our intereset: how can the agents use social information to improve their performance
-- \cite{kofinas2018fuzzy} cooperative multi-agent but only in a stand-alone micro-grid, \cite{zhang2017deep} focus on power balance between the supply and demand side, \cite{jiang2018multiple} focus on electrical vehicles with goal to lower peak demand, peak demand also \cite{marinescu2015p, dusparic2015maximizing}
-- RL Algorithms often used are Q-Learning, e.g. \cite{tan2018fast, jiang2011dynamic} but off-the-shelve does not support continuous action spaces, so we focus on actor-critic as in \cite{nakabi2021deep} (only microgrid) \cite{lu2020multi} (only manufacturing systems)
-- in psychology, there exist a theory that some human behaviours can be modeled as reinforcement algorithm \cite{jara2019theory, lee2021joint}. also behaviour of study participants when demonstrations are given is often modeled using reinforcement learning algorithms \cite{}
-
-We focus on electricity and our goal is to lower carbon emissions storage devices used in building energy systems
-
-
-Demand-Side Managem
-
-
-METHODE: Reinforcement learning weil cool
-
-FORSCHUNGSFRAGE: wie kann man da soziale information reinbringen und weniger fossile verbrauchen
