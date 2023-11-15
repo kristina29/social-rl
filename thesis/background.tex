@@ -48,6 +48,7 @@ Furthermore, we can calculate the expected reward for a given state-action pair 
 The state-value function, denoted by $V_{\pi}(s_t)$, represents the expected total discounted reward obtained when starting from state $s_t$ and following policy $\pi$. Similarly, the action-value function, denoted by $Q_{\pi}(s_t, a_t)$ is defined as the expected total discounted reward when starting in state $s_t$, taking action $a_t$ and then following the policy $\pi$. In this context, we refer to the action-value function as value function or Q-function.
 
 \subsection{Soft Actor-Critic}
+\todo[inline]{reward notation einheitlicher}
 \label{sec:SAC}
 Handling continuous state and action spaces with tabular RL algorithms can be computationally intensive and requires a significant amount of memory. We opted for the SAC algorithm to address this issue. This algorithm is widely used in RL and is designed to efficiently handle continuous state and action spaces. In actor-critic methods, the 'actor' models the policy $\pi(a_t|s_t)$, while the 'critic' models the value function $Q_\pi(s_t,a_t)$. SAC is a model-free RL algorithm that maximizes the maximum entropy objective, which aims to increase the policy's entropy while keeping the expected return constant:
 \begin{equation}

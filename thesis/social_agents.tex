@@ -171,7 +171,7 @@ In the next step, we incorporated a social Q-Value objective into the algorithm 
 \begin{equation}
 	J_Q^{social}(\theta)=\mathbb{E}_{s_t\sim\mathcal{D}}\left[\frac{1}{2}\left ( Q_{\theta}(s_t,a_t^d) - \left(Q_{\bar{\theta}}(s_t,a_t^d) + \alpha_i \left|Q_{\bar{\theta}}(s_t,a_t^d)\right| \right) \right )^2 \right].
 \end{equation}
-In this context, we again use an imitation learning rate $\alpha_i$ to update the objective. The objective also follows the assumption of decision biasing, that the actions performed by the demonstrator, denoted as $a_t^d$, are good and therefore should have a higher Q-value. After that, a soft update of the target network parameters is performed, optionally followed by another standard policy update. For a detailed description of the algorithm used in Social Agent II, please refer to Appendix~\ref{sec:app-algos}, Algorithm~\ref{app:sac-social-2}.
+Note that we formulated the objectives using the L2 loss to be consistent with the SAC paper. We again use an imitation learning rate $\alpha_i$ to update the objective. Note that we  The objective also follows the assumption of decision biasing, that the actions performed by the demonstrator, denoted as $a_t^d$, are good and therefore should have a higher Q-value. After that, a soft update of the target network parameters is performed, optionally followed by another standard policy update. For a detailed description of the algorithm used in Social Agent II, please refer to Appendix~\ref{sec:app-algos}, Algorithm~\ref{app:sac-social-2}.
 
 {
 \renewcommand{\baselinestretch}{0.9} 
