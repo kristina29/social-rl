@@ -105,12 +105,20 @@ eval_dirs = pd.DataFrame({'paths': ['Demo_B5/extra_pol',
                                     'Demo_B6/no_extra_pol',
                                     'Demo_B11/extra_pol',
                                     'Demo_B11/no_extra_pol',
+                                    'Demo_B14/extra_pol_update',
+                                    'Demo_B14/no_extra_pol_update',
+                                    'Demo_B16/extra_pol_update',
+                                    'Demo_B16/no_extra_pol_update',
                                     ],
                                  'demos': ['B5', 'B5',
                                            'B6', 'B6',
                                            'B11', 'B11',
+                                           'B14', 'B14',
+                                           'B16', 'B16',
                                            ],
                                  'extra_pols': [1, 0,
+                                                1, 0,
+                                                1, 0,
                                                 1, 0,
                                                 1, 0,
                                                 ]})
@@ -163,7 +171,7 @@ marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info
                                                   'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes',
                                                   'No', 'No', 'Yes', 'Yes', ]})
 
-mode = 'sacdb234r'
+mode = 'eval'
 var = 2
 
 
@@ -495,7 +503,9 @@ def generate_eval():
     markers = {0: 'o', 1: 'X'}
     demo_pos = {'B5': 1,
                 'B6': 2,
-                'B11': 3}
+                'B11': 3,
+                'B14': 4,
+                'B16': 5}
 
     final_df = pd.DataFrame({'irs': irs,
                              'demos': demos,
