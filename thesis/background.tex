@@ -3,16 +3,17 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Background}
 \label{Background}
-\todo[inline]{Begriffserklärung: renewable energy (wind, solar, bla)}
-This chapter provides the necessary background knowledge to comprehend our approach to the presented problem. First, we introduce the fundamental concepts of reinforcement learning (RL), often modeled as finite Markov decision processes (MDP). However, we also discuss the limitations of this traditional framework in handling continuous state and action spaces. To tackle this challenge, we consider the soft actor-critic (SAC) method a promising solution.
-\todo[inline]{TODO}
+\todo[inline]{Die plots optimiere ich während ihr korrekturlest, aber könnt natürlich trotzdem gerne schreiben wenn euch was dazu auffällt :D}
+
+This chapter provides the necessary background knowledge to comprehend our approach to the presented problem. First, we introduce the fundamental concepts of Reinforcement Learning (RL) and the Soft Actor-Critic (SAC) algorithm. Then, we explain the algorithm-independent social methods imitation learning and decision biasing, followed by presentation of the the Multi-Agent Reinforcement Learning with Iterative Sequential Action Selection (MARLISA) algorithm.
 
 \section{Reinforcement Learning}
 \label{sec:reinforcement-learning}
+RL is an agent-based approach within artificial intelligence in which an agent acts in an environment, observes the current state and selects actions to maximize a cumulative reward over time. This chapter describes the basic mathematical principles of RL. Traditional RL methods often struggle with the limitations of discrete action spaces. However, the SAC algorithm overcomes this limitation through continuous action selection. We will explain the SAC algorithm and elaborate on its mathematical framework.
+
 \subsection{Fundamentals of Reinforcement Learning}
 As defined by Sutton and Barto \cite{sutton2018reinforcement}, RL is a machine learning method that aims to choose actions to maximize a numerical reward. RL agents learn these actions through a trial-and-error approach based on the received rewards. Actions can affect both immediate rewards and long-term rewards. In contrast to supervised methods, RL does not need labeled data for learning and does not try to discover inherent structure in data as unsupervised methods.
 
-\todo[inline]{Die plots optimiere ich während ihr korrekturlest, aber könnt natürlich trotzdem gerne schreiben wenn euch was dazu auffällt :D}
 \begin{figure}[htb]
      \center
      \begin{overpic}[width=\textwidth, trim={0 1.7cm 0 0.3cm},clip]{figures/rl_overview_blank.pdf}%
@@ -116,15 +117,16 @@ For the final SAC algorithm, as given in Algorithm \ref{alg:sac-update}, the aut
 \end{algorithm}
 
 \section{Social Learning}
-\todo[inline]{Name 'agent to train' as learner}
 \todo[inline]{Hier wär vllt interessant ob die infos zum verständnis reichen, ist relativ kurz, aber ich wollte unnötiges gelaber vermeiden :D}
 
 \label{sec:background-social-learning}
-\textit{Social learning} is a term initially derived from psychology and has various definitions. Essentially, it refers to the act of learning from others \cite{reed2010social, toyokawa2019social, witt2023social}. In this thesis, we interpret social learning as observing the actions and possibly rewards of demonstrators and incorporating them into the training process of the RL agent. We distinguish between algorithm-independent methods, which we present first, and specific social algorithms.
+\textit{Social learning} is a term initially derived from psychology and has various definitions. Essentially, it refers to the act of learning from others \cite{reed2010social, toyokawa2019social, witt2023social}. In this thesis, we interpret social learning as observing the actions and possibly rewards of demonstrators and incorporating them into the training process of the RL agent. We will refer to the RL agent, which may be trained with the help of a demonstrator, as a learner. We distinguish between algorithm-independent methods, which we present first, and specific social algorithms.
 
 \subsection{Algorithm-independent Methods}
+This chapter describes two algorithm-independent techniques we integrated into the SAC algorithm. The first technique, called imitation learning, aims to replicate the actions of an experienced demonstrator by assuming that the demonstrator's decisions are optimal. The second technique, decision biasing, is a psychological theory that models the behavior of study participants in RL. According to this theory, the demonstrator's actions are valuable; therefore, the probability that the learner also performs these actions should increase.
+
 \subsubsection*{Imitation Learning}
-\textit{Imitation learning} is a technique used to improve the learning of reinforcement agents. The agent is presented with either demonstrator actions or the demonstrator agent itself as input, and it tries to mimic the actions of the demonstrator. This technique assumes that the policy of the demonstrator is optimal. There are various types of imitation learning, such as behavior cloning or inverse reinforcement learning. We used behavior cloning, where a data set $\mathcal{D}=\{(s_t, a_t, r_t, s_{t+1}, d_t)\}$ of demonstration transitions is provided \cite{osa2018algorithmic}. This dataset enables the direct calculation of the deterministic demonstrator policy $\pi^*(s_t)$. The policy of the learner $\pi_{\phi}$ is then trained using the objective
+Imitation learning is a technique used to improve the learning of reinforcement agents. The agent is presented with either demonstrator actions or the demonstrator agent itself as input, and it tries to mimic the actions of the demonstrator. This technique assumes that the policy of the demonstrator is optimal. There are various types of imitation learning, such as behavior cloning or inverse reinforcement learning. We used behavior cloning, where a data set $\mathcal{D}=\{(s_t, a_t, r_t, s_{t+1}, d_t)\}$ of demonstration transitions is provided \cite{osa2018algorithmic}. This dataset enables the direct calculation of the deterministic demonstrator policy $\pi^*(s_t)$. The policy of the learner $\pi_{\phi}$ is then trained using the objective
 \begin{equation}
 	\phi^* = \argmin_{\phi}\mathbb{E}_{(s^*,a^*)\sim \mathcal{D}}\left [\mathcal{L}(a^*, \pi_{\phi}(s^*)) \right ].
 \end{equation}
@@ -150,7 +152,7 @@ Q'(d) \leftarrow Q'(d) + \alpha_i \cdot [1-Q'(d)].
 
 \subsection{MARLISA Algorithm}
 \label{sec:marlisa}
-This section presents the Multi-Agent Reinforcement Learning with Iterative Sequential Action Selection (MARLISA) algorithm, a specific algorithm designed for social learning \cite{vazquez2020marlisa}. The MARLISA algorithm is an extension of the SAC reinforcement learning method that enables coordination between agents through a collective reward function and the exchange of building-specific information. 
+This section presents the MARLISA algorithm, a specific algorithm designed for social learning \cite{vazquez2020marlisa}. The MARLISA algorithm is an extension of the SAC reinforcement learning method that enables coordination between agents through a collective reward function and the exchange of building-specific information. 
 
 The reward function $r_{MARL_t}^b$ focuses on individual and collective goals. It encourages agents to reduce both their own electricity consumption $e_{net}^b$ and the total consumption of the entire neighborhood, i.e., all trained buildings $b \in B$ together:
 \begin{equation}

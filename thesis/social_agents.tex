@@ -4,10 +4,11 @@
 \chapter{Social Agents}
    \label{sec:social-agents}
 \noindent
-\todo[inline]{Ziel dieses Kapitels ist eine Einf\"uhrung in die Thematik BlaBlaBla ..., IRGENDWO AM ANFANG einzelne besitmmte gebäude als B\{id\}, e.g. B6 for B6, IRGENDWO hyperparameters reward and eally stopping same if not stated different}
+In this chapter, we explain the development, experiments and results of the social methods we developed. We designed four different methods for achieving our goal. The first method employs imitation learning to replicate the behavior of an expert demonstrator. The second and third methods are based on the decision-biasing theory. The fourth method uses the MARLISA algorithm to enhance collaborative decision-making. We discuss the implementation of each method and analyze their respective results.
 
 \section{Imitation Learning}
 \todo[inline]{Font in tabellen beschreibungen verkleinern}
+Our first method uses imitation learning, for which we used some pre-trained demonstrators as experts. We first present our method and results and then discuss them.
 
 \subsection{Method and Results}
 To implement the SAC agents using the demonstrator transitions for imitation learning, we used the trained agents previously described in Section~\ref{sec:pretrained-demos}. These agents acted on the complete dataset hourly for an entire year. We saved these transitions and then trained the agents normally, as outlined in Section~\ref{sec:sac-baseline}. 
@@ -16,7 +17,7 @@ As there is a wide range of buildings, we cannot assume that the demonstrators h
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/prb_kpis.pdf}
-  \caption{}
+  \caption[KPI results of the imitation learning method.]{KPIs of the training building agents when using imitation learning with pre-trained demonstrator B5 or B6 in comparison to the baseline SAC agents.}
   \label{fig:prb-kpis}
 \end{figure}
 
@@ -30,7 +31,7 @@ The policy loss values observed during training with demonstrator transitions in
 \begin{figure}[htb]
 \center
      \includegraphics[width=0.8\textwidth]{figures/prb_losses.pdf}
-  \caption[Policy losses during training of B3]{Policy losses during training of B3 for the baseline SAC agent and the SAC agent when filling the PRB with the transitions of demonstrator B5 before training.}
+  \caption[Policy losses during training of B3 with imitation learning.]{Policy losses during training of B3 for the baseline SAC agent and the SAC agent when filling the PRB with the transitions of demonstrator B5 before training.}
   \label{fig:prb-losses}
 \end{figure}
 
@@ -39,6 +40,8 @@ It should be noted that the performance of the DDPG agents was not optimized by 
 Our objective is not to replicate the behavior of a demonstrator in our buildings but rather to learn from it and adopt profitable practices. Given the diversity of our buildings, not all actions of the demonstrator may be universally effective. Therefore, we have focused on the decision-biasing approach in our following experiments. This method leverages the actions of the demonstrator more moderately.
 
 \section{Social Agent I}
+This chapter outlines our second social approach. It incorporates the assumption from decision biasing that the learner should follow demonstrator actions with higher probability into the policy update of the SAC algorithm. First, we present the method and our experiment results, and then we will discuss this approach.
+
 \subsection{Method and Results}
 In our first approach, based on decision biasing, we adjusted the loss function of the policy update. As described in Section~\ref{sec:decision-biasing}, decision biasing assumes that demonstrator actions are good and, therefore, the probability of choosing those actions or the Q-value of them should be increased. To accomplish this, we tested six different modes, all of which used an imitation learning rate that we also optimized. Also, we investigated whether it made a difference whether the demonstrated action was sampled from the demonstrator policy or the deterministic action (i.e., the learned mean) was used in one of the modes.
 
@@ -115,7 +118,7 @@ We conducted experiments testing different modes and imitation learning rates wi
 \begin{table}[htb]
 \center
 \begin{tabular}{c | c | c | c}
-Demonstrator                   & Mode & $\alpha_i$ & Deterministic policy actions \\ \hline
+Demonstrator                   & Mode & $\alpha_i$ & Deterministic demonstrator actions \\ \hline
 2 random                       & 1-6  & 0.2                      & Yes                          \\ 
 \rule{0pt}{3ex}% EXTRA vertical height  
 \multirow[t]{2}{*}{2 random}      & 1-3  & 0.01, 0.2, 1, 1.5        & No                           \\
@@ -130,7 +133,7 @@ Demonstrator                   & Mode & $\alpha_i$ & Deterministic policy action
 \multirow[t]{2}{*}{Pretrained B6} & 1-3  & 0.01, 0.2, 1, 1.5        & No                           \\
                                & 4-6  & 0.01, 0.2, 1             & No                          
 \end{tabular}
-  \caption{}
+  \caption[Overview of the experiments for Social Agent I.]{Overview of the experiments for our Social Agent I. We tested different demonstrator, mode, and imitation learning rates $\alpha_i$ combinations. Also, we examined the influence of using deterministic demonstrator actions instead of sampling them.}
   \label{tab:social1-params}
 \end{table}
 }
@@ -142,20 +145,20 @@ In the first step, we sampled the demonstrator actions from the demonstrator pol
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/social1_results.pdf}
-  \caption{}
+  \caption[Experiment results of Social Agent I.]{Test results of Social Agent I. The performance of the baseline SAC agents was only minimally exceeded. Modes 4-6 require a relatively high imitation learning rate to match the baseline's performance.}
   \label{fig:social1-results}
 \end{figure}
 
 Based on these results, we tried even higher imitation learning rates of $\alpha_i = 1$ for modes 1-3 and 4-6 for pre-trained demonstrators and $\alpha_i = 1.5$ for modes 1-3 and 5. This led to slightly better results for mode 3 with the four random demonstrators and mode 2 with demonstrator B5, both with $\alpha_i = 1$. Modes 5-6 achieved comparable results to the baseline with the higher imitation learning rates, while mode 4 still performed worse. Finally, for the two random demonstrators, with $\alpha_i = 0.2$ and deterministic policy actions, we also observed that modes 1-3 performed similarly to the baseline and modes 4-6 performed worse.
 
 \subsection{Discussion}
-\todo[inline]{Figures alle die gleiche Schriftart}
+\todo[inline]{Figures alle die gleiche Schriftart, Q-Value vs Q-value}
 
 To better understand the performance differences between modes 1-3 and 4-6, we investigate the policy loss of the standard SAC policy update and the change in the entropy value during training. The courses for B3 with demonstrator B5 and $\alpha_i = 0.2$ are visualized for modes 2 and 5 in Figure~\ref{fig:social1-losses} as an example. 
 \begin{figure}[htb]
 \center
      \includegraphics[width=0.8\textwidth]{figures/social1_losses.pdf}
-  \caption{}
+  \caption[Policy losses and entropy values during training of B3 with Social Agent I.]{Policy losses and entropy values during training of B3 for the Social Agent I with mode 2 and mode 5. The loss and entropy decreases as expected when using mode 2, but increases when using mode 5.}
   \label{fig:social1-losses}
 \end{figure}
 
@@ -166,6 +169,8 @@ If the probability of demonstrator actions is increased sufficiently in the entr
 To summarize, our approaches increased the probability or Q-values of the demonstrator actions in the agent's policy to be trained. However, overall, they only resulted in minimal fossil energy savings compared to our SAC baseline. The decision-biasing approach is still promising, so in our subsequent experiments, we directly biased the Q-value of the demonstrator actions in the Q-networks.
 
 \section{Social Agent II}
+In this chapter, we introduce our third social approach, also built upon the decision-biasing theory. We have incorporated an extra social Q-Value update to the SAC algorithm for this approach. We first present the method and our first experiments. We then present experiments with an extended environment state and new building data. Finally, we discuss the results.
+
 \subsection{Method and Results}
 In the next step, we incorporated a social Q-Value objective into the algorithm and made an extra update step of the Q-Networks accordingly. To achieve this, we initially followed the steps of the standard SAC algorithm, similar to social agent I. During each update step, we carried out an additional social Q-value update for both Q-value networks, utilizing the following social objective function:
 \begin{equation}
@@ -178,24 +183,24 @@ Note that we formulated the objectives using the L2 loss to be consistent with t
 \normalsize
 \begin{table}[htb]
 \center
-\begin{tabularx}{\textwidth}{c | Y | Y | Y}
-Demonstrator                   & $\alpha_i$                                     & Deterministic policy actions & Shared observations \\ \hline
+\begin{tabularx}{\textwidth}{c | Y | Y }
+Demonstrator                   & $\alpha_i$                                     & Deterministic policy actions  \\ \hline
 \rule{0pt}{3ex}% EXTRA vertical height  
-\multirow[t]{3}{*}{2 random}      & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2                & No                           & No                  \\
+\multirow[t]{3}{*}{2 random}      & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2                & No\\
 \rule{0pt}{2ex}% EXTRA vertical height  
-                               & 0.03, 0.05, 0.1, 0.15, 0.2, 0.25                               & No                           & Yes                 \\
+                               & 0.03, 0.05, 0.1, 0.15, 0.2, 0.25                               & No                                          \\
 \rule{0pt}{2ex}% EXTRA vertical height  
-                               & 0.1, 0.15, 0.2, 0.25                                           & Yes                          & Yes                 \\
+                               & 0.1, 0.15, 0.2, 0.25                                           & Yes                                           \\
 \rule{0pt}{3ex}% EXTRA vertical height  
-4 random                       & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15                     & No                           & No                  \\
+4 random                       & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15                     & No                  \\
 \rule{0pt}{3ex}% EXTRA vertical height  
-Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.4, 0.6, 0.8 & No                           & No                  \\
+Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.4, 0.6, 0.8 & No                       \\
 \rule{0pt}{3ex}% EXTRA vertical height  
-\multirow[t]{2}{*}{Pretrained B6} & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.4, 0.6, 0.8 & No                           & No                  \\
+\multirow[t]{2}{*}{Pretrained B6} & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.4, 0.6, 0.8 & No                  \\
 \rule{0pt}{2ex}% EXTRA vertical height  
-                               & 0.1, 0.15, 0.2, 0.4, 0.6, 0.8                                  & Yes                          & No                 
+                               & 0.1, 0.15, 0.2, 0.4, 0.6, 0.8                                  & Yes                                          
 \end{tabularx}
-  \caption{}
+  \caption[Overview of the experiments for Social Agent II.]{Overview of the experiments for our Social Agent II. We tested different demonstrator and imitation learning rates $\alpha_i$ combinations. Also, we examined the influence of using deterministic demonstrator actions instead of sampling them.}
   \label{tab:social2-params}
 \end{table}
 }
@@ -248,8 +253,6 @@ To compare the results with SAC baseline agents, we trained nonsocial agents for
   \label{fig:social2-results-shifted}
 \end{figure}
 
-\todo[inline]{$1e^-{-4}$ richtig?}
-
 The fossil energy consumption KPI values of the experiments in comparison to the values of the SAC agents are visualized in Figure~\ref{fig:social2-results-shifted}. The agents perform worse than the classic SAC algorithm at an imitation learning rate of 0.1 for both building sets and demonstrators. For higher imitation learning rates, the results are about the same as those of SAC, but no better values are achieved. The results are not significantly different depending on the demonstrator used.
 
 \subsection{Discussion}
@@ -260,7 +263,7 @@ To explain these observations, we first look at the policy loss and Q-network lo
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/social2_losses.pdf}
-  \caption{}
+  \caption[Policy and Q-network losses and during training of B3 with Social Agent II.]{Policy and Q-network losses during training of B3 for the Social Agent II with imitation learning rates $\alpha_i = 0.15$ and $\alpha_i = 1e^{-4}$. The loss curves with the higher imitation learning rate are overall as expected, while the small rate introduces an increasing policy loss.}
   \label{fig:social2-losses}
 \end{figure}
 
@@ -272,6 +275,8 @@ Finally, for the generated shifted building data setzt, the capacity of the batt
 
 
 \section{MARLISA Agent}
+This chapter introduces the fourth social approach, which trains agents using the MARLISA algorithm. We present our experiments with different reward functions and then discuss the results.
+
 \subsection{Methods and Results}
 In the next phase, we aimed to enhance the collaboration among agents by implementing the MARLISA algorithm. The algorithm, as explained in Section~\ref{sec:marlisa}, is designed to boost cooperative behavior among the agents by exchanging information. A key difference between the setup of MARLISA in the paper and ours is that in MARLISA, buildings can share any excess energy produced within the neighborhood, i.e., all trained buildings together. Further, the agents were trained to control the charging and discharging of the storage tank for domestic hot water and chilled water rather than the battery, as in our setup. 
 
