@@ -210,23 +210,22 @@ The policy is implemented as a Gaussian distribution, with the mean and covarian
 
 \subsection{Reward function}
 \label{sec:reward}
-As part of the training process for the baseline SAC agents, we experimented with various reward functions. Initially, we implemented the price penalty reward~$r_{price_t}^b$. This reward function is determined by taking the minimum value between zero and the negative price paid for energy purchased from the grid:
+As part of the training process for the baseline SAC agents, we experimented with various reward functions. Initially, we implemented the price penalty reward~$r_{pr}^b$. This reward function is determined by taking the minimum value between zero and the negative price paid for energy purchased from the grid:
 \begin{equation}
-r_{price_t}^b = \min(-p_{net_t}^b, 0).
+r_{pr}^b = \min(-p_{net}^b, 0).
 \end{equation}
-Here,~$p_{net}^b$ are the cost of net electricity consumption of building~$b$, which is the product of net electricity consumption and the price of electricity at time step~$t$. The minimum term prevents any non-negative costs that may arise when net electricity consumption is negative. 
+Here,~$p_{net}^b$ are the cost of net electricity consumption of building~$b$, which is the product of net electricity consumption and the price of electricity at this time step. The minimum term prevents any non-negative costs that may arise when net electricity consumption is negative. 
 
-Next, we used the solar penalty reward~$r_{solar_t}^b$, which is included in the CityLearn framework. It aims to maximize the solar energy used by penalizing the purchase of energy from the grid when the batteries are charged and penalizing the non-use of solar energy to charge the batteries when they are not fully charged:
+Next, we used the solar penalty reward~$r_{sol}^b$, which is included in the CityLearn framework. It aims to maximize the solar energy used by penalizing the purchase of energy from the grid when the batteries are charged and penalizing the non-use of solar energy to charge the batteries when they are not fully charged:
 \begin{equation}
-r_{solar_t}^{b} = \left\{%
+r_{sol}^{b} = \left\{%
 \begin{array}{ll}
-  -\left(1+sign(e_{net_t}^{b}) \cdot \frac{SOC^b_t}{C^b_t} \right) \cdot |e_{net_t}^{b}|, & \hbox{if } C^b_t > 0.00001 \\
+  -\left(1+sign(e_{net}^{b}) \cdot \frac{SOC^b}{C^b} \right) \cdot |e_{net}^{b}|, & \hbox{if } C^b > 0.00001 \\
   0, & \hbox{else}
 \end{array}%
 \right..
 \end{equation}
-At any given time step~$t$, $C^b_t$ represents the capacity of the battery for building~$b$, while $SOC^b_t$ represents the state of charge of the same battery. The ratio of $SOC^b_t$ to $C^b_t$ calculates the percentage state of charge. 
-%Table~\ref{tab:solar-penalty-reward} indicates that t
+Here, $C^b$ represents the capacity of the battery for building~$b$, while $SOC^b$ represents the state of charge of the same battery. The ratio of $SOC^b$ to $C^b$ calculates the percentage state of charge. 
 The solar penalty reward is zero if the building's energy consumption is balanced or if the net energy consumption is negative and the battery is fully charged. For all other cases, the reward is negative. If the building draws energy from the grid even though the battery is fully charged, then the penalty is maximized.
 
 %{
@@ -254,20 +253,20 @@ The solar penalty reward is zero if the building's energy consumption is balance
 %\end{table}
 %}
 
-Furthermore, we tested a linear combination~$r_t^b$ between these two reward functions, where the parameter~$\eta$ determines the influence of the two functions:
+Furthermore, we tested a linear combination~$r_{s,p}^b$ between these two reward functions, where the parameter~$\eta$ determines the influence of the two functions:
 \begin{equation}
-r_t^b = \eta r_{price_t}^b + (1-\eta)r_{solar_t}^b.
+r_{s,p}^b = \eta r_{pr}^b + (1-\eta)r_{sol}^b.
 \end{equation}
 
-In addition, we tested the fossil penalty reward~$r_{fossil_t}^b$. This reward aims to minimize the fossil energy fraction of the total energy consumed. Therefore, the reward value is equal to the renewable energy fraction as defined in Section \ref{sec:kpis}:
+In addition, we tested the fossil penalty reward~$r_{foss}^b$. This reward aims to minimize the fossil energy fraction of the total energy consumed. Therefore, the reward value is equal to the renewable energy fraction as defined in Section \ref{sec:kpis}:
 \begin{equation}
-r_{fossil_t}^b=R_{share}.
+r_{foss}^b=R_{share}.
 \end{equation}
 Note that this value is the same for all buildings since it cannot be determined which building obtains which fuel mix from the grid.
 
 Finally, we tested a reward function given by Tolovski et al. \cite{tolovski2020advancing}:
 \begin{equation}
-r_{tolovski_t}^b= -(E_{r,grid}-E_{net_{pos}})^2.
+r_{tol}^b= -(E_{r,grid}-E_{net_{pos}})^2.
 \end{equation}
 This reward aims to minimize the difference between the produced renewable energy in the grid and the consumed energy from the grid, penalizing both unused renewable energy and fossil fuel consumption.
 
@@ -289,9 +288,9 @@ Weather (no. of locations)  & 1               & 1, \textbf{8}                   
 \rule{0pt}{3ex}% EXTRA vertical height  
 Autotune temperature~$\alpha$          & No               & \textbf{Yes}, No                                       \\
 \rule{0pt}{3ex}% EXTRA vertical height  
-\multirow[t]{2}{*}{Reward Function} & \multirow[t]{2}{*}{$r_{price_t}^b$} & %See Section \ref{sec:reward} 
-$r_{price_t}^b, r_{solar_t}^b, \mathbf{r_{t}^b}$ \\ 
-& & (with $\eta \in \{0.25, \mathbf{0.5}, 0.75\}$), \\ & & $r_{fossil_t}^b, r_{tolovski_t}^b$\\
+\multirow[t]{2}{*}{Reward Function} & \multirow[t]{2}{*}{$r_{pr}^b$} & %See Section \ref{sec:reward} 
+$r_{pr}^b, r_{sol}^b, \mathbf{r_{s,p}^b}$ \\ 
+& & (with $\eta \in \{0.25, \mathbf{0.5}, 0.75\}$), \\ & & $r_{foss}^b, r_{tol}^b$\\
 \rule{0pt}{3ex}% EXTRA vertical height  
 \multirow[t]{3}{*}{State Space}           & \multirow[t]{3}{*}{Complete}            & a) Complete \\ 
 & & \textbf{b) No 6h and 12h predictions} \\
