@@ -246,14 +246,14 @@ We chose B3 and B5 as the base buildings because they perform differently based 
 
 To compare the results with SAC baseline agents, we trained nonsocial agents for this set of buildings respectively. The KPI values for these agents are shown in Figure~\ref{fig:sac-shifted-kpis}. For fossil energy consumption, which is the most relevant KPI for us, the agents for the new buildings perform slightly worse. The agents for the shifted versions of B3 save almost 1 \% less fossil energy, and the agents for the shifted versions of B5 save almost 3 \% less compared to the standard training buildings. However, for the KPIs of average renewable energy share overall and from the grid, the agents for each building perform slightly better than the agents of the original buildings. It is noticeable that both shifted building sets use a lower fraction of the solar energy produced than without a battery.
 
+The fossil energy consumption KPI values of the experiments in comparison to the values of the SAC agents are visualized in Figure~\ref{fig:social2-results-shifted}. The agents perform worse than the classic SAC algorithm at an imitation learning rate of 0.1 for both building sets and demonstrators. For higher imitation learning rates, the results are about the same as those of SAC, but no better values are achieved. The results are not significantly different depending on the demonstrator used.
+
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/social2_results_shifted.pdf}
   \caption[Results of the Social Agent II for shifted building data.]{Results of the fossil energy consumption KPI of the Social Agent II for shifted building data of B3 and B5. The shaded areas show the standard deviation between the experiments with and without additional policy update, and the graphs show the mean value of them.}
   \label{fig:social2-results-shifted}
 \end{figure}
-
-The fossil energy consumption KPI values of the experiments in comparison to the values of the SAC agents are visualized in Figure~\ref{fig:social2-results-shifted}. The agents perform worse than the classic SAC algorithm at an imitation learning rate of 0.1 for both building sets and demonstrators. For higher imitation learning rates, the results are about the same as those of SAC, but no better values are achieved. The results are not significantly different depending on the demonstrator used.
 
 \subsection{Discussion}
 One notable characteristic of this approach is the significant variation in performance between the agents obtained through the early-stopping method and those fully trained. The top-performing agents, which are trained using the deterministic actions of the B6 demonstrator, show a difference of 9 \% in fossil energy savings. On the other hand, for the agents that share their observations, the difference is 5 \%. For the building data of the shifted B3, the difference is only 2 \%.
