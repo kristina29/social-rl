@@ -7,7 +7,7 @@
 In this chapter, we explain the development, experiments and results of the social methods we developed. We designed four different methods for achieving our goal. The first method employs imitation learning to replicate the behavior of an expert demonstrator. The second and third methods are based on the decision-biasing theory. The fourth method uses the MARLISA algorithm to enhance collaborative decision-making. We discuss the implementation of each method and analyze their respective results.
 
 \section{Imitation Learning}
-\todo[inline]{Font in tabellen beschreibungen verkleinern}
+\todo[inline]{Font in tabellen (\& abbildungen) beschreibungen verkleinern}
 Our first method uses imitation learning, for which we used some pre-trained demonstrators as experts. We first present our method and results and then discuss them.
 
 \subsection{Method and Results}
@@ -138,7 +138,7 @@ Demonstrator                   & Mode & $\alpha_i$ & Deterministic demonstrator 
 \end{table}
 }
 \todo[inline]{early stopping, determ. vs not determ: $a_t^d \sim \pi^d(a_t|s_t)$ vs $a_t^d=f^d(\epsilon_t;s_t)$}
-As demonstrators, we used either the pre-trained B5 and B6 presented in Section~\ref{sec:pretrained-demos} or either two or four random demonstrators, which are buildings from the training buildings and not pre-trained. To ensure comparability, we always used the same random demonstrators, which were B7 and B11 for two demonstrators and additionally B5 and B17 for four demonstrators.
+As demonstrators, we used either the pre-trained B5 and B6 presented in Section~\ref{sec:pretrained-demos} or the two or four random demonstrators.
 
 In the first step, we sampled the demonstrator actions from the demonstrator policy instead of using the Gaussian distribution's learned mean. We tested the imitation learning rates of $\alpha_i = 0.01$ and $\alpha_i = 0.2$ and compared their results. We found that modes 4-6 demonstrated lower performance than the baseline, with slightly better results when using the pre-trained demonstrators than the random demonstrators. Modes 1-3 showed similar performance to the baseline for all demonstrators. 
 

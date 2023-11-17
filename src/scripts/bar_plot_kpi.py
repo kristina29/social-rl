@@ -93,10 +93,10 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
         'fossil_energy_consumption': 0
     }
     labels = [
-        'fossil_energy_consumption',
-        '1 - avg_daily_renewable_share',
-        '1 - avg_daily_renewable_share_grid',
-        '1 - used_pv_of_total_share'
+        'fossil energy consumption',
+        '1 - avg. renewable share',
+        '1 - avg. renewable share grid',
+        '1 - used pv'
     ]
 
     for i, kpi in enumerate(kpis):
@@ -107,10 +107,11 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
 
         kpi['rank'] = kpi['kpi'].map(kpi_names)
 
-        if i==0 or i==2:
-            kpi = kpi[kpi['env_id'] == 'RBC']
-        else:
-            kpi = kpi[kpi['env_id'] == 'SAC Best']
+        #if i==0 or i==2:
+        #    kpi = kpi[kpi['env_id'] == 'RBC']
+        #else:
+        #    kpi = kpi[kpi['env_id'] == 'SAC Best']
+        kpi = kpi[kpi['env_id'] == 'SAC']
 
         kpi['env_id'] = names[i]
         kpi = kpi.drop(columns=['net_value', 'net_value_without_storage'])
@@ -155,8 +156,8 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
     ax.tick_params(axis='both', which='major', labelsize=21)
 
     #fig.suptitle('KPIs at district-level', fontsize=16)
-    plt.tight_layout(rect=[0, 0, 0.75, 1])
-    ax.legend(loc='upper right', bbox_to_anchor=(1.52, 1.0), framealpha=0, fontsize=21)
+    plt.tight_layout(rect=[0, 0, 0.85, 1])
+    ax.legend(loc='upper right', bbox_to_anchor=(1.23, 1.0), framealpha=0, fontsize=21)
     #plt.show()
     fig.savefig("kpis.pdf")
 
@@ -164,19 +165,20 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
 
 
 if __name__ == '__main__':
-    kpis = [pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
-            pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
-            pd.read_csv('../experiments/New_Buildings/SAC Baseline/kpis_20231113T132158.csv'),
-            pd.read_csv('../experiments/New_Buildings/SAC Baseline/kpis_20231113T132158.csv'),
+    kpis = [#pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
+        pd.read_csv('../experiments/SAC/15_b3_demonstrator/kpis_20231030T145351.csv'),
+            pd.read_csv('../experiments/SAC/10_b5_demonstrator/kpis_20231002T132420.csv'),
+            pd.read_csv('../experiments/SAC/09_b6_demonstrator/kpis_20231002T132428.csv'),
+        pd.read_csv('../experiments/SAC/17_b11_demonstrator/kpis_20231113T143302.csv'),
     ]
 
     if len(kpis) == 1:
         plot_district_kpis1(kpis[0])
     else:
-        plot_district_kpis_multiple(kpis, ['RBC (Training)',
-                                           'Baseline SAC (Training)',
-                                           'RBC (Evaluation)',
-                                           'SAC (Evaluation)',
+        plot_district_kpis_multiple(kpis, ['B3',
+                                           'B5',
+                                           'B6',
+                                           'B11',
                                            ])
 
     #plt.show()

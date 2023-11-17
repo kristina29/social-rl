@@ -7,6 +7,21 @@
 %\setcounter{secnumdepth}{-1}
 \chapter{Appendix}\label{chap:App}
 \section{Tables}\label{chap:App}
+
+\begin{table}[htb]
+\center
+\begin{tabular}{c|c}
+Time    & Action [kWh/kWH\_capacity]     \\ \hline
+1 AM -- 6 AM & +0.05532 \\
+7 AM -- 3 PM & -0.02         \\
+4 PM -- 6 PM & -0.0044 \\
+7 PM -- 10 PM & -0.024 \\
+11 PM -- 0 AM & +0.034        
+\end{tabular}
+\caption{Rules of the RBC implemented in CityLearn.}
+\label{app:rbc-rules}
+\end{table}
+
 \begin{table}[H]
 \begin{tabularx}{\linewidth}{lXc}
 Attribute name & Description & Value \\ \hline
@@ -14,16 +29,16 @@ Capacity & Maximum amount of energy the storage device can store & 6.4 kWh \\
 Efficiency & Technical efficiency & 90 \% \\
 Capacity loss coefficient & Storage capacity lost in each charge and discharge cycle (as a fraction of the total capacity) & $1e^{-5}$ \\
 Loss coefficient & Standby hourly losses & 0 \\
-Nominal power & Maximum amount of electric power that the battery can use to charge or discharge & 5 \textcolor{red}{kW}
+Nominal power & Maximum amount of electric power that the battery can use to charge or discharge & 5 kW
 \end{tabularx}
-\caption[Attributes of the batteries of each building]{Attributes of the batteries of each building. Description of the attributes obtained from \textcolor{red}{TODO source}}
+\caption[Attributes of the batteries of each building]{Attributes of the batteries of each building. Description of the attributes obtained from \url{https://www.citylearn.net/api/citylearn.energy_model.html}.}
 \label{app:battery-attributes}
 \end{table}
 
 \begin{table}[H]
 \center
 \begin{tabular}{c|c}
-Building Id & Energy Consumption Median 
+Building & Energy Consumption Median $\bar{E}_b$
 %& Energy Consumption without storage Median & Energy Consumption without storage and PV Median 
 \\  \hline
 1  & 0.54 %& 0.58 & 0.81 
@@ -60,7 +75,7 @@ Building Id & Energy Consumption Median
 \\
 17 & 0.75% & 0.82 & 1.24 \\
 \end{tabular}
-\caption{\textcolor{red}{Zweite Appendix-Tabelle}}
+\caption[Median values for energy consumption per hour $\bar{E}_b$]{Median values for energy consumption per hour $\bar{E}_b$ obtained by training the SAC agent with the default hyperparameters.}
 \label{tab:building-medians}
 \end{table}
 
@@ -115,7 +130,7 @@ hour & hour of day (from 1 to 24)\\
 \begin{figure}[H]
     \center
      \includegraphics[width=\textwidth]{figures/weather_daily_means.pdf}
-  \caption{}
+  \caption{Daily means of the meteorologic observations and fuel mix in the grid.}
   \label{app:weather-daily-mean}
 \end{figure}
 
