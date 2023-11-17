@@ -5,7 +5,7 @@
 \label{Background}
 \todo[inline]{Die plots optimiere ich während ihr korrekturlest (zB Schriftart, KPI blalba benenne ich um), aber könnt natürlich trotzdem gerne schreiben wenn euch was dazu auffällt :D}
 
-This chapter provides the necessary background knowledge to comprehend our approach to the presented problem. First, we introduce the fundamental concepts of RL and the SAC algorithm. Then, we explain the algorithm-independent social methods imitation learning and decision biasing, followed by presentation of the the MARLISA algorithm.
+This chapter provides the necessary background knowledge to comprehend our approach to the presented problem. First, we introduce the fundamental concepts of RL and the SAC algorithm. Then, we explain the algorithm-independent social methods imitation learning and DB, followed by presentation of the the MARLISA algorithm.
 
 \section{Reinforcement Learning}
 \label{sec:reinforcement-learning}
@@ -122,20 +122,20 @@ For the final SAC algorithm, as given in Algorithm~\ref{alg:sac-update}, the aut
 \textit{Social learning} is a term initially derived from psychology and has various definitions. Essentially, it refers to the act of learning from others \cite{reed2010social, toyokawa2019social, witt2023social}. In this thesis, we interpret social learning as observing the actions and possibly rewards of demonstrators and incorporating them into the training process of the RL agent. We will refer to the RL agent currently trained as a learner. We distinguish between algorithm-independent methods, which we present first, and specific social algorithms.
 
 \subsection{Algorithm-independent Methods}
-This chapter describes two algorithm-independent techniques we integrated into the SAC algorithm. The first technique, called imitation learning, aims to replicate the actions of an experienced demonstrator by assuming that the demonstrator's decisions are optimal. The second technique, decision biasing, is a psychological theory that models the behavior of study participants in RL. According to this theory, the demonstrator's actions are valuable; therefore, the probability that the learner also performs these actions should increase.
+This chapter describes two algorithm-independent techniques we integrated into the SAC algorithm. The first technique, called imitation learning, aims to replicate the actions of an experienced demonstrator by assuming that the demonstrator's decisions are optimal. The second technique, DB, is a psychological theory that models the behavior of study participants in RL. According to this theory, the demonstrator's actions are valuable; therefore, the probability that the learner also performs these actions should increase.
 
 \subsubsection*{Imitation Learning}
 Imitation learning is a technique used to improve the learning of RL agents. The agent is presented with either demonstrator actions or the demonstrator agent itself as input, and it tries to mimic the actions of the demonstrator. This technique assumes that the policy of the demonstrator is optimal. There are various types of imitation learning, such as behavior cloning or inverse RL. We used behavior cloning, where a data set $\mathcal{D}=\{(s_t, a_t, r_t, s_{t+1}, d_t)\}$ of demonstration transitions is provided. This dataset enables the direct calculation of the deterministic demonstrator policy $\pi^*(s_t)$. The policy of the learner $\pi_{\phi}$ is then trained using the objective
 \begin{equation}
 	\phi^* = \argmin_{\phi}\mathbb{E}_{(s^*,a^*)\sim \mathcal{D}}\left [\mathcal{L}(a^*, \pi_{\phi}(s^*)) \right ].
 \end{equation}
-Behavior cloning assumes that the data is independent and identically distributed. Also, there may be a mismatch between the state spaces of the demonstrator and the learner. To overcome these challenges, the training dataset can be created by combining the demonstrator transitions with transitions created by rolling out the learner policy on the environment \cite{osa2018algorithmic, ross2011reduction}. 
+Behavior cloning assumes that the data is independent and identically distributed (i.i.d). Also, there may be a mismatch between the state spaces of the demonstrator and the learner. To overcome these challenges, the training dataset can be created by combining the demonstrator transitions with transitions created by rolling out the learner policy on the environment \cite{osa2018algorithmic, ross2011reduction}. 
 
 To integrate the demonstration transitions into the learning algorithm, we have stored them in a prioritized replay buffer (PRB) before starting training \cite{vecerik2017leveraging, hester2018deep}. This buffer prioritizes the transitions based on their temporal difference (TD) error. Transitions with a higher TD error are given a higher priority as it is assumed that they are more challenging to learn and should be observed more frequently during training. The transitions with a higher priority are more likely to be sampled. The priorities are updated during the training process \cite{schaul2015prioritized}.
 
 \subsubsection*{Decision Biasing}
 \label{sec:decision-biasing}
-Decision biasing, or frequency-dependent copying, is a method for modeling social learning. In this method, the learner observes the demonstrator's actions and biases its decision to act towards them. The more frequently an action is observed, the higher the probability that the learner will imitate it. Therefore, the assumption that the demonstrator's action is valuable is made. This method is commonly used to study participant behavior, but the experiments we discovered always have discrete action spaces \cite{najar2020actions, witt2023social, toyokawa2019social}. Therefore, we had to adapt the method for our continuous setting, which we present in Section~\ref{sec:social-agents}.
+DB, or frequency-dependent copying, is a method for modeling social learning. In this method, the learner observes the demonstrator's actions and biases its decision to act towards them. The more frequently an action is observed, the higher the probability that the learner will imitate it. Therefore, the assumption that the demonstrator's action is valuable is made. This method is commonly used to study participant behavior, but the experiments we discovered always have discrete action spaces \cite{najar2020actions, witt2023social, toyokawa2019social}. Therefore, we had to adapt the method for our continuous setting, which we present in Section~\ref{sec:social-agents}.
 
 Our approaches are based on the methods presented by Najar et al., specifically the DB1 and DB2 approaches \cite{najar2020actions}. In their experiment, the available actions were limited to binary choices. The first method adjusts the policy of the learner, denoted by $\pi$, as follows:
 \begin{align*}
@@ -155,9 +155,9 @@ Q'(d) \leftarrow Q'(d) + \alpha_i \cdot [1-Q'(d)].
 \todo[inline]{Ggf könnte ich hier noch bisschen kürzen, den informations sharing absatz?}
 This section presents the MARLISA algorithm, a specific algorithm designed for social learning \cite{vazquez2020marlisa}. The MARLISA algorithm is an extension of the SAC RL method that enables coordination between agents through a collective reward function and the exchange of building-specific information. 
 
-The reward function $r_{MARL}^b$ focuses on individual and collective goals. It encourages agents to reduce both their own electricity consumption $e_{net}^b$ and the total consumption of the entire neighborhood, i.e., all trained buildings $b \in B$ together:
+The reward function $r_{MARL}^b$ focuses on individual and collective goals. It encourages agents to reduce both their own electricity consumption $e_{b}$ and the total consumption of the entire neighborhood, i.e., all trained buildings $b \in B$ together:
 \begin{equation}
-	r_{MARL}^b = -sign(e_{net}^b)\cdot0.01(e_{net}^b)^2\cdot \min \left \{0, \sum_{b \in B} e_{net}^b \right \}.
+	r_{MARL}^b = -sign(e_b)\cdot0.01(e_b)^2\cdot \min \left \{0, \sum_{b \in B} e_b \right \}.
 \end{equation}
 The reward is negative when the building $b$ consumes more energy than it generates, and the neighborhood consumes more energy than it produces overall. The reward is positive if the building produces excess energy, but the neighborhood consumes too much energy. In all other cases, the reward is zero. Although the paper does not describe the scaling factor 0.01, it is included in the implementation. The authors found that the exponents were the best empirically.
 

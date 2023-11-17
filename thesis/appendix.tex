@@ -119,6 +119,61 @@ hour & hour of day (from 1 to 24)\\
 \label{app:observation-space-sac}
 \end{table}
 
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
+\begin{table}[htb]
+\center
+\begin{tabular}{c | c | c | c}
+Demonstrator                   & Mode & $\alpha_i$ & Deterministic demonstrator actions \\ \hline
+2 random                       & 1-6  & 0.2                      & Yes                          \\ 
+\rule{0pt}{3ex}% EXTRA vertical height  
+\multirow[t]{2}{*}{2 random}      & 1-3  & 0.01, 0.2, 1, 1.5        & No                           \\
+                               & 4-6  & 0.01, 0.2                & No                           \\
+\rule{0pt}{3ex}% EXTRA vertical height  
+\multirow[t]{2}{*}{4 random}      & 1-3  & 0.01, 0.2, 1, 1.5        & No                           \\
+                               & 4-6  & 0.01, 0.2                & No                           \\
+\rule{0pt}{3ex}% EXTRA vertical height  
+\multirow[t]{2}{*}{Pretrained B5} & 1-3, 5  & 0.01, 0.2, 1, 1.5        & No                           \\
+                               & 4, 6  & 0.01, 0.2, 1             & No                           \\
+\rule{0pt}{3ex}% EXTRA vertical height  
+\multirow[t]{2}{*}{Pretrained B6} & 1-3  & 0.01, 0.2, 1, 1.5        & No                           \\
+                               & 4-6  & 0.01, 0.2, 1             & No                          
+\end{tabular}
+  \caption[Overview of the experiments for Social Agent I.]{Overview of the experiments for our Social Agent I. We tested different demonstrator, mode, and ILRs $\alpha_i$ combinations. Also, we examined the influence of using deterministic demonstrator actions instead of sampling them.}
+  \label{app:social1-params}
+\end{table}
+}
+
+\todo[inline]{Aktuell?}
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
+\begin{table}[htb]
+\center
+\begin{tabularx}{\textwidth}{c | Y | Y }
+Demonstrator                   & $\alpha_i$                                     & Deterministic policy actions  \\ \hline
+\rule{0pt}{3ex}% EXTRA vertical height  
+\multirow[t]{3}{*}{2 random}      & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2                & No\\
+\rule{0pt}{2ex}% EXTRA vertical height  
+                               & 0.03, 0.05, 0.1, 0.15, 0.2, 0.25                               & No                                          \\
+\rule{0pt}{2ex}% EXTRA vertical height  
+                               & 0.1, 0.15, 0.2, 0.25                                           & Yes                                           \\
+\rule{0pt}{3ex}% EXTRA vertical height  
+4 random                       & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15                     & No                  \\
+\rule{0pt}{3ex}% EXTRA vertical height  
+Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.4, 0.6, 0.8 & No                       \\
+\rule{0pt}{3ex}% EXTRA vertical height  
+\multirow[t]{2}{*}{Pretrained B6} & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.4, 0.6, 0.8 & No                  \\
+\rule{0pt}{2ex}% EXTRA vertical height  
+                               & 0.1, 0.15, 0.2, 0.4, 0.6, 0.8                                  & Yes                                          
+\end{tabularx}
+  \caption[Overview of the experiments for Social Agent II.]{Overview of the experiments for our Social Agent II. We tested different demonstrator and ILRs $\alpha_i$ combinations. Also, we examined the influence of using deterministic demonstrator actions instead of sampling them.}
+  \label{app:social2-params}
+\end{table}
+}
+
+\clearpage
 \section{Figures}\label{sec:app-figures}
 \begin{figure}[H]
     \center
@@ -141,7 +196,21 @@ hour & hour of day (from 1 to 24)\\
   \label{app:prb-ddpg-kpis}
 \end{figure}
 
+\begin{figure}[htb]
+\center
+     \includegraphics[width=\textwidth]{figures/social2_results_sharedobs.pdf}
+  \caption[Results of the Social Agent II with shared observations.]{Results of the fossil energy consumption KPI of the Social Agent II with shared observation. The shaded areas show the standard deviation between the experiments with and without additional policy update, and the graphs show the mean value of them. One experiment with sampled and one with deterministic (determ.) demonstrator actions was conducted for both demonstrators.}
+  \label{app:social2-results-sharedobs}
+\end{figure}
 
+\begin{figure}[htb]
+\center
+     \includegraphics[width=\textwidth]{figures/shifted_sac_kpis.pdf}
+  \caption[Results of the SAC Agents for the shifted data of B3 and B5.]{Results of the SAC Agents for the shifted data of B3 and B5 compared to the SAC baseline results of the training buildings.}
+  \label{app:sac-shifted-kpis}
+\end{figure}
+
+\clearpage
 \section{Algorithms}\label{sec:app-algos}
 \begin{algorithm}
 \caption{\textcolor{red}{Social Agent I}}

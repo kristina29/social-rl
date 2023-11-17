@@ -4,14 +4,15 @@
 \chapter{Social Agents}
    \label{sec:social-agents}
 \noindent
-In this chapter, we explain the development, experiments and results of the social methods we developed. We designed four different methods for achieving our goal. The first method employs imitation learning to replicate the behavior of an expert demonstrator. The second and third methods are based on the decision-biasing theory. The fourth method uses the MARLISA algorithm to enhance collaborative decision-making. We discuss the implementation of each method and analyze their respective results.
+In this chapter, we explain the development, experiments and results of the social methods we developed. We designed four different methods for achieving our goal. The first method employs imitation learning to replicate the behavior of an expert demonstrator. The second and third methods are based on the DB theory. The fourth method uses the MARLISA algorithm to enhance collaborative decision-making. We discuss the implementation of each method and analyze their respective results.
 
 \section{Imitation Learning}
 \todo[inline]{Font in tabellen (\& abbildungen) beschreibungen verkleinern}
 Our first method uses imitation learning, for which we used some pre-trained demonstrators as experts. We first present our method and results and then discuss them.
 
 \subsection{Method and Results}
-To implement the SAC agents using the demonstrator transitions for imitation learning, we used the trained agents previously described in Section~\ref{sec:pretrained-demos}. These agents acted on the complete dataset hourly for an entire year. We saved these transitions and then trained the agents normally, as outlined in Section~\ref{sec:sac-baseline}. 
+To implement the SAC agents using the demonstrator transitions for imitation learning, we used the demonstrators B5 and B6 described in Section~\ref{sec:pretrained-demos}. These agents acted on the complete dataset hourly for an entire year. We saved these transitions and then trained the agents for training buildings normally, as outlined in Section~\ref{sec:sac-baseline}. 
+
 As there is a wide range of buildings, we cannot assume that the demonstrators have specified the optimal policy for the learners. Therefore, we have decided not to imitate the demonstrator transitions directly. Instead, we have integrated them into the SAC training of the learners. To achieve this, we have filled the PRB with the demonstrator transitions for each agent at the beginning of the training. We used either the transitions from B5 or B6, but not both simultaneously. The results in comparison to the baseline SAC agents are visualized in Figure~\ref{fig:prb-kpis}.
 
 \begin{figure}[htb]
@@ -23,10 +24,12 @@ As there is a wide range of buildings, we cannot assume that the demonstrators h
 
 The SAC agents using the demonstrator transitions perform worse than the baseline agents on all KPIs. However, using transitions from B6 resulted in better scores compared to the use of transitions from B5. This is contrary to the performance of both demonstrator buildings, as described in the previous chapter. 
 
-We conducted additional experiments using the Deep Deterministic Policy Gradient (DDPG) algorithm to confirm that the SAC algorithm was not responsible for the poor results. DDPG is, like SAC, a model-free, off-policy algorithm for solving continuous action space problems, but it learns a deterministic policy \cite{lillicrap2015continuous}. For this, we first trained the training buildings without demonstrator transitions using DDPG and the same hyperparameters, reward function and early stopping method as the baseline SAC agents. Then, we trained the buildings, including the same demonstrator transitions as before in their PRB. The results are visualized in Appendix \ref{sec:app-figures}, Figure~\ref{app:prb-ddpg-kpis}. The DDPG agents without imitation learning achieved worse results than the SAC baseline agents in all KPIs, with a decline of about 2.5 \% in fossil energy savings. The agents that used imitation learning, on the other hand, performed even worse, consuming more fossil energy than without using the battery. However, unlike the SAC agents, in the case of fossil energy consumption and the total daily share of renewable energy, the agents with the demonstrator transitions of B5 performed better than those with the transitions of B6.
+We conducted additional experiments using the Deep Deterministic Policy Gradient (DDPG) algorithm to confirm that the SAC algorithm was not responsible for the poor results. DDPG is, like SAC, a model-free, off-policy algorithm for solving continuous action space problems, but it learns a deterministic policy \cite{lillicrap2015continuous}. For this, we first trained the training buildings without demonstrator transitions using DDPG and the same hyperparameters, reward function and early stopping method as the baseline SAC agents. Then, we trained the buildings, including the same demonstrator transitions as before in their PRB. 
+
+The results are visualized in Figure~\ref{app:prb-ddpg-kpis}. The DDPG agents without imitation learning achieved worse results than the SAC baseline agents in all KPIs, with a decline of about 2.5~\% in fossil energy savings. The agents that used imitation learning, on the other hand, performed even worse, consuming more fossil energy than without using the battery. However, unlike the SAC agents, the agents with the demonstrator transitions of B5 performed better in some metrics than those with the transitions of B6.
 
 \subsection{Discussion}
-The policy loss values observed during training with demonstrator transitions increase for all agents instead of decreasing as expected. This is illustrated in Figure~\ref{fig:prb-losses} for B3 and the demonstrator transitions of B5 using the SAC algorithm, but it also applies to the other training buildings and demonstrator B6 as well as the DDPG algorithm. This development suggests that with higher probability, actions with a low, possibly even negative, estimated Q-Value are taken. As a result, the agents are more likely to take 'bad' actions with greater certainty, ultimately leading to poorer performance. \todo[inline]{tranisitions üerhaupt nicht unabhöngign voneinander}
+The policy loss values observed during training with demonstrator transitions increase for all agents instead of decreasing as expected. This is illustrated in Figure~\ref{fig:prb-losses} for B3 and the demonstrator transitions of B5 using the SAC algorithm, but it also applies to the other training buildings and demonstrator B6 as well as the DDPG algorithm. This development suggests that with higher probability, actions with a low, possibly even negative, estimated Q-value are taken. As a result, the agents are more likely to take 'bad' actions with greater certainty, ultimately leading to poorer performance. 
 
 \begin{figure}[htb]
 \center
@@ -37,13 +40,13 @@ The policy loss values observed during training with demonstrator transitions in
 
 It should be noted that the performance of the DDPG agents was not optimized by adapting the hyperparameters to the algorithm, suggesting that better results could be achieved. However, the increasing policy loss when using the DDPG algorithm and demonstrator transitions supports the thesis that imitation learning is unsuitable for our problem setting. Despite this, the DDPG algorithm did not show better results or more stable training than the SAC algorithm, so we stuck with SAC for further experiments.
 
-Our objective is not to replicate the behavior of a demonstrator in our buildings but rather to learn from it and adopt profitable practices. Given the diversity of our buildings, not all actions of the demonstrator may be universally effective. Therefore, we have focused on the decision-biasing approach in our following experiments. This method leverages the actions of the demonstrator more moderately.
+Our objective is not to replicate the behavior of a demonstrator in our buildings but rather to learn from it and adopt profitable practices. Given the diversity of our buildings, not all actions of the demonstrator may be universally effective. Moreover, our transitions do not fulfill the i.i.d. assumption made in behaviour cloning, since the actions are sampled from the learned policy and thus not equally distributed. Therefore, we have focused on the DB approach in our following experiments. This method leverages the actions of the demonstrator more moderately.
 
 \section{Social Agent I}
-This chapter outlines our second social approach. It incorporates the assumption from decision biasing that the learner should follow demonstrator actions with higher probability into the policy update of the SAC algorithm. First, we present the method and our experiment results, and then we will discuss this approach.
+This chapter outlines our second social approach. It incorporates the assumption from DB that the learner should follow demonstrator actions with higher probability into the policy update of the SAC algorithm. First, we present the method and our experiment results, and then we will discuss this approach.
 
 \subsection{Method and Results}
-In our first approach, based on decision biasing, we adjusted the loss function of the policy update. As described in Section~\ref{sec:decision-biasing}, decision biasing assumes that demonstrator actions are good and, therefore, the probability of choosing those actions or the Q-value of them should be increased. To accomplish this, we tested six different modes, all of which used an imitation learning rate that we also optimized. Also, we investigated whether it made a difference whether the demonstrated action was sampled from the demonstrator policy or the deterministic action (i.e., the learned mean) was used in one of the modes.
+In our first approach, based on DB, we adjusted the loss function of the policy update. As described in Section~\ref{sec:decision-biasing}, DB assumes that demonstrator actions are valuable and, therefore, the probability of choosing those actions or the Q-value of them should be increased. To accomplish this, we tested six different modes, all of which used an imitation learning rate (ILR) that we also optimized. Also, we investigated whether it made a difference whether the demonstrated action was sampled from the demonstrator policy $a_t^d \sim \pi^d(a_t|s_t)$ or the deterministic action (i.e., the learned mean) $a_t^d=f^d(\epsilon_t;s_t)$  was used.
 
 As a reminder, the classic policy objective function is defined as 
 \begin{align*}
@@ -52,29 +55,27 @@ As a reminder, the classic policy objective function is defined as
 \end{align*}
 with the entropy term that aims to maximize randomness $\mathcal{H}_{SAC}$ and the value term that aims to maximize the estimated Q-Value of the action $\mathcal{V}_{SAC}$. 
 
-We first trained the agents using the classic SAC algorithm in this social agent. For each gradient step, we incorporated an extra policy update step for each demonstrator $d \in D$, using the social objective function $J_{\pi}^{social}(\phi)$. This social objective comprises different entropy and value terms based on the mode but is fundamentally similar to the conventional objective. The training algorithm of \textcolor{red}{Social Agent I} is given in Appendix \ref{sec:app-algos}, Algorithm \ref{app:sac-social-1}. The only difference to the classic SAC algorithm are lines 14-16.
+For each gradient step during training, we incorporated an extra policy update step for each demonstrator $d \in D$, using the social objective function $J_{\pi}^{social}(\phi)$. This social objective comprises different entropy and value terms based on the mode but is fundamentally similar to the conventional objective. The training algorithm of \textcolor{red}{Social Agent I} is given in Appendix \ref{sec:app-algos}, Algorithm \ref{app:sac-social-1}. The only difference to the classic SAC algorithm are lines 14-16.
 
-When operating in mode 1, we use the actions sampled from the demonstrator policy $a_t^d=f^d_{\phi}(\epsilon_t;s_t)$. The estimated Q-value in the value term is then increased by adding a fraction of the absolute value using the imitation learning rate $\alpha_i$:
+When operating in mode 1, we use the actions sampled from the demonstrator policy $a_t^d\sim f^d_{\phi}(\epsilon_t;s_t)$. The estimated Q-value in the value term is then increased by adding a fraction of the absolute value using the ILR $\alpha_i$:
 
 \begin{equation}
 	\mathcal{V}_{M1} = Q_{\theta}(s_t, a_t^d) + \alpha_i|Q_{\theta}(s_t, a_t^d)|
 \end{equation}
 
-It is important to note that we use the Q-functions of the agent to be trained and not the Q-functions of the demonstrator. In addition, the probability of taking the demonstrator action for the demonstrator $\pi_{\phi}^d(a_t^d|s_t)$ is used in the entropy term:
+It is important to note that we use the Q-functions of the learner and not the Q-functions of the demonstrator. In addition, the probability of taking the demonstrator action for the demonstrator $\pi_{\phi}^d(a_t^d|s_t)$ is used in the entropy term:
 
 \begin{equation}
 	\mathcal{H}_{M1} = \log\pi_{\phi}^d(a_t^d|s_t)
 \end{equation}
 
-When operating in mode 2, we increase the probability of taking the demonstrator action using the imitation learning rate:
-
+When operating in mode 2, we increase the probability of taking the demonstrator action using the ILR:
 \begin{equation}
 	\mathcal{H}_{M2} = \log\pi_{\phi}^d(a_t^d|s_t) + \alpha_i|\log\pi_{\phi}^d(a_t^d|s_t)|
 \end{equation}
-
 The value term in mode 2 is the one in the classical objective.
 
-Mode 3 combines both modes by using the entropy term of mode 2 and the value term of mode 1. Modes 4-6 are similar to modes 1-3, but the probability of taking the demonstrator action in the current trained policy $\pi_{\phi}(a_t^d|s_t)$ is used:
+Mode 3 combines both modes by using the entropy term of mode 2 and the value term of mode 1. Modes 4-6 are similar to modes 1-3, but the probability of taking the demonstrator action in the learner policy $\pi_{\phi}(a_t^d|s_t)$ is used:
 
 \begin{equation}
 	\mathcal{H}_{M4} = \log\pi_{\phi}(a_t^d|s_t)
@@ -84,7 +85,7 @@ Mode 3 combines both modes by using the entropy term of mode 2 and the value ter
 	\mathcal{H}_{M5} = \log\pi_{\phi}(a_t^d|s_t) + \alpha_i|\log\pi_{\phi}(a_t^d|s_t)|
 \end{equation}
 
-Table~\ref{tab:social-policy-update-modes} summarizes the modes and their entropy and value terms. To avoid numerical errors, we have clipped the policy loss to values between -100 and 100 when implementing the social policy update. Additionally, if the probability of taking the demonstrator action in the policy to be trained is zero, we set the log probability to $1e^{-100}$.
+Table~\ref{tab:social-policy-update-modes} summarizes the modes and their entropy and value terms. To avoid numerical errors, we have clipped the policy loss to values between $-100$ and $100$ when implementing the social policy update. Additionally, if the probability of taking the demonstrator action in the learner policy is zero, we set the log probability to $1e^{-100}$.
 
 {
 \renewcommand{\baselinestretch}{0.9} 
@@ -103,58 +104,27 @@ Table~\ref{tab:social-policy-update-modes} summarizes the modes and their entrop
   5 & $\mathcal{H}_{M5}$ & $\mathcal{V}_{SAC}$ \\ \hline
   6 & $\mathcal{H}_{M5}$ &  $\mathcal{V}_{M1}$ \\ \hline 
 \end{tabular}
-  \caption[Modes for Social Agent focusing on the policy update.]{Modes for Social Agent focusing on the policy update. Mode 1 increases the estimated Q-Value of the demonstrator action, mode 2 increases the probability of the demonstrator action and mode 3 combines both. Mode 4-6 are similar, but the probability of the demonstrator actions in the current trained policy is used instead of their probabilities in the demonstrator policy.}
+  \caption[Modes for Social Agent I focusing on the policy update.]{Modes for Social Agent I focusing on the policy update. Mode 1 increases the estimated Q-Value of the demonstrator action, mode 2 increases the probability of the demonstrator action and mode 3 combines both. Mode 4-6 are similar, but the probability of the demonstrator actions in the learner policy is used instead of their probabilities in the demonstrator policy.}
   \label{tab:social-policy-update-modes}
 \end{table}
 }
 
-We conducted experiments testing different modes and imitation learning rates with various demonstrators. An overview of the experiments is provided in Table~\ref{tab:social1-params}, while the achieved $fossi\_energy\_consumption$ KPI values are shown in Figure~\ref{fig:social1-results}. The red dashed line represents the comparison value of the SAC baseline agents, while the gray dashed lines show deviations of 0.5\% compared to the baseline. We consider any deviations greater than 0.5\% to be significant.
+We conducted experiments testing different modes and ILRs with various demonstrators. An overview of the experiments is provided in Table~\ref{app:social1-params}, while the achieved fossil~energy~consumption values are shown in Figure~\ref{fig:social1-results}. The red dashed line represents the comparison value of the SAC baseline agents, while the gray dashed lines show deviations of 0.5~\% compared to the baseline. We consider any deviations greater than 0.5\% to be significant.
 
-\todo[inline]{we use 'agent' and 'building' interchangeable }
-
-{
-\renewcommand{\baselinestretch}{0.9} 
-\normalsize
-\begin{table}[htb]
-\center
-\begin{tabular}{c | c | c | c}
-Demonstrator                   & Mode & $\alpha_i$ & Deterministic demonstrator actions \\ \hline
-2 random                       & 1-6  & 0.2                      & Yes                          \\ 
-\rule{0pt}{3ex}% EXTRA vertical height  
-\multirow[t]{2}{*}{2 random}      & 1-3  & 0.01, 0.2, 1, 1.5        & No                           \\
-                               & 4-6  & 0.01, 0.2                & No                           \\
-\rule{0pt}{3ex}% EXTRA vertical height  
-\multirow[t]{2}{*}{4 random}      & 1-3  & 0.01, 0.2, 1, 1.5        & No                           \\
-                               & 4-6  & 0.01, 0.2                & No                           \\
-\rule{0pt}{3ex}% EXTRA vertical height  
-\multirow[t]{2}{*}{Pretrained B5} & 1-3, 5  & 0.01, 0.2, 1, 1.5        & No                           \\
-                               & 4, 6  & 0.01, 0.2, 1             & No                           \\
-\rule{0pt}{3ex}% EXTRA vertical height  
-\multirow[t]{2}{*}{Pretrained B6} & 1-3  & 0.01, 0.2, 1, 1.5        & No                           \\
-                               & 4-6  & 0.01, 0.2, 1             & No                          
-\end{tabular}
-  \caption[Overview of the experiments for Social Agent I.]{Overview of the experiments for our Social Agent I. We tested different demonstrator, mode, and imitation learning rates $\alpha_i$ combinations. Also, we examined the influence of using deterministic demonstrator actions instead of sampling them.}
-  \label{tab:social1-params}
-\end{table}
-}
-\todo[inline]{early stopping, determ. vs not determ: $a_t^d \sim \pi^d(a_t|s_t)$ vs $a_t^d=f^d(\epsilon_t;s_t)$}
-As demonstrators, we used either the pre-trained B5 and B6 presented in Section~\ref{sec:pretrained-demos} or the two or four random demonstrators.
-
-In the first step, we sampled the demonstrator actions from the demonstrator policy instead of using the Gaussian distribution's learned mean. We tested the imitation learning rates of $\alpha_i = 0.01$ and $\alpha_i = 0.2$ and compared their results. We found that modes 4-6 demonstrated lower performance than the baseline, with slightly better results when using the pre-trained demonstrators than the random demonstrators. Modes 1-3 showed similar performance to the baseline for all demonstrators. 
+As demonstrators, we used either the pre-trained B5 and B6 presented in Section~\ref{sec:pretrained-demos} or the two or four random demonstrators. In the first step, we sampled the demonstrator actions from the demonstrator policy instead of using the Gaussian distribution's learned mean. We tested the ILRs of $\alpha_i = 0.01$ and $\alpha_i = 0.2$ and compared their results. We found that modes 4-6 demonstrated lower performance than the baseline, with slightly better results when using the pre-trained demonstrators than the random demonstrators. Modes 1-3 showed similar performance to the baseline for all demonstrators. 
 
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/social1_results.pdf}
-  \caption[Experiment results of Social Agent I.]{Test results of Social Agent I. The performance of the baseline SAC agents was only minimally exceeded. Modes 4-6 require a relatively high imitation learning rate to match the baseline's performance.}
+  \caption[Experiment results of Social Agent I.]{Test results of Social Agent I. The performance of the baseline SAC agents was only minimally exceeded. Modes 4-6 require a relatively high ILR to match the baseline's performance.}
   \label{fig:social1-results}
 \end{figure}
 
-Based on these results, we tried even higher imitation learning rates of $\alpha_i = 1$ for modes 1-3 and 4-6 for pre-trained demonstrators and $\alpha_i = 1.5$ for modes 1-3 and 5. This led to slightly better results for mode 3 with the four random demonstrators and mode 2 with demonstrator B5, both with $\alpha_i = 1$. Modes 5-6 achieved comparable results to the baseline with the higher imitation learning rates, while mode 4 still performed worse. Finally, for the two random demonstrators, with $\alpha_i = 0.2$ and deterministic policy actions, we also observed that modes 1-3 performed similarly to the baseline and modes 4-6 performed worse.
+Based on these results, we tried even higher ILRs of $\alpha_i = 1$ for modes 1-3 and 4-6 for pre-trained demonstrators and $\alpha_i = 1.5$ for modes 1-3 and 5. This led to slightly better results for mode 3 with the four random demonstrators and mode 2 with demonstrator B5, both with $\alpha_i = 1$. Modes 5-6 achieved comparable results to the baseline with the higher ILRs, while mode 4 still performed worse. Finally, for the two random demonstrators, with $\alpha_i = 0.2$ and deterministic policy actions, we also observed that modes 1-3 performed similarly to the baseline and modes 4-6 performed worse.
 
 \subsection{Discussion}
-\todo[inline]{Figures alle die gleiche Schriftart, Q-Value vs Q-value}
-
 To better understand the performance differences between modes 1-3 and 4-6, we investigate the policy loss of the standard SAC policy update and the change in the entropy value during training. The courses for B3 with demonstrator B5 and $\alpha_i = 0.2$ are visualized for modes 2 and 5 in Figure~\ref{fig:social1-losses} as an example. 
+
 \begin{figure}[htb]
 \center
      \includegraphics[width=0.8\textwidth]{figures/social1_losses.pdf}
@@ -162,91 +132,50 @@ To better understand the performance differences between modes 1-3 and 4-6, we i
   \label{fig:social1-losses}
 \end{figure}
 
-In mode 2, the policy loss decreases as expected during training, and the entropy converges quickly to a value between 0.5 and 1. However, during training with mode 5, the entropy value increases. At the same time, the policy loss also increases, with sudden gains at the beginning of a new batch and an initial reduction in the loss within the batch. This behavior disappears in modes 5 and 6 when using higher imitation learning rates. The expected behavior, as in mode 2, can be observed, resulting in better performance. In mode 4, however, no changes can be observed as the imitation learning rate increases. The loss curves of mode 1 and 3 are similiar to mode 2.
+In mode 2, the policy loss decreases as expected during training, and the entropy converges quickly to a value between 0.5 and 1. However, during training with mode 5, the entropy value increases. At the same time, the policy loss also increases, with sudden gains at the beginning of a new batch and an initial reduction in the loss within the batch. This behavior disappears in modes 5 and 6 when using higher ILRs. The expected behavior, as in mode 2, can be observed, resulting in better performance. In mode 4, however, no changes can be observed as the ILR increases. The loss curves of mode 1 and 3 are similiar to mode 2.
 
 If the probability of demonstrator actions is increased sufficiently in the entropy term $\mathcal{H}_{M5}$, the effect disappears. Therefore, we assume that the demonstrator actions in the policy of the agent to be trained are very unlikely, which in turn increases the entropy. As a result, there is more uncertainty about which action to take, leading to an overall increase in policy loss and, ultimately, poorer performance. Increasing the value term as in $\mathcal{V}_{M1}$ should decrease the overall policy loss, however, this does not have a significant effect on the final performance based on our results. 
 
-To summarize, our approaches increased the probability or Q-values of the demonstrator actions in the agent's policy to be trained. However, overall, they only resulted in minimal fossil energy savings compared to our SAC baseline. The decision-biasing approach is still promising, so in our subsequent experiments, we directly biased the Q-value of the demonstrator actions in the Q-networks.
+To summarize, our approaches increased the probability or Q-values of the demonstrator actions in the agent's policy to be trained. However, overall, they only resulted in minimal fossil energy savings compared to our SAC baseline. The DB approach is still promising, so in our subsequent experiments, we directly biased the Q-value of the demonstrator actions in the Q-networks.
 
 \section{Social Agent II}
-In this chapter, we introduce our third social approach, also built upon the decision-biasing theory. We have incorporated an extra social Q-Value update to the SAC algorithm for this approach. We first present the method and our first experiments. We then present experiments with an extended environment state and new building data. Finally, we discuss the results.
+In this chapter, we introduce our third social approach, also built upon the DB theory. We have incorporated an extra social Q-Value update to the SAC algorithm for this approach. We first present the method and our first experiments. We then present experiments with an extended environment state and new building data. Finally, we discuss the results.
 
 \subsection{Method and Results}
-In the next step, we incorporated a social Q-Value objective into the algorithm and made an extra update step of the Q-Networks accordingly. To achieve this, we initially followed the steps of the standard SAC algorithm, similar to social agent I. During each update step, we carried out an additional social Q-value update for both Q-value networks, utilizing the following social objective function:
+In the next step, we incorporated a social Q-value objective into the algorithm and made an extra update step of the Q-Networks accordingly. To achieve this, we initially followed the steps of the standard SAC algorithm, similar to Social Agent I. During each update step, we carried out an additional social Q-value update for both Q-value networks, utilizing the following social objective function:
 \begin{equation}
 	J_Q^{social}(\theta)=\mathbb{E}_{s_t\sim\mathcal{D}}\left[\frac{1}{2}\left ( Q_{\theta}(s_t,a_t^d) - \left(Q_{\bar{\theta}}(s_t,a_t^d) + \alpha_i \left|Q_{\bar{\theta}}(s_t,a_t^d)\right| \right) \right )^2 \right].
 \end{equation}
-Note that we formulated the objectives using the L2 loss to be consistent with the SAC paper. We again use an imitation learning rate $\alpha_i$ to update the objective. Note that we  The objective also follows the assumption of decision biasing, that the actions performed by the demonstrator, denoted as $a_t^d$, are good and therefore should have a higher Q-value. After that, a soft update of the target network parameters is performed, optionally followed by another standard policy update. For a detailed description of the algorithm used in Social Agent II, please refer to Appendix~\ref{sec:app-algos}, Algorithm~\ref{app:sac-social-2}.
+Note that we formulated the objectives using the L2 loss to be consistent with the SAC paper. We again use an ILR $\alpha_i$ to update the objective. The objective also follows the assumption of DB, that the actions performed by the demonstrator, denoted as $a_t^d$, are valueable and therefore should have a higher Q-value. After that, a soft update of the target network parameters is performed, optionally followed by another standard policy update. For a detailed description of the algorithm used in \textcolor{red}{Social Agent II}, please refer to Appendix~\ref{sec:app-algos}, Algorithm~\ref{app:sac-social-2}.
 
-{
-\renewcommand{\baselinestretch}{0.9} 
-\normalsize
-\begin{table}[htb]
-\center
-\begin{tabularx}{\textwidth}{c | Y | Y }
-Demonstrator                   & $\alpha_i$                                     & Deterministic policy actions  \\ \hline
-\rule{0pt}{3ex}% EXTRA vertical height  
-\multirow[t]{3}{*}{2 random}      & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2                & No\\
-\rule{0pt}{2ex}% EXTRA vertical height  
-                               & 0.03, 0.05, 0.1, 0.15, 0.2, 0.25                               & No                                          \\
-\rule{0pt}{2ex}% EXTRA vertical height  
-                               & 0.1, 0.15, 0.2, 0.25                                           & Yes                                           \\
-\rule{0pt}{3ex}% EXTRA vertical height  
-4 random                       & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15                     & No                  \\
-\rule{0pt}{3ex}% EXTRA vertical height  
-Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.4, 0.6, 0.8 & No                       \\
-\rule{0pt}{3ex}% EXTRA vertical height  
-\multirow[t]{2}{*}{Pretrained B6} & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.4, 0.6, 0.8 & No                  \\
-\rule{0pt}{2ex}% EXTRA vertical height  
-                               & 0.1, 0.15, 0.2, 0.4, 0.6, 0.8                                  & Yes                                          
-\end{tabularx}
-  \caption[Overview of the experiments for Social Agent II.]{Overview of the experiments for our Social Agent II. We tested different demonstrator and imitation learning rates $\alpha_i$ combinations. Also, we examined the influence of using deterministic demonstrator actions instead of sampling them.}
-  \label{tab:social2-params}
-\end{table}
-}
-
-We conducted a new series of experiments using the Social Agent II. In each experiment, we compared the fossil energy consumption KPI value to the SAC baseline. Each experiment compared the fossil energy consumption KPI value to the SAC baseline. We used the same random or pre-trained demonstrators as in the previous social agent while first keeping the reward function, hyperparameter values, early stop method, and state space unchanged. Additionally, we retested how using the deterministic actions of the demonstrators, i.e., the learned mean of the Gaussian distribution, affects performance. An overview of the experiments performed can be found in Table~\ref{tab:social2-params}. We tested imitation learning rates between $1e^{-4}$ and $0.8$, starting with low rates and adjusting to higher rates for better-performing demonstrators. We conducted each experiment with and without an additional policy update to evaluate the impact of the update on the results.
+We conducted a new series of experiments using the Social Agent II. In each experiment, we compared the fossil energy consumption KPI value to the SAC baseline. Each experiment compared the fossil energy consumption metric to the SAC baseline. Additionally, we retested how using the deterministic actions of the demonstrators, i.e., the learned mean of the Gaussian distribution, affects performance. An overview of the experiments performed can be found in Table~\ref{app:social2-params}. We tested ILRs between $1e^{-4}$ and $0.8$, starting with low rates and adjusting to higher rates for better-performing demonstrators. We conducted each experiment with and without an additional policy update to evaluate the impact of the update on the results.
 
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/social2_results.pdf}
-  \caption[Results of the fossil energy consumption KPI of the Social Agent II.]{Results of the fossil energy consumption KPI of the Social Agent II depending on the imitation learning rate and the demonstrators. The shaded areas show the standard deviation between the experiments with and without additional policy update, and the graphs show the mean value of them. For demonstrator B6, one experiment was conducted with sampled and one with deterministic (determ.) demonstrator actions.}
+  \caption[Results of the fossil energy consumption KPI of the Social Agent II.]{Results of the fossil energy consumption KPI of the Social Agent II depending on the ILR and the demonstrators. The shaded areas show the standard deviation between the experiments with and without additional policy update, and the graphs show the mean value of them. For demonstrator B6, one experiment was conducted with sampled and one with deterministic (determ.) demonstrator actions.}
   \label{fig:social2-results}
 \end{figure}
 
-Figure~\ref{fig:social2-results} shows the results of the first experiments. The graphs show the mean value from the respective experiment with and without additional policy updates, and the area shows the standard deviation of both experiments. The results did not show an evident positive or negative influence of the additional update on performance. Again, we considered deviations of at least 0.5 \% compared to the SAC baseline significantly better or worse.
+Figure~\ref{fig:social2-results} shows the results of the first experiments. The graphs show the mean value from the respective experiment with and without additional policy updates, and the shaded area shows the standard deviation of both experiments. The results did not show an evident positive or negative influence of the additional update on performance. Again, we considered deviations of at least 0.5~\% compared to the SAC baseline significantly better or worse.
 
-First, we notice that overall, better results than with Social Agent I are achieved. The results of the fossil energy consumption KPI are either comparable or slightly worse than the SAC baseline. Additionally, moderate imitation learning rates produce better results than high or low rates. For random demonstrators, the best results are achieved with rates between 0.03 and 0.1, while for pre-trained demonstrators, the rates should be 0.15 or 0.2. Using random demonstrators does not enhance performance compared to the SAC baseline while using four random demonstrators leads to worse results than using two. The pre-trained demonstrator B5 has similar best KPI values to using two random demonstrators. The best results are achieved using demonstrator B6, with a fossil energy consumption KPI value of 0.921 without additional policy update and 0.916 with additional update. Thus, about 1.5 \% more fossil energy can be saved than by using the baseline SAC agents.
+First, we notice that overall, better results than with Social Agent I are achieved. The results of the fossil energy consumption metric are either comparable or slightly worse than the SAC baseline. Additionally, moderate ILRs produce better results than high or low rates. For random demonstrators, the best results are achieved with rates between 0.03 and 0.1, while for pre-trained demonstrators, the rates should be 0.15 or 0.2. Using random demonstrators does not enhance performance compared to the SAC baseline while using four random demonstrators leads to worse results than using two. The pre-trained demonstrator B5 has similar best KPI values to using two random demonstrators. The best results are achieved using demonstrator B6, with a fossil energy consumption KPI value of 0.921 without additional policy update and 0.916 with additional update. Thus, about 1.5~\% more fossil energy can be saved than by using the baseline SAC agents.
 
 We also conducted these experiments using the pre-trained B14 and B17 as demonstrators with deterministic actions. We chose the former because, similar to B6, the building has some months in which the non-shiftable load exceeds the solar generation. This allowed us to evaluate the impact of this property on social agents' performance. B17 was chosen because it has the highest median PCC between the difference of solar generation and non-shiftable load to the training buildings. However, the fossil consumption KPI values of these experiments are similar to those using demonstrator B5, so we did not include them in the plots.
 
 \subsection{Shared observations}
-In our next step, we investigated the impact on the performances of the agents by allowing them to observe the building-specific parameters of other buildings. We achieved this by expanding the state space by these parameters, namely the non-shiftable load, solar generation, battery SOC, and net electricity consumption. We then ran experiments using the most successful demonstrators from the previous experiments, which are the pre-trained B6 and the two random demonstrators to cover this scenario as well. In these experiments, we compared the results with and without additional policy updates and with deterministic and sampled demonstrator actions. The imitation learning rates were set to values that had previously performed well, as well as smaller and larger values, to detect any differences.
+In our next step, we investigated the impact on the performances of the agents by allowing them to observe the building-specific parameters of other buildings. We achieved this by expanding the state space by these parameters, namely the non-shiftable load, solar generation, battery state of charge, and net electricity consumption. We then ran experiments using the most successful demonstrators from the previous experiments, which are the pre-trained B6 and the two random demonstrators to cover this scenario as well. In these experiments, we compared the results with and without additional policy updates and with deterministic and sampled demonstrator actions. The ILRs were set to values that had previously performed well, as well as smaller and larger values, to detect any differences.
 
-\begin{figure}[htb]
-\center
-     \includegraphics[width=\textwidth]{figures/social2_results_sharedobs.pdf}
-  \caption[Results of the Social Agent II with shared observations.]{Results of the fossil energy consumption KPI of the Social Agent II with shared observation. The shaded areas show the standard deviation between the experiments with and without additional policy update, and the graphs show the mean value of them. One experiment with sampled and one with deterministic (determ.) demonstrator actions was conducted for both demonstrators.}
-  \label{fig:social2-results-sharedobs}
-\end{figure}
-
-Figure~\ref{fig:social2-results-sharedobs} shows the KPI values for fossil energy consumption of the experiments, which vary based on the imitation learning rate and demonstrators used. All experiments perform similarly to or worse than the SAC baseline. When using random demonstrators and deterministic actions, higher imitation learning rates than when using sampled actions achieve the best result. The best performance is achieved using the pre-trained B6 as a demonstrator with deterministic behavior, although the results are still worse than without using the shared parameters.
+Figure~\ref{app:social2-results-sharedobs} shows the KPI values for fossil energy consumption of the experiments, which vary based on the ILR and demonstrators used. All experiments perform similarly to or worse than the SAC baseline. When using random demonstrators and deterministic actions, higher ILRs than when using sampled actions achieve the best result. The best performance is achieved using the pre-trained B6 as a demonstrator with deterministic behavior, although the results are still worse than without using the shared parameters.
 
 \subsection{Shifted loads}
-In our next set of experiments, we aimed to determine whether the performances of the agents would improve when all buildings had similar energy consumption and solar generation. To achieve this, we first selected a base building and increased its non-shiftable load and solar generation times by a random value between 0.2 and 1. We also increased the median energy consumption per hour by the same value. This process was repeated five times, resulting in six training buildings. For each of these, we trained the Social Agent II using the same hyperparameter values, reward function, early stopping method and state space as for the SAC Baseline.
+In our next set of experiments, we aimed to determine whether the performances of the agents would improve when all buildings had similar energy consumption and solar generation. To achieve this, we first selected a base building and increased its non-shiftable load and solar generation times by a random value between 0.2 and 1. We also increased the median energy consumption per hour by the same value. This process was repeated five times, resulting in six training buildings. For each of these, we trained the Social Agent II.
 
-We chose B3 and B5 as the base buildings because they perform differently based on the KPIs of the pre-trained demonstrators. For base B3, we used the pre-trained B3 and the pre-trained B6 as demonstrators. We chose the former because we assumed similar time series data in the demonstrator would lead to faster or better learning. The latter we used because it performed better in previous experiments. For the second base B5, we used the pre-trained demonstrators B5 and B6 with the same reasoning. We tested imitation learning rates with moderate values ranging from 0.1 to 0.3 because of the results of previous experiments. Each experiment was performed with and without an additional policy update.
+We chose B3 and B5 as the base buildings because they perform differently based on the KPIs of the pre-trained demonstrators. For base B3, we used the pre-trained B3 and the pre-trained B6 as demonstrators. We chose the former because we assumed similar time series data in the demonstrator would lead to faster or better learning. The latter we used because it performed better in previous experiments. For the second base B5, we used the pre-trained demonstrators B5 and B6 with the same reasoning. We tested ILRs with moderate values ranging from 0.1 to 0.3 because of the results of previous experiments. Again, each experiment was performed with and without an additional policy update.
 
-\begin{figure}[htb]
-\center
-     \includegraphics[width=\textwidth]{figures/shifted_sac_kpis.pdf}
-  \caption[Results of the SAC Agents for the shifted data of B3 and B5.]{Results of the SAC Agents for the shifted data of B3 and B5 compared to the SAC baseline results of the training buildings.}
-  \label{fig:sac-shifted-kpis}
-\end{figure}
+To compare the results with SAC baseline agents, we trained nonsocial agents for this set of buildings respectively. The KPI values for these agents are shown in Figure~\ref{app:sac-shifted-kpis}. For fossil energy consumption, which is the most relevant KPI for us, the agents for the new buildings perform slightly worse. The agents for the shifted versions of B3 save almost 1~\% less fossil energy, and the agents for the shifted versions of B5 save almost 3~\% less compared to the standard training buildings. However, for the KPIs of average renewable energy share overall and from the grid, the agents for each building perform slightly better than the agents of the original buildings. It is noticeable that both shifted building sets use a lower fraction of the solar energy produced than without a battery.
 
-To compare the results with SAC baseline agents, we trained nonsocial agents for this set of buildings respectively. The KPI values for these agents are shown in Figure~\ref{fig:sac-shifted-kpis}. For fossil energy consumption, which is the most relevant KPI for us, the agents for the new buildings perform slightly worse. The agents for the shifted versions of B3 save almost 1 \% less fossil energy, and the agents for the shifted versions of B5 save almost 3 \% less compared to the standard training buildings. However, for the KPIs of average renewable energy share overall and from the grid, the agents for each building perform slightly better than the agents of the original buildings. It is noticeable that both shifted building sets use a lower fraction of the solar energy produced than without a battery.
-
-The fossil energy consumption KPI values of the experiments in comparison to the values of the SAC agents are visualized in Figure~\ref{fig:social2-results-shifted}. The agents perform worse than the classic SAC algorithm at an imitation learning rate of 0.1 for both building sets and demonstrators. For higher imitation learning rates, the results are about the same as those of SAC, but no better values are achieved. The results are not significantly different depending on the demonstrator used.
+The fossil energy consumption metric of the experiments in comparison to the values of the SAC agents are visualized in Figure~\ref{fig:social2-results-shifted}. The agents perform worse than the classic SAC algorithm at an ILR of 0.1 for both building sets and demonstrators. For higher ILRs, the results are about the same as those of SAC, but no improvements are achieved. The results are not significantly different depending on the demonstrator used.
 
 \begin{figure}[htb]
 \center
@@ -256,23 +185,22 @@ The fossil energy consumption KPI values of the experiments in comparison to the
 \end{figure}
 
 \subsection{Discussion}
-One notable characteristic of this approach is the significant variation in performance between the agents obtained through the early-stopping method and those fully trained. The top-performing agents, which are trained using the deterministic actions of the B6 demonstrator, show a difference of 9 \% in fossil energy savings. On the other hand, for the agents that share their observations, the difference is 5 \%. For the building data of the shifted B3, the difference is only 2 \%.
+One notable characteristic of this approach is the significant variation in performance between the agents obtained through the early-stopping method and those fully trained. The top-performing agents, which are trained using the deterministic actions of the B6 demonstrator, show a difference of 9~\% in fossil energy savings. On the other hand, for the agents that share their observations, the difference is 5~\%. For the building data of the shifted B3, the difference is only 2~\%.
 
 To explain these observations, we first look at the policy loss and Q-network loss of B3. Figure~\ref{fig:social2-losses}a shows the losses when training with the deterministic demonstrator actions of demonstrator B6 with $\alpha_i = 0.15$. The figure only visualizes the losses of the first Q-Network, but those of the second behave the same. 
 
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/social2_losses.pdf}
-  \caption[Policy and Q-network losses and during training of B3 with Social Agent II.]{Policy and Q-network losses during training of B3 for the Social Agent II with imitation learning rates $\alpha_i = 0.15$ and $\alpha_i = 1e^{-4}$. The loss curves with the higher imitation learning rate are overall as expected, while the small rate introduces an increasing policy loss.}
+  \caption[Policy and Q-network losses and during training of B3 with Social Agent II.]{Policy and Q-network losses during training of B3 for the Social Agent II with ILRs $\alpha_i = 0.15$ and $\alpha_i = 1e^{-4}$. The loss curves with the higher ILR are overall as expected, while the small rate introduces an increasing policy loss.}
   \label{fig:social2-losses}
 \end{figure}
 
 During training, the policy loss decreases significantly, even more than the policy loss of the SAC baseline. However, the Q-value loss increases slowly during training, while the expected behavior would be an initial drop and then quick convergence. When the shifted building data is used, the policy loss decreases significantly less, and the loss of the Q-networks also increases less (which is not visualized). These observations indicate that the progression of loss is a cause of the significant difference between the early stopping method and the complete training. We hypothesize that the social Q-value update is helpful at the beginning of the training to find a good solution quickly. However, it becomes rather harmful during the course of training because the targets start to differ. Adding the shared observations did not change the loss curves. 
 
-When reducing the imitation learning rate and using the sampled demonstrator actions from demonstrator B6, the Q-Network losses show the expected behavior (see Figure~\ref{fig:social2-losses}b). However, the policy loss decreases slightly and then increases again, with a relatively high variance overall. The loss curves show a similar trend to the moderate rate when increasing the imitation learning rate to 0.8. However, the policy loss decreases even more. We assume the Q-values are overestimated, so worse actions are rated too high. 
+When reducing the ILR and using the sampled demonstrator actions from demonstrator B6, the Q-Network losses show the expected behavior (see Figure~\ref{fig:social2-losses}b). However, the policy loss decreases slightly and then increases again, with a relatively high variance overall. The loss curves show a similar trend to the moderate rate when increasing the ILR to 0.8. However, the policy loss decreases even more. We assume the Q-values are overestimated, so worse actions are rated too high. 
 
-Finally, for the generated shifted building data setzt, the capacity of the batteries was not shifted. Thus, an identical behavior of the individual buildings would not lead to the same results. However, the fact that the agents for the shifted B3 buildings reach better results than the shifted B5 buildings goes along with the better performance of the B3 demonstrator. 
-
+Finally, for the generated shifted building data set, the capacity of the batteries was not shifted. Thus, an identical behavior of the individual buildings would not lead to the same results. However, the fact that the agents for the shifted B3 buildings reach better results than the shifted B5 buildings goes along with the better performance of the B3 demonstrator. 
 
 \section{MARLISA Agent}
 This chapter introduces the fourth social approach, which trains agents using the MARLISA algorithm. We present our experiments with different reward functions and then discuss the results.
@@ -282,21 +210,21 @@ In the next phase, we aimed to enhance the collaboration among agents by impleme
 
 In our experiments with the MARLISA algorithm, we focused on exploring different reward functions and incorporating building-specific observations into the state space. However, despite our efforts, we could not achieve results comparable to the baseline's performance. Therefore, we will summarize our experiments below without going into the details.
 
-First, we used the SAC baseline reward function and the MARLISA reward function. We hoped collaborative work would lead to better and more stable results with collective reward functions. This collective reward functions penalize too much energy consumption from the grid of all buildings together to reduce the fossil energy consumption. Therefore, we conducted further tests using the Tolovski and fossil penalty rewards (see Section~\ref{sec:reward}). 
+First, we used the SAC baseline reward function and the MARLISA reward function. We hoped collaborative work would lead to better and more stable results with collective reward functions, as the Tolovski and fossil penalty rewards. This collective reward functions penalize too much energy consumption from the grid of all buildings together to reduce the fossil energy consumption, so we conducted further tests using these. 
 
-Based on our findings, the reward functions presented earlier have shown inferior performance compared to the baseline. Therefore, we experimented with the direct minimization of the collective fossil energy consumption $E_{used_f}$ or the total energy purchase from the grid $E_{net_{pos}}$. We combined these rewards with the baseline reward $r_t^b$ with $\eta=0.5$. We refer to the first element as the collective reward and the second as the individual reward.
+However, these reward functions have shown inferior performance compared to the baseline. Therefore, we experimented with the direct minimization of the collective fossil energy consumption $FE_{con}$ or the total energy purchase from the grid $E_{pos}$. We combined these rewards with the baseline reward $r_t^b$ with $\eta=0.5$. We refer to the first element as the collective reward and the second as the individual reward.
 
-To modify the influence of both components, we either subtracted or multiplied the collective component and scaled the collective component by $\frac{1}{|B|}$, where $B$ represents the number of trained buildings. Since the individual reward was always negative, the total reward remained negative.
+To modify the influence of both components, we either subtracted or multiplied the collective component and scaled the collective component by $\frac{1}{|B|}$, where $B$ are the trained buildings. Since the individual reward was always negative, the total reward remained negative.
 
-Furthermore, we used the energy consumption of the considered building $e_{net}^b$ instead of the baseline reward as an individual reward, combined with the collective fossil energy consumption. We also tested the exponents used in the MARLISA paper and the scaling factors $0.01$.
+Furthermore, we used the energy consumption of the considered building $e_b$ instead of the baseline reward as an individual reward, combined with the collective fossil energy consumption. We also tested the exponents used in the MARLISA paper and the scaling factors $0.01$.
 
 The best results for the fossil energy consumption KPI were achieved using rewards without the factor of $0.01$ and exponents greater than 1. However, the policy loss curves mainly showed increasing trends with very high variance, resulting in a high variance in the KPI-based performance. The following reward function was found to be the most stable and delivered the best results:
 \begin{equation}
-	r_{MARL\_best_{t}}^b = r_t^b - \frac{1}{|B|} \cdot E_{used_f}.
+	r_{MARL\_best_{t}}^b = r_t^b - \frac{1}{|B|} \cdot FE_{con}.
 \end{equation}
 However, with a KPI value of 0.985 in fossil energy consumption, the performance is significantly worse than the baseline. The inclusion of shared observations led to even more unstable training and therefore did not improve the results.
 
 \subsection{Discussion}
-In the paper, the performance of the MARLISA agents was evaluated based on their ability to minimize annual peak consumption, average daily peak consumption, ramping, annual net energy consumption from the grid, and maximize the average daily load factor. The authors compared the performance of the MARLISA agents with an RBC used as a baseline. The authors calculated the KPIs compared to the performance of the RBC, and not in comparison to without using any storage as we did. The results showed that the MARLISA agents outperformed the RBC in all metrics studied, with the smallest improvement in minimizing net electricity demands at only about 1 \%. More information on the metrics, the MARLISA algorithm, and the evaluation procedure and results can be found in the paper. 
+In the paper, the authors calculated the KPIs compared to the performance of the RBC, and not in comparison to without using any storage as we did. The results showed that the MARLISA agents outperformed the RBC in all metrics studied, with the smallest improvement in minimizing net electricity demands at only about 1~\%.
 
-However, the authors did not evaluate the performance of the RBCs individually. Using our data, the RBC agents performed significantly worse than without using a battery (see Figure~\ref{fig:sac-kpis}). If this was also the case in the original paper, then the performance of the MARLISA agents might not be as impressive as it seems. Accordingly, the MARLISA algorithm may not lead to a significant energy saving compared to not using the storage at all. Therefore, based on our experiments, the classic SAC algorithm is more suitable than the MARLISA algorithm for minimizing fossil energy consumption.
+However, the authors did not evaluate the performance of the RBCs individually. Using our data, the RBC agents performed significantly worse than without using a battery (see Figure~\ref{fig:sac-kpis}). If this was also the case in the original paper, then the performance of the MARLISA agents might not be as impressive as it seems. Accordingly, the algorithm may not lead to a significant energy saving compared to not using the storage at all. Therefore, based on our experiments, the classic SAC algorithm is more suitable than the MARLISA algorithm for minimizing fossil energy consumption.
