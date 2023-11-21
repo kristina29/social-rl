@@ -2,7 +2,7 @@
 % Diskussion und Ausblick
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Discussion and Outlook}
+\chapter{Evaluation and Outlook}
   \label{Discussion}
  This chapter examines the effectiveness of our best-performing model, Social Agent II, on new building data. The agent utilizes the deterministic actions of a pre-trained demonstrator. First, we will present the methodology and results of our evaluation process. We will then discuss the performance and implications of our findings. The chapter concludes with an outline of future research directions that could further extend the work presented here.
   
@@ -84,7 +84,6 @@ Upon further consideration, clustering can be used to create training datasets f
 Identifying and validating relevant parameters is crucial for future research. Additionally, algorithms should be developed to effectively group buildings based on these parameters and optimize training processes accordingly.
 
 \subsection{Tuning the IRL}
-\todo[inline]{Notiz an Steffbär: Beim schreiben dieses Kapitels hab ich mich wie Viebahn gefühlt. Wenn man das Wissen/Technologie HÄTTE, KÖNNTE man supertolle sachen damit machen :D}
 As suggested by our experiments, tuning the IRL for each building set and demonstrator is necessary. Although assigning a specific IRL for each building might enhance the efficiency and effectiveness of the learning process, it is impractical to manage.
 
 An approach could be to investigate which parameters significantly influence the optimal IRL. Identifying patterns or correlations between these parameters and the appropriate IRL could make it possible to develop guidelines for setting the IRL in advance. Also, automatic hyperparameter optimization frameworks, as presented by Yang et. al. could be used \cite{yang2020hyperparameter}.

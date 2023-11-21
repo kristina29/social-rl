@@ -107,11 +107,10 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
 
         kpi['rank'] = kpi['kpi'].map(kpi_names)
 
-        #if i==0 or i==2:
-        #    kpi = kpi[kpi['env_id'] == 'RBC']
-        #else:
-        #    kpi = kpi[kpi['env_id'] == 'SAC Best']
-        kpi = kpi[kpi['env_id'] == 'SAC']
+        if i==0 or i==2:
+            kpi = kpi[kpi['env_id'] == 'SAC Best']
+        else:
+            kpi = kpi[kpi['env_id'] == 'SAC_DB2Value Best']
 
         kpi['env_id'] = names[i]
         kpi = kpi.drop(columns=['net_value', 'net_value_without_storage'])
@@ -165,20 +164,19 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
 
 
 if __name__ == '__main__':
-    kpis = [#pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
-        pd.read_csv('../experiments/SAC/15_b3_demonstrator/kpis_20231030T145351.csv'),
-            pd.read_csv('../experiments/SAC/10_b5_demonstrator/kpis_20231002T132420.csv'),
-            pd.read_csv('../experiments/SAC/09_b6_demonstrator/kpis_20231002T132428.csv'),
-        pd.read_csv('../experiments/SAC/17_b11_demonstrator/kpis_20231113T143302.csv'),
+    kpis = [pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
+            pd.read_csv('../experiments/SAC_DB2Value/8_determ_actions/demo_b6/non_extra_pol_update/ir0.15/kpis_20231005T120640.csv'),
+            pd.read_csv('../experiments/New_Buildings/SAC Baseline/kpis_20231113T132158.csv'),
+            pd.read_csv('../experiments/New_Buildings/Demo_B6/extra_pol/ir0.25/kpis_20231113T164524.csv'),
     ]
 
     if len(kpis) == 1:
         plot_district_kpis1(kpis[0])
     else:
-        plot_district_kpis_multiple(kpis, ['B3',
-                                           'B5',
-                                           'B6',
-                                           'B11',
+        plot_district_kpis_multiple(kpis, ['Training SAC',
+                                           'Training Social2',
+                                           'Evaluation SAC',
+                                           'Evaluation Social2',
                                            ])
 
     #plt.show()
