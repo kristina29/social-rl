@@ -109,7 +109,21 @@ def plot_district_kpis_multiple(kpis, names, mode) -> plt.Figure:
                 kpi = kpi[kpi['env_id'] == 'SAC Best']
             else:
                 kpi = kpi[kpi['env_id'] == 'PRB_SAC']
-        else:
+        elif mode==4:
+            if i == 0 or i == 2:
+                kpi = kpi[kpi['env_id'] == 'RBC']
+            else:
+                kpi = kpi[kpi['env_id'] == 'SAC Best']
+        elif mode==5:
+            if i == 0:
+                kpi = kpi[kpi['env_id'] == 'SAC Best']
+            elif i == 1:
+                kpi = kpi[kpi['env_id'] == 'DDPG Best']
+            else:
+                kpi = kpi[kpi['env_id'] == 'PRB_DDPG']
+        elif mode==6:
+           kpi = kpi[kpi['env_id'] == 'SAC Best']
+        elif mode==7:
             if i == 0 or i == 2:
                 kpi = kpi[kpi['env_id'] == 'SAC Best']
             else:
@@ -134,8 +148,12 @@ def plot_district_kpis_multiple(kpis, names, mode) -> plt.Figure:
 
     width = 0.9
 
-    sns.barplot(x='value', y='kpi', data=kpis, hue='env_id', ax=ax,
-                width=width)  # , palette=['tab:blue','tab:red','tab:orange','tab:green'])
+    if mode == 5:
+        sns.barplot(x='value', y='kpi', data=kpis, hue='env_id', ax=ax,
+                width=width , palette=['tab:blue','tab:red','tab:orange','tab:green'])
+    else:
+        sns.barplot(x='value', y='kpi', data=kpis, hue='env_id', ax=ax, width=width)
+
     ax.axvline(1.0, color='black', linestyle='--', linewidth=1, label='')
     ax.set_xlabel('KPI Value', fontsize=21)
     ax.set_ylabel(None)
@@ -158,12 +176,19 @@ def plot_district_kpis_multiple(kpis, names, mode) -> plt.Figure:
     ax.tick_params(axis='both', which='major', labelsize=21)
 
     # fig.suptitle('KPIs at district-level', fontsize=16)
+
     plt.tight_layout(rect=[0, 0, 0.77, 1])
 
     if mode == 2:
         val = 1.225
     elif mode==3:
         val = 1.4
+    elif mode == 4:
+        val = 1.4
+    elif mode == 5:
+        val = 1.425
+    elif mode == 6:
+        val = 1.38
     else:
         val = 1.425
 
@@ -174,6 +199,14 @@ def plot_district_kpis_multiple(kpis, names, mode) -> plt.Figure:
         filename='pretrained_kpis'
     if mode==3:
         filename='prb_kpis'
+    if mode==4:
+        filename='eval_kpis'
+    if mode==5:
+        filename='prb_ddpg_kpis'
+    if mode==6:
+        filename='shifted_sac_kpis'
+    if mode==7:
+        filename='social_kpis'
 
     fig.savefig(f"{filename}.pdf")
 
@@ -181,7 +214,7 @@ def plot_district_kpis_multiple(kpis, names, mode) -> plt.Figure:
 
 
 if __name__ == '__main__':
-    mode = 3
+    mode = 7
 
     if mode == 1:
         kpis = pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
@@ -198,7 +231,27 @@ if __name__ == '__main__':
                 pd.read_csv('../experiments/SAC_DB2/33_demo_replaybuffer/demo_b6/kpis_20231026T122547.csv'),
                 ]
         names = ['Baseline SAC', 'Transitions of D5', 'Transitions of D6']
-    else:
+    elif mode == 4:
+        kpis = [pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
+                pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
+                pd.read_csv('../experiments/New_Buildings/SAC Baseline/kpis_20231113T132158.csv'),
+                pd.read_csv('../experiments/New_Buildings/SAC Baseline/kpis_20231113T132158.csv'),
+                ]
+        names = ['RBC (Training)', 'SAC (Training)', 'RBC (Evaluation)', 'SAC (Evaluation)', ]
+    elif mode == 5:
+        kpis = [pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
+                pd.read_csv('../experiments/SAC/DDPG/kpis_20231107T143713.csv'),
+                pd.read_csv('../experiments/SAC_DB2/33_demo_replaybuffer/demo_b5_ddpg/kpis_20231106T170835.csv'),
+                pd.read_csv('../experiments/SAC_DB2/33_demo_replaybuffer/demo_b6_ddpg/kpis_20231106T170845.csv'),
+                ]
+        names = ['Baseline SAC', 'DDPG', 'DDPG with transitions\nof D5', 'DDPG with transitions\nof D6', ]
+    elif mode == 6:
+        kpis = [pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
+                pd.read_csv('../experiments/SAC/16_shifted_buildings/shifted_b3/kpis_20231031T173335.csv'),
+                pd.read_csv('../experiments/SAC/16_shifted_buildings/shifted_b5/kpis_20231031T194250.csv'),
+                ]
+        names = ['Baseline SAC', 'SAC for Shifted B3', 'SAC for Shifted B5' ]
+    elif mode == 7:
         kpis = [pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
                 pd.read_csv(
                     '../experiments/SAC_DB2Value/8_determ_actions/demo_b6/non_extra_pol_update/ir0.15/kpis_20231005T120640.csv'),

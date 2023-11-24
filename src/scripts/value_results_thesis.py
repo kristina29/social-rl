@@ -83,8 +83,8 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d
                                             None, None, None, None,
                                             None, None,
                                             None, None, None, None,
-                                            'lightskyblue', 'lightskyblue', 'blue', 'blue',
-                                            'lawngreen', 'lawngreen', 'green', 'green', ]
+                                            'dodgerblue', 'dodgerblue', 'darkblue', 'darkblue',
+                                            'limegreen', 'limegreen', 'darkgreen', 'darkgreen', ]
                                  })
 
 eval_dirs = pd.DataFrame({'paths': [#'Demo_B5/extra_pol',

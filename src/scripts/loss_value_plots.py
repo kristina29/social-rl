@@ -17,26 +17,26 @@ def plot_losses(losses, include_alpha, mode) -> List[plt.Figure]:
         fig, (ax, ax2) = plt.subplots(1,2, figsize=(14,7))
     #ax2 = ax.twinx()
     i = 0
+
+    env_names = []
+
     for env_name, env_values in losses.items():
+        env_names.append(env_name)
         for nn_name, nn_values in env_values.items():
             if i == 0:
                 if nn_name == 'policy_losses':
-                    if mode == 99:
+                    if mode == 3:
                         i += 1
                         label = 'Policy loss'
                     else:
                         label = env_name
                     ax.plot(np.arange(len(nn_values)), nn_values, label=label, zorder=3)
-                if nn_name == 'q1_losses' and mode == 99:
+                if nn_name == 'q1_losses' and mode == 3:
                     ax.plot(np.arange(len(nn_values)), nn_values, label='Q-Network loss', zorder=3)
                 if include_alpha[i] and nn_name == 'alpha_vals':
                     ax2.plot(np.arange(len(nn_values)), nn_values, label=f'{env_name} (alpha vals)', linewidth=2,
                              linestyle=(5, (10, 3)))
-
-                if mode == 99:
-                    ax.set_ylabel(env_name, fontsize=21, fontdict=dict(weight='bold'))
-            elif i == 1 and mode == 99:
-                ax2.set_ylabel(env_name, fontsize=21)
+            elif i == 1 and mode == 3:
                 if nn_name == 'policy_losses':
                     ax2.plot(np.arange(len(nn_values)), nn_values, label='Policy loss', zorder=3)
                 if nn_name == 'q1_losses':
@@ -59,15 +59,17 @@ def plot_losses(losses, include_alpha, mode) -> List[plt.Figure]:
         fig.legend(handles=handles, bbox_to_anchor=(0.074, 0.99),
                    loc='upper left', fontsize=21)
         plt.tight_layout()
-    elif mode == 99:
+    elif mode == 3:
         ax.set_xlabel('Time step', fontsize=21)
-        ax.set_title('a)', fontsize=21, pad=10)
-        ax2.set_title('b)', fontsize=21, pad=10)
+        ax.set_title(f'a) {env_names[0]}', fontsize=21, pad=10)
+        ax2.set_title(f'b) {env_names[1]}', fontsize=21, pad=10)
         ax2.axhline(0, color='black', zorder=2)
         ax2.set_xlabel('Time step', fontsize=21)
         ax2.tick_params(axis='x', which='both', labelsize=21)
         ax2.tick_params(axis='y', which='both', labelsize=21)
         ax2.grid(axis='y', zorder=1)
+        ax.set_ylabel('Loss value', fontsize=21)
+        ax2.set_ylabel('Loss value', fontsize=21)
         handles, labels = ax.get_legend_handles_labels()
         plt.tight_layout(rect=[0, 0.15, 1, 1])
         plt.subplots_adjust(wspace=0.3)
@@ -84,7 +86,7 @@ def plot_losses(losses, include_alpha, mode) -> List[plt.Figure]:
 
 
 if __name__ == '__main__':
-    mode = 2
+    mode = 3
 
     if mode == 1:
         loss_files = ['../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/losses_20231002T130931.pkl',
@@ -100,15 +102,12 @@ if __name__ == '__main__':
 
         names = ['Mode 2', 'Mode 5']
         include_alpha = [True, True]
-    else:
-        loss_files = [#'../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/losses_20231002T130931.pkl',
-                      '../experiments/SAC_DB2Value/9_interchanged_observations/demo_b6_determ/extra_pol_update/ir0.15/losses_20231029T201710.pkl',
+    elif mode == 3:
+        loss_files = ['../experiments/SAC_DB2Value/9_interchanged_observations/demo_b6_determ/extra_pol_update/ir0.15/losses_20231029T201710.pkl',
                       '../experiments/SAC_DB2Value/4_demo_b6_policyupdate/ir0.0001/losses_20231003T110826.pkl' ]
-        agents = [#'SAC',
-             'SAC_DB2Value', 'SAC_DB2Value']
+        agents = ['SAC_DB2Value', 'SAC_DB2Value']
 
-        names = [#'x',
-             r'$\bm{\alpha_i=0.15}$', r'$\bm{\alpha_i=1e^{-4}}$']
+        names = [r'$\alpha_i=0.15$', r'$\alpha_i=1e^{-4}$']
         include_alpha = [False, False]
 
     final_losses = {}

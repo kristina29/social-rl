@@ -66,7 +66,7 @@ if __name__ == '__main__':
     x_eval = 1.25 * np.ones_like(eval_buildings_sac)
 
     # Create the plot
-    fig, ax = plt.subplots(figsize=(8, 2.5))
+    fig, ax = plt.subplots(figsize=(8, 3))
 
     # Plot individual data points
     ax.scatter(training_buildings_sac, x_train, alpha=0.6, # label='Training Buildings SAC Best',
@@ -89,14 +89,17 @@ if __name__ == '__main__':
     # Add labels and title
     ax.set_yticks([1, 1.25], ['Training Buildings', 'Evaluation Buildings'], fontsize=17)
     ax.set_xlabel('Energy Consumption (SAC)', fontsize=15)
-    ax.set_ylim([0.85,1.4])
     ax.tick_params(axis='both', which='major', labelsize=14)
 
     # Add a legend and grid
     #ax.legend(fontsize=17)
+    mean_line = plt.errorbar(0.85, 1.1, xerr=0.01, fmt='o', color='black', ecolor='black', capsize=8, markersize=10, elinewidth=2)
+    ax.legend([mean_line], ['Mean and Standard Deviation'], fontsize=15, loc='upper right')
+    mean_line.remove()
+
+    ax.set_ylim([0.85,1.45])
     ax.grid(axis='x', zorder=1)
 
-    # Tight layout for better spacing
     plt.tight_layout()
 
     # Display the plot
