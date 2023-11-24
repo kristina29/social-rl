@@ -8,7 +8,8 @@ from matplotlib import pyplot as plt, rc
 rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
 rc('text', usetex=True)
 
-def plot_district_kpis1(kpis) -> plt.Figure:
+
+def plot_district_kpis1(kpis, mode) -> plt.Figure:
     kpis = kpis[kpis['level'] == 'district'].copy()
 
     kpi_names = {
@@ -18,10 +19,10 @@ def plot_district_kpis1(kpis) -> plt.Figure:
         'fossil_energy_consumption': 0
     }
     labels = [
-        'fossil_energy_consumption',
-        '1 - avg_daily_renewable_share',
-        '1 - avg_daily_renewable_share_grid',
-        '1 - used_pv_of_total_share'
+        'fossil energy consumption',
+        'avg. fossil share',
+        'avg. fossil share grid',
+        '1 - used pv'
     ]
     kpis = kpis[
         (kpis['kpi'].isin(kpi_names.keys()))
@@ -31,6 +32,7 @@ def plot_district_kpis1(kpis) -> plt.Figure:
     kpis['rank'] = kpis['kpi'].map(kpi_names)
     kpis = kpis.drop(columns=['net_value', 'net_value_without_storage'])
     kpis = kpis.sort_values(by='rank')
+    kpis = kpis.round(3)
 
     row_count = 1
     column_count = 1
@@ -43,23 +45,14 @@ def plot_district_kpis1(kpis) -> plt.Figure:
 
     sns.barplot(x='value', y='kpi', data=kpis, hue='env_id', ax=ax, width=width)
     ax.axvline(1.0, color='black', linestyle='--', linewidth=1, label='')
-    ax.set_xlabel(None)
+    ax.set_xlabel('KPI Value', fontsize=21)
     ax.set_ylabel(None)
-
-    plt.rcParams.update({
-        "text.usetex": True,
-        #"font.family": "Helvetica"
-    })
-    sns.rcParams.update({
-        "text.usetex": True,
-        # "font.family": "Helvetica"
-    })
 
     for s in ['right', 'top']:
         ax.spines[s].set_visible(False)
 
     for p in ax.patches:
-        p.set_y(p.get_y() + (1-width) * .5)
+        p.set_y(p.get_y() + (1 - width) * .5)
 
         ax.text(
             p.get_x() + p.get_width(),
@@ -67,21 +60,23 @@ def plot_district_kpis1(kpis) -> plt.Figure:
             p.get_width(), ha='left', va='center', fontsize=21
         )
 
-    #print([x - (1-width) for x in ax.get_yticks()])
+    # print([x - (1-width) for x in ax.get_yticks()])
     ax.set_yticks([x + (1 - width) * 0.5 for x in ax.get_yticks()])
     ax.set_yticklabels(labels, fontsize=21)
     ax.tick_params(axis='both', which='major', labelsize=21)
 
     plt.legend(loc='upper left', bbox_to_anchor=(1.0, 1.0), framealpha=0.0, fontsize=21)
     plt.tight_layout()
-    #fig.suptitle('KPIs at district-level', fontsize=16)
+    # fig.suptitle('KPIs at district-level', fontsize=16)
 
-
-    fig.savefig("kpis.pdf")
+    if mode == 1:
+        filename = 'sac_kpis'
+    fig.savefig(f"{filename}.pdf")
 
     return fig
 
-def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
+
+def plot_district_kpis_multiple(kpis, names, mode) -> plt.Figure:
     values = []
     kpi_ids = []
     env_ids = []
@@ -94,8 +89,8 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
     }
     labels = [
         'fossil energy consumption',
-        '1 - avg. renewable share',
-        '1 - avg. renewable share grid',
+        'avg. fossil share',
+        'avg. fossil share grid',
         '1 - used pv'
     ]
 
@@ -107,10 +102,32 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
 
         kpi['rank'] = kpi['kpi'].map(kpi_names)
 
-        if i==0 or i==2:
-            kpi = kpi[kpi['env_id'] == 'SAC Best']
-        else:
-            kpi = kpi[kpi['env_id'] == 'SAC_DB2Value Best']
+        if mode == 2:
+            kpi = kpi[kpi['env_id'] == 'SAC']
+        elif mode==3:
+            if i == 0:
+                kpi = kpi[kpi['env_id'] == 'SAC Best']
+            else:
+                kpi = kpi[kpi['env_id'] == 'PRB_SAC']
+        elif mode==4:
+            if i == 0 or i == 2:
+                kpi = kpi[kpi['env_id'] == 'RBC']
+            else:
+                kpi = kpi[kpi['env_id'] == 'SAC Best']
+        elif mode==5:
+            if i == 0:
+                kpi = kpi[kpi['env_id'] == 'SAC Best']
+            elif i == 1:
+                kpi = kpi[kpi['env_id'] == 'DDPG Best']
+            else:
+                kpi = kpi[kpi['env_id'] == 'PRB_DDPG']
+        elif mode==6:
+           kpi = kpi[kpi['env_id'] == 'SAC Best']
+        elif mode==7:
+            if i == 0 or i == 2:
+                kpi = kpi[kpi['env_id'] == 'SAC Best']
+            else:
+                kpi = kpi[kpi['env_id'] == 'SAC_DB2Value Best']
 
         kpi['env_id'] = names[i]
         kpi = kpi.drop(columns=['net_value', 'net_value_without_storage'])
@@ -131,17 +148,21 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
 
     width = 0.9
 
-    sns.barplot(x='value', y='kpi', data=kpis, hue='env_id', ax=ax, width=width)#, palette=['tab:blue','tab:red','tab:orange','tab:green'])
-    ax.axvline(1.0, color='black', linestyle='--', linewidth=1, label='')
-    ax.set_xlabel(None)
-    ax.set_ylabel(None)
+    if mode == 5:
+        sns.barplot(x='value', y='kpi', data=kpis, hue='env_id', ax=ax,
+                width=width , palette=['tab:blue','tab:red','tab:orange','tab:green'])
+    else:
+        sns.barplot(x='value', y='kpi', data=kpis, hue='env_id', ax=ax, width=width)
 
+    ax.axvline(1.0, color='black', linestyle='--', linewidth=1, label='')
+    ax.set_xlabel('KPI Value', fontsize=21)
+    ax.set_ylabel(None)
 
     for s in ['right', 'top']:
         ax.spines[s].set_visible(False)
 
     for p in ax.patches:
-        p.set_y(p.get_y() + (1-width) * .5)
+        p.set_y(p.get_y() + (1 - width) * .5)
 
         ax.text(
             p.get_x() + p.get_width(),
@@ -149,34 +170,102 @@ def plot_district_kpis_multiple(kpis, names) -> plt.Figure:
             p.get_width(), ha='left', va='center', fontsize=21
         )
 
-    #print([x - (1-width) for x in ax.get_yticks()])
+    # print([x - (1-width) for x in ax.get_yticks()])
     ax.set_yticks([x + (1 - width) * 0.5 for x in ax.get_yticks()])
-    ax.set_yticklabels(labels, fontsize=21)
+    ax.set_yticklabels(labels, fontsize=23)
     ax.tick_params(axis='both', which='major', labelsize=21)
 
-    #fig.suptitle('KPIs at district-level', fontsize=16)
-    plt.tight_layout(rect=[0, 0, 0.85, 1])
-    ax.legend(loc='upper right', bbox_to_anchor=(1.23, 1.0), framealpha=0, fontsize=21)
-    #plt.show()
-    fig.savefig("kpis.pdf")
+    # fig.suptitle('KPIs at district-level', fontsize=16)
+
+    plt.tight_layout(rect=[0, 0, 0.77, 1])
+
+    if mode == 2:
+        val = 1.225
+    elif mode==3:
+        val = 1.4
+    elif mode == 4:
+        val = 1.4
+    elif mode == 5:
+        val = 1.425
+    elif mode == 6:
+        val = 1.38
+    else:
+        val = 1.425
+
+    ax.legend(loc='upper right', bbox_to_anchor=(val, 1.0), framealpha=0, fontsize=21)
+    # plt.show()
+
+    if mode==2:
+        filename='pretrained_kpis'
+    if mode==3:
+        filename='prb_kpis'
+    if mode==4:
+        filename='eval_kpis'
+    if mode==5:
+        filename='prb_ddpg_kpis'
+    if mode==6:
+        filename='shifted_sac_kpis'
+    if mode==7:
+        filename='social_kpis'
+
+    fig.savefig(f"{filename}.pdf")
 
     return fig
 
 
 if __name__ == '__main__':
-    kpis = [pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
-            pd.read_csv('../experiments/SAC_DB2Value/8_determ_actions/demo_b6/non_extra_pol_update/ir0.15/kpis_20231005T120640.csv'),
-            pd.read_csv('../experiments/New_Buildings/SAC Baseline/kpis_20231113T132158.csv'),
-            pd.read_csv('../experiments/New_Buildings/Demo_B6/extra_pol/ir0.25/kpis_20231113T164524.csv'),
-    ]
+    mode = 7
+
+    if mode == 1:
+        kpis = pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
+    elif mode == 2:
+        kpis = [pd.read_csv('../experiments/SAC/15_b3_demonstrator/kpis_20231030T145351.csv'),
+                pd.read_csv('../experiments/SAC/10_b5_demonstrator/kpis_20231002T132420.csv'),
+                pd.read_csv('../experiments/SAC/09_b6_demonstrator/kpis_20231002T132428.csv'),
+                pd.read_csv('../experiments/SAC/17_b11_demonstrator/kpis_20231113T143302.csv'),
+                ]
+        names = ['D3', 'D5', 'D6', 'D11']
+    elif mode == 3:
+        kpis = [pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
+                pd.read_csv('../experiments/SAC_DB2/33_demo_replaybuffer/demo_b5/kpis_20231026T121912.csv'),
+                pd.read_csv('../experiments/SAC_DB2/33_demo_replaybuffer/demo_b6/kpis_20231026T122547.csv'),
+                ]
+        names = ['Baseline SAC', 'Transitions of D5', 'Transitions of D6']
+    elif mode == 4:
+        kpis = [pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
+                pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
+                pd.read_csv('../experiments/New_Buildings/SAC Baseline/kpis_20231113T132158.csv'),
+                pd.read_csv('../experiments/New_Buildings/SAC Baseline/kpis_20231113T132158.csv'),
+                ]
+        names = ['RBC (Training)', 'SAC (Training)', 'RBC (Evaluation)', 'SAC (Evaluation)', ]
+    elif mode == 5:
+        kpis = [pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
+                pd.read_csv('../experiments/SAC/DDPG/kpis_20231107T143713.csv'),
+                pd.read_csv('../experiments/SAC_DB2/33_demo_replaybuffer/demo_b5_ddpg/kpis_20231106T170835.csv'),
+                pd.read_csv('../experiments/SAC_DB2/33_demo_replaybuffer/demo_b6_ddpg/kpis_20231106T170845.csv'),
+                ]
+        names = ['Baseline SAC', 'DDPG', 'DDPG with transitions\nof D5', 'DDPG with transitions\nof D6', ]
+    elif mode == 6:
+        kpis = [pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
+                pd.read_csv('../experiments/SAC/16_shifted_buildings/shifted_b3/kpis_20231031T173335.csv'),
+                pd.read_csv('../experiments/SAC/16_shifted_buildings/shifted_b5/kpis_20231031T194250.csv'),
+                ]
+        names = ['Baseline SAC', 'SAC for Shifted B3', 'SAC for Shifted B5' ]
+    elif mode == 7:
+        kpis = [pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
+                pd.read_csv(
+                    '../experiments/SAC_DB2Value/8_determ_actions/demo_b6/non_extra_pol_update/ir0.15/kpis_20231005T120640.csv'),
+                pd.read_csv('../experiments/New_Buildings/SAC Baseline/kpis_20231113T132158.csv'),
+                pd.read_csv('../experiments/New_Buildings/Demo_B6/extra_pol/ir0.25/kpis_20231113T164524.csv'),
+                ]
+        names = ['Training SAC', 'Training SAC-DemoQ',
+                 'Evaluation SAC',
+                 'Evaluation SAC-DemoQ',
+                 ]
 
     if len(kpis) == 1:
-        plot_district_kpis1(kpis[0])
+        plot_district_kpis1(kpis[0], mode)
     else:
-        plot_district_kpis_multiple(kpis, ['Training SAC',
-                                           'Training Social2',
-                                           'Evaluation SAC',
-                                           'Evaluation Social2',
-                                           ])
+        plot_district_kpis_multiple(kpis, names, mode)
 
-    #plt.show()
+    # plt.show()

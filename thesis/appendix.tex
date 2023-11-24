@@ -140,7 +140,7 @@ Demonstrator                   & Mode & $\alpha_i$ & Deterministic demonstrator 
 \multirow[t]{2}{*}{Pretrained B6} & 1-3  & 0.01, 0.2, 1, 1.5        & No                           \\
                                & 4-6  & 0.01, 0.2, 1             & No                          
 \end{tabular}
-  \caption[Overview of the experiments for Social Agent I.]{Overview of the experiments for our Social Agent I. We tested different demonstrator, mode, and ILRs $\alpha_i$ combinations. Also, we examined the influence of using deterministic demonstrator actions instead of sampling them.}
+  \caption[Overview of the experiments for SAC-DemoPol.]{Overview of the experiments for our SAC-DemoPol. We tested different demonstrator, mode, and ILRs $\alpha_i$ combinations. Also, we examined the influence of using deterministic demonstrator actions instead of sampling them.}
   \label{app:social1-params}
 \end{table}
 }
@@ -168,7 +168,7 @@ Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.
 \rule{0pt}{2ex}% EXTRA vertical height  
                                & 0.1, 0.15, 0.2, 0.4, 0.6, 0.8                                  & Yes                                          
 \end{tabularx}
-  \caption[Overview of the experiments for Social Agent II.]{Overview of the experiments for our Social Agent II. We tested different demonstrator and ILRs $\alpha_i$ combinations. Also, we examined the influence of using deterministic demonstrator actions instead of sampling them.}
+  \caption[Overview of the experiments for SAC-DemoQ.]{Overview of the experiments for our SAC-DemoQ. We tested different demonstrator and ILRs $\alpha_i$ combinations. Also, we examined the influence of using deterministic demonstrator actions instead of sampling them.}
   \label{app:social2-params}
 \end{table}
 }
@@ -199,7 +199,7 @@ Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/social2_results_sharedobs.pdf}
-  \caption[Results of the Social Agent II with shared observations.]{Results of the fossil energy consumption KPI of the Social Agent II with shared observation. The shaded areas show the standard deviation between the experiments with and without additional policy update, and the graphs show the mean value of them. One experiment with sampled and one with deterministic (determ.) demonstrator actions was conducted for both demonstrators.}
+  \caption[Results of the SAC-DemoQ with shared observations.]{Results of the fossil energy consumption KPI of the SAC-DemoQ with shared observation. The shaded areas show the standard deviation between the experiments with and without additional policy update, and the graphs show the mean value of them. One experiment with sampled and one with deterministic (determ.) demonstrator actions was conducted for both demonstrators.}
   \label{app:social2-results-sharedobs}
 \end{figure}
 
@@ -210,135 +210,160 @@ Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.
   \label{app:sac-shifted-kpis}
 \end{figure}
 
+\begin{figure}[htb]
+\center
+     \includegraphics[width=\textwidth]{figures/social_kpis.pdf}
+  \caption[Results of the best-performing SAC and SAC-DemoQ Agents.]{Results of the best-performing SAC and SAC-DemoQ Agents for the training and the evaluation buildings.}
+  \label{app:social-kpis}
+\end{figure}
+
 \clearpage
 \section{Calculation of Key Performance Indicators}\label{sec:app-kpis}
+To enhance readability, the time index~$t$ has been excluded from the presentation of required values and preliminary calculations.
+
+%\begin{table}[htb]
+%\center
+%\begin{tabular}{l | lll || l | l}
+%\multicolumn{3}{c}{Input values}                 & & \multicolumn{2}{c}{Calculated Values} \\ \hline \hline
+ %     & $e\_net^b$ & $e\_pv^b$ & & $E_{net_{pos}}$       & 20     \\ 
+%Building~1 & -10            & -20           & & $E_{used_{r,grid}}$     & 10     \\
+%Building~2 & 20            & -30           & & $E_{used_f}$       & 10     \\
+%$E_{r,grid}$ & \multicolumn{2}{l}{10}                & & $E_{used_{pv}}$       & 40     \\
+ %     &              &             & & $E_{used_r}$       & 50     \\
+  %    &              &             & & $R_{share}$        & 5/6     \\
+   %   &              &             & & $R_{share,grid}$      & 1/2     \\
+    %  &              &             & & $E_{pv}$          & -50     
+%\end{tabular}
+%\caption{Examples of the calculated values.}
+%\label{tab:basic-prices}
+%\end{table}
+
 \subsection{Fossil Energy Consumption}
-\subsubsection*{Needed Values:}
-Given in CityLearn Framework:
-\begin{itemize}
-\item Electricity consumption of building $b$ from the grid\>$e_b$
-\end{itemize}
-Calculated:
-\begin{itemize}
-\item Generated renewable energy in the grid scaled by median consumption\>$\hat{RE}_{gen}$ (Equation \ref{eq:re-grid})
-\end{itemize}
+\subsubsection*{Required Values}
+\begin{tabularx}{\textwidth}{Xll}
+\multicolumn{3}{l}{\hspace{-6px}\textit{Given in CityLearn Framework:}}                                                                                     \\
+Electricity consumption of building $b$ from grid               & $e_b$            &  \\             
+& & \\
+\multicolumn{3}{l}{\hspace{-6px}\textit{Calculated:}}                                                                                                       \\
+Scaled generated renewable energy in grid & $\hat{RE}_{gen}$ & (Equation \ref{eq:re-grid})
+\end{tabularx}
 
-\subsubsection*{Preliminary Calculations:}
-\begin{itemize}
-	\item Positive net electricity consumption:
-		\begin{equation}
-		\label{eq:energy-pos}
-		E_{pos} = \sum_{b\in B} \max(e_b, 0)
-		\end{equation} 
-		Positive consumption value is used to prevent sharing of surplus energy between buildings
-	\item Consumed renewable energy from the grid 
-		\begin{equation}
-		\label{eq:re-con-grid}
-		RE_{con}^G = \min(E_{pos}, \hat{RE}_{gen}^G)
-		\end{equation} 
-		Minimum of $E_{pos}$ ($\hat{=}$ required energy from the grid) and the available renewable energy in the grid
-\end{itemize}
-
-\subsubsection*{Formula:}
+\subsubsection*{Preliminary Calculations}
+\textit{Total positive electricity consumption from grid:}
 \begin{equation}
-fossil~energy~consumption = FE_{con} = \sum_t E_{pos}^t - RE_{con}^{G,t}
+	\label{eq:energy-pos}
+	E_{pos} = \sum_{b\in B} \max(e_b, 0)
+\end{equation} 
+Positive consumption is used to prevent sharing of surplus energy between buildings \vspace{10px} \\
+\textit{Total consumed renewable energy from grid:}
+\begin{equation}
+	\label{eq:re-con-grid}
+	RE_{con}^G = \min(E_{pos}, \hat{RE}_{gen}^G)
+\end{equation} 
+
+\subsubsection*{Formula}
+\begin{equation}
+\text{fossil energy consumption} = FE_{con} = \sum_t E_{pos}^t - RE_{con}^{G,t}
 \end{equation}
 over all time steps~$t$. \vspace{10px}
 
-\subsubsection*{Interpretation:} Absolute fossil energy consumption of all buildings.
+\begin{description}
+\item[Interpretation] Total fossil energy consumption of all buildings.
+\item[Level] District-level
+\end{description}
 
-\subsubsection*{Level:} District-level
-
-\subsection{1 - Average Renewable Share}
-\subsubsection*{Needed Values:}
-Given in CityLearn Framework:
-\begin{itemize}
-\item Electricity consumption of building $b$ from the grid\>$e_b$
-\item Generated solar energy of building $b$\>$pv_{gen}^b$
-\end{itemize}
-Calculated:
-\begin{itemize}
-\item Sum of positive electricity consumption from grid for all buildings\>$E_{pos}$ (Equation \ref{eq:energy-pos})
-\item Consumed renewable energy from the grid from all buildings\>$RE_{con}^G$ (Equation \ref{eq:re-con-grid})
-\end{itemize}
-
-\subsubsection*{Preliminary Calculations:}
-\begin{itemize}
-	\item Total solar consumption
-		\begin{equation}
-		\label{eq:re-con-pv}
-		RE_{con}^{PV} = \sum_{b\in B} \max(\min(e_{b} - pv_{gen}^b, - pv_{gen}^b), 0)
-		\end{equation}
-		Amount of solar energy consumed per building is the minimum between the net energy consumption excluding produced solar energy~$pv_{gen}^b$ and negative solar energy. \\
-		Negative solar energy since this is specified as a negative time series in the CityLearn framework. \\
-		Solar energy only refers to the energy produced by the PVs of the buildings (excluding solar energy in the grid).
-	\item Total renewable energy consumption
-		\begin{equation}
-		 RE_{con} = RE_{con}^G + RE_{con}^{PV}
-		 \end{equation}
-	\item Share of renewable energy consumed in the total energy consumed
-		\begin{equation}
-		RE_{pct} = \frac{RE_{con}}{E_{pos} + RE_{con}^{PV}}
-		\end{equation}
-\end{itemize}
-
-\subsubsection*{Formula and Interpreation:}
-\begin{equation}
- 1 - avg.~renewable~share = \sum_{t=1}^{24}\frac{RE_{pct}^t}{24}.
-\end{equation}
-over all time steps~$t$.  Average daily fossil energy fraction of the total energy consumed
-
-\subsubsection*{Level:} District-level
-
-\subsection{1 - Average Renewable Share Grid}
-\subsubsection*{Needed Values:}
-Calculated:
-\begin{itemize}
-\item Sum of positive electricity consumption from grid for all buildings\>$E_{pos}$ (Equation \ref{eq:energy-pos})
-\item Consumed renewable energy from the grid from all buildings\>$RE_{con}^G$ (Equation \ref{eq:re-con-grid})
-\end{itemize}
+\subsection{Average Fossil Share}
+\subsubsection*{Required Values}
+\begin{tabularx}{\textwidth}{Xll}
+\multicolumn{3}{l}{\hspace{-6px}\textit{Given in CityLearn Framework:}}  \\
+Electricity consumption of building $b$ from the grid               & $e_b$            &  \\             
+Generated solar energy of building $b$ & $pv_{gen}^b$ & \\
+& & \\
+\multicolumn{3}{l}{\hspace{-6px}\textit{Calculated:}}                                                                                                       \\
+Total positive electricity consumption from grid & $E_{pos}$ & (Equation \ref{eq:energy-pos}) \\
+Total consumed renewable energy from grid & $RE_{con}^G$ & (Equation \ref{eq:re-con-grid})
+\end{tabularx}
 
 \subsubsection*{Preliminary Calculations}
-\begin{itemize}
-	\item Share of renewable energy consumed in the energy consumed from the grid
-		\begin{equation}
-		RE_{pct}^G = \frac{RE_{con}^G}{E_{pos}}
-		\end{equation} 
-\end{itemize}
-
-\subsubsection*{Formula and Interpreation:}
+\textit{Total solar energy consumption:}
 \begin{equation}
- 1 - avg~renewable~share~grid = \sum_{t=1}^{24}\frac{RE_{pct}^{G,t}}{24}.
+	\label{eq:re-con-pv}
+	RE_{con}^{PV} = \sum_{b\in B} \max(\min(e_{b} - pv_{gen}^b, - pv_{gen}^b), 0)
 \end{equation}
-over all time steps~$t$.  Average daily fossil energy fraction of the energy consumed from the grid
+Negative solar energy value is used since this is specified as a negative time series in the CityLearn framework. Solar energy only refers to the energy produced by the PVs of the buildings (excluding solar energy in the grid). \vspace{10px} \\
+\textit{Total renewable energy consumption:}
+\begin{equation}
+	RE_{con} = RE_{con}^G + RE_{con}^{PV}
+\end{equation}
+\vspace{10px}\\
+\textit{Proportion of total energy consumption attributed to renewable sources:}
+\begin{equation}
+	RE_{pct} = \frac{RE_{con}}{E_{pos} + RE_{con}^{PV}}
+\end{equation}
 
-\subsubsection*{Level:} District-level
+\subsubsection*{Formula}
+\begin{equation}
+ \text{avg.~fossil~share} = \sum_{t=1}^{24}1-\frac{RE_{pct}^t}{24}.
+\end{equation}
+over all time steps~$t$. 
+
+\begin{description}[leftmargin=3.15cm]
+\item[Interpretation] The average daily fraction of fossil energy in the total energy consumption.
+\item[Level] District-level
+\end{description}
+
+\subsection{Average Fossil Share Grid}
+\subsubsection*{Required Values:}
+\begin{tabularx}{\textwidth}{Xll}
+\multicolumn{3}{l}{\hspace{-6px}\textit{Calculated:}}  \\
+Total positive electricity consumption from grid & $E_{pos}$ & (Equation \ref{eq:energy-pos}) \\
+Total consumed renewable energy from grid & $RE_{con}^G$ & (Equation \ref{eq:re-con-grid})
+\end{tabularx}
+
+\subsubsection*{Preliminary Calculations}
+\textit{Proportion of grid energy consumption attributed to renewable sources:}
+\begin{equation}
+	RE_{pct}^G = \frac{RE_{con}^G}{E_{pos}}
+\end{equation} 
+
+\subsubsection*{Formula}
+\begin{equation}
+\text{avg.~fossil~share~grid} = \sum_{t=1}^{24}1-\frac{RE_{pct}^{G,t}}{24}.
+\end{equation}
+over all time steps~$t$. 
+ 
+\begin{description}[leftmargin=3.15cm]
+\item[Interpretation] The average daily fraction of fossil energy in the grid energy consumption.
+\item[Level] District-level
+\end{description}
 
 \subsection{1 - Used PV}
-\subsubsection*{Needed Values:}
-Given in CityLearn Framework:
-\begin{itemize}
-\item Generated solar energy of all buildings \> $PV_{gen}$
-\end{itemize}
-Calculated:
-\begin{itemize}
-\item Consumed energy from all buildings PV's\>$RE_{con}^{PV}$ (Equation \ref{eq:re-con-pv})
-\end{itemize}
+\subsubsection*{Required Values}
+\begin{tabularx}{0.85\textwidth}{Xll}
+\multicolumn{3}{l}{\hspace{-6px}\textit{Given in CityLearn Framework:}}  \\
+Total generated solar energy & $PV_{gen}$ & \\
+& & \\
+\multicolumn{3}{l}{\hspace{-6px}\textit{Calculated:}}  \\
+Total consumed solar energy & $RE_{con}^{PV}$ & (Equation \ref{eq:re-con-pv})
+\end{tabularx}
 
-\subsubsection*{Formula and Interpreation:}
+\subsubsection*{Formula}
 \begin{equation}
- 1 - used~pv = \sum_{t=1}^{24}\frac{\frac{RE_{con}^{PV,t}}{-PV_{gen}^t}}{24}.
+ 1 - \text{used~pv} = \sum_{t=1}^{24}\frac{\frac{RE_{con}^{PV,t}}{-PV_{gen}^t}}{24}.
 \end{equation}
-over all time steps~$t$.  Average daily used solar energy of the total produced. PV energy generated~$PV_{gen}$,
+over all time steps~$t$.  
 
-\subsubsection*{Level:} Building- and District-level
+\begin{description}[leftmargin=3.15cm]
+\item[Interpretation] The average daily fraction of consumed solar energy in the total produced solar energy.
+\item[Level] Building- and District-level
+\end{description}
 
 
 \clearpage
 
 \section{Algorithms}\label{sec:app-algos}
 \begin{algorithm}
-\caption{\textcolor{red}{Social Agent I}}
+\caption{\textcolor{red}{SAC-DemoPol}}
 \label{app:sac-social-1}
 \small\textbf{Input:}   $\theta_1,\theta_2,\phi$ \Comment{\footnotesize Initial parameters}
 \begin{algorithmic}[1]
@@ -366,7 +391,7 @@ over all time steps~$t$.  Average daily used solar energy of the total produced.
 \end{algorithm}
 
 \begin{algorithm}
-\caption{\textcolor{red}{Social Agent II}}
+\caption{\textcolor{red}{SAC-DemoQ}}
 \label{app:sac-social-2}
 \small\textbf{Input:}   $\theta_1,\theta_2,\phi$ \Comment{\footnotesize Initial parameters}
 \begin{algorithmic}[1]

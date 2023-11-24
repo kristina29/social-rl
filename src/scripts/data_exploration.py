@@ -12,6 +12,8 @@ from scipy.stats import pearsonr
 
 from utils import save_multi_image
 
+plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
+plt.rc('text', usetex=True)
 
 def create_scatter_plot(ax, x, y):
     ax.scatter(x, y, s=1)
@@ -591,7 +593,7 @@ def plot_building_means(save, timestamp):
     # plt.tick_params(labelcolor='none', which='both', top=False, bottom=False, left=False, right=False)
     plt.xticks(np.linspace(0, 365, 13)[:-1],
                ('Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'))
-    fig.legend(handles, labels, loc='upper center', fontsize=21)
+    fig.legend(handles, labels, loc='upper center', fontsize=21, framealpha=0)
     plt.tight_layout(rect=[0, 0, 1, 0.93])
     fig.subplots_adjust(wspace=0, hspace=0.1)
 
@@ -741,8 +743,8 @@ if __name__ == '__main__':
     ny_data = False
     pricing_data = False
     building_data = False
-    building_data_means = False
-    weather_means = True
+    building_data_means = True
+    weather_means = False
     timestamp = datetime.now().strftime("%Y%m%dT%H%M%S")
 
     if challenge_data:
