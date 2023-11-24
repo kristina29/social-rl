@@ -4,11 +4,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from matplotlib import rc
 
-plt.rcParams.update({
-    "text.usetex": True,
-    "font.family": "Helvetica"
-})
+rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
+rc('text', usetex=True)
 
 BEST_SAC_VALUE = 0.9298
 Y_LIM = [0.91, 1.005]
@@ -32,8 +31,8 @@ sacdb2_dirs = pd.DataFrame({'paths': ['31_randomdemo/d2/ir0.01',
                                       ],
                             'demos': ['2 random', '2 random', '2 random', '2 random', '2 random\n(determ.)',
                                       '4 random', '4 random', '4 random', '4 random',
-                                      'B5', 'B5', 'B5', 'B5',
-                                      'B6', 'B6', 'B6', 'B6'],
+                                      'D5', 'D5', 'D5', 'D5',
+                                      'D6', 'D6', 'D6', 'D6'],
                             'ir': [0.01, 0.2, 1, 1.5, 0.2,
                                    0.01, 0.2, 1, 1.5,
                                    0.01, 0.2, 1, 1.5,
@@ -63,11 +62,11 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d
                                            '2 random\n(shared obs.,\ndeterm.)', '2 random\n(shared obs.,\ndeterm.)',
                                            '2 random', '2 random',
                                            '4 random', '4 random',
-                                           'B6', 'B6',
-                                           'B6 (determ.)', 'B6 (determ.)',
+                                           'D6', 'D6',
+                                           'D6 (determ.)', 'D6 (determ.)',
                                            'B5', 'B5',
-                                           'B6\n(shared obs.)', 'B6\n(shared obs.)',
-                                           'B6\n(shared obs.,\ndeterm.)', 'B6\n(shared obs.,\ndeterm.)'],
+                                           'D6\n(shared obs.)', 'D6\n(shared obs.)',
+                                           'D6\n(shared obs.,\ndeterm.)', 'D6\n(shared obs.,\ndeterm.)'],
                                  'extra_pols': [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]})
 
 marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info_sharing',
@@ -155,8 +154,8 @@ def generate_sacdb2():
     demo_pos = {'2 random\n(determ.)': 1,
                 '2 random': 2,
                 '4 random': 3,
-                'B5': 4,
-                'B6': 5}
+                'D5': 4,
+                'D6': 5}
     markers = {r'$\leq$ 0.2': 'o',
                r'$\geq$ 1': 'X'}
 
@@ -195,8 +194,8 @@ def generate_sacdb2():
 
     ax.tick_params(axis='both', which='major', labelsize=17)
 
-    ax.set_ylabel('KPI $fossil\_energy\_consumption$', fontsize=19)
-    ax.set_xlabel('Demonstrators', fontsize=19)
+    ax.set_ylabel('fossil energy consumption', fontsize=19)
+    ax.set_xlabel('Demonstrator', fontsize=19)
 
     for t in range(len(xticks)):
         if t % 2 == 1:
@@ -361,9 +360,9 @@ def generate_sacdb2value():
                 #'2 random\n(shared obs.,\ndeterm.)': 2,
                 '2 random': 1, #3,
                 '4 random': 2, #4,
-                'B5': 3, #5,
-                'B6': 4, #6,
-                'B6 (determ.)': 5, #7,
+                'D5': 3, #5,
+                'D6': 4, #6,
+                'D6 (determ.)': 5, #7,
                 #'B6\n(shared obs.)': 8,
                 #'B6\n(shared obs.,\ndeterm.)': 9
         }
@@ -406,8 +405,8 @@ def generate_sacdb2value():
 
     ax.tick_params(axis='both', which='major', labelsize=17)
 
-    ax.set_ylabel('KPI $fossil\_energy\_consumption$', fontsize=19)
-    ax.set_xlabel('Demonstrators', fontsize=19)
+    ax.set_ylabel('fossil energy consumption', fontsize=19)
+    ax.set_xlabel('Demonstrator', fontsize=19)
 
     for t in range(len(xticks)):
         if t % 2 == 1:

@@ -24,7 +24,9 @@ x2, y2 = map(lon[1:], lat[1:])
 #csf = map.contourf(x, y, data)  # filled contour
 #map.colorbar(csf, "right", extend='both', size="3%", pad="1%")
 map.scatter(x1, y1, s=150, c='#38761d')
-map.scatter(x1, y1, s=100, c='#cc0000')
+map.scatter(x1, y1, s=50, c='#cc0000')
 map.scatter(x2, y2, s=150, c='#cc0000')
+
+plt.tight_layout()
 
 fig.savefig("locations.pdf")

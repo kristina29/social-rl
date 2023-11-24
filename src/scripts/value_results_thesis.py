@@ -4,10 +4,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from matplotlib import rc
 from matplotlib.ticker import FormatStrFormatter
 
-plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
-plt.rc('text', usetex=True)
+rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
+rc('text', usetex=True)
 
 BEST_SAC_VALUE = 0.93
 BEST_SAC_B3 = 0.94
@@ -48,15 +49,15 @@ sacdb2value_dirs = pd.DataFrame({'paths': ['9_interchanged_observations/random_d
                                            '2 random (determ.)', '2 random (determ.)',
                                            '2 random', '2 random',
                                            '4 random', '4 random',
-                                           'B6', 'B6',
-                                           'B6 (determ.)', 'B6 (determ.)',
-                                           'B5', 'B5',
-                                           'B6', 'B6',
-                                           'B6 (determ.)', 'B6 (determ.)',
-                                           'B5 (Shifted B5)', 'B5 (Shifted B5)',
-                                           'B6 (Shifted B5)', 'B6 (Shifted B5)',
-                                           'B3 (Shifted B3)', 'B3 (Shifted B3)',
-                                           'B6 (Shifted B3)', 'B6 (Shifted B3)'
+                                           'D6', 'D6',
+                                           'D6 (determ.)', 'D6 (determ.)',
+                                           'D5', 'D5',
+                                           'D6', 'D6',
+                                           'D6 (determ.)', 'D6 (determ.)',
+                                           'D5 (Shifted B5)', 'D5 (Shifted B5)',
+                                           'D6 (Shifted B5)', 'D6 (Shifted B5)',
+                                           'D3 (Shifted B3)', 'D3 (Shifted B3)',
+                                           'D6 (Shifted B3)', 'D6 (Shifted B3)'
                                            ],
                                  'extra_pols': [0, 1, 0, 1, #interchanged obs
                                                 0, 1, 0, 1, #random demo
@@ -93,9 +94,9 @@ eval_dirs = pd.DataFrame({'paths': [#'Demo_B5/extra_pol',
                                     'Demo_B11/extra_pol',
                                     'Demo_B11/no_extra_pol',
                                     ],
-                                 'demos': [#'B5', 'B5',
-                                           'B6 (determ.)', 'B6 (determ.)',
-                                           'B11 (determ.)', 'B11 (determ.)',
+                                 'demos': [#'D5', 'D5',
+                                           'D6 (determ.)', 'D6 (determ.)',
+                                           'D11 (determ.)', 'D11 (determ.)',
                                            ],
                                  'extra_pols': [#1, 0,
                                                 1, 0,
@@ -180,7 +181,7 @@ def generate_sacdb2value():
     for a in [ax, ax2, ax3]:
         a.set_xscale('log', base=2)
         a.set_ylim(0.91, 0.975)
-        a.set_ylabel('KPI $fossil\_energy\_consumption$', fontsize=19)
+        a.set_ylabel('fossil energy consumption', fontsize=19)
         a.set_xlabel(r'Imitation learning rate $\alpha_i$', fontsize=19)
         a.grid(zorder=1)
         a.tick_params(axis='both', which='major', labelsize=17)
@@ -282,7 +283,7 @@ def generate_eval():
     for a in [ax]:
         a.set_xscale('log', base=2)
         a.set_ylim(0.905, 0.955)
-        a.set_ylabel('KPI $fossil\_energy\_consumption$', fontsize=19)
+        a.set_ylabel('fossil energy consumption', fontsize=19)
         a.set_xlabel(r'Imitation learning rate $\alpha_i$', fontsize=19)
         a.grid(zorder=1)
         a.tick_params(axis='both', which='major', labelsize=17)
@@ -309,5 +310,5 @@ def generate_eval():
 
 
 if __name__ == '__main__':
-    #generate_sacdb2value()
-    generate_eval()
+    generate_sacdb2value()
+    #generate_eval()
