@@ -17,10 +17,13 @@ The project is built upon the [CityLearn environment](https://www.citylearn.net)
 
 ## Repository Structure
 
-- **src/**: Contains all the source code developed for the thesis and the CityLearn code.
-- **datasets/**: Includes datasets and the results from simulations.
-- **experiments/**: 
-- **thesis/**:
+- `src/`: Contains all the source code developed for the thesis and the CityLearn code.
+  - `src/citylearn/agents`: Contains all the source code of the RL agents (provided by CityLearn and developed for the thesis).
+  - `src/citylearn/data`: Contains the datasets used in the CityLearn simulations.
+  - `src/scripts`: Contains the python scripts for data exploration, data preprocessing and generating plots. 
+- `datasets/`: Includes datasets and the results from simulations.
+- `experiments/`:  Includes configuration details and results of all experiments.
+- `thesis/`: LaTeX source code for the thesis document.
 
 ## Key Results
 
@@ -32,11 +35,12 @@ Comparative performance metrics and findings from the implementation of social l
 To get started with the project:
 
 - Clone the repository.
-- Install the required dependencies listed in requirements.txt.
-- Follow the setup instructions in the installation.md to configure your environment.
-- Navigate to the examples/ directory to run sample simulations.
-
-
-## Contact Information
-
-For any queries regarding the project, please contact [Your Name] at [Your Email].
+- Install the required dependencies listed in `requirements.txt` or create a conda environment using `env.yml`.
+- Navigate to the `src/` directory.
+- Use one of the following commands to run a social simulation (**Attention! With standard parameters, the running time is around 45 minutes**):
+  - Imitation Learning: `python3 `
+  - social i
+  - social ii
+  - marlisa
+  
+For enhanced flexibility and customization, you have the ability to fine-tune the simulations by configuring additional options. This includes integrating a pre-trained demonstrator to guide the agents or adjusting various hyperparameters. To explore the full range of configurable settings for both non-social and social simulations, please refer to `src/options.py`.
