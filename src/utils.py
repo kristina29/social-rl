@@ -670,7 +670,6 @@ def plot_fossil_consumption(envs: Mapping[str, CityLearnEnv]) -> plt.Figure:
         Figure containing plotted axes.
     """
 
-    # figsize = (5.0, 1.5)
     fig, ax = plt.subplots(1, 1)  # , figsize=figsize)
 
     for k, v in envs.items():
@@ -1029,3 +1028,14 @@ def save_transitions_to(env: CityLearnEnv, model: Agent, name: str):
     with open(t_filename, 'wb') as fp:
         pickle.dump(transitions, fp)
         print('Saved transitions to', t_filename)
+
+
+def get_best_env(model, best_state):
+    best_state_env = copy.deepcopy(model.env)
+    eval_observations = best_state_env.reset()
+
+    while not best_state_env.done:
+        actions = best_state.predict(eval_observations, deterministic=True)
+        eval_observations, eval_rewards, _, _ = best_state_env.step(actions)
+
+    return best_state_env

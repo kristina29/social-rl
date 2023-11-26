@@ -1,4 +1,3 @@
-import copy
 import pickle
 import time
 
@@ -11,7 +10,7 @@ from citylearn.data import DataSet
 from citylearn.utilities import get_active_parts
 from options import parseOptions_social
 from utils import set_schema_buildings, set_active_observations, set_schema_demonstrators, save_results, \
-    save_transitions_to
+    save_transitions_to, get_best_env
 from nonsocialrl import train_tql, train_rbc, train_sac
 
 
@@ -25,8 +24,6 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
 
     # load data
     schema = DataSet.get_schema(dataset_name)
-
-    # TODO: DATA EXPLORATION
 
     # Data Preprocessing
     schema = preprocessing(schema, building_count, demonstrators_count, random_seed, active_observations, building_ids)
@@ -58,29 +55,29 @@ def train(dataset_name, random_seed, building_count, demonstrators_count, episod
         all_envs['SAC-DemoPol'], all_losses['SAC-DemoPol'], all_rewards['SAC-DemoPol'], all_eval_results['SAC-DemoPol'], \
         all_agents['SAC-DemoPol'], all_envs['SAC-DemoPol Best'] = \
             train_sacdemopol(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
-                         discount=discount, autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
-                         kaiming_initialization=kaiming_initialization, l2_loss=l2_loss, mode=mode,
-                         imitation_lr=imitation_lr, pretrained_demonstrator=pretrained_demonstrator,
-                         deterministic_demo=deterministic_demo, end_exploration_t=end_exploration_t,
-                         save_transitions=save_transitions)
+                             discount=discount, autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
+                             kaiming_initialization=kaiming_initialization, l2_loss=l2_loss, mode=mode,
+                             imitation_lr=imitation_lr, pretrained_demonstrator=pretrained_demonstrator,
+                             deterministic_demo=deterministic_demo, end_exploration_t=end_exploration_t,
+                             save_transitions=save_transitions)
 
     # Train SAC agent with decision-biasing on the value function
     if include_sacdemoq:
         all_envs['SAC-DemoQ'], all_losses['SAC-DemoQ'], all_rewards['SAC-DemoQ'], \
         all_eval_results['SAC-DemoQ'], all_agents['SAC-DemoQ'], all_envs['SAC-DemoQ Best'] = \
             train_sacdemoq(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
-                              discount=discount, autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
-                              kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
-                              imitation_lr=imitation_lr, pretrained_demonstrator=pretrained_demonstrator,
-                              deterministic_demo=deterministic_demo, extra_policy_update=extra_policy_update,
-                              end_exploration_t=end_exploration_t, save_transitions=save_transitions)
+                           discount=discount, autotune_entropy=autotune_entropy, clip_gradient=clip_gradient,
+                           kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
+                           imitation_lr=imitation_lr, pretrained_demonstrator=pretrained_demonstrator,
+                           deterministic_demo=deterministic_demo, extra_policy_update=extra_policy_update,
+                           end_exploration_t=end_exploration_t, save_transitions=save_transitions)
 
     # Train DDPG agent with demonstrator transitions
     if ddpg:
         all_envs['DDPG'], all_losses['DDPG'], all_rewards['DDPG'], all_eval_results['DDPG'], \
         all_agents['DDPG'], all_envs['DDPG Best'] = \
             train_ddpg(schema=schema, episodes=episodes, random_seed=random_seed, batch_size=batch_size,
-                          discount=discount, end_exploration_t=end_exploration_t, l2_loss=l2_loss)
+                       discount=discount, end_exploration_t=end_exploration_t, l2_loss=l2_loss)
 
     # Train SAC agent with demonstrator transitions
     if demo_transitions is not None and ddpg:
@@ -125,26 +122,23 @@ def preprocessing(schema, building_count, demonstrators_count, random_seed, acti
 
 
 def train_sacdemopol(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
-                 kaiming_initialization, l2_loss, mode, imitation_lr, pretrained_demonstrator, deterministic_demo,
-                 end_exploration_t, save_transitions):
+                     kaiming_initialization, l2_loss, mode, imitation_lr, pretrained_demonstrator, deterministic_demo,
+                     end_exploration_t, save_transitions):
     if pretrained_demonstrator is not None:
         with open(pretrained_demonstrator, 'rb') as file:
             pretrained_demonstrator = pickle.load(file)
 
     env = CityLearnEnv(schema)
     sacdemopol_model = SACDEMOPOL(env=env, seed=random_seed, batch_size=batch_size, autotune_entropy=autotune_entropy,
-                                  clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
+                                  clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization,
+                                  l2_loss=l2_loss,
                                   discount=discount, mode=mode, imitation_lr=imitation_lr,
-                                  pretrained_demonstrator=pretrained_demonstrator, deterministic_demo=deterministic_demo,
+                                  pretrained_demonstrator=pretrained_demonstrator,
+                                  deterministic_demo=deterministic_demo,
                                   end_exploration_time_step=end_exploration_t)
     losses, rewards, eval_results, best_state = sacdemopol_model.learn(episodes=episodes, deterministic_finish=True)
 
-    best_state_env = copy.deepcopy(sacdemopol_model.env)
-    eval_observations = best_state_env.reset()
-
-    while not best_state_env.done:
-        actions = best_state.predict(eval_observations, deterministic=True)
-        eval_observations, eval_rewards, _, _ = best_state_env.step(actions)
+    best_state_env = get_best_env(sacdemopol_model, best_state)
 
     print('SAC-DemoPol model trained!')
 
@@ -155,8 +149,8 @@ def train_sacdemopol(schema, episodes, random_seed, batch_size, discount, autotu
 
 
 def train_sacdemoq(schema, episodes, random_seed, batch_size, discount, autotune_entropy, clip_gradient,
-                      kaiming_initialization, l2_loss, imitation_lr, pretrained_demonstrator, deterministic_demo,
-                      extra_policy_update, end_exploration_t, save_transitions):
+                   kaiming_initialization, l2_loss, imitation_lr, pretrained_demonstrator, deterministic_demo,
+                   extra_policy_update, end_exploration_t, save_transitions):
     if pretrained_demonstrator is not None:
         with open(pretrained_demonstrator, 'rb') as file:
             pretrained_demonstrator = pickle.load(file)
@@ -172,12 +166,7 @@ def train_sacdemoq(schema, episodes, random_seed, batch_size, discount, autotune
                               n_interchanged_obs=len(env.interchanged_observations) * (len(env.buildings) - 1))
     losses, rewards, eval_results, best_state = sacdemoq_model.learn(episodes=episodes, deterministic_finish=True)
 
-    best_state_env = copy.deepcopy(sacdemoq_model.env)
-    eval_observations = best_state_env.reset()
-
-    while not best_state_env.done:
-        actions = best_state.predict(eval_observations, deterministic=True)
-        eval_observations, eval_rewards, _, _ = best_state_env.step(actions)
+    best_state_env = get_best_env(sacdemoq_model, best_state)
 
     print('SAC-DemoQ model trained!')
 
@@ -212,8 +201,8 @@ def train_prbddpg(schema, episodes, random_seed, batch_size, discount, demo_tran
         demo_transitions = pickle.load(file)
 
     prbddpg_model = PRBDDPG(env=env, seed=random_seed, batch_size=batch_size, l2_loss=l2_loss,
-                        discount=discount, demonstrator_transitions=demo_transitions,
-                        end_exploration_time_step=end_exploration_t)
+                            discount=discount, demonstrator_transitions=demo_transitions,
+                            end_exploration_time_step=end_exploration_t)
     losses, rewards, eval_results, best_state = prbddpg_model.learn(episodes=episodes, deterministic_finish=True)
 
     print('PRB DDPG model trained!')
@@ -225,16 +214,11 @@ def train_ddpg(schema, episodes, random_seed, batch_size, discount, end_explorat
     env = CityLearnEnv(schema)
 
     ddpg_model = DDPG(env=env, seed=random_seed, batch_size=batch_size, l2_loss=l2_loss,
-                        discount=discount, demonstrator_transitions=demo_transitions,
-                        end_exploration_time_step=end_exploration_t)
+                      discount=discount, demonstrator_transitions=demo_transitions,
+                      end_exploration_time_step=end_exploration_t)
     losses, rewards, eval_results, best_state = ddpg_model.learn(episodes=episodes, deterministic_finish=True)
 
-    best_state_env = copy.deepcopy(ddpg_model.env)
-    eval_observations = best_state_env.reset()
-
-    while not best_state_env.done:
-        actions = best_state.predict(eval_observations, deterministic=True)
-        eval_observations, eval_rewards, _, _ = best_state_env.step(actions)
+    best_state_env = get_best_env(ddpg_model, best_state)
 
     print('DDPG model trained!')
 
@@ -285,7 +269,8 @@ if __name__ == '__main__':
           demonstrators_count=demonstrators_count, episodes=episodes, discount=discount,
           active_observations=active_observations, batch_size=batch_size, autotune_entropy=autotune_entropy,
           clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization, l2_loss=l2_loss,
-          include_tql=include_tql, include_rbc=include_rbc, include_sac=include_sac, include_sacdemopol=include_sacdemopol,
+          include_tql=include_tql, include_rbc=include_rbc, include_sac=include_sac,
+          include_sacdemopol=include_sacdemopol,
           include_sacdemoq=include_sacdemoq,
           mode=mode, imitation_lr=imitation_lr, building_ids=building_ids, store_agents=store_agents,
           pretrained_demonstrator=pretrained_demonstrator, demo_transitions=demo_transitions,
