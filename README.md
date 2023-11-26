@@ -31,7 +31,7 @@ To get started with the project:
 
 - Clone the repository.
 - Install the required dependencies listed in `requirements.txt` or create a conda environment using `env.yml` and activate it.
-- Use one of the following commands to run a social simulation (**Attention! With standard parameters, the running time is around 45 minutes**):
+- Use one of the following commands to run a social simulation:
   - Train RBC, asocial SAC and SAC agents using imitation learning for two buildings using the optimized hyperparameters:
     ```
     python3 src/socialrl.py -s nnb_limitobs1 -b 2 --rbc --sac --transitions datasets/transitions/SAC_transitions_b5.pkl --autotune
@@ -41,16 +41,16 @@ To get started with the project:
     ```
     python3 src/socialrl.py -s nnb_limitobs1 -b 2 -d 2 --rbc --sacdemopol --autotune --mode 1 --ir 0.2
     ```
-    [Runtime ~x Minutes]
+    [Runtime ~10 Minutes]
   - Train RBC and SAC-DemoQ agents for two buildings using the optimized hyperparameters, two random demonstrators, and an imitation learning rate $\alpha_i=0.15$:
     ```
     python3 src/socialrl.py -s nnb_limitobs1 -b 2 -d 2 --rbc --sacdemoq --autotune --ir 0.15
     ```
-    [Runtime ~x Minutes]
+    [Runtime ~10 Minutes]
   - Train RBC and MARLISA agents for two buildings using the optimized hyperparameters and information sharing. The reward function to use is defined in `src/citylearn/data/nnb_limitobs1_marlisa/schema.json`:
     ```
-    srun python3 src/marlisa_social.py -s nnb_limitobs1_marlisa -b 2 --autotune --information_sharing
+    python3 src/marlisa_social.py -s nnb_limitobs1_marlisa -b 2 --rbc --autotune --information_sharing
     ```
-    [Runtime ~x Minutes]
+    [Runtime ~11 Minutes]
   
 For enhanced flexibility and customization, you have the ability to fine-tune the simulations by configuring additional options. This includes using a pre-trained demonstrator to guide the agents or adjusting various hyperparameters. To explore the full range of configurable settings for both non-social and social simulations, please refer to `src/options.py` or run `python3 src/socialrl.py --help`.
