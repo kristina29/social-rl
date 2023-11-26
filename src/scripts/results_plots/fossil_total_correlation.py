@@ -1,5 +1,3 @@
-import math
-
 import numpy as np
 import pandas as pd
 import os
@@ -8,8 +6,6 @@ from glob import glob
 from scipy.stats import pearsonr
 
 import matplotlib.pyplot as plt
-
-from scripts.building_demand_correlation import read_building_demand
 
 plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
 plt.rc('text', usetex=True)
