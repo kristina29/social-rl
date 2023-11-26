@@ -9,7 +9,7 @@ from citylearn.data import DataSet
 from citylearn.utilities import get_active_parts
 from citylearn.wrappers import TabularQLearningWrapper
 from options import parseOptions_nonsocial
-from utils import set_schema_buildings, set_active_observations, save_results, save_transitions_to
+from utils import set_schema_buildings, set_active_observations, save_results, save_transitions_to, get_best_env
 
 
 def train(dataset_name, random_seed, building_count, episodes, active_observations, batch_size, discount,
@@ -124,12 +124,7 @@ def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entr
                     discount=discount, end_exploration_time_step=end_exploration_t)
     losses, rewards, eval_results, best_state = sac_model.learn(episodes=episodes, deterministic_finish=True)
 
-    best_state_env = copy.deepcopy(sac_model.env)
-    eval_observations = best_state_env.reset()
-
-    while not best_state_env.done:
-        actions = best_state.predict(eval_observations, deterministic=True)
-        eval_observations, eval_rewards, _, _ = best_state_env.step(actions)
+    best_state_env = get_best_env(sac_model, best_state)
 
     print('SAC model trained!')
 
