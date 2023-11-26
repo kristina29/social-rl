@@ -17,7 +17,7 @@ The project is built upon the [CityLearn environment](https://www.citylearn.net)
 
 ## Repository Structure
 
-- **src/**: Contains all the source code developed for the thesis.
+- **src/**: Contains all the source code developed for the thesis and the CityLearn code.
 - **datasets/**: Includes datasets and the results from simulations.
 - **experiments/**: 
 - **thesis/**:
