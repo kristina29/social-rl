@@ -7,7 +7,6 @@ commands.txt
 CityLearn-master/
 datasets/trying_net_electricity_cons.xlsx
 datasets/fuel_mix_ny_2021/
-datasets/weather_ny_*.csv
 datasets/building_data_test/
 experiments/Explore_Demand/
 experiments/SAC_DB2/plots_*
