@@ -1,5 +1,6 @@
 from optparse import Option, OptionParser
 
+
 class ExtendedOption(Option):
     # Based on http://docs.python.org/library/optparse.html#adding-new-actions
     ACTIONS = Option.ACTIONS + ("extend",)
@@ -32,14 +33,14 @@ def parseOptions_social():
                          default='1',
                          help='Number of random selected buildings that act as demonstrators (lower or equal than the '
                               'number of total buildings). If not defined, one building acts as demonstrator.')
-    optParser.add_option('--sac', action='store_true', default=False, dest='exclude_sac',
-                         help='Do not train a soft actor-critic (SAC) agent for comparison.')
-    optParser.add_option('--sacdb2', action='store_true', default=False, dest='exclude_sacdb2',
-                         help='Do not train a DB2 soft actor-critic (SAC) agent for comparison.')
-    optParser.add_option('--sacdb2value', action='store_true', default=False, dest='exclude_sacdb2value',
-                         help='Do not train a DB2 soft actor-critic (SAC) agent on the value function for comparison.')
+    optParser.add_option('--sac', action='store_true', default=False, dest='include_sac',
+                         help='Train a soft actor-critic (SAC) agent for comparison.')
+    optParser.add_option('--sacdemopol', action='store_true', default=False, dest='include_sacdemopol',
+                         help='Train a SAC-DemoPol agent for comparison.')
+    optParser.add_option('--sacdemoq', action='store_true', default=False, dest='include_sacdemoq',
+                         help='Train a SAC-DemoQ agent for comparison.')
     optParser.add_option('--mode', action='store', type='int', dest='mode', default='1',
-                         help='Social-learning mode to use.')
+                         help='Social-learning mode to use for training the SAC-DemoPol agents.')
     optParser.add_option('--ir', action='store', type='float', dest='ir', default='0.01',
                          help='Imitation rate for imitating actions/values of the demonstrators.')
     optParser.add_option('--pretrained_demonstrator', action='store', type='string', dest='pretrained_demonstrator',
@@ -47,13 +48,15 @@ def parseOptions_social():
                          help='Path to pretained demonstrator agent to use. '
                               'Overwrites the number of demonstrators to use.')
     optParser.add_option('--deterministic_demo', action='store_true', default=False, dest='deterministic_demo',
-                         help='Use deterministic action if the demonstrator')
+                         help='Use deterministic actions of the demonstrator')
     optParser.add_option('--transitions', action='store', type='string', dest='demo_transitions', default=None,
-                         help='Path to transitions stored as csv from a demonstrator to put in the replay buffer.')
+                         help='Path to transitions stored as csv from a demonstrator to put in the '
+                              '(prioritized) replay buffer.')
     optParser.add_option('--extra_policy_update', action='store_true', default=False, dest='extra_policy_update',
-                         help='Perform an additional policy update after the social Q-Value update.')
+                         help='Perform an additional policy update after the social Q-Value update '
+                              'for the SAC-DemoQ agents.')
     optParser.add_option('--ddpg', action='store_true', default=False, dest='ddpg',
-                         help='Train DDPG Agent with demo transitions.')
+                         help='Train DDPG Agent with demonstrator transitions.')
 
     opts, args = optParser.parse_args()
 
@@ -82,15 +85,15 @@ def add_nonsocial_options(optParser):
     optParser.add_option('--discount', action='store', type='float', dest='discount', default='0.99',
                          help='Discount factor')
     optParser.add_option('-b', '--buildings', action='store', type='int', dest='buildings',
-                         help='Number of random selected buildings to include in training (between 1 and 15). '
+                         help='Number of random selected buildings to include in training. '
                               'If not defined, all buildings are included.')
     optParser.add_option('-e', '--episodes', action='store', type='int', dest='episodes',
-                         default='128',
-                         help='Number of training epsiodes')
-    optParser.add_option('--tql', action='store_true', default=False, dest='exclude_tql',
-                         help='Do not train a Tabular Q-Learning agent for comparison.')
-    optParser.add_option('--rbc', action='store_true', default=False, dest='exclude_rbc',
-                         help='Do not train a rule-based control agent for comparison.')
+                         default='2',
+                         help='Number of training episodes')
+    optParser.add_option('--tql', action='store_true', default=False, dest='include_tql',
+                         help='Train a Tabular Q-Learning agent for comparison.')
+    optParser.add_option('--rbc', action='store_true', default=False, dest='include_rbc',
+                         help='Train a rule-based control (RBC) agent for comparison.')
     optParser.add_option('--autotune', action='store_true', default=False, dest='autotune',
                          help='Autotune the entropy value of the SAC agent.')
     optParser.add_option('--clipgradient', action='store_true', default=False, dest='clipgradient',
@@ -103,13 +106,12 @@ def add_nonsocial_options(optParser):
                          help='Comma separated list of observations that should be active. '
                               'If not defined, the full observation space (as defined in the schema file) is used.')
     optParser.add_option('--building_ids', action='append', type='int', dest='building_ids',
-                         help='Ids of the buildings that should be trained. Overwrites the building_count.')
+                         help='IDs of the buildings that should be trained. Overwrites the building_count.')
     optParser.add_option('--store', action='store_true', default=False, dest='store_agents',
                          help='Store trained agents.')
     optParser.add_option('--save_transitions', action='store_true', default=False, dest='save_transitions',
                          help='Save transitions in a pkl file.')
     optParser.add_option('--end_exploration', action='store', type='int', default=7000, dest='end_exploration_t',
-                         help='End exploration time step.')
+                         help='End exploration time step (see CityLearn documentation).')
 
     return optParser
-

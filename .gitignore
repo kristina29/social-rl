@@ -1,3 +1,4 @@
+Thesis_Topics_All_23.pdf
 Book1.xlsx
 ~$*.xlsx
 src/.xlsx
@@ -5,9 +6,7 @@ literature/
 literature
 commands.txt
 CityLearn-master/
-datasets/fuel_mix_ny_2021/
-datasets/weather_ny_*.csv
-datasets/data_exploration_plots/
+datasets/trying_net_electricity_cons.xlsx
 datasets/building_data_test/
 experiments/Explore_Demand/
 experiments/SAC_DB2/plots_*
@@ -38,7 +37,13 @@ src/agents/
 src/.idea/
 src/.ipynb_checkpoints/
 src/__pycache__/
-src/citylearn/data/
+src/citylearn/data/citylearn_challenge_2022_phase_1/
+src/citylearn/data/nnb_limitobs1_shared/
+src/citylearn/data/nnb_limitobs2/
+src/citylearn/data/nydata/
+src/citylearn/data/nydata_new_buildings/
+src/citylearn/data/nydata_new_buildings2/
+src/citylearn/data/testenv/
 src/citylearn/assets/
 src/citylearn/__pycache__/
 src/citylearn/agents/__pycache__/

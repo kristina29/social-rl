@@ -1,9 +1,5 @@
 import copy
-import pickle
 import time
-
-import pandas as pd
-from citylearn.rl import ReplayBuffer
 
 from citylearn.agents.q_learning import TabularQLearning
 from citylearn.agents.rbc import OptimizedRBC
@@ -13,19 +9,17 @@ from citylearn.data import DataSet
 from citylearn.utilities import get_active_parts
 from citylearn.wrappers import TabularQLearningWrapper
 from options import parseOptions_nonsocial
-from utils import set_schema_buildings, set_active_observations, save_results, save_transitions_to
+from utils import set_schema_buildings, set_active_observations, save_results, save_transitions_to, get_best_env
 
 
 def train(dataset_name, random_seed, building_count, episodes, active_observations, batch_size, discount,
-          autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_tql, exclude_rbc,
+          autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, include_tql, include_rbc,
           building_ids, store_agents, end_exploration_t, save_transitions):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
 
     # load data
     schema = DataSet.get_schema(dataset_name)
-
-    # TODO: DATA EXPLORATION
 
     # Data Preprocessing
     schema = preprocessing(schema, building_count, random_seed, active_observations, building_ids=building_ids)
@@ -36,11 +30,11 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
     all_agents = {}
     all_eval_results = {}
     # Train rule-based control (RBC) agent for comparison
-    if not exclude_rbc:
+    if include_rbc:
         all_envs['RBC'], all_agents['RBC'] = train_rbc(schema=schema, episodes=episodes)
 
     # Train tabular Q-Learning (TQL) agent for comparison
-    if not exclude_tql:
+    if include_tql:
         all_envs['TQL'], all_agents['TQL'] = train_tql(schema=schema, active_observations=active_observations,
                                                        episodes=episodes)
 
@@ -130,12 +124,7 @@ def train_sac(schema, episodes, random_seed, batch_size, discount, autotune_entr
                     discount=discount, end_exploration_time_step=end_exploration_t)
     losses, rewards, eval_results, best_state = sac_model.learn(episodes=episodes, deterministic_finish=True)
 
-    best_state_env = copy.deepcopy(sac_model.env)
-    eval_observations = best_state_env.reset()
-
-    while not best_state_env.done:
-        actions = best_state.predict(eval_observations, deterministic=True)
-        eval_observations, eval_rewards, _, _ = best_state_env.step(actions)
+    best_state_env = get_best_env(sac_model, best_state)
 
     print('SAC model trained!')
 
@@ -155,8 +144,8 @@ if __name__ == '__main__':
     building_count = opts.buildings
     episodes = opts.episodes
     discount = opts.discount
-    exclude_tql = opts.exclude_tql
-    exclude_rbc = opts.exclude_rbc
+    include_tql = opts.include_tql
+    include_rbc = opts.include_rbc
     active_observations = opts.observations
     batch_size = opts.batch
     autotune_entropy = opts.autotune
@@ -168,30 +157,10 @@ if __name__ == '__main__':
     end_exploration_t = opts.end_exploration_t
     save_transitions = opts.save_transitions
 
-    if False:
-        DATASET_NAME = 'nydata_new_buildings2'
-        exclude_rbc = 0
-        exclude_tql = 1
-        building_count = 2
-        episodes = 2
-        seed = 2
-        autotune_entropy = True
-        discount = 0.99
-        building_ids = None
-        active_observations = None  # ['solar_generation', 'electrical_storage_soc', 'non_shiftable_load']  # , 'electricity_pricing', 'electricity_pricing_predicted_6h',
-        # '#electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
-        batch_size = 256
-        clip_gradient = False
-        store_agents = False
-        kaiming_initialization = False
-        l2_loss = False
-        save_transitions = False
-        end_exploration_t = 7000
-
     train(dataset_name=DATASET_NAME, random_seed=seed, building_count=building_count, episodes=episodes,
           active_observations=active_observations, batch_size=batch_size, discount=discount,
           autotune_entropy=autotune_entropy, clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization,
-          l2_loss=l2_loss, exclude_tql=exclude_tql, exclude_rbc=exclude_rbc, building_ids=building_ids,
+          l2_loss=l2_loss, include_tql=include_tql, include_rbc=include_rbc, building_ids=building_ids,
           store_agents=store_agents, end_exploration_t=end_exploration_t, save_transitions=save_transitions)
 
     # get the end time
