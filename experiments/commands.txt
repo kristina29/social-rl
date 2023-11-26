@@ -50,6 +50,6 @@ scp src/job* klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/src/
 
 mv agents/SAC_agent_20231114T160153.pkl agents/SAC_agent_Building14.pkl
 
-scp 
+scp klietz10@134.2.168.52:/mnt/qb/work/ludwig/klietz10/social-rl/SAC_transitions_b5.pkl .
 
 

@@ -12,7 +12,7 @@ from utils import set_schema_buildings, set_active_observations, save_results
 
 
 def train(dataset_name, random_seed, building_count, episodes, active_observations, batch_size, discount,
-          autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, exclude_rbc,
+          autotune_entropy, clip_gradient, kaiming_initialization, l2_loss, include_rbc,
           building_ids, store_agents, end_exploration_t, information_sharing):
     # Train SAC agent on defined dataset
     # Workflow strongly based on the citylearn_ccai_tutorial
@@ -31,7 +31,7 @@ def train(dataset_name, random_seed, building_count, episodes, active_observatio
     all_agents = {}
     all_eval_results = {}
     # Train rule-based control (RBC) agent for comparison
-    if not exclude_rbc:
+    if include_rbc:
         all_envs['RBC'], all_agents['RBC'] = train_rbc(schema=schema, episodes=episodes)
 
     # Train MARLISA agent
@@ -93,8 +93,8 @@ if __name__ == '__main__':
     building_count = opts.buildings
     episodes = opts.episodes
     discount = opts.discount
-    exclude_tql = opts.exclude_tql
-    exclude_rbc = opts.exclude_rbc
+    include_tql = opts.include_tql
+    include_rbc = opts.include_rbc
     active_observations = opts.observations
     batch_size = opts.batch
     autotune_entropy = opts.autotune
@@ -106,30 +106,10 @@ if __name__ == '__main__':
     end_exploration_t = opts.end_exploration_t
     information_sharing = opts.information_sharing
 
-    if False:
-        DATASET_NAME = 'nnb_limitobs1_marlisa'
-        exclude_rbc = 0
-        exclude_tql = 1
-        building_count = 2
-        episodes = 2
-        seed = 2
-        autotune_entropy = True
-        discount = 0.99
-        building_ids = None
-        active_observations = ['hour', 'net_electricity_consumption']  # ['solar_generation', 'electrical_storage_soc', 'non_shiftable_load']  # , 'electricity_pricing', 'electricity_pricing_predicted_6h',
-        # '#electricity_pricing_predicted_12h', 'electricity_pricing_predicted_24h']
-        batch_size = 256
-        clip_gradient = False
-        store_agents = False
-        kaiming_initialization = False
-        l2_loss = False
-        end_exploration_t = 9000
-        information_sharing = False
-
     train(dataset_name=DATASET_NAME, random_seed=seed, building_count=building_count, episodes=episodes,
           active_observations=active_observations, batch_size=batch_size, discount=discount,
           autotune_entropy=autotune_entropy, clip_gradient=clip_gradient, kaiming_initialization=kaiming_initialization,
-          l2_loss=l2_loss, exclude_rbc=exclude_rbc, building_ids=building_ids,
+          l2_loss=l2_loss, include_rbc=include_rbc, building_ids=building_ids,
           store_agents=store_agents, end_exploration_t=end_exploration_t, information_sharing=information_sharing)
 
     # get the end time

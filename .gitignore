@@ -37,7 +37,6 @@ src/.idea/
 src/.ipynb_checkpoints/
 src/__pycache__/
 src/citylearn/data/citylearn_challenge_2022_phase_1/
-src/citylearn/data/nnb_limitobs1_marlisa/
 src/citylearn/data/nnb_limitobs1_shared/
 src/citylearn/data/nnb_limitobs2/
 src/citylearn/data/nydata/

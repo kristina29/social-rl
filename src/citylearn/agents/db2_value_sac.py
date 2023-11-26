@@ -6,7 +6,7 @@ from torch import tensor, nn
 from citylearn.agents.sac import SAC
 
 
-class SACDB2VALUE(SAC):
+class SACDEMOQ(SAC):
     def __init__(self, *args, imitation_lr: float = 0.01, pretrained_demonstrator: SAC = None,
                  deterministic_demo: bool = False, extra_policy_update: bool = False, **kwargs):
         r"""Initialize :class:`SACDB2`.
