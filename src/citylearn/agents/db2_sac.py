@@ -11,7 +11,7 @@ except (ModuleNotFoundError, ImportError) as e:
 from citylearn.agents.sac import SAC
 
 
-class SACDB2(SAC):
+class SACDEMOPOL(SAC):
     def __init__(self, *args, imitation_lr: float = 0.01, mode: int = 1, pretrained_demonstrator: SAC = None,
                  deterministic_demo: bool = False, **kwargs):
         r"""Initialize :class:`SACDB2`.
