@@ -191,6 +191,13 @@ Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.
 
 \begin{figure}[H]
     \center
+     \includegraphics[width=0.8\textwidth]{figures/electricity_pricing.pdf}
+  \caption{Basic electricity price and fossil share-weighted price with a factor of $\beta=20$ for the initial week in the dataset.}
+  \label{app:electricity-pricing}
+\end{figure}
+
+\begin{figure}[H]
+    \center
      \includegraphics[width=\textwidth]{figures/prb_ddpg_kpis.pdf}
   \caption{}
   \label{app:prb-ddpg-kpis}
@@ -303,7 +310,7 @@ Negative solar energy value is used since this is specified as a negative time s
 
 \subsubsection*{Formula}
 \begin{equation}
- \text{avg.~fossil~share} = \sum_{t=1}^{24}1-\frac{RE_{pct}^t}{24}.
+ \text{avg.~fossil~share} = 1- \frac{1}{24}\sum_{t=1}^{24}RE_{pct}^t.
 \end{equation}
 over all time steps~$t$. 
 
@@ -328,7 +335,7 @@ Total consumed renewable energy from grid & $RE_{con}^G$ & (Equation \ref{eq:re-
 
 \subsubsection*{Formula}
 \begin{equation}
-\text{avg.~fossil~share~grid} = \sum_{t=1}^{24}1-\frac{RE_{pct}^{G,t}}{24}.
+\text{avg.~fossil~share~grid} = 1-\frac{1}{24}\sum_{t=1}^{24}RE_{pct}^{G,t}.
 \end{equation}
 over all time steps~$t$. 
  
@@ -349,7 +356,7 @@ Total consumed solar energy & $RE_{con}^{PV}$ & (Equation \ref{eq:re-con-pv})
 
 \subsubsection*{Formula}
 \begin{equation}
- 1 - \text{used~pv} = \sum_{t=1}^{24}\frac{\frac{RE_{con}^{PV,t}}{-PV_{gen}^t}}{24}.
+ 1 - \text{used~pv} = \frac{1}{24}\sum_{t=1}^{24}\frac{RE_{con}^{PV,t}}{-PV_{gen}^t}.
 \end{equation}
 over all time steps~$t$.  
 
