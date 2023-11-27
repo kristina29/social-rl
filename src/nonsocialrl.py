@@ -1,4 +1,3 @@
-import copy
 import time
 
 from citylearn.agents.q_learning import TabularQLearning

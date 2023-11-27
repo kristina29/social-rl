@@ -201,8 +201,8 @@ class Agent(Environment):
                         eval_observations, eval_rewards, _, _ = eval_env.step(actions)
 
                     kpis = eval_env.evaluate()
-                    kpis = kpis[(kpis['cost_function'].isin(['1 - average_daily_renewable_share',
-                                                             '1 - average_daily_renewable_share_grid',
+                    kpis = kpis[(kpis['cost_function'].isin(['average_daily_fossil_share',
+                                                             'average_daily_fossil_share_grid',
                                                              '1 - used_pv_of_total_share',
                                                              'fossil_energy_consumption']))].dropna()
                     kpis['value'] = kpis['value'].round(3)
