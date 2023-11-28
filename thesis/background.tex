@@ -3,13 +3,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Background}
 \label{Background}
-\todo[inline]{Die plots optimiere ich während ihr korrekturlest (zB Schriftart, KPI blalba benenne ich um), aber könnt natürlich trotzdem gerne schreiben wenn euch was dazu auffällt :D}
-
 This chapter provides the necessary background knowledge to comprehend our approach to the presented problem. First, we introduce the fundamental concepts of RL and the SAC algorithm. Then, we explain the algorithm-independent social methods imitation learning and DB, followed by presentation of the the MARLISA algorithm.
 
 \section{Reinforcement Learning}
 \label{sec:reinforcement-learning}
-RL is an agent-based approach within artificial intelligence in which an agent acts in an environment, observes the current state and selects actions to maximize a cumulative reward over time. This chapter describes the basic mathematical principles of RL. Traditional RL methods often struggle with the limitations of discrete action spaces. However, the SAC algorithm overcomes this limitation through continuous action selection. We will explain the SAC algorithm and elaborate on its mathematical framework.
+RL is an agent-based approach within artificial intelligence in which an agent acts in an environment, observes the current state and performs actions to maximize a cumulative reward over time. This chapter describes the basic mathematical principles of RL. Traditional RL methods often struggle with the limitations of discrete action spaces. However, the SAC algorithm overcomes this limitation through continuous action selection. We will explain the SAC algorithm and elaborate on its mathematical framework.
 
 \subsection{Fundamentals of Reinforcement Learning}
 As defined by Sutton and Barto \cite{sutton2018reinforcement}, RL is a machine learning method that aims to choose actions to maximize a numerical reward. RL agents learn these actions through a trial-and-error approach based on the received rewards. Actions can affect both immediate rewards and long-term rewards. In contrast to supervised methods, RL does not need labeled data for learning and does not try to discover inherent structure in data as unsupervised methods.
@@ -26,46 +24,46 @@ As defined by Sutton and Barto \cite{sutton2018reinforcement}, RL is a machine l
 	\put(503,122){\small Reward $r_t$}%
 	\put(417,60){Environment}%
     \end{overpic}
-  \caption[Reinforcement Learning Overview]{In RL, the agent observes the state of the environment $s_t$ at timestep $t$. The agent takes an action $a_t$ based on the policy $\pi$. This action determines the next state of the environment $s_{t+1}$, and the environment sends a reward $r_{t+1}$ to the agent..}
+  \caption[Reinforcement Learning Overview.]{In RL, the agent observes the state of the environment~$s_t$ at timestep~$t$. The agent takes an action~$a_t$ based on the policy~$\pi$. This action determines the next state of the environment~$s_{t+1}$, and the environment sends a reward~$r_{t+1}$ to the agent.}
   \label{fig:rl_overview}
 \end{figure}
 
 \noindent
-Figure~\ref{fig:rl_overview} shows the general RL approach. RL problems are often formulated as finite MDPs, where the agent interacts with the environment over a series of time steps. At each time step $t$, the agent observes the current state of the environment, denoted as $s_t \in \mathcal{S}$. The agent selects an action $a_t \in \mathcal{A}$ using its, in this case stochastic, policy $\pi(a_t|s_t)$, which maps from the state to the probability of selecting the action. As a consequence of the chosen action, the agent receives at the next time step a numerical reward $r_{t+1}\in\mathcal{R} \subset \mathbb{R}$ and a new state $s_{t+1}\in \mathcal{S}$. Both are used in the RL algorithm to optimize the policy to maximize the expected sum of discounted rewards.
+Figure~\ref{fig:rl_overview} shows the general RL approach. RL problems are often formulated as finite Markov Decision Processes (MDPs), where the agent interacts with the environment over a series of time steps. At each time step~$t$, the agent observes the current state of the environment, denoted as~$s_t \in \mathcal{S}$. The agent selects an action~$a_t \in \mathcal{A}$ using its, in this case stochastic, policy~$\pi(a_t|s_t)$, which maps from the state to the probability of selecting the action. As a consequence of the chosen action, the agent receives at the next time step a numerical reward~$r_{t+1}\in\mathcal{R} \subset \mathbb{R}$ and a new state~$s_{t+1}\in \mathcal{S}$. Both are used in the RL algorithm to optimize the policy to maximize the expected sum of discounted rewards.
 
-The dynamics of the MDP are captured by a function $p': \mathcal{S}\times\mathcal{R}\times\mathcal{S}\times\mathcal{A} \rightarrow [0,1]$. This function represents the probability of transitioning from state $s_t\in\mathcal{S}$ to state $s_{t+1}\in\mathcal{S}$ and receiving reward $r_{t+1}\in\mathcal{R}$ when the action $a_t\in\mathcal{A}$ is taken.
+The dynamics of the MDP are captured by a function~$p': \mathcal{S}\times\mathcal{R}\times\mathcal{S}\times\mathcal{A} \rightarrow [0,1]$. This function represents the probability of transitioning from state~$s_t\in\mathcal{S}$ to state~$s_{t+1}\in\mathcal{S}$ and receiving reward~$r_{t+1}\in\mathcal{R}$ when the action~$a_t\in\mathcal{A}$ is taken.
 %\begin{equation}
 %p(s', r \mid s,a)=P(s_t=s', r_t=r \mid s_{t-1}=s, a_{t-1}=a)
 %\end{equation}
-Using this function, we can calculate additional quantities of interest. The state transition probability defined as function $p: \mathcal{S}\times\mathcal{S}\times\mathcal{A} \rightarrow [0,1]$ is the probability of transitioning to state $s_{t+1}$ when action $a_t$ is taken, given the current state is $s_t$.
+Using this function, we can calculate additional quantities of interest. The state transition probability defined as function~$p: \mathcal{S}\times\mathcal{S}\times\mathcal{A} \rightarrow [0,1]$ is the probability of transitioning to state~$s_{t+1}$ when action~$a_t$ is taken, given the current state is~$s_t$.
 %\begin{equation}
 %p(s'\mid s,a)=P(s_t=s'\mid s_{t-1}=s, a_{t-1}=a) = \sum_{r\in\mathcal{R}}p(s',r \mid s,a)
 %\end{equation}
-Furthermore, we can calculate the expected reward for a given state-action pair $(s_t,a_t)$ as a function $r: \mathcal{S}\times\mathcal{A}\rightarrow \mathbb{R}$.
+Furthermore, we can calculate the expected reward for a given state-action pair~$(s_t,a_t)$ as a function~$r: \mathcal{S}\times\mathcal{A}\rightarrow \mathbb{R}$.
 %\begin{equation}
 %r(s_t,a_t)=\mathbb{E}[r_t\mid s_{t-1}=s,a_{t-1}=a]=\sum_{r\in\mathcal{R}}r\sum_{s'\in\mathcal{S}}p(s',r\mid s,a)
 %\end{equation}
 
-The state-value function, denoted by $V_{\pi}(s_t)$, represents the expected total discounted reward obtained when starting from state $s_t$ and following policy $\pi$. Similarly, the action-value function, denoted by $Q_{\pi}(s_t, a_t)$ is defined as the expected total discounted reward when starting in state $s_t$, taking action $a_t$ and then following the policy $\pi$. In this context, we refer to the action-value function as value function or Q-function.
+The state-value function, denoted by~$V_{\pi}(s_t)$, represents the expected total discounted reward obtained when starting from state~$s_t$ and following policy~$\pi$. Similarly, the action-value function, denoted by~$Q_{\pi}(s_t, a_t)$ is defined as the expected total discounted reward when starting in state~$s_t$, taking action~$a_t$ and then following the policy~$\pi$. In this context, we refer to the action-value function as value function or Q-function.
 
 \subsection{Soft Actor-Critic}
 \label{sec:SAC}
-Handling continuous state and action spaces with tabular RL algorithms can be computationally intensive and requires a significant amount of memory. We opted for the SAC algorithm to address this issue. This algorithm is widely used in RL and is designed to efficiently handle continuous state and action spaces. In actor-critic methods, the actor models the policy $\pi(a_t|s_t)$, while the critic models the value function $Q_\pi(s_t,a_t)$. SAC is a model-free RL algorithm that maximizes the maximum entropy objective, which aims to increase the policy's entropy while keeping the expected return constant:
+Handling continuous state and action spaces with tabular RL algorithms can be computationally intensive and requires a significant amount of memory. We opted for the SAC algorithm to address this issue. This algorithm is widely used in RL and is designed to efficiently handle continuous state and action spaces. In actor-critic methods, the actor models the policy~$\pi(a_t|s_t)$, while the critic models the value function~$Q_\pi(s_t,a_t)$. SAC is a model-free RL algorithm that maximizes the maximum entropy objective, which aims to increase the policy's entropy while keeping the expected return constant:
 \begin{equation}
 	\pi^*=\argmax_{\pi}\sum_t \mathbb{E}_{(s_t,a_t)\sim\rho_{\pi}} \left [r(s_t,a_t)+\alpha \mathcal{H}(\pi(\cdot | s_t) \right ],
 \end{equation}
-with state-action marginal induced by the policy $\rho_{\pi}(s_t,a_t)$, temperature parameter $\alpha$ and entropy $ \mathcal{H}$.
-The first part of this objective is equivalent to the classic maximizing total expected reward approach of RL algorithms, and the second term adds the maximum entropy of the policy. The temperature parameter controls the trade-off between these two. As $\alpha \rightarrow 0$, this objective is the same as in standard RL. The entropy term introduces stochasticity to the policy and thus favors exploration. 
+with state-action marginal induced by the policy~$\rho_{\pi}(s_t,a_t)$, temperature parameter~$\alpha$ and entropy~$ \mathcal{H}$.
+The first part of this objective is equivalent to the classic maximizing total expected reward approach of RL algorithms, and the second term adds the maximum entropy of the policy. The temperature parameter controls the trade-off between these two. As~$\alpha \rightarrow 0$, this objective is the same as in standard RL. The entropy term introduces stochasticity to the policy and thus favors exploration. 
 
-SAC can be derived from the Soft Policy Iteration, an algorithm that alternates between the policy evaluation step, where the soft Q-function of the current policy $\pi$ is calculated, and the policy iteration step, where the policy is improved in terms of its soft Q-value. 
-The set of possible policies $\Pi$ is constrained using the Kullback-Leibler (KL) divergence to ensure the tractability of the obtained policy.
-For the tabular setting, the convergence of the Soft Policy Iteration towards the optimal policy $\pi^* \in \Pi$ in terms of the maximum entropy RL is guaranteed.
+SAC can be derived from the Soft Policy Iteration, an algorithm that alternates between the policy evaluation step, where the soft Q-function of the current policy~$\pi$ is calculated, and the policy iteration step, where the policy is improved in terms of its soft Q-value. 
+The set of possible policies~$\Pi$ is constrained using the Kullback-Leibler (KL) divergence to ensure the tractability of the obtained policy.
+For the tabular setting, the convergence of the Soft Policy Iteration towards the optimal policy~$\pi^* \in \Pi$ in terms of the maximum entropy RL is guaranteed.
 
-However, for continuous space and action dimensions, functional approximators are needed for the Q-value function $Q_{\theta}(s_t,a_t)$ and the policy $\pi_{\phi}(a_t|s_t)$ with parameters $\theta$ and $\phi$. For these, iterating the Soft Policy Iteration algorithm until convergence is computationally intractable. Hence, the authors introduced SAC, alternating between optimizing these networks with stochastic gradient descent. The parameters of the soft Q-value functions are minimized using the soft Bellman residual using a target network with parameters $\bar{\theta}$ to stabilize training:
+However, for continuous space and action dimensions, functional approximators are needed for the Q-value function~$Q_{\theta}(s_t,a_t)$ and the policy~$\pi_{\phi}(a_t|s_t)$ with parameters~$\theta$ and $\phi$. For these, iterating the Soft Policy Iteration algorithm until convergence is computationally intractable. Hence, Haarnoja et al. introduced SAC, alternating between optimizing these networks with stochastic gradient descent. The parameters of the soft Q-value functions are minimized using the soft Bellman residual using a target network with parameters~$\bar{\theta}$ to stabilize training:
 \begin{equation}
 	J_Q(\theta)=\mathbb{E}_{(s_t,a_t)\sim\mathcal{D}}\left[\frac{1}{2}(Q_\theta(s_t,a_t)-(r(s_t,a_t)+\gamma\mathbb{E}_{s_{t+1}\sim p}\left[V_{\bar{\theta}}(s_{t+1}) \right ]))^2 \right],
 \end{equation}
-using replay buffer data $\mathcal{D}$ and discount factor $\gamma$. The update rule given by stochastic gradient descent is denoted as $\hat{\triangledown}_{\theta}J_Q(\theta)$.
+using replay buffer data~$\mathcal{D}$ and discount factor~$\gamma$. The update rule given by stochastic gradient descent is denoted as~$\hat{\triangledown}_{\theta}J_Q(\theta)$.
 %The update rule given by stochastic gradient decent is given by 
 %\begin{equation} \small
 %	\hat{\triangledown}_{\theta}J_Q(\theta)=\triangledown_{\theta} Q_{\theta}(a_t,s_t)(Q_{\theta}(s_t,a_t)-(r(s_t,a_t)+\gamma(Q_{\bar{\theta}}(s_{t+1},a_{t+1})-\alpha \log (\pi_\phi(a_{t+1}|s_{t+1})))).
@@ -75,21 +73,20 @@ The objective function for updating the policy is obtained by minimizing the exp
 \begin{equation}
 	J_{\pi}(\phi)=\mathbb{E}_{s_t\sim\mathcal{D},\epsilon_t\sim\mathcal{N}}\left [\alpha \log \pi_{\phi}(f_{\phi}(\epsilon_t;s_t)|s_t)-Q_{\theta}(s_t, f_{\phi}(\epsilon_t;s_t)) \right ],
 \end{equation}
-where the policy is reparametrizied by a neural network $a_t=f_{\phi}(\epsilon_t;s_t)$ with input noise $\epsilon_t$ to apply the reparametrization trick. This trick enables backpropagation through a sampling operation by transforming the sampling process  into a differentiable operation \cite{kingma2013auto}. The update rule is denoted as $\hat{\triangledown}_{\phi}J_{\pi}(\phi)$.
+where the policy is reparametrizied by a neural network~$a_t=f_{\phi}(\epsilon_t;s_t)$ with input noise~$\epsilon_t$ to apply the reparametrization trick. This trick enables backpropagation through a sampling operation by transforming the sampling process  into a differentiable operation \cite{kingma2013auto}. The update rule is denoted as~$\hat{\triangledown}_{\phi}J_{\pi}(\phi)$.
 %\begin{equation}
 %	\hat{\triangledown}_{\phi}J_{\pi}(\phi)=\triangledown_{\phi}\alpha\log (\pi_{\phi}(a_t|s_t))+(\triangledown_{a_t}\alpha \log (\pi_{\phi}(a_t|s_t))-\triangledown_{a_t}Q(s_t,a_t))\triangledown_{\phi}f_{\phi}(\epsilon_t;s_t).
 %\end{equation}
 
-The temperature parameter $\alpha$ is essential for the success of SAC and needs to be tuned for each task individually. Even during training of one single task, it would be advantageous if $\alpha$ would be adjustable: In regions where the policy is very sure about the best action, the entropy should be rather small and thus the policy deterministic. In regions where the policy is unsure, exploration should be enhanced. Thus, the authors presented a solution for adjusting the temperature parameter automatically and proved its theoretical optimality in the tabular setting. For this, the new objective considers the target minimum entropy $\mathcal{H}$ in a constraint to the classical maximum reward approach:
+The temperature parameter~$\alpha$ is essential for the success of SAC and needs to be tuned for each task individually. Even during training of one single task, it would be advantageous if~$\alpha$ would be adjustable: In regions where the policy is very sure about the best action, the entropy should be rather small and thus the policy deterministic. In regions where the policy is unsure, exploration should be enhanced. Thus, Haarnoja et al. presented a solution for adjusting the temperature parameter automatically and proved its theoretical optimality in the tabular setting. For this, the new objective considers the target minimum entropy~$\mathcal{H}$ in a constraint to the classical maximum reward approach:
 \begin{equation}
-	\max_{\pi_{0:T}}\mathbb{E}_{\rho_{\pi}}\left[\sum_{t=0}^Tr(s_t,a_t) \right ] \textbf{ s.t. } \mathbb{E}_{(s_t,a_t)\sim \rho_{\pi}}\left [-\log(\pi_t(a_t|s_t)) \right ] \geq \mathcal{H}~\forall t
+	\max_{\pi_{0:T}}\mathbb{E}_{\rho_{\pi}}\left[\sum_{t=0}^Tr(s_t,a_t) \right ] \textbf{ s.t. } \mathbb{E}_{(s_t,a_t)\sim \rho_{\pi}}\left [-\log(\pi_t(a_t|s_t)) \right ] \geq \mathcal{H}~\forall t.
 \end{equation}
-After solving for the optimal soft Q-value function $Q^*_t$ and the optimal policy $\pi^*_t$, the optimal temperature parameter at time step $t$ is given by
+After solving for the optimal soft Q-value function~$Q^*_t$ and the optimal policy~$\pi^*_t$, the optimal temperature parameter at time step~$t$ is given by
 \begin{equation}\label{eq:obj-alpha}
 	\alpha^*_t = \argmin_{\alpha_t} \mathbb{E}_{a_t \sim \pi^*_t}\left [-\alpha_t \log \pi^*_t(a_t|s_t; \alpha_t)-\alpha_t \bar{\mathcal{H}} \right ].
 \end{equation}
-For the final SAC algorithm, as given in Algorithm~\ref{alg:sac-update}, the authors propose to use two soft Q-function approximators trained independently to lower the positive bias introduced in the policy improvement step. The minimum value of these is used for updating both Q-function approximators as well as the policy. The temperature parameter $\alpha$ is learned by computing the gradient of the objective given in Equation~\ref{eq:obj-alpha}, where $Q_t$ and $\pi_t$ are assumed to be optimal for the current time step.
-
+For the final SAC algorithm, as given in Algorithm~\ref{alg:sac-update}, Haarnoja et al. propose to use two soft Q-function approximators trained independently to lower the positive bias introduced in the policy improvement step. The minimum value of these is used for updating both Q-function approximators as well as the policy. The temperature parameter~$\alpha$ is learned by computing the gradient of the objective given in equation~\ref{eq:obj-alpha}, where $Q_t$ and $\pi_t$ are assumed to be optimal for the current time step.
 
 \begin{algorithm}
 \caption{Soft Actor-Critic \cite{haarnoja2018soft}}
@@ -116,20 +113,18 @@ For the final SAC algorithm, as given in Algorithm~\ref{alg:sac-update}, the aut
 \end{algorithm}
 
 \section{Social Learning}
-\todo[inline]{Hier wär vllt interessant ob die infos zum verständnis reichen, ist relativ kurz, aber ich wollte unnötiges gelaber vermeiden :D}
-
 \label{sec:background-social-learning}
-\textit{Social learning} is a term initially derived from psychology and has various definitions. Essentially, it refers to the act of learning from others \cite{reed2010social, toyokawa2019social, witt2023social}. In this thesis, we interpret social learning as observing the actions and possibly rewards of demonstrators and incorporating them into the training process of the RL agent. We will refer to the RL agent currently trained as a learner. We distinguish between algorithm-independent methods, which we present first, and specific social algorithms.
+\textit{Social learning} is a term initially derived from psychology and has various definitions. Essentially, it refers to the act of learning from others \cite{reed2010social, toyokawa2019social, witt2023social}. In this thesis, we interpret social learning as observing the actions and possibly rewards of demonstrators and incorporating them into the training process of the RL agent. These demonstrators perform actions within the same environment as the RL agent and provide a reference for successful behaviors and strategies. We will refer to the RL agent currently trained as a learner. In the following, we distinguish between algorithm-independent methods, which we present first, and specific social algorithms.
 
 \subsection{Algorithm-independent Methods}
 This chapter describes two algorithm-independent techniques we integrated into the SAC algorithm. The first technique, called imitation learning, aims to replicate the actions of an experienced demonstrator by assuming that the demonstrator's decisions are optimal. The second technique, DB, is a psychological theory that models the behavior of study participants in RL. According to this theory, the demonstrator's actions are valuable; therefore, the probability that the learner also performs these actions should increase.
 
 \subsubsection*{Imitation Learning}
-Imitation learning is a technique used to improve the learning of RL agents. The agent is presented with either demonstrator actions or the demonstrator agent itself as input, and it tries to mimic the actions of the demonstrator. This technique assumes that the policy of the demonstrator is optimal. There are various types of imitation learning, such as behavior cloning or inverse RL. We used behavior cloning, where a data set $\mathcal{D}=\{(s_t, a_t, r_t, s_{t+1}, d_t)\}$ of demonstration transitions is provided. This dataset enables the direct calculation of the deterministic demonstrator policy $\pi^*(s_t)$. The policy of the learner $\pi_{\phi}$ is then trained using the objective
+\textit{Imitation learning} is a technique used to improve the learning of RL agents. The agent is presented with either demonstrator actions or the demonstrator agent itself as input, and it tries to mimic the actions of the demonstrator. This technique assumes that the policy of the demonstrator is optimal. There are various types of imitation learning, such as behavior cloning or inverse RL. We used behavior cloning, where a data set~$\mathcal{D}=\{(s_t, a_t, r_t, s_{t+1}, d_t)\}$ of demonstration transitions is provided. This dataset enables the direct calculation of the deterministic demonstrator policy~$\pi^*(s_t)$. The policy of the learner~$\pi_{\phi}$ is then trained using the objective
 \begin{equation}
 	\phi^* = \argmin_{\phi}\mathbb{E}_{(s^*,a^*)\sim \mathcal{D}}\left [\mathcal{L}(a^*, \pi_{\phi}(s^*)) \right ].
 \end{equation}
-Behavior cloning assumes that the data is independent and identically distributed (i.i.d). Also, there may be a mismatch between the state spaces of the demonstrator and the learner. To overcome these challenges, the training dataset can be created by combining the demonstrator transitions with transitions created by rolling out the learner policy on the environment \cite{osa2018algorithmic, ross2011reduction}. 
+Behavior cloning assumes that the data is independent and identically distributed (i.i.d.). Also, there may be a mismatch between the state spaces of the demonstrator and the learner. To overcome these challenges, the training dataset can be created by combining the demonstrator transitions with transitions created by rolling out the learner policy on the environment \cite{osa2018algorithmic, ross2011reduction}. 
 
 To integrate the demonstration transitions into the learning algorithm, we have stored them in a prioritized replay buffer (PRB) before starting training \cite{vecerik2017leveraging, hester2018deep}. This buffer prioritizes the transitions based on their temporal difference (TD) error. Transitions with a higher TD error are given a higher priority as it is assumed that they are more challenging to learn and should be observed more frequently during training. The transitions with a higher priority are more likely to be sampled. The priorities are updated during the training process \cite{schaul2015prioritized}.
 
@@ -137,29 +132,28 @@ To integrate the demonstration transitions into the learning algorithm, we have 
 \label{sec:decision-biasing}
 DB, or frequency-dependent copying, is a method for modeling social learning. In this method, the learner observes the demonstrator's actions and biases its decision to act towards them. The more frequently an action is observed, the higher the probability that the learner will imitate it. Therefore, the assumption that the demonstrator's action is valuable is made. This method is commonly used to study participant behavior, but the experiments we discovered always have discrete action spaces \cite{najar2020actions, witt2023social, toyokawa2019social}. Therefore, we had to adapt the method for our continuous setting, which we present in Section~\ref{sec:social-agents}.
 
-Our approaches are based on the methods presented by Najar et al., specifically the DB1 and DB2 approaches \cite{najar2020actions}. In their experiment, the available actions were limited to binary choices. The first method adjusts the policy of the learner, denoted by $\pi$, as follows:
+Our approaches are based on the methods presented by Najar et al., specifically the DB1 and DB2 approaches \cite{najar2020actions}. In their experiment, the available actions were limited to binary choices. The first method adjusts the policy of the learner, denoted by~$\pi$, as follows:
 \begin{align*}
    \pi(d) &\leftarrow \pi(d) + \alpha_i\cdot [1- \pi(d)] \\
    \pi(\bar{d}) &\leftarrow 1- \pi(d),
   \numberthis
 \end{align*}
-where $d$ is the action of the demonstrator and $\bar{d}$ is the other possible action. The parameter $\alpha_i$ controls the imitation decision rate. As a result, the probability of the learner choosing the observed action is increased.
+where~$d$ is the action of the demonstrator and $\bar{d}$ is the other possible action. The parameter~$\alpha_i$ controls the imitation decision rate. As a result, the probability of the learner choosing the observed action is increased.
 
-The second method uses a decision value function $Q'$, a copy of the current value function used to derive the policy $\pi$. $Q'$ is biased towards the observed actions of the demonstrator as follows: 
+The second method uses a decision value function~$Q'$, a copy of the current value function used to derive the policy~$\pi$. $Q'$ is biased towards the observed actions of the demonstrator as follows: 
 \begin{equation} 
 Q'(d) \leftarrow Q'(d) + \alpha_i \cdot [1-Q'(d)].
 \end{equation}
 
 \subsection{MARLISA Algorithm}
 \label{sec:marlisa}
-\todo[inline]{Ggf könnte ich hier noch bisschen kürzen, den informations sharing absatz?}
 This section presents the MARLISA algorithm, a specific algorithm designed for social learning \cite{vazquez2020marlisa}. The MARLISA algorithm is an extension of the SAC RL method that enables coordination between agents through a collective reward function and the exchange of building-specific information. 
 
-The reward function $r_{MARL}^b$ focuses on individual and collective goals. It encourages agents to reduce both their own electricity consumption $e_{b}$ and the total consumption of the entire neighborhood, i.e., all trained buildings $b \in B$ together:
+The reward function~$r_{MARL}^b$ focuses on individual and collective goals. It encourages agents to reduce both their own electricity consumption~$e_{b}$ and the total consumption of the entire neighborhood, i.e., all trained buildings~$b \in B$ together:
 \begin{equation}
 	r_{MARL}^b = -sign(e_b)\cdot0.01(e_b)^2\cdot \min \left \{0, \sum_{b \in B} e_b \right \}.
 \end{equation}
-The reward is negative when the building $b$ consumes more energy than it generates, and the neighborhood consumes more energy than it produces overall. The reward is positive if the building produces excess energy, but the neighborhood consumes too much energy. In all other cases, the reward is zero. Although the paper does not describe the scaling factor 0.01, it is included in the implementation. The authors found that the exponents were the best empirically.
+The reward is negative when the building~$b$ consumes more energy than it generates, and the neighborhood consumes more energy than it produces overall. The reward is positive if the building produces excess energy, but the neighborhood consumes too much energy. In all other cases, the reward is zero. Although the paper does not describe the scaling factor 0.01, it is included in the implementation. Vazquez et al. found that the exponents were the best empirically.
 
 The collective reward in MARLISA leads to additional stochasticity, mitigated by exchanging information between agents. By sharing data, the agents can make more accurate predictions about potential rewards for current states and subsequent actions. A gradient-boosting decision tree is trained to predict the future energy consumption of a building, taking into account both the state and the chosen action. The agents are ordered randomly, and each agent selects an action, then estimates the next energy consumption and passes this prediction on to the following agent. This iterative communication allows for improved coordination as the agents gradually refine their actions based on the predictions of the other agents. The advantage of this method is that each agent only has to share two variables with another agent, so the algorithm is scalable.
 

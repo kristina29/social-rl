@@ -52,7 +52,10 @@ if __name__ == '__main__':
         #np.array(
         correlations
         #, dtype='float64')
-        , annot=True, xticklabels=True, yticklabels=True, annot_kws={"fontsize":21})
+        , annot=True, xticklabels=True, yticklabels=True, annot_kws={"fontsize":19})
+    cbar = ax.collections[0].colorbar
+    cbar.set_label('PCC', labelpad=35)
+    ax.figure.axes[-1].yaxis.label.set_size(21)
 
     buldings = [3,5,7,8,11,17]
     lw = 15

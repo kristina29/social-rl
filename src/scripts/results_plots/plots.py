@@ -10,12 +10,12 @@ ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
 ax.spines['bottom'].set_visible(False)
 ax.spines['left'].set_visible(False)
-map = Basemap(projection='cyl', llcrnrlat=min(lat)-1, urcrnrlat=max(lat)+1,
+map = Basemap(projection='cyl', llcrnrlat=min(lat)-0.6, urcrnrlat=max(lat)+0.6,
               llcrnrlon=min(lon)-1.5, urcrnrlon=max(lon)+1, resolution='i')
-map.drawcoastlines(linewidth=1)  # draws coastline
-map.drawcountries(linewidth=1)  # draws countries
-map.drawstates(linewidth=1)
-map.fillcontinents(color="#eeeeee", lake_color='#DDEEFF')
+map.drawcoastlines(linewidth=1, zorder=2)  # draws coastline
+map.drawcountries(linewidth=1, zorder=2)  # draws countries
+map.drawstates(linewidth=1, zorder=2)
+map.fillcontinents(color="#eeeeee", lake_color='#DDEEFF', zorder=1)
 map.drawmapboundary(fill_color='#DDEEFF', linewidth=1)
 #lons, lats = np.meshgrid(lon, lat)  # 2D lat lon to plot contours
 x1, y1 = map(lon[0], lat[0])
@@ -23,10 +23,10 @@ x2, y2 = map(lon[1:], lat[1:])
 
 #csf = map.contourf(x, y, data)  # filled contour
 #map.colorbar(csf, "right", extend='both', size="3%", pad="1%")
-map.scatter(x1, y1, s=150, c='#38761d')
-map.scatter(x1, y1, s=50, c='#cc0000')
-map.scatter(x2, y2, s=150, c='#cc0000')
+map.scatter(x1, y1, s=150, c='#38761d', zorder=3)
+#map.scatter(x1, y1, s=50, c='#cc0000')
+map.scatter(x2, y2, s=150, c='#cc0000', zorder=3)
 
-plt.tight_layout()
+fig.tight_layout()
 
 fig.savefig("locations.pdf")

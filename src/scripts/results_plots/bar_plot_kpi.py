@@ -33,6 +33,10 @@ def plot_district_kpis1(kpis, mode) -> plt.Figure:
     kpis = kpis.drop(columns=['net_value', 'net_value_without_storage'])
     kpis = kpis.sort_values(by='rank')
     kpis = kpis.round(3)
+    kpis = kpis[
+        (kpis['env_id'].isin(['RBC', 'SAC Best']))
+    ]
+    kpis = kpis.replace('SAC Best', 'Baseline SAC')
 
     row_count = 1
     column_count = 1
@@ -105,10 +109,10 @@ def plot_district_kpis_multiple(kpis, names, mode) -> plt.Figure:
         if mode == 2:
             kpi = kpi[kpi['env_id'] == 'SAC']
         elif mode==3:
-            if i == 0:
-                kpi = kpi[kpi['env_id'] == 'SAC Best']
-            else:
-                kpi = kpi[kpi['env_id'] == 'PRB_SAC']
+            #if i == 0:
+            #    kpi = kpi[kpi['env_id'] == 'SAC Best']
+            #else:
+            kpi = kpi[kpi['env_id'] == 'PRB_SAC']
         elif mode==4:
             if i == 0 or i == 2:
                 kpi = kpi[kpi['env_id'] == 'RBC']
@@ -155,6 +159,13 @@ def plot_district_kpis_multiple(kpis, names, mode) -> plt.Figure:
         sns.barplot(x='value', y='kpi', data=kpis, hue='env_id', ax=ax, width=width)
 
     ax.axvline(1.0, color='black', linestyle='--', linewidth=1, label='')
+
+    if mode==2 or mode==3:
+        ax.axvline(0.93, ymin=0.74, ymax=1, color='black', linestyle=':', linewidth=1.5, label='SAC Best')
+        ax.axvline(0.982, ymin=0.49, ymax=0.74, color='black', linestyle=':', linewidth=1.5, label='')
+        ax.axvline(0.973, ymin=0.24, ymax=0.49, color='black', linestyle=':', linewidth=1.5, label='')
+        ax.axvline(0.767, ymin=0, ymax=0.24, color='black', linestyle=':', linewidth=1.5, label='')
+
     ax.set_xlabel('KPI Value', fontsize=21)
     ax.set_ylabel(None)
 
@@ -214,10 +225,10 @@ def plot_district_kpis_multiple(kpis, names, mode) -> plt.Figure:
 
 
 if __name__ == '__main__':
-    mode = 7
+    mode = 1
 
     if mode == 1:
-        kpis = pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
+        kpis = pd.read_csv('../experiments/SAC/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
     elif mode == 2:
         kpis = [pd.read_csv('../experiments/SAC/15_b3_demonstrator/kpis_20231030T145351.csv'),
                 pd.read_csv('../experiments/SAC/10_b5_demonstrator/kpis_20231002T132420.csv'),
@@ -226,9 +237,9 @@ if __name__ == '__main__':
                 ]
         names = ['D3', 'D5', 'D6', 'D11']
     elif mode == 3:
-        kpis = [pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
-                pd.read_csv('../experiments/SAC_DB2/33_demo_replaybuffer/demo_b5/kpis_20231026T121912.csv'),
-                pd.read_csv('../experiments/SAC_DB2/33_demo_replaybuffer/demo_b6/kpis_20231026T122547.csv'),
+        kpis = [#pd.read_csv('../experiments/SAC/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
+                pd.read_csv('../experiments/Imitation_Learning/demo_b5/kpis_20231026T121912.csv'),
+                pd.read_csv('../experiments/Imitation_Learning/demo_b6/kpis_20231026T122547.csv'),
                 ]
         names = ['Baseline SAC', 'Transitions of D5', 'Transitions of D6']
     elif mode == 4:
