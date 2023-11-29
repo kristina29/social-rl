@@ -20,7 +20,7 @@ As there is a wide range of buildings, we cannot assume that the demonstrators h
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/prb_kpis.pdf}
-  \caption[Performance of the SAC agents using imitation learning.]{Performance achieved by the training building agents using SAC and imitation learning with transitions of the pre-trained demonstrator D5 or D6 compared against the baseline SAC agents.}
+  \caption[Performance of the SAC agents trained with imitation learning.]{Comparison of the performance of SAC agents trained with imitation learning using transitions of D5 or D6 against the SAC baseline agents.}
   \label{fig:prb-kpis}
 \end{figure}
 }
@@ -219,7 +219,7 @@ To explain these observations, we first look at the policy loss and Q-network lo
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/social2_losses.pdf}
-  \caption[Policy and Q-network losses and during training of B3 with SAC-DemoQ.]{Policy and Q-network losses during training of B3 for the SAC-DemoQ with ILRs~$\alpha_i = 0.15$ and~$\alpha_i = 1e^{-4}$. The loss curves with the higher ILR are overall as expected, while the small rate introduces an increasing policy loss.}
+  \caption[Policy and Q-network loss trends during training with SAC-DemoQ.]{Policy and Q-network loss trends during B3 training with SAC-DemoQ using ILRs~$\alpha_i = 0.15$ and~$\alpha_i = 1e^{-4}$. The loss curves when using the higher ILR are overall as expected, while the small IRL introduces an increasing policy loss.}
   \label{fig:social2-losses}
 \end{figure}
 }

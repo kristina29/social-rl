@@ -86,14 +86,14 @@ def plot_losses(losses, include_alpha, mode) -> List[plt.Figure]:
 
 
 if __name__ == '__main__':
-    mode = 3
+    mode = 1
 
     if mode == 1:
-        loss_files = ['../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/losses_20231002T130931.pkl',
-                      '../experiments/SAC_DB2/33_demo_replaybuffer/demo_b5/losses_20231026T121912.pkl']
+        loss_files = ['../experiments/SAC/30_renewable_prod/reward_05pvprice/0.5/losses_20231002T130931.pkl',
+                      '../experiments/Imitation_Learning/demo_b5/losses_20231026T121912.pkl']
         agents = ['SAC', 'PRB_SAC']
 
-        names = ['Baseline SAC', 'Transitions of D5']
+        names = ['SAC Baseline', 'Transitions of D5']
         include_alpha = [False, False]
     elif mode == 2:
         loss_files = ['../experiments/SAC_DB2/32_demo_b5/ir0.2/socialMode2/losses_20231107T200708.pkl',

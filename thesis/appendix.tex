@@ -24,7 +24,7 @@ Time    & Action [kWh/kWH\_capacity]     \\
 11 PM -- 0 AM & +0.034  \\
 \bottomrule    
 \end{tabular}
-\caption{Rules of the RBC implemented in CityLearn.}
+\caption{Overview of RBC rules implemented in the CityLearn framework.}
 \label{app:rbc-rules}
 \end{table}
 }
@@ -44,7 +44,7 @@ Loss coefficient & Standby hourly losses & 0 \\
 Nominal power & Maximum amount of electric power that the battery can use to charge or discharge & 5 kW \\
 \bottomrule
 \end{tabularx}
-\caption[Attributes of the batteries of each building]{Attributes of the batteries of each building. Description of the attributes obtained from \url{https://www.citylearn.net/api/citylearn.energy_model.html}.}
+\caption[Battery specifications for each building.]{Battery specifications for each building. Description of the attributes obtained from CityLearn (\url{https://www.citylearn.net/api/citylearn.energy_model.html}).}
 \label{app:battery-attributes}
 \end{table}
 }
@@ -78,24 +78,24 @@ Building & Energy Consumption Median $\bar{E}_b$
 \\
 9  & 0.36 %& 0.38 & 0.46 
 \\
-10 & 0.56 %& 0.65 & 0.98
-\\
+%10 & 0.56 %& 0.65 & 0.98
+%\\
 11 & 0.66 %& 0.71 & 1.19 
 \\
-12 & 0.0 %& 0.0 & 0.0 
-\\
-13 & 0.43 %& 0.48 & 0.97 
-\\
+%12 & 0.0 %& 0.0 & 0.0 
+%\\
+%13 & 0.43 %& 0.48 & 0.97 
+%\\
 14 & 0.49 %& 0.48 & 0.59 
 \\
-15 & 0.12 %& 0.0 & 0.0 
-\\
+%15 & 0.12 %& 0.0 & 0.0 
+%\\
 16 & 0.55 %& 0.72 & 1.2 
 \\
 17 & 0.75 \\% & 0.82 & 1.24 \\
 \bottomrule
 \end{tabular}
-\caption[Median values for energy consumption per hour $\bar{E}_b$]{Median values for energy consumption per hour $\bar{E}_b$ obtained by training the SAC agent with the default hyperparameters.}
+\caption[Median hourly energy consumption $\bar{E}_b$ for each building.]{Median hourly energy consumption $\bar{E}_b$ for each building $b$ obtained by training the SAC agent with default hyperparameters in the CityLearn implementation.}
 \label{tab:building-medians}
 \end{table}
 }
@@ -142,7 +142,7 @@ hour & hour of day (from 1 to 24)\\
  renewable\_energy\_share & share of renewable energy in the fuel mix of the grid. \\
 \bottomrule
 \end{tabularx}
-\caption{Available state variables of the baseline SAC agent.}
+\caption{List of available state variables in CityLearn.}
 \label{app:observation-space-sac}
 \end{table}
 }
@@ -154,7 +154,7 @@ hour & hour of day (from 1 to 24)\\
 \center
 \begin{tabular}{c | c | c | c}
 \toprule
-Demonstrator                   & Mode & $\alpha_i$ & Deterministic demonstrator actions \\
+Demonstrator                   & Mode & IRL $\alpha_i$ & Deterministic demonstrator actions \\
 \midrule
 2 random                       & 1-6  & 0.2                      & Yes                          \\ 
 \rule{0pt}{3ex}% EXTRA vertical height  
@@ -171,7 +171,7 @@ Demonstrator                   & Mode & $\alpha_i$ & Deterministic demonstrator 
                                & 4-6  & 0.01, 0.2, 1             & No                          \\
 \bottomrule
 \end{tabular}
-  \caption[Overview of the experiments for SAC-DemoPol.]{Overview of the experiments for our SAC-DemoPol. We tested different demonstrator, mode, and ILRs $\alpha_i$ combinations. Also, we examined the influence of using deterministic demonstrator actions instead of sampling them.}
+  \caption[Summary of experiments with SAC-DemoPol.]{Summary of experiments with SAC-DemoPol. Overview of the tested demonstrator, mode, and ILRs combinations, and the experiments to evaluate the impact of using deterministic demonstrator actions instead of sampling them.}
   \label{app:social1-params}
 \end{table}
 }
@@ -184,7 +184,7 @@ Demonstrator                   & Mode & $\alpha_i$ & Deterministic demonstrator 
 \center
 \begin{tabularx}{\textwidth}{c | Y | Y }
 \toprule
-Demonstrator                   & $\alpha_i$                                     & Deterministic policy actions  \\
+Demonstrator                   & IRL $\alpha_i$                                     & Deterministic policy actions  \\
 \midrule
 \rule{0pt}{3ex}% EXTRA vertical height  
 \multirow[t]{3}{*}{2 random}      & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2                & No\\
@@ -202,7 +202,7 @@ Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.
                                & 0.1, 0.15, 0.2, 0.4, 0.6, 0.8                                  & Yes                  \\
                           \bottomrule                        
 \end{tabularx}
-  \caption[Overview of the experiments for SAC-DemoQ.]{Overview of the experiments for our SAC-DemoQ. We tested different demonstrator and ILRs $\alpha_i$ combinations. Also, we examined the influence of using deterministic demonstrator actions instead of sampling them.}
+  \caption[Summary of experiments with SAC-DemoQ.]{Summary of experiments with SAC-DemoQ. Overview of the tested  demonstrator and ILRs combinations, and the experiments to evaluate the impact of using deterministic demonstrator actions instead of sampling them.}
   \label{app:social2-params}
 \end{table}
 }
@@ -215,7 +215,7 @@ Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.
 \begin{figure}[htb]
     \center
      \includegraphics[width=\textwidth]{figures/building_daily_means.pdf}
-  \caption{Daily means of the non-shiftable load and the solar generation of the buildings in kWh.}
+  \caption[Daily averages of non-shiftable load and solar generation for buildings.]{Daily averages of non-shiftable load and solar generation for buildings, measured in kWh.}
   \label{app:building-daily-mean}
 \end{figure}
 }
@@ -226,7 +226,7 @@ Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.
 \begin{figure}[htb]
     \center
      \includegraphics[width=\textwidth]{figures/weather_daily_means.pdf}
-  \caption{Daily means of the meteorologic observations and fuel mix in the grid.}
+  \caption{Daily averages of meteorological observations and grid fuel mix.}
   \label{app:weather-daily-mean}
 \end{figure}
 }
@@ -237,7 +237,7 @@ Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.
 \begin{figure}[htb]
     \center
      \includegraphics[width=0.8\textwidth]{figures/electricity_pricing.pdf}
-  \caption{Basic electricity price and fossil share-weighted price with a factor of $\beta=20$ for the initial week in the dataset.}
+  \caption[Comparison of basic electricity prices and fossil share-weighted prices.]{Comparison of basic electricity prices and fossil share-weighted prices (with a factor of $\beta=20$) for the initial week in the dataset.}
   \label{app:electricity-pricing}
 \end{figure}
 }
@@ -248,7 +248,7 @@ Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.
 \begin{figure}[htb]
     \center
      \includegraphics[width=\textwidth]{figures/prb_ddpg_kpis.pdf}
-  \caption{}
+  \caption[Performance of the DDPG agents trained with and without imitation learning.]{Comparison of the performance of DDPG agents trained classical or with imitation learning using transitions of D5 or D6 against the SAC baseline agents.}
   \label{app:prb-ddpg-kpis}
 \end{figure}
 }
@@ -259,7 +259,7 @@ Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/social2_results_sharedobs.pdf}
-  \caption[Results of the SAC-DemoQ with shared observations.]{Results of the fossil energy consumption KPI of the SAC-DemoQ with shared observation. The shaded areas show the standard deviation between the experiments with and without additional policy update, and the graphs show the mean value of them. One experiment with sampled and one with deterministic (determ.) demonstrator actions was conducted for both demonstrators.}
+  \caption[Fossil energy consumption in SAC-DemoQ experiments using shared observations.]{Fossil energy consumption in SAC-DemoQ experiments when sharing building-specific information. The shaded areas indicate the standard deviation between the experiments with and without additional policy update, and the graphs show the mean value of them. One experiment with sampled and one with deterministic (determ.) demonstrator actions was conducted using both demonstrators.}
   \label{app:social2-results-sharedobs}
 \end{figure}
 }
@@ -270,7 +270,7 @@ Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/shifted_sac_kpis.pdf}
-  \caption[Results of the SAC Agents for the shifted data of B3 and B5.]{Results of the SAC Agents for the shifted data of B3 and B5 compared to the SAC baseline results of the training buildings.}
+  \caption[Performance of the SAC baseline agents trained for shifted building data.]{Performance of the SAC baseline agents trained for shifted building data of B3 and B5 compared to the performance of the SAC baseline agents trained for the training buildings.}
   \label{app:sac-shifted-kpis}
 \end{figure}
 }
@@ -281,7 +281,7 @@ Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/social_kpis.pdf}
-  \caption[Results of the best-performing SAC and SAC-DemoQ Agents.]{Results of the best-performing SAC and SAC-DemoQ Agents for the training and the evaluation buildings.}
+  \caption[Performance of the best-performing SAC-DemoQ agents.]{Performance of the best-performing SAC-DemoQ agents trained for the training and evaluation buildings compared to the performance of the SAC baseline agents.}
   \label{app:social-kpis}
 \end{figure}
 }
