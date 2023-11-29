@@ -17,6 +17,7 @@ As defined by Sutton and Barto \cite{sutton2018reinforcement}, RL is a machine l
 \normalsize
 \begin{figure}[htb]
      \center
+     \scalebox{.8}{%
      \begin{overpic}[width=\textwidth, trim={0 1.7cm 0 0.3cm},clip]{figures/rl_overview_blank.pdf}%
 	\put(455,415){Agent}%
 	\put(450,351){Policy $\pi$}%
@@ -26,8 +27,8 @@ As defined by Sutton and Barto \cite{sutton2018reinforcement}, RL is a machine l
 	\put(120,332){State $s_t$}%
 	\put(503,122){\small Reward $r_t$}%
 	\put(417,60){Environment}%
-    \end{overpic}
-  \caption[Reinforcement Learning Overview.]{In RL, the agent observes the state of the environment~$s_t$ at timestep~$t$. The agent takes an action~$a_t$ based on the policy~$\pi$. This action determines the next state of the environment~$s_{t+1}$, and the environment sends a reward~$r_{t+1}$ to the agent.}
+    \end{overpic}}
+  \caption[Reinforcement learning sequence.]{Reinforcement learning sequence: The agent observes the state of the environment~$s_t$ at timestep~$t$. Using its policy~$\pi$, the agent takes an action~$a_t$. This action determines the next state of the environment~$s_{t+1}$, and the reward~$r_{t+1}$.}
   \label{fig:rl_overview}
 \end{figure}
 }

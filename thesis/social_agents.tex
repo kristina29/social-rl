@@ -20,7 +20,7 @@ As there is a wide range of buildings, we cannot assume that the demonstrators h
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/prb_kpis.pdf}
-  \caption[KPI results of the imitation learning method.]{KPIs of the training building agents when using imitation learning with pre-trained demonstrator D5 or D6 in comparison to the baseline SAC agents.}
+  \caption[Performance of the SAC agents using imitation learning.]{Performance achieved by the training building agents using SAC and imitation learning with transitions of the pre-trained demonstrator D5 or D6 compared against the baseline SAC agents.}
   \label{fig:prb-kpis}
 \end{figure}
 }
@@ -40,7 +40,7 @@ The policy loss values observed during training with demonstrator transitions in
 \begin{figure}[htb]
 \center
      \includegraphics[width=0.9\textwidth]{figures/prb_losses.pdf}
-  \caption[Policy losses during training of B3 with imitation learning.]{Policy losses during training of B3 for the baseline SAC agent and the SAC agent when filling the PRB with the transitions of demonstrator D5 before training.}
+  \caption[Policy loss trends during training with imitation learning.]{Policy loss trends during B3 training of the baseline SAC agent and the SAC agent using imitation learning with transitions from D5.}
   \label{fig:prb-losses}
 \end{figure}
 }
@@ -112,7 +112,7 @@ Table~\ref{tab:social-policy-update-modes} summarizes the modes and their entrop
   6 & $\mathcal{H}_{M5}$ &  $\mathcal{V}_{M1}$ \\
   \bottomrule
 \end{tabular}
-  \caption[Modes for SAC-DemoPol focusing on the policy update.]{Modes for SAC-DemoPol focusing on the policy update. Mode~1 increases the estimated Q-Value of the demonstrator action, mode~2 increases the probability of the demonstrator action and mode~3 combines both. Mode~4-6 are similar, but the probability of the demonstrator actions in the learner policy is used instead of their probabilities in the demonstrator policy.}
+  \caption[Operational modes of the SAC-DemoPol method.]{Operational modes of the SAC-DemoPol method. Mode~1 increases the estimated Q-value of the demonstrator action, mode~2 increases the probability of the demonstrator action and mode~3 combines both. Mode~4-6 are similar, but the probability of the demonstrator actions in the learner policy is used instead of their probabilities in the demonstrator policy.}
   \label{tab:social-policy-update-modes}
 \end{table}
 }
@@ -127,7 +127,7 @@ As demonstrators, we used either the pre-trained D5 and D6 presented in Section~
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/social1_results.pdf}
-  \caption[Experiment results of SAC-DemoPol.]{Test results of SAC-DemoPol. The performance of the baseline SAC agents was only minimally exceeded. Modes 4-6 require a relatively high ILR to match the baseline's performance.}
+  \caption[Fossil energy consumption in SAC-DemoPol experiments.]{Fossil energy consumption in SAC-DemoPol experiments. The performance of the baseline SAC agents is only minimally exceeded. Modes 4-6 require a relatively high ILR to match the baseline's performance.}
   \label{fig:social1-results}
 \end{figure}
 }
@@ -143,7 +143,7 @@ To better understand the performance differences between modes 1-3 and 4-6, we i
 \begin{figure}[htb]
 \center
      \includegraphics[width=0.9\textwidth]{figures/social1_losses.pdf}
-  \caption[Policy losses and entropy values during training of B3 with SAC-DemoPol.]{Policy losses and entropy values during training of B3 for the SAC-DemoPol with mode~2 and mode~5. The loss and entropy decreases as expected when using mode~2, but increases when using mode~5.}
+  \caption[Policy loss and entropy trends during training with SAC-DemoPol.]{Policy loss and entropy trends during B3 training with SAC-DemoPol using mode~2 and mode~5. The loss and entropy decreases as expected when using mode~2, but increases when using mode~5.}
   \label{fig:social1-losses}
 \end{figure}
 }
@@ -172,7 +172,7 @@ We conducted a new series of experiments using the SAC-DemoQ. In each experiment
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/social2_results.pdf}
-  \caption[Results of the fossil energy consumption KPI of the SAC-DemoQ.]{Results of the fossil energy consumption KPI of the SAC-DemoQ depending on the ILR and the demonstrators. The shaded areas show the standard deviation between the experiments with and without additional policy update, and the graphs show the mean value of them. For demonstrator D6, one experiment was conducted with sampled and one with deterministic (determ.) demonstrator actions.}
+  \caption[Fossil energy consumption in SAC-DemoQ experiments.]{Fossil energy consumption in SAC-DemoQ experiments depending on the ILR and the demonstrators. Shaded areas indicate the standard deviation between the experiments with and without additional policy update and the graphs show the mean value of them. For demonstrator D6, one experiment was conducted with sampled and one with deterministic (determ.) demonstrator actions.}
   \label{fig:social2-results}
 \end{figure}
 }
@@ -203,7 +203,7 @@ The fossil energy consumption metric of the experiments in comparison to the val
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/social2_results_shifted.pdf}
-  \caption[Results of the SAC-DemoQ for shifted building data.]{Results of the fossil energy consumption KPI of the SAC-DemoQ for shifted building data of B3 and B5. The shaded areas show the standard deviation between the experiments with and without additional policy update, and the graphs show the mean value of them.}
+  \caption[Fossil energy consumption in SAC-DemoQ experiments using shifted building data.]{Fossil energy consumption in SAC-DemoQ experiments using shifted building data of B3 and B5. The shaded areas indicate the standard deviation between the experiments with and without additional policy update, and the graphs show the mean value of them.}
   \label{fig:social2-results-shifted}
 \end{figure}
 }
