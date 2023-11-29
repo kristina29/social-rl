@@ -33,14 +33,18 @@ if __name__ == '__main__':
                 correlations.iloc[b_id-1][b_id2] = pearsonr(demand, demand2)[0]
 
     correlations = correlations.drop(columns=[1,2,4,6,9,10,12,13,14,15,16])
+    correlations = correlations.drop(index=[10, 12, 13, 15])
     for b_id in range(1, n_buildings + 1):
-        b_correlations = np.array(correlations.iloc[b_id-1][:-1])
-        correlations.iloc[b_id-1]['Median'] = np.median(b_correlations)
+        try:
+            b_correlations = np.array(correlations.iloc[b_id-1][:-1])
+            correlations.iloc[b_id-1]['Median'] = np.median(b_correlations)
+        except:
+            pass
 
     #correlations.to_csv('../building_correlations.csv')
     correlations = correlations.astype('float64')
 
-    f = plt.figure(figsize=(18, 15))
+    f = plt.figure(figsize=(13, 10))
     #plt.matshow(np.array(correlations, dtype='float64'), fignum=f.number)
     #cb = plt.colorbar()
     #cb.ax.tick_params(labelsize=14)
@@ -48,7 +52,10 @@ if __name__ == '__main__':
         #np.array(
         correlations
         #, dtype='float64')
-        , annot=True, xticklabels=True, yticklabels=True, annot_kws={"fontsize":21})
+        , annot=True, xticklabels=True, yticklabels=True, annot_kws={"fontsize":19})
+    cbar = ax.collections[0].colorbar
+    cbar.set_label('PCC', labelpad=35)
+    ax.figure.axes[-1].yaxis.label.set_size(21)
 
     buldings = [3,5,7,8,11,17]
     lw = 15
@@ -57,9 +64,9 @@ if __name__ == '__main__':
     for b in buldings:
         wanted_label = b
         wanted_index = correlations.index.get_loc(wanted_label)
-        x, y, w, h = 0, wanted_index, len(buldings)-0.05, 1
+        x, y, w, h = 0, wanted_index, len(buldings)-0.07, 1
         ax.add_patch(Rectangle((x, y), w, h, fill=False, edgecolor='black', lw=2.5, clip_on=False, zorder=3))
-        x, y, w, h = len(buldings)+0.05, wanted_index, 0.95, 1
+        x, y, w, h = len(buldings)+0.07, wanted_index, 0.93, 1
         ax.add_patch(Rectangle((x, y), w, h, fill=False, edgecolor='black', lw=2.5, clip_on=False, zorder=3))
 
     ax.set_xlabel('Training Building IDs', fontsize=21)
@@ -71,5 +78,3 @@ if __name__ == '__main__':
     plt.tight_layout()
 
     f.savefig('correlations.pdf')
-
-    plt.show()

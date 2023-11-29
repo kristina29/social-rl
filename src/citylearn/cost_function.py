@@ -253,9 +253,9 @@ class CostFunction:
         return data['quadratic'].tolist()
 
     @staticmethod
-    def average_daily_renewable_share(net_renewable_electricity_share: List[float],
-                                      daily_time_step: int = None) -> List[float]:
-        r"""Difference between 1 and the Mean of daily share of renewable electricity consumption of the total consumption.
+    def average_daily_fossil_share(net_renewable_electricity_share: List[float],
+                                   daily_time_step: int = None) -> List[float]:
+        r"""Mean of daily share of fossil electricity consumption of the total consumption.
 
         Parameters
         ----------
@@ -266,9 +266,8 @@ class CostFunction:
 
         Returns
         -------
-        average_daily_renewable_share : List[float]
-            1-Average daily share of renewable electricity consumption.
-            (equivalent to average daily share of non-renewable electricity consumption)
+        average_daily_fossil_share : List[float]
+            Average daily share of non-renewable electricity consumption.
         """
 
         daily_time_step = 24 if daily_time_step is None else daily_time_step

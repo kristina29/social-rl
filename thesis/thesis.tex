@@ -27,6 +27,8 @@
 \usepackage[permil]{overpic}
 \usepackage{multirow}
 \usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{booktabs} 
 
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
 \newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
@@ -43,6 +45,15 @@
 
 % Kann von Student auch nach pers\"onlichem Geschmack ver\"andert werden.
 \pagestyle{headings}
+\fancypagestyle{plain}{%
+\fancyhf{} % clear all header and footer fields
+\fancyhead{} % clear all header fields
+\fancyfoot{} % clear all footer fields
+\fancyhead[RO]{\thepage}
+\fancyhead[LE]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+}
 
 \sloppy
 
@@ -86,7 +97,7 @@ to \\Lower Carbon Emissions in Energy Systems\\[1.5cm]}
 \emph{Incorporating Social Learning into Multi-Agent Reinforcement Learning
 to Lower Carbon Emissions in Energy Systems}\\ Master Thesis Computer Science\\
 Eberhard Karls Universit\"at T\"ubingen\\
-Thesis period: 01.06.2023~-~01.12.2023
+Thesis period: 01.06.2023~--~01.12.2023
 \end{minipage}
 \newpage
 
@@ -177,7 +188,7 @@ Thesis period: 01.06.2023~-~01.12.2023
 \textbf{DNI}\>Direct Normal Irradiation \\
 \textbf{DDPG}\>Deep Deterministic Policy Gradient \\
 \textbf{GHI}\>Global Horizontal Irradiance \\
-\textbf{i.i.d}\>independent and identically distributed \\
+\textbf{i.i.d.}\>independent and identically distributed \\
 \textbf{ILR}\>Imitation Learning Rate \\
 \textbf{KL divergence}\>Kullback-Leibler divergence \\
 \textbf{KPI}\>Key performance indicator \\
@@ -192,6 +203,7 @@ Thesis period: 01.06.2023~-~01.12.2023
 \textbf{PCC}\>Pearson Correlation Coefficient \\
 \textbf{PRB}\>Prioritized Replay Buffer \\
 \textbf{PV}\> Photovoltaic \\
+\textbf{RBC}\>Rule-Based Controller \\
 \textbf{RL}\>Reinforcement learning \\
 \textbf{SAC}\>Soft actor-critic \\
 \textbf{TD error}\> Temporal Difference error \\

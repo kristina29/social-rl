@@ -947,21 +947,21 @@ class CityLearnEnv(Environment, Env):
             'net_value_without_storage':
                 CostFunction.peak_demand(self.net_electricity_consumption_without_storage)[-1]
         }, {
-            'cost_function': '1 - average_daily_renewable_share',
-            'value': CostFunction.average_daily_renewable_share(self.net_renewable_electricity_share)[-1] / \
-                     CostFunction.average_daily_renewable_share(self.net_renewable_electricity_share_without_storage)[
+            'cost_function': 'average_daily_fossil_share',
+            'value': CostFunction.average_daily_fossil_share(self.net_renewable_electricity_share)[-1] / \
+                     CostFunction.average_daily_fossil_share(self.net_renewable_electricity_share_without_storage)[
                          -1],
-            'net_value': CostFunction.average_daily_renewable_share(self.net_renewable_electricity_share)[-1],
+            'net_value': CostFunction.average_daily_fossil_share(self.net_renewable_electricity_share)[-1],
             'net_value_without_storage':
-                CostFunction.average_daily_renewable_share(self.net_renewable_electricity_share_without_storage)[-1]
+                CostFunction.average_daily_fossil_share(self.net_renewable_electricity_share_without_storage)[-1]
         }, {
-            'cost_function': '1 - average_daily_renewable_share_grid',
-            'value': CostFunction.average_daily_renewable_share(self.net_renewable_electricity_grid_share)[-1] / \
-                     CostFunction.average_daily_renewable_share(
+            'cost_function': 'average_daily_fossil_share_grid',
+            'value': CostFunction.average_daily_fossil_share(self.net_renewable_electricity_grid_share)[-1] / \
+                     CostFunction.average_daily_fossil_share(
                          self.net_renewable_electricity_grid_share_without_storage)[-1],
-            'net_value': CostFunction.average_daily_renewable_share(self.net_renewable_electricity_grid_share)[-1],
+            'net_value': CostFunction.average_daily_fossil_share(self.net_renewable_electricity_grid_share)[-1],
             'net_value_without_storage':
-                CostFunction.average_daily_renewable_share(self.net_renewable_electricity_grid_share_without_storage)[
+                CostFunction.average_daily_fossil_share(self.net_renewable_electricity_grid_share_without_storage)[
                     -1]
         }, {
             'cost_function': 'fossil_energy_consumption',

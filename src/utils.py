@@ -244,8 +244,8 @@ def get_kpis(env: CityLearnEnv) -> pd.DataFrame:
         'electricity_consumption', 'cost',
         'average_daily_peak', 'ramping', '1 - load_factor',
         'carbon_emissions',
-        '1 - average_daily_renewable_share',
-        '1 - average_daily_renewable_share_grid',
+        'average_daily_fossil_share',
+        'average_daily_fossil_share_grid',
         '1 - used_pv_of_total_share',
         'fossil_energy_consumption'
     ]

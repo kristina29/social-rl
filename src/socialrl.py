@@ -1,8 +1,8 @@
 import pickle
 import time
 
-from citylearn.agents.db2_sac import SACDEMOPOL
-from citylearn.agents.db2_value_sac import SACDEMOQ
+from citylearn.agents.sac_demopol import SACDEMOPOL
+from citylearn.agents.sac_demoq import SACDEMOQ
 from citylearn.agents.dpb_sac import PRBSAC
 from citylearn.agents.ddpg import DDPG, PRBDDPG
 from citylearn.citylearn import CityLearnEnv

@@ -2,66 +2,78 @@
 % Diskussion und Ausblick
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Evaluation and Outlook}
+\chapter{Evaluation of the Method and Outlook}
   \label{Discussion}
  This chapter examines the effectiveness of our best-performing model, SAC-DemoQ, on new building data. The agent utilizes the deterministic actions of a pre-trained demonstrator. First, we will present the methodology and results of our evaluation process. We will then discuss the performance and implications of our findings. The chapter concludes with an outline of future research directions that could further extend the work presented here.
   
-\section{Evaluation on new Buildings}
+\section{Assessing Performance on New Buildings}
+In the preceding sections, we presented the theoretical foundations and development of our social approach to reducing fossil energy consumption. This chapter will evaluate our method on a new set of buildings. For the assessment, we selected the six buildings 1, 2, 4, 6, 9 and 14 (see Section~\ref{sec:building-data}), which we will refer to as evaluation buildings. These buildings were not included in the training set to avoid overlap. We first used the asocial SAC algorithm to train each building.
+
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/eval_kpis.pdf}
      \caption[KPI results of the evaluation buildings using non-social methods.]{KPIs of the asocial SAC and RBC agents on the evaluation buildings compared to the training buildings. While the RBC agents perform approximately similar on both building sets, the SAC agents perform better on the evaluation data.}
   \label{fig:eval-kpis}
 \end{figure}
+}
 
-In the preceding sections, we presented the theoretical foundations and development of our social approach to reducing fossil energy consumption. This chapter will evaluate our method on a new set of buildings. For the assessment, we selected the six buildings 1, 2, 4, 6, 9 and 14 (see Section~\ref{sec:building-data}), which we will refer to as evaluation buildings. These buildings were not included in the training set to avoid overlap. We first used the asocial SAC algorithm to train each building.
+Figure~\ref{fig:eval-kpis} shows the KPI results of the RBC and SAC agents for both the training and evaluation buildings. The performance of the RBC agents is consistent across the building sets, with a slight improvement in the utilization of produced solar energy in the evaluation group.
 
-Figure~\ref{fig:eval-kpis} shows the KPI results of the RBC and SAC agents for both the training and evaluation buildings. The performance of the RBC agents is consistent across the building sets, with a slight improvement in the utilization of produced solar energy in the evaluation group. %This indicates that when deploying RBC in evaluation buildings, the increase in the use of fossil fuels compared to without using the battery is similar to that of training buildings. 
+On the other hand, the SAC agents of the evaluation buildings perform better than the baseline SAC agents in all KPIs except for the share of total renewable energy used. Notably, using battery storage in evaluation buildings facilitates an additional reduction of fossil energy consumption by approximately 1~\% compared to the training group. 
 
-On the other hand, the SAC agents of the evaluation buildings perform better than the baseline SAC agents in all KPIs except for the share of total renewable energy used. Notably, using battery storage in evaluation buildings facilitates an additional reduction of fossil energy consumption by approximately 1 \% compared to the training group. 
-
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/eval_results.pdf}
   \caption[Fossil energy consumption of the SAC-DemoQ on the evaluation buildings.]{Fossil energy consumption of the SAC-DemoQ on the evaluation buildings for different IRLs and pre-trained demonstrators.}
   \label{fig:eval-results}
 \end{figure}
+}
 
 To evaluate the effectiveness of our social method, we used a pre-trained demonstrator to train SAC-DemoQ for the evaluation buildings. We used deterministic demonstrator actions and chose D11 and D6 as pre-trained demonstrators based on their correlation in energy consumption with the evaluation buildings. B11 has the highest median correlation without being part of the evaluation group, and B6 has the highest correlation within the group and performed the best in the training phase. We tested various IRLs to determine the need for parameter tuning.
 
-The mean value of the fossil energy consumption KPI was calculated for one experiment with and without additional policy update, as shown in Figure~\ref{fig:eval-results}. Based on our analysis, we found that demonstrators D6 and D11 achieved the highest average saving of fossil energy at IRLs of 0.2 and 0.3, respectively. We also discovered that the agents perform best when using demonstrator D6 with a rate of 0.25 and an additional policy update. Under these conditions, we can save about 1 \% more fossil energy than with the classic SAC agents. However, the savings achieved are lower compared to the training buildings.
+The mean value of the fossil energy consumption KPI was calculated for one experiment with and without additional policy update, as shown in Figure~\ref{fig:eval-results}. Based on our analysis, we found that demonstrators D6 and D11 achieved the highest average saving of fossil energy at IRLs of 0.2 and 0.3, respectively. We also discovered that the agents perform best when using demonstrator D6 with a rate of 0.25 and an additional policy update. Using these parameters, we can save about 1~\% more fossil energy than with the classic SAC agents. However, the savings achieved are lower compared to the training buildings.
 
 We also conducted these experiments using the pre-trained demonstrators D5, D14, and D16. However, all of them reached slightly worse performance in the fossil consumption KPI than the presented ones. 
 
-In the Appendix, Figure~\ref{app:social-kpis} shows the KPI results of the best-performing SAC and SAC-DemoQ agents in both the training and evaluation buildings. Besides the already presented fossil energy consumption, the SAC-DemoQ agents outperform the asocial SAC agents in the three additional KPIs. However, this improvement is only significant, i.e., greater than 0.5 \%, for the 1 - Used PV metric.
+In the Appendix, Figure~\ref{app:social-kpis} shows the KPI results of the best-performing SAC and SAC-DemoQ agents in both the training and evaluation buildings. Besides the already presented fossil energy consumption, the SAC-DemoQ agents outperform the asocial SAC agents in the three additional KPIs. However, this improvement is only significant, i.e., greater than 0.5~\%, for the 1~-~used~PV metric.
   
-\section{Final Discussion}
-The evaluation of the SAC-DemoQ to reduce fossil fuel consumption has shown that an improvement in this respect can also be achieved for new buildings. Among the demonstrators, the pre-trained B6 showed the most significant improvement. However, we could not find any correlation between the properties of the pre-trained demonstrator and the performance of the social agents. Our analysis indicates that the demonstrator's performance, the correlation between the non-shiftable load or the correlation of the difference between solar generation and non-shiftable load are not decisive factors. Additionally, the fact that the demonstrator building had a relatively high number of periods where the load exceeded the solar generation is not a significant factor based on our findings. Further experiments with other buildings could provide more insights into this matter. Also, the IRL needs to be tuned for each set of buildings and each tested demonstrator.
+\section{Final Discussion of the Methodology}
+The evaluation of the SAC-DemoQ to reduce fossil fuel consumption has shown that an improvement in this respect can also be achieved for new buildings. Among the demonstrators, the pre-trained B6 showed the most significant improvement. However, we could not find any correlation between the properties of the pre-trained demonstrator and the performance of the social agents. Our analysis indicates that the demonstrator's performance, the correlation between the non-shiftable load or the correlation of the difference between solar generation and non-shiftable load are not decisive factors. Additionally, based on our findings, it is irrelevant if the demonstrator has many periods where the load exceeds the solar generation. Further experiments with other buildings could provide more insights into this matter. Also, the IRL needs to be tuned for each set of buildings and each tested demonstrator.
 
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
 \begin{figure}[htb]
 \center
      \includegraphics[width=0.8\textwidth]{figures/building_sac.pdf}
   \caption[Energy consumption metric of the baseline SAC agent on the individual buildings.]{Energy consumption metric of the baseline SAC agent compared between the training and the evaluation buildings. While the agents perform better on average on the evaluation buildings, the standard deviation is lower on the training set.}
   \label{fig:sac-per-building}
 \end{figure}
+}
 
 In order to compare the benefits of our social method between the training and evaluation groups, we conducted a detailed analysis of the buildings. We found that the district fossil consumption has a PCC of 0.999 to the district energy consumption across all our experiments. CityLearn provides the latter KPI and calculates the average saving of grid energy per building compared to without the use of the battery. It is also calculated building on building-level. 
 
 Figure~\ref{fig:sac-per-building} shows the energy consumption metric of the SAC agents of the training and evaluation buildings, their mean value, and the standard deviation. It is noticeable that the SAC agents in the training group perform worse on average but have a significantly lower standard deviation. This suggests that finding a suitable pre-trained demonstrator for the evaluation group may be more difficult and could explain the lower improvement of our social method during evaluation.
 
-In both the training and evaluation buildings, the only significant improvement observed when using the SAC-DemoQ agents was in the fossil energy consumption and 1 - Used PV metrics. This suggests that the reduction in fossil energy usage was primarily due to the more efficient utilization of the building's solar energy. To better investigate the effects of renewable energy from the grid, reducing the amount available more significantly than what has been done may be necessary.
+In both the training and evaluation buildings, the only significant improvement observed when using the SAC-DemoQ agents was in the fossil energy consumption and 1~-~used~PV metrics. This suggests that the reduction in fossil energy usage was primarily due to the more efficient utilization of the building's solar energy. To better investigate the effects of renewable energy from the grid, reducing the amount available more significantly than what has been done may be necessary.
 
 However, our experiments were mainly conducted only once, limiting the robustness of our results. Repeating the experiments to obtain a mean performance metric could improve the robustness of our findings. Also, it is important to note that the forecasts used in our assessments, including weather and price forecasts, were perfect. However, this level of precision was also applied to the baseline methods, so it is reasonable to use them to evaluate the improvements of our social method.
 
-Our study has a limitation due to the simulation methods used, which led to lower variability in solar power generation between buildings than would occur in real life. The uniformity in simulation could create bias in the results, highlighting the necessity for a more diverse simulation of solar power generation or the use of real data in future assessments. In addition, our pre-trained demonstrators were trained on the same weather and fuel mix data as used in the training of the social agents. This consistency may have unintentionally positively influenced our results. Hence, evaluating our method with new weather and fuel data for the social agents would be beneficial, allowing a better examination of the adaptability and resilience of our method. Experiments with more buildings would provide information about the scalability of our method. 
+Our study has a limitation due to the simulation methods used, which led to lower variability in solar power generation between buildings than would occur in reality. The uniformity in simulation could create bias in the results, highlighting the necessity for a more diverse simulation of solar power generation or the use of real data in future assessments. In addition, our pre-trained demonstrators were trained on the same weather and fuel mix data as used in the training of the social agents. This consistency may have unintentionally positively influenced our results. Hence, evaluating our method with new weather and fuel data for the social agents would be beneficial, allowing a better examination of the adaptability and resilience of our method. Experiments with more buildings would provide information about the scalability of our method. 
 
-Finally, during the training phase, the policy loss has been shown to be a reliable indicator of the final performance and stability of the social agent's performance. In the next chapter, we will present in detail some approaches that can enhance the performance and robustness of our developed social method.
+Finally, during the training phase, the policy loss has been shown to be a reliable indicator of the final performance and stability of the social agent's performance. Furthermore, it is essential to mention that we have categorized nuclear methods as fossil fuels for simplicity. Although they do not cause significant emissions, they remain a contentious issue, at least in Germany. Nevertheless, they should be assessed separately in future research to evaluate emissions reduction in energy systems. 
 
-\section{Outlook}
-In this chapter, we explore potential research opportunities to enhance the effectiveness and robustness of our method. First, we explore value shaping, another theory used to model the behavior of study participants in RL. Secondly, we will examine clustering buildings, which will allow for the use of customized demonstrators. Finally, we investigate the possibility of refining the IRL, which could be adaptive to improve the learning efficiency of our agents further.
+\section{Future Research Fields}
+In this chapter, we explore potential research opportunities to enhance the performance and robustness of our developed social method. First, we explore value shaping, another theory used to model the behavior of study participants in RL. Second, we examine clustering buildings, which will allow for the use of customized demonstrators. Finally, we investigate the possibility of refining the IRL, which could be adaptive to improve the learning efficiency of our agents further. In addition to the approaches we present, other approaches, such as using a different RL algorithm as a basis, are also conceivable.
 
-\subsection{Value Shaping}
-In the field of psychology, value shaping and DB are commonly used methods. Value shaping involves adding social information from a demonstrator into the value function, rather than the policy \cite{najar2020actions, witt2023social}. In our SAC-DemoQ, we have already incorporated a social update of the Q-networks, but only with regard to assuming the frequency-based increasing value of observed actions. However, the main difference with value shaping is that we use the actual value of the demonstrator's action. To achieve this, an additional Q-Value Update in the SAC context based on the method used by Najar et. al. \cite{najar2020actions} could minimize the following objective:
+\subsection{Incorparating Value Shaping into SAC}
+In the field of psychology, value shaping and DB are commonly used methods. Value shaping involves adding social information from a demonstrator into the value function, rather than the policy \cite{najar2020actions, witt2023social}. In our SAC-DemoQ, we have already incorporated a social update of the Q-networks, but only with regard to assuming the frequency-based increasing value of observed actions. However, the main difference with value shaping is that we use the actual value of the demonstrator's action. To achieve this, an additional Q-Value Update in the SAC context based on the method used by Najar et al. \cite{najar2020actions} could minimize the following objective:
 \begin{equation}
 	\small J_Q^{value\_shaping}(\theta)=\mathbb{E}_{s_t\sim\mathcal{D}}\left[\frac{1}{2}\left ( Q_{\theta}(s_t,a_t^d) - \left(Q_{\bar{\theta}}(s_t,a_t^d) + \alpha_i Q_{\bar{\theta}}(s_t,a_t^d) \right) \right )^2 \right].
 \end{equation}
@@ -73,22 +85,22 @@ r^b = r^b + \alpha_i(r^d - r^b).
 \end{equation}
 If the reward of the demonstrator is greater than that of the learner, the final reward will increase, and vice versa \cite{witt2023social}. The final reward can then be used to calculate the Q-target in the classic SAC Q-value objective. Hence, an additional Q-value update will minimize the following objective:
 \begin{equation}
-	J_Q^{value\_shaping2}(\theta)=\mathbb{E}_{(s_t,a_t)\sim\mathcal{D}}\left[\frac{1}{2}(Q_\theta(s_t, a_t^d)-(r(s_t,a_t^d)+\gamma\mathbb{E}_{s_{t+1}\sim p}\left[V_{\bar{\theta}}(s_{t+1}) \right ]))^2 \right],
+	J_Q^{value\_shaping2}(\theta)=\mathbb{E}_{(s_t,a_t)\sim\mathcal{D}}\left[\frac{1}{2}(Q_\theta(s_t, a_t^d)-(r(s_t,a_t^d)+\gamma\mathbb{E}_{s_{t+1}\sim p}\left[V_{\bar{\theta}}(s_{t+1}) \right ]))^2 \right].
 \end{equation}
 However, it is essential to consider the meaningful calculation of the reward received by the demonstrator. It is also possible to combine value shaping with DB.
 
-\subsection{Cluster Buildings}
+\subsection{Cluster Buildings to Identify Demonstrators}
 Expanding our social method of reducing fossil energy consumption to more buildings or even entire districts or cities is challenging. Accordingly, the heterogeneity of buildings would increase, for example, in terms of typical load, storage capacity or solar generation. This increased diversity of conditions could reduce the effectiveness of a single pre-trained demonstrator, which may not be able to handle such variability.
 
-One way to address this challenge is to group them based on key parameters that reflect their similarities and differences. These parameters may include the ratio of energy load to solar generation and storage capacity. Santamouis et. al. use in their work intelligent fuzzy clustering techniques for clustering school buildings based on their energy performance \cite{santamouris2007using}. Gao et.al. identify in their dataset as most relevant features the occupants, operation hours, and gross area for the energy use of buildings \cite{gao2014new}. Once the buildings are clustered, one building from each group can be pre-trained and used as a demonstrator for the others.
+One way to address this challenge is to group them based on key parameters that reflect their similarities and differences. These parameters may include the ratio of energy load to solar generation and storage capacity. Santamouis et al. use in their work intelligent fuzzy clustering techniques for clustering school buildings based on their energy performance \cite{santamouris2007using}. Gao et al. identify in their dataset the occupants, operation hours, and gross area for the energy use of buildings \cite{gao2014new} as most relevant features. Once the buildings are clustered, one building from each group can be pre-trained and used as a demonstrator for the others.
 
 Upon further consideration, clustering can be used to create training datasets for demonstrators tailored to the specific characteristics of each building group. This approach can increase the relevance of the training data, as well as enhance the adaptivity and accuracy of the pre-trained demonstrators. By maximizing homogeneity within clusters while recognizing the heterogeneity between them, the social method could maintain its effectiveness on a larger scale.
 
 Identifying and validating relevant parameters is crucial for future research. Additionally, algorithms should be developed to effectively group buildings based on these parameters and optimize training processes accordingly.
 
-\subsection{Tuning the IRL}
+\subsection{Auto-tuning the Imitation Learning Rate}
 As suggested by our experiments, tuning the IRL for each building set and demonstrator is necessary. Although assigning a specific IRL for each building might enhance the efficiency and effectiveness of the learning process, it is impractical to manage.
 
-An approach could be to investigate which parameters significantly influence the optimal IRL. Identifying patterns or correlations between these parameters and the appropriate IRL could make it possible to develop guidelines for setting the IRL in advance. Also, automatic hyperparameter optimization frameworks, as presented by Yang et. al. could be used \cite{yang2020hyperparameter}.
+An approach could be to investigate which parameters significantly influence the optimal IRL. Identifying patterns or correlations between these parameters and the appropriate IRL could make it possible to develop guidelines for setting the IRL in advance. Also, automatic hyperparameter optimization frameworks, as presented by Yang et al. could be used \cite{yang2020hyperparameter}.
 
 A more advanced approach would be to develop adaptive systems that dynamically adjust the IRL during the training process, similar to the adjustment of entropy in the SAC algorithm. The IRL could be adjusted based on performance indicators during training to optimize the balance between imitating the demonstrator and exploring new strategies.

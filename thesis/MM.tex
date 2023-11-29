@@ -2,20 +2,20 @@
 % Grundlagen
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Material and Asocial Baseline Agent}
+\chapter{Material and Baseline Agent}
  \label{sec:met-mat}
 
 \noindent
 This chapter will provide an overview of the materials, baseline algorithms, and demonstrators used to develop our social methods. To begin with, we introduce the CityLearn framework, which is used to simulate RL algorithms for energy management in buildings and explain the modifications we made to it. We then describe the datasets used to capture the energy profiles of the buildings, weather conditions, fuel mix composition and energy prices. Furthermore, we explain the calculation of the KPIs used for our algorithmic assessments. We also discuss the architecture and performance of our asocial SAC baseline agents. Finally, we describe the demonstrators used in our social methodological approaches.
 
-\section{CityLearn Framework}
+\section{Presentation of the CityLearn Framework}
 %\subsection{Presentation}
 \label{sec:city-learn-presentation}
 CityLearn \cite{vazquez2020citylearn} is a framework that utilizes RL applications to simulate and optimize building energy management. The framework requires the energy simulation of buildings as input data, which can include equipment electric power (i.e., non-shiftable load) and required energy for heating or cooling. For this work, only the non-shiftable load is taken into account. The buildings in the simulation are equipped with batteries that can be charged either with energy from the grid or their photovoltaic (PV) system. The amount of energy produced by the solar system at a point in time is also provided as an input time series. However, the buildings can only use their solar and battery energy themselves, so passing on surplus solar energy or discharging the battery to other buildings is not possible. The non-shiftable load must be covered by energy from the grid, produced solar energy, or discharging the battery at any time. 
 
 An RL agent is trained for each building on charging or discharging its battery. The action is a real number between [-1.0, 1.0], defining the ratio of the battery capacity that is to be charged or discharged. By default, the framework operates hourly, expecting input data and actions to be performed hourly.
 
-In addition, CityLearn offers the possibility to upload data sets on the weather (temperature, humidity, solar irradiance), weather forecasts (6h, 12h and 24h ahead), energy prices (and forecasts) and carbon emissions. These data sets can be combined with time-specific data (month, day type, hour) and building-specific data (load, solar generation, battery state of the charge, energy consumption from the grid) to create a comprehensive state of the environment that is passed to the RL agents. However, the buildings can only observe their own building-specific data by default. Detailed information about the predefined state and action variables can be found on the CityLearn website\footnote{\url{https://www.citylearn.net}}.
+In addition, CityLearn offers the possibility to upload data sets on the weather (temperature, humidity, solar irradiance), weather forecasts (6h, 12h and 24h ahead), energy prices (and forecasts) and carbon emissions. These data sets can be combined with time-specific data (month, day type, hour) and building-specific data (load, solar generation, battery state of the charge, energy consumption from the grid) to create a comprehensive state of the environment that is passed to the RL agents. However, the buildings can only observe their own building-specific data by default. Detailed information about the predefined state and action variables can be found on the CityLearn website\footnote{\url{https://www.citylearn.net}.}.
 
 The framework offers a range of KPIs based on the actions performed by the agents. These KPIs are available at both the building level and the district level, so for all buildings combined. The framework is highly adaptable and can be customized to meet various objectives: Individual reward functions, data sets, and algorithms can be used to train the agents.
 
@@ -25,78 +25,95 @@ Finally, CityLearn offers an optimized RBC that we compared with our trained age
 %\label{sec:adaptions}
 Our goal was to minimize fossil energy use, which was not possible with the current state of the CityLearn framework. Therefore, we had to make some extensions regarding the state space of the environment and the KPIs, which are explained below.
 
-First, we added the hourly fuel mix data from the grid as input. This dataset includes the renewable energy produced in kilowatt-hours (kWh)~$RE_{gen}^{G}$, as well as the percentage of renewable of the total energy produced. However, the former does not always correspond to the energy consumed by the buildings in the simulations. There would be too much or too little renewable energy available to compare the performance of the agents. Therefore, the median electricity consumption per hour~$\bar{e}_{b}$ in kWh is expected as input for each building $b \in B$. Then, the absolute renewable energy generated by the grid is calculated as 
+First, we added the hourly fuel mix data from the grid as input. This dataset includes the renewable energy produced in kilowatt-hours (kWh)~$RE_{gen}^{G}$, with $G$ denoting the grid source. It also details the proportion of renewable energy relative to the total energy produced. However, the former does not always correspond to the energy consumed by the buildings in the simulations. There would be too much or too little renewable energy available to compare the performance of the agents. Therefore, the median electricity consumption per hour~$\bar{e}_{b}$ in kWh is expected as input for each building $b \in B$. Then, the absolute renewable energy generated by the grid is calculated as 
 \begin{equation}
 	\label{eq:re-grid}
 	\hat{RE}_{gen}^G = \frac{RE_{gen}^{G}}{E_{gen}^{G}} \cdot k\sum_{b\in B} \bar{e}_b,
 \end{equation}
 and thus scaled to a value corresponding to the median energy consumption of the buildings. Here, $E_{gen}^{G}$ is the total energy produced in the grid and $k$ is an optional scaling factor. If more energy is consumed from the grid than the renewable energy generated, we assume that this excess energy comes from fossil sources.
 
-Since a significant part of the renewable energy produced is wind energy, we further added the current wind speed in $m/s$ as well as the forecasts with a forecast horizon of 6h, 12h and 24h corresponding to the other forecasts in the framework to the state of the environment.
+Since a significant part of the renewable energy produced is wind energy, we further added the current wind speed in $m/s$ as well as its forecasts with a forecast horizon of 6h, 12h and 24h corresponding to the other forecasts in the framework to the state of the environment.
 
-\section{Datasets}
+\section{Data Sources and Preprocessing}
 In this chapter, we discuss the datasets used in our study. These datasets contain records of energy consumption, simulated solar energy production for each building, and weather and fuel mix information. Additionally, we describe the energy pricing dataset that we used. The meteorological and fuel mix data we used for this study comes from New York (NY) State.
 
-\subsection{Building data}
+\subsection{Building Data}
 \label{sec:building-data}
-\todo[inline]{Hab ja nur 12 von den gebäuden genutzt (6x training, 6x eval) also könnte die anderen droppen (falls nicht als demonstrator genutzt)}
-We utilized the data provided by CityLearn for the 2022 CityLearn Challenge \cite{citylearn-challenge} to build our building datasets. These datasets consist of the specifications for the battery and PV of 13 buildings, along with the non-shiftable load time series for one year, starting in August. Each building has a battery with attributes specified in Appendix~\ref{app:battery-attributes}. If we address individual buildings, we will abbreviate them with B and the identifier, for example B1 for building 1. B4 and B10-B17 have a 5 kW nominal power PV, while all other buildings have a PV with a nominal power of 4 kW.
+We utilized the 2022 CityLearn Challenge data \cite{citylearn-challenge} to construct our building datasets, which feature the specifications of battery and PV systems for 13 buildings, along with the non-shiftable load time series for an entire year starting in August. The attributes of each building's battery are specified in Appendix~\ref{app:battery-attributes}. In our analyses, buildings are designated with a 'B' followed by their specific identifier, such as B1 for Building 1. B4 and B10-B17 have a 5 kW nominal power PV, while all other buildings have a PV with a nominal power of 4 kW. We excluded Buildings B10, B12, B13, and B15 from our study to reduce training time and thus do not present them.
 
-We conducted a new simulation for the time series of solar power generation for the buildings, as we used different weather data than in the challenge. To carry out the simulation, we used the Python library pvlib \cite{holmgren2018pvlib} and followed the instructions provided on their website\footnote{see \url{https://pvlib-python.readthedocs.io/en/latest/gallery/adr-pvarray/plot_simulate_fast.html}}. The weather data we used is described in Section~\ref{sec:weather-data}, and for the location, we used $42$°~$17'~60''$~N, $74$°~$22'~12''$~W (marked with green border in Figure~\ref{fig:weather-locations}). Furthermore, we set the default test condition power output of the PV for each building to be the maximum solar generation of the original data and added 500 W to attain a nearly equivalent median generation of all buildings as in the original dataset.
+We conducted a new simulation for the time series of solar power generation for the buildings, as we used different weather data than in the challenge. To carry out the simulation, we used the Python library pvlib \cite{holmgren2018pvlib} and followed the instructions provided on their website\footnote{see \url{https://pvlib-python.readthedocs.io/en/latest/gallery/adr-pvarray/plot_simulate_fast.html}.}. The weather data we used is described in Section~\ref{sec:weather-data}, and for the location, we used $42$°~$17'~60''$~N, $74$°~$22'~12''$~W (marked in green in Figure~\ref{fig:weather-locations}). Furthermore, we set the default test condition power output of the PV for each building to be the maximum solar generation of the original data and added 500 W to attain a nearly equivalent median generation of all buildings as in the original dataset.
 
-In Appendix~\ref{app:building-daily-mean}, you can find the daily average solar generation and daily average non-shiftable load in kWh for each building. The solar generation simulation shows an almost identical curve for all buildings but with different scales. For B8, B9, B12, and 1B5, it is noticeable that the non-shiftable load is almost equal to the produced solar energy. However, the load exceeds the solar production for the other buildings, especially from the end of November to the end of January. In B1-B9 and B13, the average daily solar production surpasses the average daily load around the beginning of April.
+In Appendix~\ref{app:building-daily-mean}, you can find the daily average solar generation and daily average non-shiftable load in kWh for each building. The solar generation simulation shows an almost identical curve for all buildings but with different scales. For B3, B7, B8, and B9, it is noticeable that the non-shiftable load is almost equal to the produced solar energy. However, the load exceeds the solar production for the other buildings, especially from the end of November to the end of January. In B1-B9, the average daily solar production surpasses the average daily load around the beginning of April.
 
 To obtain the median values for energy consumption per hour $\bar{e}_b$, we trained the SAC agent with the default hyperparameters from CityLearn for three episodes using the default reward function and the weather data described in Section~\ref{sec:weather-data}. The medians obtained are listed in the Appendix~\ref{tab:building-medians}. 
 
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
 \begin{figure}[htb]
 \center
-   \includegraphics[width=\textwidth]{figures/building_correlations.pdf}
- \caption{PCC between all buildings and the training buildings as well as the median PCC between each building and the training buildings.}
+   \includegraphics[width=0.9\textwidth]{figures/building_correlations.pdf}
+ \caption[PCC between each building and the training buildings.]{PCC between all buildings and the training buildings and the median PCC between each building and the training buildings. A value of 1 indicates a total positive linear correlation, and 0 indicates no linear correlation.}
  \label{fig:building-correlations}
 \end{figure}
+}
 
-We optimized our agents by training them for only six buildings - 3, 5, 7, 8, 11, and 17. These six buildings are referred to as the training buildings in this thesis. This approach has two advantages. Firstly, training only six agents reduces the training time. Secondly, after the optimization is finished, we can evaluate our results using the other buildings. We conducted a Pearson Correlation Coefficient (PCC) analysis between the non-shiftable load of all buildings and the training buildings (marked with a thick border in Figure~\ref{fig:building-correlations}). Among the training buildings, B5 has the highest correlation with the other training buildings, with a median PCC of 0.33, and B7 has the lowest, with a median PCC of 0.13. As for the buildings that are not training buildings, B2 and B6 have the highest median correlation (PCC 0.27), and B12 has the lowest (PCC 0.15). 
+We optimized our agents by training them for only six buildings: B3, B5, B7, B8, B11, and B17, hereafter referred to as our training buildings. This approach has two advantages. Firstly, training only six agents reduces the training time. Secondly, after the optimization, we can evaluate our results using the other buildings. 
 
-\subsection{Fuelmix and Weather data}
+We conducted a Pearson Correlation Coefficient (PCC) analysis to understand the load similarities among all buildings, particularly how they relate to our training buildings, facilitating insights into their cooperative potential (marked with a thick border in Figure~\ref{fig:building-correlations}). The PCC measures the linear correlation between two variables, where a value of 1 indicates a total positive correlation, and -1 indicates a total negative correlation. Among the training buildings, B5 has the highest correlation with the other training buildings, with a median PCC of 0.33, and B7 has the lowest, with a median PCC of 0.13. As for the buildings that are not training buildings, B2 and B6 have the highest median correlation (PCC 0.27), and B1 has the lowest (PCC 0.19). 
+
+\subsection{Fuelmix and Meteorological Data}
 \label{sec:weather-data}
-For our analysis, we used fuel mix data from the New York Independent System Operator (NYISO), retrieved on June 7, 2023 \cite{fuelmix_nyiso}. The dataset provides the generated energy in MW for each of the energy sources dual fuel, natural gas, nuclear, other fossil fuel, wind, hydro, and other renewables for a 5-minute time interval for the year 2021 in NY State. Hydro energy accounts for most of the renewable energy available on the grid, at around 82~\%. Wind energy comes second at around 12~\%. The other renewables, which include solar energy, energy storage resources, methane, refuse, and wood, comprise approximately 6~\% of the renewable energy available on the grid. 
+For our analysis, we used fuel mix data from the New York Independent System Operator (NYISO), retrieved on June 7, 2023 \cite{fuelmix_nyiso}. The dataset provides the generated energy in megawatt for each of the energy sources dual fuel, natural gas, nuclear, other fossil fuel, wind, hydro, and other renewables for a 5-minute time interval for the year 2021 in NY State. Hydro energy accounts for most of the renewable energy available on the grid, at around 82~\%. Wind energy comes second at around 12~\%. The other renewables, which include solar energy, energy storage resources, methane, refuse, and wood, comprise approximately 6~\% of the renewable energy available on the grid. 
 
-Since we are only interested in renewable (wind, hydro, other renewables) or fossil (all others) energy generated, we added up the values of the corresponding energy sources and converted the resulting values to kWh for hourly intervals. The preprocessed fuel mix data includes the hourly amount of energy generated by renewable energy sources in kWh and the share of renewable energy generated, which is calculated as the absolute amount of renewable energy generated divided by the total energy generated. Note that this data only includes renewable energy from the grid and does not include the building solar generation described in Section~\ref{sec:building-data}.
+Since we are only interested in renewable (wind, hydro, other renewables) or fossil (all others) energy generated, we added up the values of the corresponding energy sources and converted the resulting values to kWh for hourly intervals. Note that for the sake of simplicity, we refer to all non-renewable energy sources as fossil. The preprocessed fuel mix data includes the hourly amount of energy generated by renewable energy sources in kWh and the share of renewable energy generated, which is calculated as the absolute amount of renewable energy generated divided by the total energy generated. Note that this data only includes renewable energy from the grid and does not include the building solar generation described in Section~\ref{sec:building-data}.
 
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
 \begin{figure}[htb]
 \center
    \includegraphics[width=0.7\textwidth]{figures/locations.pdf}
- \caption[Locations in NY State from which weather data was used.]{Locations in NY State from which weather data was used. The location with the green border is the initially only used one, and the location used to simulate the building's PV generation time series.}
+ \caption[Locations in NY State from which weather data was used.]{Locations in NY State from which weather data was used. The location marked in green is the initially only used one, and the location used to simulate the building's PV generation time series.}
  \label{fig:weather-locations}
 \end{figure}
+}
 
-We utilized weather data from NY State to establish a correlation between weather and the amount of renewable energy generated. We obtained the data from the USA Continental \& Mexico dataset from the National Solar Radiation Database (NSRDB) on July 04, 2023. As attributes, we retrieved global horizontal irradiance (GHI), diffuse horizontal irradiance (DHI), direct normal irradiation (DNI), relative humidity, temperature, and wind speed at 5-minute intervals. Except for GHI, which we used to generate the solar production time series of the buildings, all values are part of the state of the environment. To better cover geographic differences, we collected these attributes from eight locations across NY State (see Figure~\ref{fig:weather-locations}). We calculated the median across these locations and per hour to obtain a single hourly value for each attribute. The predictions for 6h, 12h, and 24h were based on the correct values, which means our predictions were perfect.
+We utilized meteorological data from NY State to establish a correlation between weather and the amount of renewable energy generated. We obtained the data from the USA Continental \& Mexico dataset from the National Solar Radiation Database (NSRDB) on July 04, 2023. As attributes, we retrieved global horizontal irradiance (GHI), diffuse horizontal irradiance (DHI), direct normal irradiation (DNI), relative humidity, temperature, and wind speed at 5-minute intervals. Except for GHI, which we used to generate the solar production time series of the buildings, all values are part of the state of the environment. To better cover geographic differences, we collected these attributes from eight locations across NY State (see Figure~\ref{fig:weather-locations}). We calculated the median across these locations and per hour to obtain a single hourly value for each attribute. The predictions for 6h, 12h, and 24h were based on the correct values, which means our predictions were perfect.
 
 Appendix \ref{app:weather-daily-mean} presents the daily average values of various weather variables, the amount of wind energy produced, the total renewable energy produced, and the percentage of renewable energies. However, it should be noted that there is no clear visual correlation between wind energy produced and wind speed, although the PCC is 0.45. The same is true for solar radiance and other renewable sources (which includes solar energy), with DHI having a PCC of 0.32 and DNI having a PCC of 0.28. When considering the summed renewables, the PCC values drop to 0.26 for wind, 0.18 for DHI, and 0.11 for DNI.
 
-\subsection{Energy prices}
+\subsection{Energy Price Calculation}
 \label{sec:prices}
-We used the CityLearn Challenge 2022 price dataset to determine the energy prices. Then, we weighted the price information by the proportion of fossil fuel energy in the grid. The baseline dataset follows an electricity rate that offers lower prices during early morning, late evening, and from October to May. Table~\ref{tab:basic-prices} shows the detailed electricity prices.
+We used the CityLearn Challenge 2022 price dataset to determine the energy prices. Then, we weighted the price information by the proportion of fossil fuel energy in the grid. The baseline dataset follows an electricity rate that offers lower prices during the early morning and late evening. Table~\ref{tab:basic-prices} shows the detailed electricity prices.
 
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
 \begin{table}[htb]
 \center
 \begin{tabular}{c|c|c|c|c}
+\toprule
       & \multicolumn{2}{c|}{June - September} & \multicolumn{2}{c}{Oktober - May} \\
-Time    & Weekday      & Weekend     & Weekday     & Weekend     \\ \hline
+Time    & Weekday      & Weekend     & Weekday     & Weekend     \\
+\midrule
 8 AM - 4 PM & 0.21         & 0.21        & 0.20         & 0.20         \\
 4 PM - 9 PM & 0.54         & 0.40         & 0.50        & 0.50        \\
-9 PM - 8 AM & 0.21         & 0.21         & 0.20        & 0.20        
+9 PM - 8 AM & 0.21         & 0.21         & 0.20        & 0.20    \\
+\bottomrule    
 \end{tabular}
 \caption[Electricity price rate CityLearn Challenge 2022]{Electricity price rate of the electricity price data set provided with the CityLearn Challenge 2022.}
 \label{tab:basic-prices}
 \end{table}
+}
+
 To calculate the prices at a given time step, we first consider the basic prices~$p_{base,t}$ at that time step as described above. Then, we factor in the share of fossil energy by using a weighting factor~$\beta$:
 \begin{equation}
 	p_t = p_{base,t} + \beta \cdot (1-\frac{RE_{gen}^G}{E_{gen}^G}).
 \end{equation}
-Finally, we normalized the prices to be within a range of zero and one. We used the actual prices for the 6-hour, 12-hour, and 24-hour price predictions, just as we did for the weather data.
+Finally, we normalized the prices to be within a range of zero and one. We used the actual prices for the 6-hour, 12-hour, and 24-hour price predictions, just as we did for the weather data. In Figure \ref{app:electricity-pricing}, we compare the basic electricity price to the fossil-weighted price using $\beta=20$. The weighted price preserves the peaks of the base price.
 
-\section{Key Performance Indicators}
+\section{Defining Key Performance Indicators}
 \label{sec:kpis}
 We used four KPIs to evaluate the performance of the agents. These KPIs were calculated based on cost functions, with lower values indicating better performance. Appendix \ref{sec:app-kpis} provides the exact calculation steps of these cost functions. We will also explain the interpretation of the KPIs.
 
@@ -106,26 +123,24 @@ The second cost function, 'Average Fossil Share', determines the average daily s
 
 The third cost function, named 'Average Fossil Share Grid', only considers the share of non-renewable energy in the energy drawn from the grid.
 
-Lastly, the fourth cost function, labeled '1 - Used PV', quantifies the degree of utilization of the solar energy generated by a building and thus provides insights at the individual building level. \todo[inline]{Für district-level mean genommen}
+Lastly, the fourth cost function, labeled '1 - Used PV', quantifies the degree of utilization of the solar energy generated by a building and thus provides insights at the individual building level. To calculate this KPI for the entire district, we took the average value of the individual buildings.
 
 To derive the KPIs, we calculate the ratios of the individual cost functions in scenarios with and without energy storage. When no storage is used, the values are determined using the (positive) electricity consumption from the grid without storage, which is already implemented as part of CityLearn. Also, the values without storage correspond to the energy demand of the buildings not met by PV production at a particular time step. KPI metrics below 1 indicate improved performance due to storage use, while metrics above 1 indicate a decline in performance.
 
 In the following discussions, we refer to the KPIs by the corresponding cost functions and compare the efficiency between scenarios with and without battery storage.
 
-\section{Asocial SAC Baseline Agent}
+\section{Development of the SAC Baseline Agent}
 \label{sec:sac-baseline}
 This chapter describes our asocial SAC agent, which serves as a benchmark for evaluating our socially-informed methods. We first describe the structure of the policy and critic networks. Then, we discuss the reward functions we tested. Next, we describe our systematic approach to tuning the hyperparameters and highlight the optimal performance configurations. We conclude the chapter with a comparative analysis of the performance of our baseline agents using our KPIs compared to the RBC.
 
-\subsection{Architecture}
+\subsection{Network Architectures}
 We trained SAC agents following the calculations presented in section \ref{sec:SAC} as a basis for comparison. We used the implementation of the algorithm provided by CityLearn and customized it according to our requirements, including the autotuning of the temperature parameter~$\alpha$. In addition, we extended the implementation with options to clip the gradient of both the critic and policy networks, to use kaiming initialization, and to use the mean squared error loss (L2 loss) for the critic networks.
 
-The critic networks are implemented as three-layer feedforward networks with 256 neurons in each hidden layer using layer normalization and ReLU activation. When kaiming initialization is not used, initial weights and biases are drawn from the uniform distribution $\mathcal{U}(-0.003, 0.003)$. The output is the estimated soft Q-value.
+The critic networks are implemented as three-layer feedforward networks with 256 neurons in each hidden layer using layer normalization and ReLU activation. In the CityLearn implementation, when kaiming initialization is not used, initial weights and biases are drawn from the uniform distribution $\mathcal{U}(-0.003, 0.003)$. The output is the estimated soft Q-value.
 
 The policy is implemented as a Gaussian distribution, with the mean and covariance approximated by neural networks. These have the same backbone, a three-layer feedforward network similar to the critical networks, but without layer normalization. The network has two output layers, one for computing the mean and one for the log standard deviation. The latter must be in a certain range between -20 and 2. When sampling an action from the policy, the neural network first performs a forward pass to calculate the mean and standard deviation. Next, the reparameterization trick is applied to sample actions from the resulting Gaussian distribution. These actions are then transformed to fit within the defined action space. Additionally, the log-likelihood of the generated actions is computed.
 
-%The observation space of the SAC agent is given in Appendix~\ref{app:observation-space-sac}.
-
-\subsection{Reward function}
+\subsection{Designing the Reward Function}
 \label{sec:reward}
 As part of the training process for the baseline SAC agents, we experimented with various reward functions. Initially, we implemented the price penalty reward~$r_{pr}^b$. This reward function is determined by taking the minimum value between zero and the negative price paid for energy purchased from the grid:
 \begin{equation}
@@ -145,31 +160,6 @@ r_{sol}^{b} = \left\{%
 Here, $C_b$ represents the capacity of the battery for building~$b$, while $SOC_b$ represents the state of charge of the same battery. The ratio of $SOC_b$ to $C_b$ calculates the percentage state of charge. 
 The solar penalty reward is zero if the building's energy consumption is balanced or if the net energy consumption is negative and the battery is fully charged. For all other cases, the reward is negative. If the building draws energy from the grid even though the battery is fully charged, then the penalty is maximized.
 
-%{
-%\renewcommand{\baselinestretch}{0.9} 
-%\normalsize
-%\begin{table}[htb]
-%\center
-%\begin{tabular}{|c|c||c|}
-%\hline
-%  \textbf{$e_{net_t}^b$} & \textbf{$\frac{SOC^b_t}{C^b_t}$} & \textbf{$r_{solar_t}^b$} \\
-% \hline\hline
-% $<0$ & $0$ & $<0$ \\
-% $<0$ & $>0$ and $<1$ & $<0$ \\
-% $<0$ & $1$ & 0\\
-% $0$ & $0$ & 0\\
-% $0$ & $>0$ and $<1$ & 0\\
-% $0$ & $1$ & 0\\
-% $>0$ & $0$ & $<0$ \\
-% $>0$ & $>0$ and $<1$ & $<0$ \\
-% $>0$ & $1$ & $<0$ \\
-% \hline
-%\end{tabular}
-% \caption[Beispieltabelle mit einer langen Legende]{Beispieltabelle mit einer langen Legende, damit man sieht, dass in der Legende der Zeilenabstand verringert wurde. Ausserdem soll auch der Font etwas kleiner gew\"ahlt werden. So sieht die ganze Umgebung kompakter aus.}
-% \label{tab:solar-penalty-reward}
-%\end{table}
-%}
-
 Furthermore, we tested a linear combination~$r_{s,p}^b$ between these two reward functions, where the parameter~$\eta$ determines the influence of the two functions:
 \begin{equation}
 r_{s,p}^b = \eta r_{pr}^b + (1-\eta)r_{sol}^b.
@@ -187,13 +177,18 @@ r_{tol}^b= -(RE_{gen}^G-E_{pos})^2.
 \end{equation}
 This reward aims to minimize the difference between the produced renewable energy in the grid and the consumed energy from the grid, penalizing both unused renewable energy and fossil fuel consumption.
 
-\subsection{Hyperparameters}
-In order to improve the baseline SAC agents, we experimented with various hyperparameter values, reward functions, and observation spaces. We followed a step-by-step approach where we optimized one parameter at a time and assumed that the optimal value would work for the following changes as well. Thus, we did not perform grid search optimization, which might have resulted in better final results but would have been much more time-consuming. However, since our goal was not to achieve an optimally trained agent but to train an appropriate baseline agent, this approach was sufficient. 
+\subsection{Hyperparameter Optimization}
+In order to improve the baseline SAC agents, experiments with various hyperparameter values, reward functions, and observation spaces were conducted. A step-by-step approach was followed to optimize one parameter at a time and assume that the optimal value would work for the following changes as well. Thus, no grid search optimization was performed, which might have resulted in better final results but would have been much more time-consuming. However, since our goal was not to achieve an optimally trained agent but to train an appropriate baseline agent, this approach was sufficient. 
 
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
 \begin{table}[htb]
 \center
 \begin{tabularx}{\linewidth}{X|l|X}
-\textbf{Hyperparameter}          & \textbf{Initial Value}         & \textbf{Tested Values}                                    \\ \hline
+\toprule
+Hyperparameter          & Initial Value         & Tested Values                                    \\
+\midrule
 \rule{0pt}{3ex}% EXTRA vertical height  
 Training Episodes        & 2               & \textbf{2}, 3, 4                                        \\
 \rule{0pt}{3ex}% EXTRA vertical height  
@@ -221,46 +216,56 @@ Kaiming Initialization      & No               & Yes, \textbf{No}               
 \rule{0pt}{3ex}% EXTRA vertical height  
 Discount Factor~$\gamma$         & 0.99              & 0.96, 0.97, 0.98, \textbf{0.99}                                \\
 \rule{0pt}{3ex}% EXTRA vertical height  
-Loss function          & L1               & \textbf{L1}, L2                                        
+Loss function          & L1               & \textbf{L1}, L2     \\
+\bottomrule                                  
 \end{tabularx}
 \caption[Optimized hyperparameters of the baseline SAC agent.]{Optimized hyperparameters of the baseline SAC agent with the initial and all tested values. The value that achieved the best results in terms of fossil consumption is printed in bold. The hyperparameters were optimized step by step, so no grid search optimization was performed.}
 \label{tab:optimized-sac}
 \end{table}
+}
 
-In Table~\ref{tab:optimized-sac}, you can find the hyperparameters we optimized, along with their initial values, all tested values, and the value we ultimately chose (in bold). Remember that we only used six training buildings for optimizing the agents. We selected the value that resulted in improvements of at least 0.5 \% in fossil energy consumption KPI compared to the previous best agents. Note that the fossil energy consumption is based on the performance of all agents.
+In Table~\ref{tab:optimized-sac}, you can find the hyperparameters we optimized, along with their initial values, all tested values, and the value we ultimately chose (in bold). Remember that we only used six training buildings for optimizing the agents. We selected the value that resulted in improvements of at least 0.5~\% in fossil energy consumption KPI compared to the previous best agents. Note that the fossil energy consumption is based on the performance of all agents.
 
-First, we found that increasing the number of training episodes does not increase the performance of the agents, so we kept the initial two episodes. We discovered that the agent's performance improved when we weighted the price by 20 times the fossil energy fraction (see Section \ref{sec:prices}). Normalizing the price between 0 and 1 did not increase the performance but led to more stable results, so we implemented this change. Initially, we used only one location as the weather data source (highlighted with a green border in Figure~\ref{fig:weather-locations}). However, using the median values from eight different locations as described in Section \ref{sec:weather-data} produced better results. Autotuning the temperature parameter \cite{haarnoja2018soft} also reduced fossil energy consumption. We then obtained the best results using the linear combination of the price and solar penalty rewards, with a weighting factor of $\eta=0.5$. We first included all available variables in the state of the environment. An overview of these is given in Appendix~\ref{app:observation-space-sac}. However, removing all 6h and 12h forecasts of the weather and price variables improved the performance of the agents. Increasing batch size, gradient clipping and kaiming initialization did not significantly affect the fossil energy consumption. The same was true for reducing the discount factor and using the L2 loss instead of the L1 loss.
+First, we found that increasing the number of training episodes does not increase the performance of the agents, so we kept the initial two episodes. We discovered that the agent's performance improved when we weighted the price by 20 times the fossil energy fraction (see Section \ref{sec:prices}). Normalizing the price between 0 and 1 did not increase the performance but led to more stable results, so we implemented this change. Initially, we used only one location as the weather data source (highlighted in green in Figure~\ref{fig:weather-locations}). However, using the median values from eight different locations as described in Section \ref{sec:weather-data} produced better results. Autotuning the temperature parameter \cite{haarnoja2018soft} also reduced fossil energy consumption. We then obtained the best results using the linear combination of the price and solar penalty rewards, with a weighting factor of $\eta=0.5$. We first included all available variables in the state of the environment. An overview of these is given in Appendix~\ref{app:observation-space-sac}. However, removing all 6h and 12h forecasts of the weather and price variables improved the performance of the agents. Increasing batch size, gradient clipping and kaiming initialization did not significantly affect the fossil energy consumption. The same was true for reducing the discount factor and using the L2 loss instead of the L1 loss.
 
 Furthermore, it is worth noting that we selected the scaling factor~$k=0.5$ for the absolute amount of renewable energy available in the grid after optimizing the hyperparameters (see Section \ref{sec:city-learn-presentation}). This choice ensured that the buildings utilize the complete renewable energy in the grid more frequently. We aimed to test whether social agents could effectively prevent the overconsumption of energy by the grid since individual buildings are unaware of how much energy other buildings in the grid are using and may unknowingly consume fossil fuels.
 
-Lastly, we implemented the early stopping method. For this, we evaluated the performance of the agents every 168 time steps during the training until the end of the exploration phase (see CityLearn for more details), i.e., once per week in the data. To achieve this, we used deterministic actions on the complete data set to allow the agents to act and calculate the KPIs. We kept track of the training state at which the agents achieved the best value in fossil energy consumption, along with the final training state.
+Lastly, we implemented the early stopping method. For this, we evaluated the performance of the agents every 168 time steps, i.e., once per week, during the training until the end of the exploration phase (see CityLearn for more details). To achieve this, we used deterministic actions on the complete data set to allow the agents to act and calculate the KPIs. We kept track of the training state at which the agents achieved the best value in fossil energy consumption, along with the final training state.
 
 Unless otherwise described, the identified reward function, the hyperparameter values and the early-stopping method are kept for training the social agents.
 
-\subsection{Performance}
-We trained the agents with the final hyperparameters five times and calculated the average of the KPIs to prevent the final result from reflecting only an outlier. The mean values obtained by the final SAC agents, the best SAC agents using the early stopping method (SAC Best) and the RBC agents are visualized in Figure~\ref{fig:sac-kpis}. Note that the 1~-~used~pv KPI is the average value over all agents. The figure shows that the RBC agents perform worse than if no battery was available in all KPIs. This could be because the RBC agents do not utilize solar energy during the day to charge the battery but instead discharge it. All agents have a maximum standard deviation of 4.2 \% for the 1~-~used~pv KPI and a maximum of 1.4 \% for all other KPIs, indicating a stable training of the agents over the five runs.
+\subsection{Evaluating Agent Performance}
+We trained the agents with the final hyperparameters five times and calculated the average of the KPIs to prevent the final result from reflecting only an outlier. The KPI values obtained by the RBC agents and the SAC agents are visualized in Figure~\ref{fig:sac-kpis}. The figure shows that the RBC agents perform worse than if no battery was available in all KPIs. This could be because the RBC agents do not utilize solar energy during the day to charge the battery but instead discharge it. All agents have a maximum standard deviation of 4.2~\% for the 1~-~used~pv KPI and a maximum of 1.4~\% for all other KPIs, indicating a stable training of the agents over the five training runs.
 
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
 \begin{figure}[htb]
 \center
    \includegraphics[width=\textwidth]{figures/sac_kpis.pdf}
- \caption{Average KPI values of baseline SAC agents of the six training buildings.}
+ \caption{KPI values of baseline SAC agents of the six training buildings.}
  \label{fig:sac-kpis}
 \end{figure}
+}
 
-Both the SAC Best and the SAC Agents achieve achieve better results when using the battery in all cost functions. While the SAC Best agents perform slightly better than the SAC agents in all KPIs, the exact differences are not discussed. The most significant improvement is the use of available solar energy produced by the buildings' PVs, with SAC agents utilizing, on average, almost 25 \% more of the produced energy. Moreover, there is an increase of about 2.5 \% in the use of available renewable energy from the grid and approximately 2 \% overall available renewable energy utilization (for SAC Best agents). For the most relevant KPI, the SAC Best agents save about 7 \% of the absolute fossil energy consumed.
+By using the battery, the SAC agents perform significantly better than without the battery. The most significant improvement is in using the solar energy generated by the buildings' PV systems. On average, the SAC agents use almost 25~\% more of the energy generated than without using the battery. Additionally, the share of fossil energy in the total grid energy used is reduced by around 2.5~\%, leading to an overall reduction in the proportion of fossil energy consumed by around 2~\%. The most important KPI, the absolute fossil energy consumption, shows a saving of around 7~\% when using SAC agents.
 
 
-\section{Demonstrator Buildings}
+\section{Presentation of Demonstrator Buildings}
 \label{sec:pretrained-demos}
 For some of our methods, we used pre-trained demonstrators, where we also scaled the available renewable energy in the grid by the factor $k = 0.5$. We used B3, B5 und B6 as demonstrators for the training buildings and additionally B11 for the evaluation buildings. We chose the buildings with the highest median PCC to the training buildings from the set of training buildings and the remaining ones: B5, which is a training building, and B6. We used B3 for a new generated set of buildings used in some experiments, and chose B11 as it has the highest PCC to the evaluation buildings without being part of the group.
 When referring to pre-trained demonstrators, we will abbreviate them with D, such as D3 for the pre-trained demonstrator using B3.
 
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/pretrained_kpis.pdf}
   \caption{Average KPI values of pre-trained demonstrators of the six training buildings.}
   \label{fig:b5-b6-kpis}
 \end{figure}
+}
 
 Figure~\ref{fig:b5-b6-kpis} shows the KPI metrics of the pre-trained demonstrators. D3 performs best in fossil energy consumption while using the least available solar energy. D5 and D6 perform worst in the other three metrics, with D6 still performing slightly worse than D5. D11 uses the largest share of available renewable energy but is only in the middle of the field for fossil consumption. Compared to the SAC baseline agents, all demonstrators perform worse in the metrics, except for the 1~-~used~pv metric. 
 
