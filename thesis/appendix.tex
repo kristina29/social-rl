@@ -5,8 +5,8 @@
 \appendix
 
 %\setcounter{secnumdepth}{-1}
-\chapter{Appendix}\label{chap:App}
-\section{Tables}\label{chap:App}
+%\chapter{Appendix}
+\chapter{Tables}\label{chap:tables}
 
 \begin{table}[htb]
 \center
@@ -115,7 +115,7 @@ hour & hour of day (from 1 to 24)\\
  electricity\_pricing\_pred\_24h & electricity rate predicted 24 hours ahead. \\
  renewable\_energy\_share & share of renewable energy in the fuel mix of the grid.
 \end{tabularx}
-\caption{Available state variables of the baseline SAC Agent}
+\caption{Available state variables of the baseline SAC agent.}
 \label{app:observation-space-sac}
 \end{table}
 
@@ -174,7 +174,7 @@ Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.
 }
 
 \clearpage
-\section{Figures}\label{sec:app-figures}
+\chapter{Figures}\label{sec:app-figures}
 \begin{figure}[H]
     \center
      \includegraphics[width=\textwidth]{figures/building_daily_means.pdf}
@@ -225,7 +225,7 @@ Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.
 \end{figure}
 
 \clearpage
-\section{Calculation of Key Performance Indicators}\label{sec:app-kpis}
+\chapter{Calculation of Key Performance Indicators}\label{sec:app-kpis}
 To enhance readability, the time index~$t$ has been excluded from the presentation of required values and preliminary calculations.
 
 %\begin{table}[htb]
@@ -245,8 +245,8 @@ To enhance readability, the time index~$t$ has been excluded from the presentati
 %\label{tab:basic-prices}
 %\end{table}
 
-\subsection{Fossil Energy Consumption}
-\subsubsection*{Required Values}
+\section{Fossil Energy Consumption}
+\subsection*{Required Values}
 \begin{tabularx}{\textwidth}{Xll}
 \multicolumn{3}{l}{\hspace{-6px}\textit{Given in CityLearn Framework:}}                                                                                     \\
 Electricity consumption of building $b$ from grid               & $e_b$            &  \\             
@@ -255,7 +255,7 @@ Electricity consumption of building $b$ from grid               & $e_b$         
 Scaled generated renewable energy in grid & $\hat{RE}_{gen}$ & (Equation \ref{eq:re-grid})
 \end{tabularx}
 
-\subsubsection*{Preliminary Calculations}
+\subsection*{Preliminary Calculations}
 \textit{Total positive electricity consumption from grid:}
 \begin{equation}
 	\label{eq:energy-pos}
@@ -268,7 +268,7 @@ Positive consumption is used to prevent sharing of surplus energy between buildi
 	RE_{con}^G = \min(E_{pos}, \hat{RE}_{gen}^G)
 \end{equation} 
 
-\subsubsection*{Formula}
+\subsection*{Formula}
 \begin{equation}
 \text{fossil energy consumption} = FE_{con} = \sum_t E_{pos}^t - RE_{con}^{G,t}
 \end{equation}
@@ -279,8 +279,8 @@ over all time steps~$t$. \vspace{10px}
 \item[Level] District-level
 \end{description}
 
-\subsection{Average Fossil Share}
-\subsubsection*{Required Values}
+\section{Average Fossil Share}
+\subsection*{Required Values}
 \begin{tabularx}{\textwidth}{Xll}
 \multicolumn{3}{l}{\hspace{-6px}\textit{Given in CityLearn Framework:}}  \\
 Electricity consumption of building $b$ from the grid               & $e_b$            &  \\             
@@ -291,7 +291,7 @@ Total positive electricity consumption from grid & $E_{pos}$ & (Equation \ref{eq
 Total consumed renewable energy from grid & $RE_{con}^G$ & (Equation \ref{eq:re-con-grid})
 \end{tabularx}
 
-\subsubsection*{Preliminary Calculations}
+\subsection*{Preliminary Calculations}
 \textit{Total solar energy consumption:}
 \begin{equation}
 	\label{eq:re-con-pv}
@@ -308,7 +308,7 @@ Negative solar energy value is used since this is specified as a negative time s
 	RE_{pct} = \frac{RE_{con}}{E_{pos} + RE_{con}^{PV}}
 \end{equation}
 
-\subsubsection*{Formula}
+\subsection*{Formula}
 \begin{equation}
  \text{avg.~fossil~share} = 1- \frac{1}{24}\sum_{t=1}^{24}RE_{pct}^t.
 \end{equation}
@@ -319,21 +319,21 @@ over all time steps~$t$.
 \item[Level] District-level
 \end{description}
 
-\subsection{Average Fossil Share Grid}
-\subsubsection*{Required Values:}
+\section{Average Fossil Share Grid}
+\subsection*{Required Values:}
 \begin{tabularx}{\textwidth}{Xll}
 \multicolumn{3}{l}{\hspace{-6px}\textit{Calculated:}}  \\
 Total positive electricity consumption from grid & $E_{pos}$ & (Equation \ref{eq:energy-pos}) \\
 Total consumed renewable energy from grid & $RE_{con}^G$ & (Equation \ref{eq:re-con-grid})
 \end{tabularx}
 
-\subsubsection*{Preliminary Calculations}
+\subsection*{Preliminary Calculations}
 \textit{Proportion of grid energy consumption attributed to renewable sources:}
 \begin{equation}
 	RE_{pct}^G = \frac{RE_{con}^G}{E_{pos}}
 \end{equation} 
 
-\subsubsection*{Formula}
+\subsection*{Formula}
 \begin{equation}
 \text{avg.~fossil~share~grid} = 1-\frac{1}{24}\sum_{t=1}^{24}RE_{pct}^{G,t}.
 \end{equation}
@@ -344,8 +344,8 @@ over all time steps~$t$.
 \item[Level] District-level
 \end{description}
 
-\subsection{1 - Used PV}
-\subsubsection*{Required Values}
+\section{1 - Used PV}
+\subsection*{Required Values}
 \begin{tabularx}{0.85\textwidth}{Xll}
 \multicolumn{3}{l}{\hspace{-6px}\textit{Given in CityLearn Framework:}}  \\
 Total generated solar energy & $PV_{gen}$ & \\
@@ -354,7 +354,7 @@ Total generated solar energy & $PV_{gen}$ & \\
 Total consumed solar energy & $RE_{con}^{PV}$ & (Equation \ref{eq:re-con-pv})
 \end{tabularx}
 
-\subsubsection*{Formula}
+\subsection*{Formula}
 \begin{equation}
  1 - \text{used~pv} = 1-\frac{1}{24}\sum_{t=1}^{24}\frac{RE_{con}^{PV,t}}{-PV_{gen}^t}.
 \end{equation}
@@ -368,9 +368,9 @@ over all time steps~$t$.
 
 \clearpage
 
-\section{Algorithms}\label{sec:app-algos}
+\chapter{Algorithms}\label{sec:app-algos}
 \begin{algorithm}
-\caption{\textcolor{red}{SAC-DemoPol}}
+\caption{SAC-DemoPol}
 \label{app:sac-social-1}
 \small\textbf{Input:}   $\theta_1,\theta_2,\phi$ \Comment{\footnotesize Initial parameters}
 \begin{algorithmic}[1]
@@ -398,7 +398,7 @@ over all time steps~$t$.
 \end{algorithm}
 
 \begin{algorithm}
-\caption{\textcolor{red}{SAC-DemoQ}}
+\caption{SAC-DemoQ}
 \label{app:sac-social-2}
 \small\textbf{Input:}   $\theta_1,\theta_2,\phi$ \Comment{\footnotesize Initial parameters}
 \begin{algorithmic}[1]

@@ -119,7 +119,7 @@ def get_data_sacdb2(dirs):
 
         for m in range(1, 7):
             try:
-                file = glob.glob(f'../experiments/SAC_DB2/{dir[1]["paths"]}/socialMode{m}/kpis_*.csv')[0]
+                file = glob.glob(f'../experiments/SAC-DemoPol/{dir[1]["paths"]}/socialMode{m}/kpis_*.csv')[0]
                 kpis = pd.read_csv(file)
                 kpis = kpis.set_index('kpi')
                 kpis = kpis[(kpis['env_id'] == 'SAC_DB2 Best') & (kpis['level'] == 'district')]
@@ -187,15 +187,15 @@ def generate_sacdb2():
     ax.axhline(BEST_SAC_VALUE + 0.005, ls='--', lw=1, c='grey', zorder=2)
 
     ax.text(0.001, BEST_SAC_VALUE - 0.0003, 'SAC Baseline', color='r', ha='left', va='top',
-            transform=ax.get_yaxis_transform(), fontsize=17)
+            transform=ax.get_yaxis_transform(), fontsize=18)
 
     ax.set_xticks(list(demo_pos.values()))
-    ax.set_xticklabels(list(demo_pos.keys()), fontsize=17)
+    ax.set_xticklabels(list(demo_pos.keys()), fontsize=18.5)
 
-    ax.tick_params(axis='both', which='major', labelsize=17)
+    ax.tick_params(axis='both', which='major', labelsize=18.5)
 
-    ax.set_ylabel('fossil energy consumption', fontsize=19)
-    ax.set_xlabel('Demonstrator', fontsize=19)
+    ax.set_ylabel('fossil energy consumption', fontsize=20)
+    ax.set_xlabel('Demonstrator', fontsize=20)
 
     for t in range(len(xticks)):
         if t % 2 == 1:

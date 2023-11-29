@@ -119,9 +119,9 @@ def plot_district_kpis_multiple(kpis, names, mode) -> plt.Figure:
             else:
                 kpi = kpi[kpi['env_id'] == 'SAC Best']
         elif mode==5:
+            #if i == 0:
+            #    kpi = kpi[kpi['env_id'] == 'SAC Best']
             if i == 0:
-                kpi = kpi[kpi['env_id'] == 'SAC Best']
-            elif i == 1:
                 kpi = kpi[kpi['env_id'] == 'DDPG Best']
             else:
                 kpi = kpi[kpi['env_id'] == 'PRB_DDPG']
@@ -150,21 +150,32 @@ def plot_district_kpis_multiple(kpis, names, mode) -> plt.Figure:
     figsize = (18.0 * column_count, 0.125 * env_count * kpi_count * row_count)
     fig, ax = plt.subplots(row_count, column_count, figsize=figsize)
 
-    width = 0.9
-
-    if mode == 5:
-        sns.barplot(x='value', y='kpi', data=kpis, hue='env_id', ax=ax,
-                width=width , palette=['tab:blue','tab:red','tab:orange','tab:green'])
+    if mode in [3,5]:
+        width = 0.75
     else:
-        sns.barplot(x='value', y='kpi', data=kpis, hue='env_id', ax=ax, width=width)
+        width = 0.9
 
-    ax.axvline(1.0, color='black', linestyle='--', linewidth=1, label='')
+    #if mode == 5:
+    #    sns.barplot(x='value', y='kpi', data=kpis, hue='env_id', ax=ax,
+    #            width=width , palette=['tab:blue','tab:green','tab:red','tab:purple'])
+    #else:
+    sns.barplot(x='value', y='kpi', data=kpis, hue='env_id', ax=ax, width=width)
 
-    if mode==2 or mode==3:
-        ax.axvline(0.93, ymin=0.74, ymax=1, color='black', linestyle=':', linewidth=1.5, label='SAC Best')
-        ax.axvline(0.982, ymin=0.49, ymax=0.74, color='black', linestyle=':', linewidth=1.5, label='')
-        ax.axvline(0.973, ymin=0.24, ymax=0.49, color='black', linestyle=':', linewidth=1.5, label='')
-        ax.axvline(0.767, ymin=0, ymax=0.24, color='black', linestyle=':', linewidth=1.5, label='')
+    if mode in [3, 5]:
+        ax.axvline(0.93, ymin=0.75, ymax=0.984, color='black', linestyle='--', linewidth=2, label='Baseline SAC')
+        ax.text(0.905, 0.978, '0.93', color='black', transform=ax.get_xaxis_transform(), ha='center', va='top',
+                fontsize=17)
+        ax.axvline(0.982, ymin=0.5, ymax=0.734, color='black', linestyle='--', linewidth=2, label='')
+        ax.text(0.95, 0.728, '0.982', color='black', transform=ax.get_xaxis_transform(), ha='center', va='top',
+                fontsize=17)
+        ax.axvline(0.973, ymin=0.25, ymax=0.484, color='black', linestyle='--', linewidth=2, label='')
+        ax.text(0.941, 0.478, '0.973', color='black', transform=ax.get_xaxis_transform(), ha='center', va='top',
+                fontsize=17)
+        ax.axvline(0.767, ymin=0, ymax=0.234, color='black', linestyle='--', linewidth=2, label='')
+        ax.text(0.735, 0.228, '0.767', color='black', transform=ax.get_xaxis_transform(), ha='center', va='top',
+                fontsize=17)
+    if mode==2:
+        ax.axvline(1, color='black', linestyle='--', linewidth=1, label='')
 
     ax.set_xlabel('KPI Value', fontsize=21)
     ax.set_ylabel(None)
@@ -225,7 +236,7 @@ def plot_district_kpis_multiple(kpis, names, mode) -> plt.Figure:
 
 
 if __name__ == '__main__':
-    mode = 1
+    mode = 5
 
     if mode == 1:
         kpis = pd.read_csv('../experiments/SAC/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
@@ -241,21 +252,23 @@ if __name__ == '__main__':
                 pd.read_csv('../experiments/Imitation_Learning/demo_b5/kpis_20231026T121912.csv'),
                 pd.read_csv('../experiments/Imitation_Learning/demo_b6/kpis_20231026T122547.csv'),
                 ]
-        names = ['Baseline SAC', 'Transitions of D5', 'Transitions of D6']
+        names = [#'Baseline SAC',
+                 'Transitions of D5', 'Transitions of D6']
     elif mode == 4:
-        kpis = [pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
-                pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
-                pd.read_csv('../experiments/New_Buildings/SAC Baseline/kpis_20231113T132158.csv'),
-                pd.read_csv('../experiments/New_Buildings/SAC Baseline/kpis_20231113T132158.csv'),
+        kpis = [pd.read_csv('../experiments/SAC/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
+                pd.read_csv('../experiments/SAC/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
+                pd.read_csv('../experiments/Eval_Buildings/SAC Baseline/kpis_20231113T132158.csv'),
+                pd.read_csv('../experiments/Eval_Buildings/SAC Baseline/kpis_20231113T132158.csv'),
                 ]
         names = ['RBC (Training)', 'SAC (Training)', 'RBC (Evaluation)', 'SAC (Evaluation)', ]
     elif mode == 5:
-        kpis = [pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
+        kpis = [# pd.read_csv('../experiments/SAC/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
                 pd.read_csv('../experiments/SAC/DDPG/kpis_20231107T143713.csv'),
-                pd.read_csv('../experiments/SAC_DB2/33_demo_replaybuffer/demo_b5_ddpg/kpis_20231106T170835.csv'),
-                pd.read_csv('../experiments/SAC_DB2/33_demo_replaybuffer/demo_b6_ddpg/kpis_20231106T170845.csv'),
+                pd.read_csv('../experiments/Imitation_Learning/demo_b5_ddpg/kpis_20231106T170835.csv'),
+                pd.read_csv('../experiments/Imitation_Learning/demo_b6_ddpg/kpis_20231106T170845.csv'),
                 ]
-        names = ['Baseline SAC', 'DDPG', 'DDPG with transitions\nof D5', 'DDPG with transitions\nof D6', ]
+        names = [#'Baseline SAC',
+                 'DDPG', 'DDPG with transitions\nof D5', 'DDPG with transitions\nof D6', ]
     elif mode == 6:
         kpis = [pd.read_csv('../experiments/SAC_DB2/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
                 pd.read_csv('../experiments/SAC/16_shifted_buildings/shifted_b3/kpis_20231031T173335.csv'),
