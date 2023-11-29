@@ -6,41 +6,60 @@
 
 %\setcounter{secnumdepth}{-1}
 %\chapter{Appendix}
-\chapter{Tables}\label{chap:tables}
+\chapter{Supplementary Tables}\label{chap:tables}
 
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
 \begin{table}[htb]
 \center
 \begin{tabular}{c|c}
-Time    & Action [kWh/kWH\_capacity]     \\ \hline
+\toprule
+Time    & Action [kWh/kWH\_capacity]     \\
+\midrule
 1 AM -- 6 AM & +0.05532 \\
 7 AM -- 3 PM & -0.02         \\
 4 PM -- 6 PM & -0.0044 \\
 7 PM -- 10 PM & -0.024 \\
-11 PM -- 0 AM & +0.034        
+11 PM -- 0 AM & +0.034  \\
+\bottomrule    
 \end{tabular}
 \caption{Rules of the RBC implemented in CityLearn.}
 \label{app:rbc-rules}
 \end{table}
+}
 
-\begin{table}[H]
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
+\begin{table}[htb]
 \begin{tabularx}{\linewidth}{lXc}
-Attribute name & Description & Value \\ \hline
+\toprule
+Attribute name & Description & Value \\
+\midrule
 Capacity & Maximum amount of energy the storage device can store & 6.4 kWh \\
 Efficiency & Technical efficiency & 90 \% \\
 Capacity loss coefficient & Storage capacity lost in each charge and discharge cycle (as a fraction of the total capacity) & $1e^{-5}$ \\
 Loss coefficient & Standby hourly losses & 0 \\
-Nominal power & Maximum amount of electric power that the battery can use to charge or discharge & 5 kW
+Nominal power & Maximum amount of electric power that the battery can use to charge or discharge & 5 kW \\
+\bottomrule
 \end{tabularx}
 \caption[Attributes of the batteries of each building]{Attributes of the batteries of each building. Description of the attributes obtained from \url{https://www.citylearn.net/api/citylearn.energy_model.html}.}
 \label{app:battery-attributes}
 \end{table}
+}
 
-\begin{table}[H]
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
+\begin{table}[htb]
 \center
 \begin{tabular}{c|c}
+\toprule
 Building & Energy Consumption Median $\bar{E}_b$
 %& Energy Consumption without storage Median & Energy Consumption without storage and PV Median 
-\\  \hline
+\\
+\midrule
 1  & 0.54 %& 0.58 & 0.81 
 \\
 2  & 0.45 %& 0.49 & 0.74 
@@ -73,15 +92,22 @@ Building & Energy Consumption Median $\bar{E}_b$
 \\
 16 & 0.55 %& 0.72 & 1.2 
 \\
-17 & 0.75% & 0.82 & 1.24 \\
+17 & 0.75 \\% & 0.82 & 1.24 \\
+\bottomrule
 \end{tabular}
 \caption[Median values for energy consumption per hour $\bar{E}_b$]{Median values for energy consumption per hour $\bar{E}_b$ obtained by training the SAC agent with the default hyperparameters.}
 \label{tab:building-medians}
 \end{table}
+}
 
-\begin{table}[H]
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
+\begin{table}[htb]
 \begin{tabularx}{\linewidth}{l|X}
-Name & Description \\ \hline
+\toprule
+Name & Description \\
+\midrule
 month & 1 (January) through 12 (December)\\
 day\_type & type of day as provided by EnergyPlus (from 1 to 8). 1 (Sunday), 2 (Monday), ..., 7 (Saturday), 8 (Holiday)\\
 hour & hour of day (from 1 to 24)\\
@@ -113,11 +139,13 @@ hour & hour of day (from 1 to 24)\\
  electricity\_pricing\_pred\_6h & electricity rate predicted 6 hours ahead. \\
  electricity\_pricing\_pred\_12h & electricity rate predicted 12 hours ahead. \\
  electricity\_pricing\_pred\_24h & electricity rate predicted 24 hours ahead. \\
- renewable\_energy\_share & share of renewable energy in the fuel mix of the grid.
+ renewable\_energy\_share & share of renewable energy in the fuel mix of the grid. \\
+\bottomrule
 \end{tabularx}
 \caption{Available state variables of the baseline SAC agent.}
 \label{app:observation-space-sac}
 \end{table}
+}
 
 {
 \renewcommand{\baselinestretch}{0.9} 
@@ -125,7 +153,9 @@ hour & hour of day (from 1 to 24)\\
 \begin{table}[htb]
 \center
 \begin{tabular}{c | c | c | c}
-Demonstrator                   & Mode & $\alpha_i$ & Deterministic demonstrator actions \\ \hline
+\toprule
+Demonstrator                   & Mode & $\alpha_i$ & Deterministic demonstrator actions \\
+\midrule
 2 random                       & 1-6  & 0.2                      & Yes                          \\ 
 \rule{0pt}{3ex}% EXTRA vertical height  
 \multirow[t]{2}{*}{2 random}      & 1-3  & 0.01, 0.2, 1, 1.5        & No                           \\
@@ -138,7 +168,8 @@ Demonstrator                   & Mode & $\alpha_i$ & Deterministic demonstrator 
                                & 4, 6  & 0.01, 0.2, 1             & No                           \\
 \rule{0pt}{3ex}% EXTRA vertical height  
 \multirow[t]{2}{*}{Pretrained B6} & 1-3  & 0.01, 0.2, 1, 1.5        & No                           \\
-                               & 4-6  & 0.01, 0.2, 1             & No                          
+                               & 4-6  & 0.01, 0.2, 1             & No                          \\
+\bottomrule
 \end{tabular}
   \caption[Overview of the experiments for SAC-DemoPol.]{Overview of the experiments for our SAC-DemoPol. We tested different demonstrator, mode, and ILRs $\alpha_i$ combinations. Also, we examined the influence of using deterministic demonstrator actions instead of sampling them.}
   \label{app:social1-params}
@@ -152,7 +183,9 @@ Demonstrator                   & Mode & $\alpha_i$ & Deterministic demonstrator 
 \begin{table}[htb]
 \center
 \begin{tabularx}{\textwidth}{c | Y | Y }
-Demonstrator                   & $\alpha_i$                                     & Deterministic policy actions  \\ \hline
+\toprule
+Demonstrator                   & $\alpha_i$                                     & Deterministic policy actions  \\
+\midrule
 \rule{0pt}{3ex}% EXTRA vertical height  
 \multirow[t]{3}{*}{2 random}      & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2                & No\\
 \rule{0pt}{2ex}% EXTRA vertical height  
@@ -166,7 +199,8 @@ Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.
 \rule{0pt}{3ex}% EXTRA vertical height  
 \multirow[t]{2}{*}{Pretrained B6} & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.4, 0.6, 0.8 & No                  \\
 \rule{0pt}{2ex}% EXTRA vertical height  
-                               & 0.1, 0.15, 0.2, 0.4, 0.6, 0.8                                  & Yes                                          
+                               & 0.1, 0.15, 0.2, 0.4, 0.6, 0.8                                  & Yes                  \\
+                          \bottomrule                        
 \end{tabularx}
   \caption[Overview of the experiments for SAC-DemoQ.]{Overview of the experiments for our SAC-DemoQ. We tested different demonstrator and ILRs $\alpha_i$ combinations. Also, we examined the influence of using deterministic demonstrator actions instead of sampling them.}
   \label{app:social2-params}
@@ -174,55 +208,83 @@ Pretrained B5                  & $1e^{-4}$, $1e^{-3}$, 0.01, 0.03, 0.05, 0.1, 0.
 }
 
 \clearpage
-\chapter{Figures}\label{sec:app-figures}
-\begin{figure}[H]
+\chapter{Supplementary Figures}\label{sec:app-figures}
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
+\begin{figure}[htb]
     \center
      \includegraphics[width=\textwidth]{figures/building_daily_means.pdf}
   \caption{Daily means of the non-shiftable load and the solar generation of the buildings in kWh.}
   \label{app:building-daily-mean}
 \end{figure}
+}
 
-\begin{figure}[H]
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
+\begin{figure}[htb]
     \center
      \includegraphics[width=\textwidth]{figures/weather_daily_means.pdf}
   \caption{Daily means of the meteorologic observations and fuel mix in the grid.}
   \label{app:weather-daily-mean}
 \end{figure}
+}
 
-\begin{figure}[H]
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
+\begin{figure}[htb]
     \center
      \includegraphics[width=0.8\textwidth]{figures/electricity_pricing.pdf}
   \caption{Basic electricity price and fossil share-weighted price with a factor of $\beta=20$ for the initial week in the dataset.}
   \label{app:electricity-pricing}
 \end{figure}
+}
 
-\begin{figure}[H]
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
+\begin{figure}[htb]
     \center
      \includegraphics[width=\textwidth]{figures/prb_ddpg_kpis.pdf}
   \caption{}
   \label{app:prb-ddpg-kpis}
 \end{figure}
+}
 
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/social2_results_sharedobs.pdf}
   \caption[Results of the SAC-DemoQ with shared observations.]{Results of the fossil energy consumption KPI of the SAC-DemoQ with shared observation. The shaded areas show the standard deviation between the experiments with and without additional policy update, and the graphs show the mean value of them. One experiment with sampled and one with deterministic (determ.) demonstrator actions was conducted for both demonstrators.}
   \label{app:social2-results-sharedobs}
 \end{figure}
+}
 
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/shifted_sac_kpis.pdf}
   \caption[Results of the SAC Agents for the shifted data of B3 and B5.]{Results of the SAC Agents for the shifted data of B3 and B5 compared to the SAC baseline results of the training buildings.}
   \label{app:sac-shifted-kpis}
 \end{figure}
+}
 
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/social_kpis.pdf}
   \caption[Results of the best-performing SAC and SAC-DemoQ Agents.]{Results of the best-performing SAC and SAC-DemoQ Agents for the training and the evaluation buildings.}
   \label{app:social-kpis}
 \end{figure}
+}
 
 \clearpage
 \chapter{Calculation of Key Performance Indicators}\label{sec:app-kpis}
@@ -368,7 +430,7 @@ over all time steps~$t$.
 
 \clearpage
 
-\chapter{Algorithms}\label{sec:app-algos}
+\chapter{Algorithms of Social Methods}\label{sec:app-algos}
 \begin{algorithm}
 \caption{SAC-DemoPol}
 \label{app:sac-social-1}

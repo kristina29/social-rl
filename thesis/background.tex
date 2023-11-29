@@ -1,17 +1,20 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Background
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Background}
+\chapter{Theoretical Foundations}
 \label{Background}
 This chapter provides the necessary background knowledge to comprehend our approach to the presented problem. First, we introduce the fundamental concepts of RL and the SAC algorithm. Then, we explain the algorithm-independent social methods imitation learning and DB, followed by presentation of the the MARLISA algorithm.
 
-\section{Reinforcement Learning}
+\section{Reinforcement Learning Paradigms}
 \label{sec:reinforcement-learning}
 RL is an agent-based approach within artificial intelligence in which an agent acts in an environment, observes the current state and performs actions to maximize a cumulative reward over time. This chapter describes the basic mathematical principles of RL. Traditional RL methods often struggle with the limitations of discrete action spaces. However, the SAC algorithm overcomes this limitation through continuous action selection. We will explain the SAC algorithm and elaborate on its mathematical framework.
 
 \subsection{Fundamentals of Reinforcement Learning}
 As defined by Sutton and Barto \cite{sutton2018reinforcement}, RL is a machine learning method that aims to choose actions to maximize a numerical reward. RL agents learn these actions through a trial-and-error approach based on the received rewards. Actions can affect both immediate rewards and long-term rewards. In contrast to supervised methods, RL does not need labeled data for learning and does not try to discover inherent structure in data as unsupervised methods.
 
+{
+\renewcommand{\baselinestretch}{0.9} 
+\normalsize
 \begin{figure}[htb]
      \center
      \begin{overpic}[width=\textwidth, trim={0 1.7cm 0 0.3cm},clip]{figures/rl_overview_blank.pdf}%
@@ -27,13 +30,14 @@ As defined by Sutton and Barto \cite{sutton2018reinforcement}, RL is a machine l
   \caption[Reinforcement Learning Overview.]{In RL, the agent observes the state of the environment~$s_t$ at timestep~$t$. The agent takes an action~$a_t$ based on the policy~$\pi$. This action determines the next state of the environment~$s_{t+1}$, and the environment sends a reward~$r_{t+1}$ to the agent.}
   \label{fig:rl_overview}
 \end{figure}
+}
 
 \noindent
 Figure~\ref{fig:rl_overview} illustrates the fundamental structure of the RL approach. RL problems are typically modeled as finite Markov Decision Processes (MDPs), where the agent interacts with the environment over a series of time steps. At each time step~$t$, the agent observes the current state $s_t \in \mathcal{S}$ of the environment. Based on this observation, the agent employs a stochastic policy~$\pi(a_t|s_t)$ to choose an action~$a_t \in \mathcal{A}$. The agent's action results in a transition to a new state~$s_{t+1}\in \mathcal{S}$ at the next time step and the receipt of a numerical reward~$r_{t+1}\in\mathcal{R} \subset \mathbb{R}$. The RL algorithm uses these transitions and rewards to refine the policy, aiming to maximize the expected sum of discounted rewards.
 
 Using the dynamics of the MDP, we can calculate various quantities of interest. The expected reward for a given state-action pair~$(s_t,a_t)$ is represented as a function~$r: \mathcal{S}\times\mathcal{A}\rightarrow \mathbb{R}$. Furthermore, the state-value function~$V_{\pi}(s_t)$ quantifies the expected total discounted reward starting from state~$s_t$ and following policy~$\pi$. Analogously, the action-value function~$Q_{\pi}(s_t, a_t)$ calculates the expected total discounted reward for beginning in state~$s_t$, taking action~$a_t$ and then following the policy~$\pi$. In this context, we refer to the action-value function as value function or Q-function.
 
-\subsection{Soft Actor-Critic}
+\subsection{Soft Actor-Critic Approach}
 \label{sec:SAC}
 We opted for the SAC algorithm, an actor-critic method, to address the computational challenges of handling continuous state and action spaces in RL. In actor-critic methods, the actor models the policy~$\pi(a_t|s_t)$, while the critic models the value function~$Q_\pi(s_t,a_t)$. SAC is a model-free RL algorithm that maximizes the maximum entropy objective, which aims to increase the policy's entropy while keeping the expected return constant:
 \begin{equation}
@@ -84,7 +88,7 @@ For the final SAC algorithm, as given in Algorithm~\ref{alg:sac-update}, Haarnoj
 \small \textbf{Output:}   $\theta_1,\theta_2,\phi$ \Comment{\footnotesize Optimized parameters}
 \end{algorithm}
 
-\section{Social Learning}
+\section{Social Learning Strategies}
 \label{sec:background-social-learning}
 \textit{Social learning} is a term initially derived from psychology and has various definitions. Essentially, it refers to the act of learning from others \cite{reed2010social, toyokawa2019social, witt2023social}. In this thesis, we interpret social learning as observing the actions and possibly rewards of demonstrators and incorporating them into the training process of the RL agent. These demonstrators perform actions within the same environment as the RL agent and provide a reference for successful behaviors and strategies. We will refer to the RL agent currently trained as a learner. In the following, we distinguish between algorithm-independent methods, which we present first, and specific social algorithms.
 
