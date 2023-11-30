@@ -35,6 +35,9 @@
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 
+\hyphenation{thatshouldnot}
+
+
 \textwidth 14cm
 \textheight 22cm
 \topmargin 0.0cm
@@ -114,7 +117,7 @@ Thesis period: 01.06.2023~--~01.12.2023
 \section*{Abstract}
 Reducing the consumption of fossil fuels is crucial for mitigating climate change, as it reduces greenhouse gas emissions. At the same time, renewable energy creates more uncertainty in the energy supply, challenging the traditional approach of consuming available energy immediately.
 This thesis explores integrating social learning into multi-agent reinforcement learning to minimize fossil fuel consumption in building energy management. By equipping each building with a battery, the study employs agents to learn optimal charging and discharging strategies. 
-We use the CityLearn framework, modified to suit our requirements and define four KPIs for evaluation. As a baseline, we train a non-social Soft Actor-Critic (SAC) agent, which we compare to four social learning methods. These methods include imitation learning for policy mimicry, SAC-DemoPol, which biases the policy toward demonstrator actions, SAC-DemoQ, which positively biases the Q-values of demonstrator actions, and the MARLISA algorithm for collaborative fossil energy saving. Results indicate that the SAC-DemoQ agents, trained with a pre-trained demonstrator, outperform the SAC baseline by approximately 1.5 \% in fossil energy savings. Using novel building data, the social agents save about 1 \% more fossil energy. The other social methods achieved minimal or no improvement. We suggest future evaluation using more diverse datasets and employing methods such as value shaping, clustering for optimal demonstrator selection, and fine-tuning the imitation learning rate to enhance the efficacy of the proposed strategie in reducing fossil fuel consumption in buildings.
+We use the CityLearn framework, modified to suit our requirements and define four KPIs for evaluation. As a baseline, we train a non-social Soft Actor-Critic (SAC) agent, which we compare to four social learning methods. These methods include imitation learning for policy mimicry, SAC-DemoPol, which biases the policy toward demonstrator actions, SAC-DemoQ, which increases the Q-values of demonstrator actions, and the MARLISA algorithm for collaborative fossil energy saving. Results indicate that the SAC-DemoQ agents, trained with a pre-trained demonstrator, outperform the SAC baseline by approximately 1.5 \% in fossil energy savings. Using novel building data, the social agents save about 1 \% more fossil energy. The other social methods achieved minimal or no improvement. We suggest future evaluation using more diverse datasets and employing methods such as value shaping, clustering for optimal demonstrator selection, and fine-tuning the imitation learning rate to enhance the efficacy of the proposed strategy in reducing fossil fuel consumption in buildings.
 
 \newpage
 \section*{Zusammenfassung}
@@ -201,7 +204,7 @@ I am deeply grateful to all of you. Your collective support has made this work p
 \textbf{i.i.d.}\>independent and identically distributed \\
 \textbf{ILR}\>Imitation Learning Rate \\
 \textbf{KPI}\>Key performance indicator \\
-\textbf{kWh}\>Kilowatt hour \\
+\textbf{kWh}\>Kilowatt-hour \\
 \textbf{L2 loss}\>Mean Squared Error Loss \\
 \textbf{MARLISA}\> Multi-Agent Reinforcement Learning with Iterative \\ 
 \>Sequential Action Selection \\

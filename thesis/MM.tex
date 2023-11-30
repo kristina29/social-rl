@@ -4,7 +4,7 @@
 
 \chapter{Material and Baseline Agent}
  \label{sec:met-mat}
-This chapter provides an overview of the materials, baseline algorithms, and demonstrators we use to develop the social methods. To begin with, we introduce the CityLearn framework, which is used to simulate RL algorithms for energy management in buildings and explain our applied modifications. We then describe the datasets we use to capture the energy profiles of the buildings, weather conditions, fuel mix composition and energy prices. Furthermore, we explain the calculation of the KPIs used for our algorithmic assessments. We also discuss the architecture and performance of our asocial SAC baseline agents. Finally, we describe the demonstrators we use in our social methodological approaches.
+This chapter provides an overview of the materials, baseline algorithms, and demonstrators we use to develop the social methods. To begin with, we introduce the CityLearn framework, which simulates RL algorithms for energy management in buildings and explain our applied modifications to the framework. We then describe the datasets we use to capture the energy profiles of the buildings, weather conditions, fuel mix composition and energy prices. Furthermore, we explain the calculation of the KPIs used for our algorithmic assessments. We also discuss the architecture and performance of our asocial SAC baseline agents. Finally, we describe the demonstrators we use in our social methodological approaches.
 
 \section{Presentation of the CityLearn Framework}
 \label{sec:city-learn-presentation}
@@ -12,15 +12,13 @@ CityLearn \cite{vazquez2020citylearn} is a framework that uses RL applications t
 
 An agent is trained for each building on charging or discharging its battery. The action is a real number between [-1.0, 1.0], defining the ratio of the battery capacity that is to be charged or discharged. By default, the framework operates hourly, expecting input data and actions to be performed hourly.
 
-In addition, CityLearn offers the possibility to upload data sets on the weather (temperature, humidity, solar irradiance), weather forecasts (6h, 12h and 24h ahead), energy prices (and forecasts), and carbon emissions. These data sets can be combined with time-specific data (month, day type, hour) and building-specific data (load, solar generation, battery state of the charge, energy consumption from the grid) to create a comprehensive state of the environment that is passed to the agents. However, the buildings can only observe their own building-specific data by default. Detailed information about the predefined state and action variables can be found on the CityLearn website\footnote{\url{https://www.citylearn.net}.}.
+In addition, CityLearn offers the possibility to upload datasets on the weather (temperature, humidity, solar irradiance), weather forecasts (6h, 12h and 24h ahead), energy prices (and forecasts), and carbon emissions. These datasets can be combined with time-specific data (month, day type, hour) and building-specific data (load, solar generation, battery state of the charge, energy consumption from the grid) to create a comprehensive state of the environment that is passed to the agents. However, the buildings can only observe their own building-specific data by default. Detailed information about the predefined state and action variables can be found on the CityLearn website\footnote{\url{https://www.citylearn.net}.}.
 
-The framework offers a range of KPIs based on the actions performed by the agents. These KPIs are available at the building and district levels for all buildings combined. The framework is highly adaptable and can be customized to meet various objectives: Individual reward functions, data sets, and algorithms can be used to train the agents.
+The framework offers a range of KPIs based on the actions performed by the agents. These KPIs are available at the building and district levels for all buildings combined. The framework is highly adaptable and can be customized to meet various objectives: Individual reward functions, datasets, and algorithms can be used to train the agents.
 
 Finally, CityLearn offers an optimized RBC that we compare with our trained agents regarding performance. The RBC charges and discharges the battery based on the current hour. Table~\ref{app:rbc-rules} shows the schedule: During the day (between 7 AM and 10 PM), the battery is slowly discharged and recharged at night.
 
-Our goal is to minimize fossil energy use, which is impossible with the current state of the CityLearn framework. Therefore, we apply some extensions regarding the state space of the environment and the KPIs, which are explained below.
-
-First, we add the hourly fuel mix data from the grid as input. This dataset includes the renewable energy produced in kilowatt-hours (kWh)~$RE_{gen}^{G}$, with $G$ denoting the grid source. It also details the proportion of renewable energy relative to the total energy produced. However, the former does not always correspond to the energy consumed by the buildings in the simulations. There would be too much or too little renewable energy available to compare the performance of the agents. Therefore, the median electricity consumption per hour~$\bar{e}_{b}$ in kWh is expected as input for each building $b \in B$. Then, the absolute renewable energy generated by the grid is calculated as 
+Our goal is to minimize fossil energy use, which is impossible with the current state of the CityLearn framework. Therefore, we apply some extensions regarding the state space of the environment and the KPIs, which are explained below. First, we add the hourly fuel mix data from the grid as input. This dataset includes the renewable energy produced in kilowatt-hours (kWh)~$RE_{gen}^{G}$, with $G$ denoting the grid source. It also details the proportion of renewable energy relative to the total energy produced. However, the former does not always correspond to the energy consumed by the buildings in the simulations. There would be too much or too little renewable energy available to compare the performance of the agents. Therefore, we expect the median electricity consumption per hour~$\bar{e}_{b}$ in kWh as input for each building $b \in B$. Then, the absolute renewable energy generated by the grid is calculated as 
 \begin{equation}
 	\label{eq:re-grid}
 	\hat{RE}_{gen}^G = \frac{RE_{gen}^{G}}{E_{gen}^{G}} \cdot k\sum_{b\in B} \bar{e}_b.
@@ -30,7 +28,7 @@ Thus, the available energy is scaled to a value corresponding to the median ener
 Since a significant part of the renewable energy produced is wind energy, we further add the current wind speed in $m/s$ as well as its forecasts with a forecast horizon of 6h, 12h and 24h corresponding to the other forecasts in the framework to the state of the environment.
 
 \section{Data Sources and Preprocessing}
-This section discusses the datasets we use in our study. These datasets contain energy consumption records, simulated solar energy production for each building, and meteorological and fuel mix information. Additionally, we describe the energy pricing dataset that we use. This study's weather and fuel mix data originates from New York (NY) State.
+This section discusses the datasets we use in our study. These datasets contain energy consumption records, simulated solar energy production for each building, and meteorological and fuel mix information. Additionally, we describe the energy pricing dataset that we use. This study's weather and fuel mix data originates from New York (NY) state.
 
 \subsection{Building Data}
 \label{sec:building-data}
@@ -49,8 +47,8 @@ We optimize our agents by training them for only six buildings: B3, B5, B7, B8, 
 \normalsize
 \begin{figure}[htb]
 \center
-   \includegraphics[width=0.9\textwidth]{figures/building_correlations.pdf}
- \caption[Comparison of individual and median PCC across buildings.]{Comparison of individual and median PCC between each building and the training buildings. A value of 1 indicates a total positive linear correlation and a value of 0 indicates no linear correlation.}
+  \includegraphics[width=0.9\textwidth]{figures/building_correlations.pdf}
+ \caption[Comparison of individual and median PCC across buildings.]{Comparison of individual and median PCC between each building and the training buildings. A value of 1 indicates a total positive linear correlation, and a value of 0 indicates no linear correlation.}
  \label{fig:building-correlations}
 \end{figure}
 }
@@ -70,8 +68,8 @@ The preprocessed fuel mix data includes the hourly amount of energy generated by
 \normalsize
 \begin{figure}[htb]
 \center
-   \includegraphics[width=0.7\textwidth]{figures/locations.pdf}
- \caption[Map of meteorological data sources in NY state.]{Map of meteorological data sources in NY state. The location marked in green is the initial data source and used to simulate the PV generation time series of the buildings.}
+  \includegraphics[width=0.7\textwidth]{figures/locations.pdf}
+ \caption[Map of meteorological data sources in NY state.]{Map of meteorological data sources in NY state. The location marked in green is the initial data source and is used to simulate the PV generation time series of the buildings.}
  \label{fig:weather-locations}
 \end{figure}
 }
@@ -91,13 +89,13 @@ We use the CityLearn Challenge 2022 price dataset to determine the energy prices
 \center
 \begin{tabular}{c|c|c|c|c}
 \toprule
-      & \multicolumn{2}{c|}{June - September} & \multicolumn{2}{c}{Oktober - May} \\
-Time    & Weekday      & Weekend     & Weekday     & Weekend     \\
+   & \multicolumn{2}{c|}{June - September} & \multicolumn{2}{c}{Oktober - May} \\
+Time  & Weekday   & Weekend   & Weekday   & Weekend   \\
 \midrule
-8 AM - 4 PM & 0.21         & 0.21        & 0.20         & 0.20         \\
-4 PM - 9 PM & 0.54         & 0.40         & 0.50        & 0.50        \\
-9 PM - 8 AM & 0.21         & 0.21         & 0.20        & 0.20    \\
-\bottomrule    
+8 AM - 4 PM & 0.21     & 0.21    & 0.20     & 0.20     \\
+4 PM - 9 PM & 0.54     & 0.40     & 0.50    & 0.50    \\
+9 PM - 8 AM & 0.21     & 0.21     & 0.20    & 0.20  \\
+\bottomrule   
 \end{tabular}
 \caption[Electricity price rates CityLearn Challenge 2022.]{Electricity price rates of the electricity price dataset provided with the CityLearn Challenge 2022.}
 \label{tab:basic-prices}
@@ -177,7 +175,7 @@ r_{tol}^b= -(RE_{gen}^G-E_{pos})^2.
 This reward aims to minimize the difference between the produced renewable energy in the grid and the consumed energy from the grid, penalizing both unused renewable energy and fossil fuel consumption.
 
 \subsection{Hyperparameter Optimization}
-In order to improve the baseline SAC agents, we conduct experiments with various hyperparameter values, reward functions, and observation spaces. For this, we follow a step-by-step approach to optimize one parameter at a time and assume that the optimal value would work for the following changes as well. Thus, no grid search optimization is performed, which might result in better final results but is much more time-consuming. However, since our goal is not to achieve an optimally trained agent but to train an appropriate baseline agent, this approach is sufficient. 
+To improve the baseline SAC agents, we conduct experiments with various hyperparameter values, reward functions, and observation spaces. For this, we follow a step-by-step approach to optimize one parameter at a time and assume that the optimal value would work for the following changes as well. Thus, no grid search optimization is performed, which might result in better final results but is much more time-consuming. However, since our goal is not to achieve an optimally trained agent but to train an appropriate baseline agent, this approach is sufficient. 
 
 {
 \renewcommand{\baselinestretch}{0.9} 
@@ -186,37 +184,37 @@ In order to improve the baseline SAC agents, we conduct experiments with various
 \center
 \begin{tabularx}{\linewidth}{X|l|X}
 \toprule
-Hyperparameter          & Initial Value         & Tested Values                                    \\
+Hyperparameter     & Initial Value     & Tested Values                  \\
 \midrule
 \rule{0pt}{3ex}% EXTRA vertical height  
-Training Episodes        & 2               & \textbf{2}, 3, 4                                        \\
+Training Episodes    & 2        & \textbf{2}, 3, 4                    \\
 \rule{0pt}{3ex}% EXTRA vertical height  
-Pricing Factor~$\beta$          & 1               & 1, 10, \textbf{20}                                       \\
+Pricing Factor~$\beta$     & 1        & 1, 10, \textbf{20}                    \\
 \rule{0pt}{3ex}% EXTRA vertical height  
-Normalize Price         & No               & \textbf{Yes}, No                                       \\
+Normalize Price     & No        & \textbf{Yes}, No                    \\
 \rule{0pt}{3ex}% EXTRA vertical height  
-Weather (no. of locations)  & 1               & 1, \textbf{8}                                         \\
+Weather (no. of locations) & 1        & 1, \textbf{8}                     \\
 \rule{0pt}{3ex}% EXTRA vertical height  
-Autotune temperature~$\alpha$          & No               & \textbf{Yes}, No                                       \\
+Autotune temperature~$\alpha$     & No        & \textbf{Yes}, No                    \\
 \rule{0pt}{3ex}% EXTRA vertical height  
 \multirow[t]{2}{*}{Reward Function} & \multirow[t]{2}{*}{$r_{pr}^b$} & %See Section \ref{sec:reward} 
 $r_{pr}^b, r_{sol}^b, \mathbf{r_{s,p}^b}$ \\ 
 & & (with $\eta \in \{0.25, \mathbf{0.5}, 0.75\}$), \\ & & $r_{foss}^b, r_{tol}^b$\\
 \rule{0pt}{3ex}% EXTRA vertical height  
-\multirow[t]{3}{*}{State Space}           & \multirow[t]{3}{*}{Complete}            & a) Complete \\ 
+\multirow[t]{3}{*}{State Space}      & \multirow[t]{3}{*}{Complete}      & a) Complete \\ 
 & & \textbf{b) No 6h and 12h predictions} \\
 & & c) No 6h and 12h predictions, no wind, no renewable share \\
 \rule{0pt}{3ex}% EXTRA vertical height  
-Batch Size            & 256              & \textbf{256}, 1024                                      \\
+Batch Size      & 256       & \textbf{256}, 1024                   \\
 \rule{0pt}{3ex}% EXTRA vertical height  
-Gradient Clipping        & No               & Yes, \textbf{No}                                       \\
+Gradient Clipping    & No        & Yes, \textbf{No}                    \\
 \rule{0pt}{3ex}% EXTRA vertical height  
-Kaiming Initialization      & No               & Yes, \textbf{No}                                       \\
+Kaiming Initialization   & No        & Yes, \textbf{No}                    \\
 \rule{0pt}{3ex}% EXTRA vertical height  
-Discount Factor~$\gamma$         & 0.99              & 0.96, 0.97, 0.98, \textbf{0.99}                                \\
+Discount Factor~$\gamma$     & 0.99       & 0.96, 0.97, 0.98, \textbf{0.99}                \\
 \rule{0pt}{3ex}% EXTRA vertical height  
-Loss function          & L1               & \textbf{L1}, L2     \\
-\bottomrule                                  
+Loss function     & L1        & \textbf{L1}, L2   \\
+\bottomrule                  
 \end{tabularx}
 \caption[Optimized hyperparameters of the baseline SAC agent.]{Optimized hyperparameters of the baseline SAC agent with the initial and experimentally tested values. Optimal hyperparameters yielding the best results in reducing fossil fuel consumption are highlighted in bold.}
 \label{tab:optimized-sac}
@@ -229,7 +227,7 @@ First, we find that increasing the number of training episodes does not increase
 
 Furthermore, it is worth noting that we select the scaling factor~$k=0.5$ for the absolute amount of renewable energy available in the grid after optimizing the hyperparameters (see Section~\ref{sec:city-learn-presentation}). This choice ensures that the buildings use the complete renewable grid energy more frequently. We aim to test whether social agents can effectively prevent the overconsumption of energy by the grid since individual buildings are unaware of how much energy other buildings in the grid are using and may unknowingly consume fossil fuels.
 
-Lastly, we implement the early stopping method. For this, we evaluate the performance of the agents every 168 time steps, i.e., once per week, during the training until the end of the exploration phase (see CityLearn for more details). We use deterministic actions, i.e., the learned Gaussian mean, on the complete data set and calculate the KPIs to achieve this. We keep track of the training state at which the agents achieve the lowest fossil energy consumption and the final training state.
+Lastly, we implement the early stopping method. For this, we evaluate the performance of the agents every 168 time steps, i.e., once per week, during the training until the end of the exploration phase (see CityLearn for more details). We use deterministic actions, i.e., the learned Gaussian mean, on the complete dataset and calculate the KPIs to achieve this. We keep track of the training state at which the agents achieve the lowest fossil energy consumption and the final training state.
 
 Unless otherwise described, we keep the identified reward function, the hyperparameter values, and the early-stopping method for training the social agents.
 
@@ -243,7 +241,7 @@ All SAC baseline agents have a maximum standard deviation of 4.2~\% for the 1~-~
 \normalsize
 \begin{figure}[htb]
 \center
-   \includegraphics[width=\textwidth]{figures/sac_kpis.pdf}
+  \includegraphics[width=\textwidth]{figures/sac_kpis.pdf}
  \caption[Performance of SAC baseline agents for training buildings.]{Performance of the SAC baseline agents trained for the training buildings.}
  \label{fig:sac-kpis}
 \end{figure}
@@ -255,16 +253,16 @@ By using the battery, the SAC agents perform significantly better than without t
 \section{Presentation of Demonstrator Buildings}
 \label{sec:pretrained-demos}
 For some of our methods, we use pre-trained demonstrators, where we also scale the available renewable energy in the grid by the factor $k = 0.5$. We use B3, B5, and B6 as demonstrators for the training buildings and additionally B11 for the evaluation buildings. We choose the buildings with the highest median PCC to the training buildings from the set of training buildings and the remaining ones: B5, which is a training building, and B6. Also, we use B3 for a newly generated set of buildings used in some experiments and choose B11 as it has the highest PCC to the evaluation buildings without being part of the group.
-When referring to pre-trained demonstrators, we abbreviate them with D,  for example, D3 for the pre-trained demonstrator using B3.
+When referring to pre-trained demonstrators, we abbreviate them with D, for example, D3 for the pre-trained demonstrator using B3.
 
 {
 \renewcommand{\baselinestretch}{0.9} 
 \normalsize
 \begin{figure}[htb]
 \center
-     \includegraphics[width=\textwidth]{figures/pretrained_kpis.pdf}
-  \caption[{Performance of SAC baseline agents trained as demonstrators.}]{Performance of the SAC baseline agents trained as pre-trained demonstrator buildings. Exact KPI values of the demonstrators are omitted since they are irrelevant.}
-  \label{fig:b5-b6-kpis}
+   \includegraphics[width=\textwidth]{figures/pretrained_kpis.pdf}
+ \caption[{Performance of SAC baseline agents trained as demonstrators.}]{Performance of the SAC baseline agents trained as pre-trained demonstrator buildings. The exact KPI values of the demonstrators are omitted since they are irrelevant.}
+ \label{fig:b5-b6-kpis}
 \end{figure}
 }
 

@@ -50,7 +50,7 @@ def plot_losses(losses, include_alpha, mode) -> List[plt.Figure]:
 
     if mode == 2:
         ax.set_ylabel('Policy loss value', fontsize=21)
-        ax2.set_ylabel(r'Entropy $\alpha$', fontsize=21, labelpad=15)
+        ax2.set_ylabel(r'Temperature $\alpha$', fontsize=21, labelpad=15)
         ax2.set_xlabel('Time step', fontsize=21)
         ax2.tick_params(axis='x', which='both', labelsize=21)
         ax2.tick_params(axis='y', which='both', labelsize=21)
@@ -86,7 +86,7 @@ def plot_losses(losses, include_alpha, mode) -> List[plt.Figure]:
 
 
 if __name__ == '__main__':
-    mode = 1
+    mode = 2
 
     if mode == 1:
         loss_files = ['../experiments/SAC/30_renewable_prod/reward_05pvprice/0.5/losses_20231002T130931.pkl',
@@ -96,8 +96,8 @@ if __name__ == '__main__':
         names = ['SAC Baseline', 'Transitions of D5']
         include_alpha = [False, False]
     elif mode == 2:
-        loss_files = ['../experiments/SAC_DB2/32_demo_b5/ir0.2/socialMode2/losses_20231107T200708.pkl',
-                      '../experiments/SAC_DB2/32_demo_b5/ir0.2/socialMode5/losses_20231107T201820.pkl']
+        loss_files = ['../experiments/SAC-DemoPol/32_demo_b5/ir0.2/socialMode2/losses_20231107T200708.pkl',
+                      '../experiments/SAC-DemoPol/32_demo_b5/ir0.2/socialMode5/losses_20231107T201820.pkl']
         agents = ['SAC_DB2', 'SAC_DB2']
 
         names = ['Mode 2', 'Mode 5']
