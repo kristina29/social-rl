@@ -112,18 +112,29 @@ Thesis period: 01.06.2023~--~01.12.2023
 
 
 \section*{Abstract}
-
-\todo[inline]{Write here your abstract.}
+Reducing the consumption of fossil fuels is crucial for mitigating climate change, as it reduces greenhouse gas emissions. At the same time, renewable energy creates more uncertainty in the energy supply, challenging the traditional approach of consuming available energy immediately.
+This thesis explores integrating social learning into multi-agent reinforcement learning to minimize fossil fuel consumption in building energy management. By equipping each building with a battery, the study employs agents to learn optimal charging and discharging strategies. 
+We use the CityLearn framework, modified to suit our requirements and define four KPIs for evaluation. As a baseline, we train a non-social Soft Actor-Critic (SAC) agent, which we compare to four social learning methods. These methods include imitation learning for policy mimicry, SAC-DemoPol, which biases the policy toward demonstrator actions, SAC-DemoQ, which positively biases the Q-values of demonstrator actions, and the MARLISA algorithm for collaborative fossil energy saving. Results indicate that the SAC-DemoQ agents, trained with a pre-trained demonstrator, outperform the SAC baseline by approximately 1.5 \% in fossil energy savings. Using novel building data, the social agents save about 1 \% more fossil energy. The other social methods achieved minimal or no improvement. We suggest future evaluation using more diverse datasets and employing methods such as value shaping, clustering for optimal demonstrator selection, and fine-tuning the imitation learning rate to enhance the efficacy of the proposed strategie in reducing fossil fuel consumption in buildings.
 
 \newpage
 \section*{Zusammenfassung}
+Die Verringerung des Verbrauchs fossiler Brennstoffe und die damit verbundene Reduzierung der Treibhausgasemissionen sind für die Eindämmung des Klimawandels von entscheidender Bedeutung. Gleichzeitig schaffen erneuerbare Energien mehr Unsicherheit in der Energieversorgung, was den traditionellen Ansatz des sofortigen Verbrauchs der verfügbaren Energie infrage stellt.
+In dieser Arbeit wird die Integration von sozialem Lernen in Multi-Agenten Reinforcement Learning untersucht, um den Verbrauch fossiler Brennstoffe im Energiemanagement von Gebäuden zu minimieren. Es werden Agenten entwickelt, welche optimale Lade- und Entladestrategien der Batterien von Gebäuden erlernen. 
+Wir verwenden das CityLearn-Framework, das wir an unsere Anforderungen anpassen, und definieren vier KPIs für die Performanzbewertung. Als Ausgangsbasis trainieren wir einen nicht-sozialen Soft Actor-Critic (SAC)-Agenten, den wir mit vier sozialen Lernmethoden vergleichen. Zu diesen Methoden gehören das Nachahmungslernen für die Nachahmung der Policy eines Demonstrators, SAC-DemoPol, wobei die Policy in Richtung der Demonstrantenaktionen gelenkt wird, SAC-DemoQ, wobei die Q-Werte der Demonstrantenaktionen erhöht werden, und der MARLISA-Algorithmus für kollaboratives fossiles Energiesparen. Die Ergebnisse zeigen, dass die SAC-DemoQ-Agenten, die mit einem vortrainierten Demonstrator trainiert wurden, die unsozialen SAC-Agenten bei der Einsparung fossiler Energie um etwa 1,5 \% übertreffen. Bei Verwendung neuer Gebäudedaten sparen die sozialen Agenten etwa 1 \% mehr fossile Energie. Die anderen sozialen Ansätze zeigen keine oder nur minimale Verbesserung. Wir schlagen vor, zukünftige Evaluierungen mit vielfältigeren Datensätzen und unter Verwendung von Methoden wie Value Shaping, Clustering für die optimale Auswahl von Demonstratoren und Feinabstimmung der Imitationslernrate durchzuführen, um die Wirksamkeit der entwickelten Strategie bei der Reduzierung des Verbrauchs fossiler Brennstoffe in Gebäuden zu verbessern.
 
-\todo[inline]{Bei einer englischen Masterarbeit muss zus\"atzlich eine deutsche Zusammenfassung verfasst werden.}
+
 
 \newpage
 \section*{Acknowledgements}
+I sincerely thank all those who have supported me in my studies and during this work.
 
-\todo[inline]{Write here your acknowledgements.}
+First, I would like to express my deepest gratitude to my closest family: My sister Annika, my parents Heike, Rüdiger, Andrea, and my grandma Ellen. Your emotional support and encouragement help guide me through all the difficult times and inspire me to persevere. Your belief in me and my abilities was a source of motivation and perseverance.
+
+I am also immensely grateful to my friends who have supported me, especially in the last few months: Jule, Elli, Basti, Steffen, Fabio and Flop. Your support, camaraderie and understanding have been crucial in this work. The proofreading from some of you also helped me a lot. The moments we have shared and the moral support you have given me have been invaluable and have given me balance and a sense of belonging.
+
+Special thanks to my supervisor, Dr. Nicole Ludwig, for her guidance, patience, and expertise. Her insightful feedback and constructive criticism have been instrumental in shaping my research and writing. 
+
+I am deeply grateful to all of you. Your collective support has made this work possible. Thank you.
 
 \cleardoublepage
 
@@ -179,7 +190,6 @@ Thesis period: 01.06.2023~--~01.12.2023
 % can be removed
 \addcontentsline{toc}{chapter}{List of Abbreviations}
 \chapter*{List of Abbreviations\markboth{LIST OF ABBREVIATIONS}{LIST OF ABBREVIATIONS}}
-\todo[inline]{TODO ganz zum schluss checken}
 \begin{tabbing}
 \textbf{FACTOTUM}\hspace{1cm}\=Schrott\kill
 \textbf{CO2}\>Carbon Dioxide\\
@@ -190,7 +200,6 @@ Thesis period: 01.06.2023~--~01.12.2023
 \textbf{GHI}\>Global Horizontal Irradiance \\
 \textbf{i.i.d.}\>independent and identically distributed \\
 \textbf{ILR}\>Imitation Learning Rate \\
-\textbf{KL divergence}\>Kullback-Leibler divergence \\
 \textbf{KPI}\>Key performance indicator \\
 \textbf{kWh}\>Kilowatt hour \\
 \textbf{L2 loss}\>Mean Squared Error Loss \\
@@ -211,32 +220,6 @@ Thesis period: 01.06.2023~--~01.12.2023
 
 \cleardoublepage
 
-%\addcontentsline{toc}{chapter}{List of Symbols}
-%\chapter*{List of Symbols\markboth{LIST OF SYMBOLS}{LIST OF SYMBOLS}}
-%\todo[inline]{Drinlassen? Erweitern mit RL kram?}
-%\begin{tabbing}
-%\textbf{FACUM}\hspace{0.05cm}\=Schrott\kill
-%\textbf{$C_b$}\>Battery capacity of building $b$ \\
-%\textbf{$E_{gen}^G$}\>Generated energy in the grid \\
-%\textbf{$E_{pos}$}\>Sum of positive electricity consumption from grid for all buildings \\
-%\textbf{$e_b$}\>Electricity consumption of building $b$ from the grid \\
-%\textbf{$\bar{e}_b$}\>Estimated median electricity consumption of building $b$ from the grid \\
-%\textbf{$ec_b$}\>Electricity cost of building $b$ for electricity from the grid \\
-%\textbf{$FE_{con}$}\>Consumed fossil energy \\
-%\textbf{$p_{t}^{base}$}\>Electricity price in price schedule \\
-%\textbf{$p_{t}$}\>Electricity price in price schedule weighted by fossil energy share \\
-%\textbf{$PV_{gen}$}\>Generated solar energy of all buildings \\
-%\textbf{$pv_{gen}^b$}\>Generated solar energy of building $b$ \\
-%\textbf{$RE_{gen}$}\>Generated renewable energy in the grid \\
-%\textbf{$\hat{RE}_{gen}$}\>Generated renewable energy in the grid scaled by median consumption \\
-%\textbf{$RE_{con}^G$}\>Consumed renewable energy from the grid from all buildings \\
-%\textbf{$RE_{con}^{PV}$}\>Consumed energy from all buildings PV's \\
-%\textbf{$RE_{con}$}\>Total consumed renewable energy from all buildings \\
-%\textbf{$RE_{pct}$}\>Share of renewable energy of total consumed energy from all buildings \\
-%\textbf{$SOC_b$}\>State of the charge of the battery of building $b$ \\
-%\end{tabbing}
-%
-%\cleardoublepage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Der Haupttext, ab hier mit arabischer Numerierung
@@ -261,37 +244,6 @@ Thesis period: 01.06.2023~--~01.12.2023
 %% 
 \input{social_agents}
 \cleardoublepage
-
-%%
-%\input{results}
-%Used PV of available\\
-%$possible\_battery\_input_{b,t} = \min(\min(C^b_t-SOC^b_t, 0), max\_input\_power_{b, \textcolor{red}{t=last}})$\\
-%\\
-%$could\_used\_without\_pv_{b,t} = possible\_battery\_input_{b,t} + net\_electricity\_consumption\_without\_storage\_and\_pv_{b,t} $ \\
-%\\
-%$could\_used\_with\_pv_{b,t} = \max(possible\_battery\_input_{b,t} + net\_electricity\_consumption\_without\_storage\_and\_pv_{b,t} - solar\_generation_{b,t}*-1, 0)$ \\
-%\\
-%$pv\_could\_have\_used_{b,t} = \min(solar\_generation_{b,t}*-1, could\_used\_without\_pv_{b,t})$ \\
-%\\
-%$pv\_used_{b,t} = E_{used_{pv_{b,t}}} = \max(\min(e_{net}^b - e_{pv}^b, - e_{pv}^b), 0) $ \\
-%\\
-%$pv\_used\_of\_available_{b,t} = used_{b,t}/pv\_could\_have\_used_{b,t}$\\
-%\\
-%$grid\_could\_have\_used_{t} = \min(E_{r,grid_{t}}, \sum_{b\in Buildings}could\_used\_with\_pv_{b,t})$ \\
-%\\
-%$grid\_used_{t} = E_{used_{r,grid_{t}}} = \min(E_{net_{pos}}, E_{r, grid})$ \\
-%\\
-%$grid\_used\_of\_available_{t} = grid\_used_{b,t} / grid\_could\_have\_used_{b,t}$ \\
-%\\
-%$total\_could\_have\_used_{t} = \min(E_{r,grid_{t}} + \sum_{b\in Buildings} \min(solar\_generation_{b,t}*-1, could\_used\_without\_pv_{b,t}), \sum_{b\in Buildings}could\_used\_with\_pv_{b,t}))$ \\
-%\\
-%$total\_used_{t} = E_{used_{r}} = E_{used_{r,grid}}  + E_{used_{pv}}$ \\
-%\\
-%$total\_used\_of\_available_{t} = total\_used_{t} / total\_could\_have\_used_{t}$
-%
-%
-%\cleardoublepage
-
 
 %%
 \input{discussion}

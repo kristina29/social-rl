@@ -45,7 +45,7 @@ The policy loss values during training with demonstrator transitions increase fo
 \end{figure}
 }
 
-We do not optimize the hyperparameters for the DDPG agents, suggesting that better results could be achieved. However, the increasing policy loss when using the DDPG algorithm and demonstrator transitions supports the thesis that imitation learning is unsuitable for our problem setting. Despite this, the DDPG algorithm does not show better results or more stable training than the SAC algorithm, so we stuck with SAC for further experiments.
+We do not optimize the hyperparameters for the DDPG agents, suggesting that better results could be achieved. However, the increasing policy loss when using the DDPG algorithm and demonstrator transitions supports the hypothesis that imitation learning is unsuitable for our problem setting. Nevertheless, the DDPG algorithm does not show better results or more stable training than the SAC algorithm, so we stuck with SAC for further experiments.
 
 Our objective is not to replicate the behavior of a demonstrator in our buildings but rather to learn from it and adopt profitable practices. Given the diversity of our buildings, not all demonstrator actions may be universally effective. Moreover, the transitions do not fulfill the i.i.d. assumption made in behavior cloning since the actions are sampled from the learned policy and thus are not equally distributed. Therefore, we focus on the DB approach in our following experiments. This method leverages the actions of the demonstrator more moderately.
 
@@ -53,7 +53,7 @@ Our objective is not to replicate the behavior of a demonstrator in our building
 This chapter outlines our second social approach. It incorporates the assumption from DB that the learner should follow demonstrator actions with higher probability into the policy update of the SAC algorithm, leading to the SAC-DemoPol agent. First, we present the method and our experiment results, and then discuss this approach.
 
 \subsection{Methodological Approach and Findings}
-In our first approach based on DB, we adjust the loss function of the policy update. As described in Section~\ref{sec:decision-biasing}, DB assumes that demonstrator actions are valuable and, therefore, the probability of choosing those actions or their Q-value should be increased. To accomplish this, we test six different operation modes using an imitation learning rate (ILR) that we also optimize. Also, we investigate the impact of sampling demonstrated action from the demonstrator policy~$a_t^d \sim \pi^d(a_t|s_t)$ versus using the deterministic action (i.e., the learned mean)~$a_t^d=f^d(\epsilon_t;s_t)$.
+In our first approach based on DB, we adjust the loss function of the policy update. As described in Section~\ref{sec:decision-biasing}, DB assumes that demonstrator actions are valuable and, therefore, the probability of choosing those actions or their Q-value should be increased. To accomplish this, we test six different operation modes using an ILR that we also optimize. Also, we investigate the impact of sampling demonstrated action from the demonstrator policy~$a_t^d \sim \pi^d(a_t|s_t)$ versus using the deterministic action (i.e., the learned mean)~$a_t^d=f^d(\epsilon_t;s_t)$.
 
 As a reminder, the classic policy objective function is defined as 
 \begin{align*}
@@ -219,7 +219,7 @@ To explain these observations, we first look at the policy loss and Q-network lo
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/social2_losses.pdf}
-  \caption[Policy and Q-network loss trends during training with SAC-DemoQ.]{Policy and Q-network loss trends during B3 training with SAC-DemoQ using ILRs~$\alpha_i = 0.15$ and~$\alpha_i = 1e^{-4}$. The loss curves when using the higher ILR are overall as expected, while the small IRL introduces an increasing policy loss.}
+  \caption[Policy and Q-network loss trends during training with SAC-DemoQ.]{Policy and Q-network loss trends during B3 training with SAC-DemoQ using ILRs~$\alpha_i = 0.15$ and~$\alpha_i = 1e^{-4}$. The loss curves when using the higher ILR are overall as expected, while the small ILR introduces an increasing policy loss.}
   \label{fig:social2-losses}
 \end{figure}
 }

@@ -3,7 +3,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Evaluation of the Method and Outlook}
-  \label{Discussion}
+  \label{chap:discussion}
 This chapter examines the effectiveness of our best-performing model, SAC-DemoQ, on new building data. The agent utilizes the deterministic actions of a pre-trained demonstrator. First, we present the methodology and results of our evaluation process. We then discuss the performance and implications of our findings. The chapter concludes with an outline of future research directions that could further extend our work.
   
 \section{Assessing Performance on New Buildings}
@@ -30,14 +30,14 @@ Figure~\ref{fig:eval-kpis} shows the KPI results of the SAC baseline agents for 
 \begin{figure}[htb]
 \center
      \includegraphics[width=\textwidth]{figures/eval_results.pdf}
-  \caption[Fossil energy consumption of the SAC-DemoQ agents trained for the evaluation buildings.]{Fossil energy consumption of the SAC-DemoQ agents trained for the evaluation buildings using different IRLs and pre-trained demonstrators.}
+  \caption[Fossil energy consumption of the SAC-DemoQ agents trained for the evaluation buildings.]{Fossil energy consumption of the SAC-DemoQ agents trained for the evaluation buildings using different ILRs and pre-trained demonstrators.}
   \label{fig:eval-results}
 \end{figure}
 }
 
-To evaluate the effectiveness of our social method, we use a pre-trained demonstrator to train SAC-DemoQ for the evaluation buildings. We use deterministic demonstrator actions and choose D11 and D6 as pre-trained demonstrators based on their correlation in energy consumption with the evaluation buildings. B11 has the highest median correlation without being part of the evaluation group, and B6 has the highest correlation within the group and performs best in the training phase. We test various IRLs to determine the need for parameter tuning.
+To evaluate the effectiveness of our social method, we use a pre-trained demonstrator to train SAC-DemoQ for the evaluation buildings. We use deterministic demonstrator actions and choose D11 and D6 as pre-trained demonstrators based on their correlation in energy consumption with the evaluation buildings. B11 has the highest median correlation without being part of the evaluation group, and B6 has the highest correlation within the group and performs best in the training phase. We test various ILRs to determine the need for parameter tuning.
 
-Figure~\ref{fig:eval-results} shows the mean value of the fossil energy consumption between with and without additional policy update for each experiment. Demonstrators D6 and D11 achieve the highest average saving of fossil energy using IRLs of 0.2 and 0.3, respectively. Also, the agents perform best when using D6 with a rate of 0.25 and an additional policy update. Using these parameters, the SAC-DemoQ agents save about 1~\% more fossil energy than the SAC baseline agents. However, the savings are lower than those in the training set.
+Figure~\ref{fig:eval-results} shows the mean value of the fossil energy consumption between with and without additional policy update for each experiment. Demonstrators D6 and D11 achieve the highest average saving of fossil energy using ILRs of 0.2 and 0.3, respectively. Also, the agents perform best when using D6 with a rate of 0.25 and an additional policy update. Using these parameters, the SAC-DemoQ agents save about 1~\% more fossil energy than the SAC baseline agents. However, the savings are lower than those in the training set.
 
 We also conduct these experiments using the pre-trained demonstrators D5, D14, and D16. However, they all consume slightly more fossil energy than the presented ones. 
 
@@ -48,7 +48,7 @@ The evaluation of the SAC-DemoQ to reduce fossil fuel consumption shows an impro
 
 However, we cannot determine any correlation between the properties of the pre-trained demonstrator and the performance of the social agents. Our analysis indicates that the demonstrator's performance, the correlation between the non-shiftable load or the correlation of the difference between solar generation and non-shiftable load are not decisive factors. Additionally, based on our findings, it is irrelevant if the demonstrator has many periods where the load exceeds the solar generation. 
 
-Further experiments with other buildings could provide more insights into this matter. Also, the IRL needs to be tuned for each set of buildings and each tested demonstrator.
+Further experiments with other buildings could provide more insights into this matter. Also, the ILR needs to be tuned for each set of buildings and each tested demonstrator.
 
 {
 \renewcommand{\baselinestretch}{0.9} 
@@ -78,7 +78,7 @@ In addition, our pre-trained demonstrators are trained on the same weather and f
 Finally, during the training phase, the policy loss is a reliable indicator of the final performance and stability of the social agent's performance. It is essential to mention that we categorize nuclear methods as fossil fuels for simplicity. Although they do not cause significant emissions, they remain a contentious issue, at least in Germany. Nevertheless, future research should assess them separately to evaluate emissions reduction in energy systems. 
 
 \section{Future Research Fields}
-In this chapter, we explore potential research opportunities to enhance the performance and robustness of the SAC-DemoQ. First, we explore value shaping, another theory that models the behavior of study participants in RL. Second, we examine clustering buildings, which allows for the use of customized demonstrators. Finally, we investigate the possibility of refining the IRL, which could be adaptive to improve the learning efficiency of our agents further. In addition, other approaches, such as using a different RL algorithm as a basis, are also conceivable.
+In this chapter, we explore potential research opportunities to enhance the performance and robustness of the SAC-DemoQ. First, we explore value shaping, another theory that models the behavior of study participants in RL. Second, we examine clustering buildings, which allows for the use of customized demonstrators. Finally, we investigate the possibility of refining the ILR, which could be adaptive to improve the learning efficiency of our agents further. In addition, other approaches, such as using a different RL algorithm as a basis, are also conceivable.
 
 \subsection{Incorparating Value Shaping into SAC}
 In psychology, value shaping adds social information from a demonstrator into the value function rather than the policy \cite{najar2020actions, witt2023social}. In SAC-DemoQ, we incorporate a social update of the Q-networks, but only to frequency-based increase the value of observed actions. However, the main difference with value shaping is to use the actual value of the demonstrator's action. An additional Q-value update in the SAC algorithm based on the method used by Najar et al. \cite{najar2020actions} could minimize the following objective:
@@ -107,8 +107,8 @@ Also, clustering allows training datasets for demonstrators tailored to the spec
 Identifying and validating relevant parameters is crucial for future research. Additionally, algorithms should effectively group buildings based on these parameters and optimize training processes accordingly.
 
 \subsection{Auto-tuning the Imitation Learning Rate}
-Our experiments suggest the necessity of tuning the IRL for each building set and demonstrator. Although assigning a specific IRL for each building might enhance the efficiency and effectiveness of the learning process, it is impractical to manage.
+Our experiments suggest the necessity of tuning the ILR for each building set and demonstrator. Although assigning a specific ILR for each building might enhance the efficiency and effectiveness of the learning process, it is impractical to manage.
 
-An approach is to investigate which parameters significantly influence the optimal IRL. Identifying patterns or correlations between these parameters and the appropriate IRL allows developing guidelines for setting the IRL in advance. Also, as Yang et al. present, automatic hyperparameter optimization frameworks can be used \cite{yang2020hyperparameter}.
+An approach is to investigate which parameters significantly influence the optimal ILR. Identifying patterns or correlations between these parameters and the appropriate ILR allows developing guidelines for setting the ILR in advance. Also, as Yang et al. present, automatic hyperparameter optimization frameworks can be used \cite{yang2020hyperparameter}.
 
-A more advanced approach is to develop adaptive systems that dynamically adjust the IRL during the training process, similar to the adjustment of entropy in the SAC algorithm. The IRL adapts based on performance indicators during training to optimize the balance between imitating the demonstrator and exploring new strategies.
+A more advanced approach is to develop adaptive systems that dynamically adjust the ILR during the training process, similar to the adjustment of entropy in the SAC algorithm. The ILR adapts based on performance indicators during training to optimize the balance between imitating the demonstrator and exploring new strategies.

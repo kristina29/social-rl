@@ -2,7 +2,7 @@
 % Background
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Theoretical Foundations}
-\label{Background}
+\label{chap:background}
 This chapter provides the necessary background knowledge to comprehend our approach to the presented problem. First, we introduce the fundamental concepts of RL and the SAC algorithm. Then, we explain the algorithm-independent social methods of imitation learning and DB and present the MARLISA algorithm.
 
 \section{Reinforcement Learning Paradigms}
@@ -55,7 +55,7 @@ However, for continuous space and action dimensions, functional approximators ar
 \end{equation}
 using replay buffer data~$\mathcal{D}$ and discount factor~$\gamma$. The update rule given by stochastic gradient descent is denoted as~$\hat{\triangledown}_{\theta}J_Q(\theta)$.
 
-Policy updates minimize the expected KL divergence:
+The policy update minimizes the expected Kullback-Leibler divergence:
 \begin{equation}
 	J_{\pi}(\phi)=\mathbb{E}_{s_t\sim\mathcal{D},\epsilon_t\sim\mathcal{N}}\left [\alpha \log \pi_{\phi}(f_{\phi}(\epsilon_t;s_t)|s_t)-Q_{\theta}(s_t, f_{\phi}(\epsilon_t;s_t)) \right ],
 \end{equation}
@@ -115,7 +115,7 @@ Our approaches are based on the methods presented by Najar et al., specifically 
   \pi(\bar{d}) &\leftarrow 1- \pi(d),
  \numberthis
 \end{align*}
-where~$d$ is the action of the demonstrator and $\bar{d}$ is the other possible action. The parameter~$\alpha_i$ controls the imitation learning rate. As a result, the probability of the learner choosing the observed action increases.
+where~$d$ is the action of the demonstrator and $\bar{d}$ is the other possible action. The parameter~$\alpha_i$ controls the imitation learning rate (ILR). As a result, the probability of the learner choosing the observed action increases.
 
 The second method uses a decision value function~$Q'$, a copy of the current value function used to derive the policy~$\pi$. $Q'$ is biased towards the observed actions of the demonstrator as follows: 
 \begin{equation} 
