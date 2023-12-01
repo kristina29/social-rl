@@ -130,7 +130,7 @@ def generate_sacdb2value():
         for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.6, 0.8]:
             # for ir in [0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25, 0.4]:#, 0.6, 0.8]:
             try:
-                file = glob.glob(f'../experiments/SAC_DB2Value/{dir[1]["paths"]}/ir{ir}/kpis_*.csv')[0]
+                file = glob.glob(f'../experiments/SAC-DemoQ/{dir[1]["paths"]}/ir{ir}/kpis_*.csv')[0]
                 kpis = pd.read_csv(file)
                 kpis = kpis.set_index('kpi')
                 kpis = kpis[(kpis['env_id'] == 'SAC_DB2Value Best') & (kpis['level'] == 'district')]
@@ -197,27 +197,27 @@ def generate_sacdb2value():
     ax3.set_xticks(np.unique(ax3_irs))
     ax3.set_xticklabels(np.unique(ax3_irs))
 
-    ax.axhline(BEST_SAC_VALUE, ls='--', lw=1, c='red', zorder=2)
-    ax.axhline(BEST_SAC_VALUE - 0.005, ls='--', lw=1, c='grey', zorder=2)
-    ax.axhline(BEST_SAC_VALUE + 0.005, ls='--', lw=1, c='grey', zorder=2)
+    ax.axhline(BEST_SAC_VALUE, ls='--', lw=1.5, c='red', zorder=2)
+    ax.axhline(BEST_SAC_VALUE - 0.005, ls='--', lw=1.5, c='grey', zorder=2)
+    ax.axhline(BEST_SAC_VALUE + 0.005, ls='--', lw=1.5, c='grey', zorder=2)
     ax.text(0.001, BEST_SAC_VALUE - 0.0003, 'SAC Baseline', color='r', ha='left', va='top',
              transform=ax.get_yaxis_transform(), fontsize=17)
 
-    ax2.axhline(BEST_SAC_VALUE, ls='--', lw=1, c='red', zorder=2)
-    ax2.axhline(BEST_SAC_VALUE - 0.005, ls='--', lw=1, c='grey', zorder=2)
-    ax2.axhline(BEST_SAC_VALUE + 0.005, ls='--', lw=1, c='grey', zorder=2)
+    ax2.axhline(BEST_SAC_VALUE, ls='--', lw=1.5, c='red', zorder=2)
+    ax2.axhline(BEST_SAC_VALUE - 0.005, ls='--', lw=1.5, c='grey', zorder=2)
+    ax2.axhline(BEST_SAC_VALUE + 0.005, ls='--', lw=1.5, c='grey', zorder=2)
     ax2.text(0.001, BEST_SAC_VALUE - 0.0003, 'SAC Baseline', color='r', ha='left', va='top',
             transform=ax2.get_yaxis_transform(), fontsize=17)
 
-    ax3.axhline(BEST_SAC_B3, ls='--', lw=1, c='tab:green', zorder=2)
-    ax3.axhline(BEST_SAC_B3 - 0.005, ls=':', lw=1.5, c='tab:green', zorder=2)
-    ax3.axhline(BEST_SAC_B3 + 0.005, ls=':', lw=1.5, c='tab:green', zorder=2)
-    ax3.axhline(BEST_SAC_B5, ls='--', lw=1, c='tab:blue', zorder=2)
-    ax3.axhline(BEST_SAC_B5 - 0.005, ls=':', lw=1.5, c='tab:blue', zorder=2)
-    ax3.axhline(BEST_SAC_B5 + 0.005, ls=':', lw=1.5, c='tab:blue', zorder=2)
-    ax3.text(0.001, BEST_SAC_B3 - 0.0003, 'SAC (Shifted B3)', color='tab:green', ha='left', va='top',
+    ax3.axhline(BEST_SAC_B3, ls='--', lw=1.5, c='tab:green', zorder=2)
+    ax3.axhline(BEST_SAC_B3 - 0.005, ls=':', lw=2, c='tab:green', zorder=2)
+    ax3.axhline(BEST_SAC_B3 + 0.005, ls=':', lw=2, c='tab:green', zorder=2)
+    ax3.axhline(BEST_SAC_B5, ls='--', lw=1.5, c='tab:blue', zorder=2)
+    ax3.axhline(BEST_SAC_B5 - 0.005, ls=':', lw=2, c='tab:blue', zorder=2)
+    ax3.axhline(BEST_SAC_B5 + 0.005, ls=':', lw=2, c='tab:blue', zorder=2)
+    ax3.text(0.001, BEST_SAC_B3 - 0.0003, 'SAC Baseline (Shifted B3)', color='tab:green', ha='left', va='top',
              transform=ax3.get_yaxis_transform(), fontsize=17)
-    ax3.text(0.001, BEST_SAC_B5 - 0.0003, 'SAC (Shifted B5)', color='tab:blue', ha='left', va='top',
+    ax3.text(0.001, BEST_SAC_B5 - 0.0003, 'SAC Baseline (Shifted B5)', color='tab:blue', ha='left', va='top',
              transform=ax3.get_yaxis_transform(), fontsize=17)
 
     fig.tight_layout()

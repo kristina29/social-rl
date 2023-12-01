@@ -277,7 +277,7 @@ def plot_district_kpis_multiple(kpis, names, mode) -> plt.Figure:
     elif mode == 3:
         val = 1.4
     elif mode == 4:
-        val = 1.48
+        val = 1.33
     elif mode == 5:
         val = 1.425
     elif mode == 6:
@@ -307,7 +307,7 @@ def plot_district_kpis_multiple(kpis, names, mode) -> plt.Figure:
 
 
 if __name__ == '__main__':
-    mode = 1
+    mode = 4
 
     if mode == 1:
         kpis = pd.read_csv('../experiments/SAC/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
@@ -329,7 +329,7 @@ if __name__ == '__main__':
         kpis = [pd.read_csv('../experiments/SAC/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
                 pd.read_csv('../experiments/Evaluation_Buildings/SAC Baseline/kpis_20231113T132158.csv'),
                 ]
-        names = ['SAC Baseline (Training)', 'SAC Baseline (Evaluation)', ]
+        names = ['SAC Baseline\n(Training)', 'SAC Baseline\n(Evaluation)', ]
     elif mode == 5:
         kpis = [  # pd.read_csv('../experiments/SAC/30_renewable_prod/reward_05pvprice/0.5/kpis_mean.csv'),
             pd.read_csv('../experiments/SAC/DDPG/kpis_20231107T143713.csv'),
