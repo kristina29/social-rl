@@ -171,7 +171,7 @@ marl_dirs = pd.DataFrame({'paths': ['1_marlisa_classic/with_shared_obs/with_info
                                                   'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes',
                                                   'No', 'No', 'Yes', 'Yes', ]})
 
-mode = 'eval'
+mode = 'sacdb2va'
 var = 2
 
 
@@ -373,7 +373,7 @@ def generate_sacdb2value():
 
         for ir in [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.6, 0.8]:
             try:
-                file = glob.glob(f'../experiments/SAC_DB2Value/{dir[1]["paths"]}/ir{ir}/kpis_*.csv')[0]
+                file = glob.glob(f'../experiments/SAC-DemoQ/{dir[1]["paths"]}/ir{ir}/kpis_*.csv')[0]
                 kpis = pd.read_csv(file)
                 kpis = kpis.set_index('kpi')
                 kpis = kpis[(kpis['env_id'] == 'SAC_DB2Value Best') & (kpis['level'] == 'district')]

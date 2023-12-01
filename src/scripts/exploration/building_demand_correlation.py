@@ -4,9 +4,13 @@ from matplotlib import pyplot as plt
 
 import seaborn as sns
 from matplotlib.patches import Rectangle
+from matplotlib.pyplot import rc
 from scipy.stats import pearsonr
 
 DIR_PATH = 'citylearn/data/nydata_new_buildings2'
+
+rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
+rc('text', usetex=True)
 
 
 def read_building_demand(b_id):
@@ -52,10 +56,10 @@ if __name__ == '__main__':
         #np.array(
         correlations
         #, dtype='float64')
-        , annot=True, xticklabels=True, yticklabels=True, annot_kws={"fontsize":19})
+        , annot=True, xticklabels=True, yticklabels=True, annot_kws={"fontsize":23})
     cbar = ax.collections[0].colorbar
     cbar.set_label('PCC', labelpad=35)
-    ax.figure.axes[-1].yaxis.label.set_size(21)
+    ax.figure.axes[-1].yaxis.label.set_size(23)
 
     buldings = [3,5,7,8,11,17]
     lw = 15
@@ -65,15 +69,15 @@ if __name__ == '__main__':
         wanted_label = b
         wanted_index = correlations.index.get_loc(wanted_label)
         x, y, w, h = 0, wanted_index, len(buldings)-0.07, 1
-        ax.add_patch(Rectangle((x, y), w, h, fill=False, edgecolor='black', lw=2.5, clip_on=False, zorder=3))
+        ax.add_patch(Rectangle((x, y), w, h, fill=False, edgecolor='crimson', lw=3.5, clip_on=False, zorder=3))
         x, y, w, h = len(buldings)+0.07, wanted_index, 0.93, 1
-        ax.add_patch(Rectangle((x, y), w, h, fill=False, edgecolor='black', lw=2.5, clip_on=False, zorder=3))
+        ax.add_patch(Rectangle((x, y), w, h, fill=False, edgecolor='crimson', lw=3.5, clip_on=False, zorder=3))
 
-    ax.set_xlabel('Training Building IDs', fontsize=21)
-    ax.set_ylabel('Building IDs', fontsize=21)
-    ax.tick_params(axis='both', which='major', labelsize=21)
+    ax.set_xlabel('Training Building IDs', fontsize=23)
+    ax.set_ylabel('Building IDs', fontsize=23)
+    ax.tick_params(axis='both', which='major', labelsize=23)
     cbar = ax.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=21)
+    cbar.ax.tick_params(labelsize=23)
 
     plt.tight_layout()
 
